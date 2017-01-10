@@ -27,7 +27,7 @@ trait UtilVectorN {
     new VectorN(midpointValues)
   }
 
-  @JSExport def average(vectors: Array[VectorN]): VectorNCapabilities = {
+  @JSExport def average(vectors: Array[VectorN]): Vector = {
     val l = vectors(0).dimension
     for(i <- 1 until vectors.length) {
       if (vectors(i).dimension != l) throw MismatchedVectorDimensionsException(

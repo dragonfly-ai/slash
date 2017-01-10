@@ -37,3 +37,28 @@ object TestVectorN extends App {
 
   println("midpoint: " + VectorN.midpoint(new VectorN(1.0, 2.0, 3.0, 4.0, 5.0), new VectorN(5.0, 4.0, 3.0, 2.0, 1.0)))
 }
+
+object TestVector3 extends App {
+  val i = new Vector3(1, 0, 0)
+  val j = new Vector3(0, 1, 0)
+  val k = new Vector3(0, 0, 1)
+
+  println("i X j -> " + (i X j))
+  println("j X i -> " + (j X i))
+
+  println("i X k -> " + (i X k))
+  println("k X i -> " + (k X i))
+
+  println("j X k -> " + (j X k))
+  println("k X j -> " + (k X j))
+
+
+  println("i dot j -> " + (i dot j))
+  println("j dot i -> " + (j dot i))
+
+  println("i dot k -> " + (i dot k))
+  println("k dot i -> " + (k dot i))
+
+  println("j dot k -> " + (j dot k))
+  println("k dot j -> " + (k dot j))
+}

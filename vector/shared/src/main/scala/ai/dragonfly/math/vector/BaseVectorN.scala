@@ -3,22 +3,21 @@ package ai.dragonfly.math.vector
 import scala.scalajs.js.annotation.JSExport
 
 /**
- * Created by clifton on 1/9/17.
+ * Created by clifton on 1/10/17.
  */
-trait VectorNCapabilities {
+trait BaseVectorN extends Vector {
 
-  def values: Array[Double]
+  override def values: Array[Double]
 
-  @JSExport def dimension: Int = values.length
+  override def dimension: Int = values.length
 
-  @JSExport def component(i: Int): Double = values(i)
-
-  @JSExport def magnitude(): Double = Math.sqrt( magnitudeSquared() )
-
-  @JSExport def magnitudeSquared(): Double = { var mag2 = 0.0; for (v <- values) mag2 = mag2 + (v*v); mag2 }
+  override def component(i: Int): Double = values(i)
 
 
-  @JSExport def distanceSquaredTo(v0: VectorNCapabilities): Double = {
+  override def magnitudeSquared(): Double = { var mag2 = 0.0; for (v <- values) mag2 = mag2 + (v*v); mag2 }
+
+
+  override def distanceSquaredTo(v0: Vector): Double = {
     val v0Values = v0.values
     if (values.length != v0Values.length) throw MismatchedVectorDimensionsException(
       s"distanceSquaredTo undefined on vectors with different dimensions:\n" +
@@ -36,11 +35,7 @@ trait VectorNCapabilities {
 
   }
 
-  @JSExport def distanceTo(v0: VectorNCapabilities): Double = Math.sqrt(distanceSquaredTo(v0))
-
-
-
-  @JSExport def dot(v0: VectorNCapabilities): Double = {
+  override def dot(v0: Vector): Double = {
     val v0Values = v0.values
     if (values.length != v0Values.length) throw MismatchedVectorDimensionsException(
       s"dot undefined on vectors with different dimensions:\n" +
@@ -56,15 +51,12 @@ trait VectorNCapabilities {
   }
 
 
-  @JSExport def scale(scalar: Double): VectorNCapabilities = {
+  override def scale(scalar: Double): Vector = {
     for (i <- 0 until values.length) values(i) = values(i) * scalar
     this
   }
 
-  @JSExport def divide(denominator: Double): VectorNCapabilities = scale(1.0/denominator)
-
-
-  @JSExport def normalize(): VectorNCapabilities = {
+  override def normalize(): Vector = {
     val mag2 = magnitudeSquared()
     if (mag2 > 0.0) {
       val mag = Math.sqrt(mag2)
@@ -74,7 +66,7 @@ trait VectorNCapabilities {
   }
 
 
-  @JSExport def add(v0: VectorNCapabilities): VectorNCapabilities = {
+  override def add(v0: Vector): Vector = {
     val v0Values = v0.values
     if (values.length != v0Values.length) throw MismatchedVectorDimensionsException(
       s"add undefined on vectors with different dimensions:\n" +
@@ -86,7 +78,7 @@ trait VectorNCapabilities {
     }
   }
 
-  @JSExport def subtract(v0: VectorNCapabilities): VectorNCapabilities = {
+  override def subtract(v0: Vector): Vector = {
     val v0Values = v0.values
     if (values.length != v0Values.length) throw MismatchedVectorDimensionsException(
       s"subtract undefined on vectors with different dimensions:\n" +
@@ -98,14 +90,10 @@ trait VectorNCapabilities {
     }
   }
 
-
-  @JSExport def center(vectors: Array[VectorNCapabilities]): Array[VectorNCapabilities] = {
-    for (v: VectorNCapabilities <- vectors) v.subtract(this)
-    vectors
-  }
+  override def copy(): Vector
 
 
-  @JSExport override def toString(): String = {
+  override def toString(): String = {
     val sb = new StringBuilder(dimension * 10)
     sb.append(s"[${values(0)}")
     if (dimension > 16) {

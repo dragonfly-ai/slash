@@ -6,7 +6,7 @@ import scala.scalajs.js.annotation.JSExport
 /**
  * Created by clifton on 1/9/17.
  */
-@JSExport class VectorN(override val values: Array[Double]) extends VectorNCapabilities {
+@JSExport class VectorN(override val values: Array[Double]) extends BaseVectorN {
 
   @JSExport def this(vals: Double*) = this(vals.toArray[Double])
 
@@ -19,7 +19,9 @@ import scala.scalajs.js.annotation.JSExport
     new VectorN(clonedValues)
   }
 
-  @JSExport def center(vectors: js.Array[VectorNCapabilities]): Array[VectorNCapabilities] = center(
+  @JSExport override def copy = clone()
+
+  @JSExport def center(vectors: js.Array[Vector]): Array[Vector] = center(
     Util.toScalaArray(vectors)
   )
 
@@ -27,7 +29,7 @@ import scala.scalajs.js.annotation.JSExport
 
 @JSExport("UtilVectorN")
 object VectorN extends UtilVectorN {
-  @JSExport def average(vectors: js.Array[VectorN]): VectorNCapabilities = average(
+  @JSExport def average(vectors: js.Array[VectorN]): Vector = average(
     Util.toScalaArray(vectors)
   )
 
