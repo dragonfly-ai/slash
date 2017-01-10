@@ -14,6 +14,14 @@ class StreamingVectorStats(val dimension: Int) {
   val s1: Array[Double] = Array.fill[Double](dimension)(0.0)
   val s2: Array[Double] = Array.fill[Double](dimension)(0.0)
 
+  @JSExport def reset():Unit = {
+    s0 = 0.0
+    for (i <- 0 until dimension) {
+      s1(i) = 0.0
+      s2(i) = 0.0
+    }
+  }
+
   @JSExport def apply(c: Vector, weight: Double = 1.0): Unit = {
     s0 = s0 + weight
     for (i <- 0 until dimension) {
