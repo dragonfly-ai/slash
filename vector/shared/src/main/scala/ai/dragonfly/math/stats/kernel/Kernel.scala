@@ -30,7 +30,7 @@ object GaussianKernel {
 }
 
 case class GaussianKernel(radius: Double, sigma: Double, denominator: Double, c: Double) extends Kernel {
-  def weight(v: Vector): Double = weight(v.magnitudeSquared)
+  def weight(v: Vector): Double = weight(v.magnitudeSquared())
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0
