@@ -38,6 +38,16 @@ object TestVectorN extends App {
   println("midpoint: " + VectorN.midpoint(new VectorN(1.0, 2.0, 3.0, 4.0, 5.0), new VectorN(5.0, 4.0, 3.0, 2.0, 1.0)))
 }
 
+object TestVector2 extends App {
+
+  for (deg <- Array[Double](10, 25, 33.333333, 45, 60, 75, 90)) {
+    val i = new Vector2(1, 0)
+    i.rotateDegrees(deg)
+    println(s"${new Vector2(1, 0)}.rotateDegrees($deg) -> " + i)
+  }
+
+}
+
 object TestVector3 extends App {
   val i = new Vector3(1, 0, 0)
   val j = new Vector3(0, 1, 0)

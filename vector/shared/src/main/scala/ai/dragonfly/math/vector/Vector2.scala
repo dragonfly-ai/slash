@@ -94,6 +94,19 @@ class Vector2(var x: Double, var y: Double) extends Vector {
     )
   }
 
+  def rotateDegrees(degrees: Double): Vector = rotate(degrees * 0.01745329252)
+
+  def rotate(radians: Double): Vector = {
+    val cos = Math.cos( radians )
+    val sin = Math.sin( radians )
+
+    val x1 = x*cos - y*sin
+    y = x*sin + y*cos
+    x = x1
+
+    this
+  }
+
   override def copy(): Vector = new Vector2(x, y)
 
   override def toString(): String = s"[$x,$y]"
