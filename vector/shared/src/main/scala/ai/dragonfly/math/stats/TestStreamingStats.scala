@@ -1,16 +1,15 @@
 package ai.dragonfly.math.stats
 
 import ai.dragonfly.math.vector._
-
 import ai.dragonfly.math.stats.kernel.GaussianKernel
 
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 /**
  * Created by clifton on 1/10/17.
  */
 
-@JSExport("test.TestStreamingStats")
+@JSExportTopLevel("test.TestStreamingStats")
 object TestStreamingStats {
   @JSExport def test0(): Unit = {
     val k = GaussianKernel(5)

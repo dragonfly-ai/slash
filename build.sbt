@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-scalaVersion in ThisBuild := "2.12.0"
+scalaVersion in ThisBuild := "2.12.3"
 
 name in ThisBuild := "vector"
 

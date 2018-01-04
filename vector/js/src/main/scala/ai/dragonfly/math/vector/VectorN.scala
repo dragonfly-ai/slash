@@ -1,16 +1,16 @@
 package ai.dragonfly.math.vector
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 /**
  * Created by clifton on 1/9/17.
  */
-@JSExport class VectorN(override val values: Array[Double]) extends BaseVectorN {
+@JSExportTopLevel("VectorN") class VectorN(override val values: Array[Double]) extends BaseVectorN {
 
-  @JSExport def this(vals: Double*) = this(vals.toArray[Double])
+  @JSExportTopLevel("VectorN.fromValues") def this(vals: Double*) = this(vals.toArray[Double])
 
-  @JSExport def this(values: js.Array[Double]) = this(Util.toScalaArray(values))
+  @JSExportTopLevel("VectorN.fromArrayValues") def this(values: js.Array[Double]) = this(Util.toScalaArray(values))
 
 
   @JSExport override def clone(): VectorN = {
@@ -27,7 +27,7 @@ import scala.scalajs.js.annotation.JSExport
 
 }
 
-@JSExport("UtilVectorN")
+@JSExportTopLevel("UtilVectorN")
 object VectorN extends UtilVectorN {
   @JSExport def average(vectors: js.Array[VectorN]): Vector = average(
     Util.toScalaArray(vectors)

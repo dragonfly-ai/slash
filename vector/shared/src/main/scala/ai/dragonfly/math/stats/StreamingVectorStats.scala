@@ -1,14 +1,13 @@
 package ai.dragonfly.math.stats
 
-import scala.scalajs.js.annotation.JSExport
-
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import ai.dragonfly.math.vector._
 
 /**
  * Created by clifton on 1/10/17.
  */
 
-@JSExport
+@JSExportTopLevel("StreamingVectorStats")
 class StreamingVectorStats(val dimension: Int) {
   var s0: Double = 0.0
   val s1: Array[Double] = Array.fill[Double](dimension)(0.0)
@@ -22,7 +21,7 @@ class StreamingVectorStats(val dimension: Int) {
     }
   }
 
-  @JSExport def apply(c: Vector, weight: Double = 1.0): Unit = {
+  @JSExport("apply") def apply(c: Vector, weight: Double = 1.0): Unit = {
     s0 = s0 + weight
     for (i <- 0 until dimension) {
       val wci = c.component(i) * weight
