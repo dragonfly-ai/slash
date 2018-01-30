@@ -27,7 +27,7 @@ trait Vector {
 
   @JSExport def scale(scalar: Double): Vector
 
-  @JSExport def divide(denominator: Double): Vector = scale(1.0/denominator)
+  @JSExport def divide(denominator: Double): Vector
 
 
   @JSExport def normalize(): Vector

@@ -80,9 +80,5 @@ class StreamingVectorStats(val dimension: Int) {
     }
   }
 
-  override def toString(): String = {
-    "StreamingVectorStats(" +
-    "\n\t" +s0 + "\n\t" + new VectorN(s1) + "\n\t" + new VectorN(s2) + "\n" +
-    ")"
-  }
+  override def toString(): String = s"StreamingVectorStats(\n\t$s0\n\t${new VectorN(s1)}\n\t${new VectorN(s2)}\n)"
 }

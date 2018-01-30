@@ -41,17 +41,17 @@ object TestVectorN extends App {
 object TestVector2 extends App {
 
   for (deg <- Array[Double](10, 25, 33.333333, 45, 60, 75, 90)) {
-    val i = new Vector2(1, 0)
+    val i = Vector2(1, 0)
     i.rotateDegrees(deg)
-    println(s"${new Vector2(1, 0)}.rotateDegrees($deg) -> " + i)
+    println(s"${Vector2(1, 0)}.rotateDegrees($deg) -> " + i)
   }
 
 }
 
 object TestVector3 extends App {
-  val i = new Vector3(1, 0, 0)
-  val j = new Vector3(0, 1, 0)
-  val k = new Vector3(0, 0, 1)
+  val i = Vector3(1, 0, 0)
+  val j = Vector3(0, 1, 0)
+  val k = Vector3(0, 0, 1)
 
   println("i X j -> " + (i X j))
   println("j X i -> " + (j X i))
@@ -71,4 +71,10 @@ object TestVector3 extends App {
 
   println("j dot k -> " + (j dot k))
   println("k dot j -> " + (k dot j))
+}
+
+object TestWeightedVector3 extends App {
+  val wv0 = WeightedVector3(0.5, Vector3(1.1, 2.5, 0.1))
+  println(wv0)
+  println(wv0.weighted)
 }

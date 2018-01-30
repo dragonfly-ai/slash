@@ -11,6 +11,8 @@ trait BaseVectorN extends Vector {
 
   override def dimension: Int = values.length
 
+  override def divide(denominator: Double): Vector = scale(1.0/denominator)
+
   override def component(i: Int): Double = values(i)
 
 

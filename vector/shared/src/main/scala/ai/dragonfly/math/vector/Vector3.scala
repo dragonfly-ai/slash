@@ -5,7 +5,7 @@ import scala.scalajs.js.annotation.JSExport
 /**
  * Created by clifton on 1/10/17.
  */
-class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
+case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override val dimension: Int = 3
 
@@ -25,6 +25,7 @@ class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
     )
   }
 
+  override def divide(denominator: Double): Vector3 = scale(1.0/denominator)
 
   override def dot(v0: Vector): Double = {
     if (v0.dimension == dimension) x * v0.component(0) + y * v0.component(1) + z * v0.component(2)
@@ -49,7 +50,7 @@ class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
         s"dim($v0) = ${v0.dimension}"
     )
   }
-  override def scale(scalar: Double): Vector = {
+  override def scale(scalar: Double): Vector3 = {
     x = x * scalar
     y = y * scalar
     z = z * scalar
@@ -68,7 +69,7 @@ class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
   override def magnitudeSquared(): Double = x*x + y*y + z*z
 
 
-  override def normalize(): Vector = {
+  override def normalize(): Vector3 = {
     val mag2 = x*x + y*y + z*z
     if (mag2 > 0.0) {
       val mag = Math.sqrt(mag2)
@@ -79,8 +80,7 @@ class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
     this
   }
 
-
-  override def add(v0: Vector): Vector = {
+  override def add(v0: Vector): Vector3 = {
     if (v0.dimension == 2) {
       x = x + v0.component(0)
       y = y + v0.component(1)
@@ -93,7 +93,7 @@ class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
     )
   }
 
-  override def subtract(v0: Vector): Vector = {
+  override def subtract(v0: Vector): Vector3 = {
     if (v0.dimension == 2) {
       x = x - v0.component(0)
       y = y - v0.component(1)
@@ -106,7 +106,8 @@ class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
     )
   }
 
-  override def copy(): Vector = new Vector3(x, y, z)
+  override def copy(): Vector3 = new Vector3(x, y, z)
 
   override def toString(): String = s"[$x,$y,$z]"
+
 }

@@ -1,18 +1,18 @@
 package ai.dragonfly.math.vector
 
-import scala.Array
 import scala.scalajs.js.annotation.JSExport
 
 /**
  * Created by clifton on 1/10/17.
  */
 
-class Vector2(var x: Double, var y: Double) extends Vector {
+case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override val dimension: Int = 2
 
   override def values: Array[Double] = Array[Double](x, y)
 
+  override def divide(denominator: Double): Vector2 = scale(1.0 / denominator)
 
   override def distanceSquaredTo(v0: Vector): Double = {
     if (v0.dimension == dimension) {
@@ -25,7 +25,6 @@ class Vector2(var x: Double, var y: Double) extends Vector {
       s"dim($v0) = ${v0.dimension}"
     )
   }
-
 
   override def dot(v0: Vector): Double = {
     if (v0.dimension == dimension) x * v0.component(0) + y * v0.component(1)
@@ -45,7 +44,7 @@ class Vector2(var x: Double, var y: Double) extends Vector {
     )
   }
 
-  override def scale(scalar: Double): Vector = {
+  override def scale(scalar: Double): Vector2 = {
     x = x * scalar
     y = y * scalar
     this
@@ -59,7 +58,7 @@ class Vector2(var x: Double, var y: Double) extends Vector {
   override def magnitudeSquared(): Double = x*x + y*y
 
 
-  override def normalize(): Vector = {
+  override def normalize(): Vector2 = {
     val mag2 = x*x + y*y
     if (mag2 > 0.0) {
       val mag = Math.sqrt(mag2)
@@ -70,7 +69,7 @@ class Vector2(var x: Double, var y: Double) extends Vector {
   }
 
 
-  override def add(v0: Vector): Vector = {
+  override def add(v0: Vector): Vector2 = {
     if (v0.dimension == dimension) {
       x = x + v0.component(0)
       y = y + v0.component(1)
@@ -82,7 +81,7 @@ class Vector2(var x: Double, var y: Double) extends Vector {
     )
   }
 
-  override def subtract(v0: Vector): Vector = {
+  override def subtract(v0: Vector): Vector2 = {
     if (v0.dimension == dimension) {
       x = x - v0.component(0)
       y = y - v0.component(1)
@@ -94,9 +93,9 @@ class Vector2(var x: Double, var y: Double) extends Vector {
     )
   }
 
-  def rotateDegrees(degrees: Double): Vector = rotate(degrees * 0.01745329252)
+  def rotateDegrees(degrees: Double): Vector2 = rotate(degrees * 0.01745329252)
 
-  def rotate(radians: Double): Vector = {
+  def rotate(radians: Double): Vector2 = {
     val cos = Math.cos( radians )
     val sin = Math.sin( radians )
 
@@ -107,7 +106,8 @@ class Vector2(var x: Double, var y: Double) extends Vector {
     this
   }
 
-  override def copy(): Vector = new Vector2(x, y)
+  override def copy(): Vector2 = new Vector2(x, y)
 
   override def toString(): String = s"[$x,$y]"
+
 }
