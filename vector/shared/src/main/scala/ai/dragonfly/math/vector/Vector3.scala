@@ -16,7 +16,7 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
     if (v0.dimension == dimension) {
       val dx = x - v0.component(0)
       val dy = y - v0.component(1)
-      val dz = z - v0.component(1)
+      val dz = z - v0.component(2)
       dx * dx + dy * dy + dz * dz
     } else throw MismatchedVectorDimensionsException(
       s"distanceSquaredTo undefined on vectors with different dimensions:\n" +
