@@ -32,6 +32,8 @@ trait Vector {
 
   @JSExport def normalize(): Vector
 
+  @JSExport def round(): Vector
+
 
   @JSExport def add(v0: Vector): Vector
 

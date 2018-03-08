@@ -110,4 +110,10 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override def toString(): String = s"[$x,$y,$z]"
 
+  override def round(): Vector = {
+    x = Math.round(x)
+    y = Math.round(y)
+    z = Math.round(z)
+    this
+  }
 }

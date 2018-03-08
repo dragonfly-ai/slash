@@ -25,6 +25,10 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
     Util.toScalaArray(vectors)
   )
 
+  override def round(): Vector = {
+    for (i <- values.indices) values(i) = Math.round(values(i))
+    this
+  }
 }
 
 @JSExportTopLevel("UtilVectorN")
