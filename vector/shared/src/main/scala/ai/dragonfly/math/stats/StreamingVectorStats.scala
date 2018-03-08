@@ -21,13 +21,14 @@ class StreamingVectorStats(val dimension: Int) {
     }
   }
 
-  @JSExport("apply") def apply(c: Vector, weight: Double = 1.0): Unit = {
+  @JSExport("apply") def apply(c: Vector, weight: Double = 1.0): StreamingVectorStats = {
     s0 = s0 + weight
     for (i <- 0 until dimension) {
       val wci = c.component(i) * weight
       s1(i) = s1(i) + wci
       s2(i) = s2(i) + wci * wci
     }
+    this
   }
 
   @JSExport def average(): Vector = {
