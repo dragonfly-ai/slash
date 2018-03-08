@@ -67,6 +67,10 @@ trait BaseVectorN extends Vector {
     this
   }
 
+  override def round(): Vector = {
+    for (i <- values.indices) values(i) = Math.round(values(i))
+    this
+  }
 
   override def add(v0: Vector): Vector = {
     val v0Values = v0.values
