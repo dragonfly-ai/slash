@@ -81,7 +81,7 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
   }
 
   override def add(v0: Vector): Vector3 = {
-    if (v0.dimension == 2) {
+    if (v0.dimension == dimension) {
       x = x + v0.component(0)
       y = y + v0.component(1)
       z = z + v0.component(2)
@@ -94,7 +94,7 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
   }
 
   override def subtract(v0: Vector): Vector3 = {
-    if (v0.dimension == 2) {
+    if (v0.dimension == dimension) {
       x = x - v0.component(0)
       y = y - v0.component(1)
       z = z - v0.component(2)
