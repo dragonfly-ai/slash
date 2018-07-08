@@ -12,6 +12,7 @@ publishTo in ThisBuild := Some(Resolver.file("file",  new File( "/var/www/maven"
 
 val vector = crossProject.settings(
   // shared settings
+  libraryDependencies += "org.scala-js" %% "scalajs-dom_sjs0.6" % "0.9.1",
 ).jsSettings(
   // JS-specific settings here
 ).jvmSettings(

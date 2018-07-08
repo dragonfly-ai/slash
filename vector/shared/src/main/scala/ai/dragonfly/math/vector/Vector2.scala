@@ -1,5 +1,6 @@
 package ai.dragonfly.math.vector
 
+import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 
 /**
@@ -11,6 +12,8 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
   override val dimension: Int = 2
 
   override def values: Array[Double] = Array[Double](x, y)
+
+  override def jsValues: js.Array[Double] = js.Array[Double](x, y)
 
   override def divide(denominator: Double): Vector2 = scale(1.0 / denominator)
 

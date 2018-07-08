@@ -1,5 +1,6 @@
 package ai.dragonfly.math.vector
 
+import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 
 /**
@@ -11,6 +12,7 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override def values: Array[Double] = Array[Double](x, y, z)
 
+  def jsValues: js.Array[Double] = js.Array[Double](x, y, z)
 
   override def distanceSquaredTo(v0: Vector): Double = {
     if (v0.dimension == dimension) {
@@ -106,7 +108,7 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
     )
   }
 
-  override def copy(): Vector3 = new Vector3(x, y, z)
+  override def copy(): Vector3 = Vector3(x, y, z)
 
   override def toString(): String = s"[$x,$y,$z]"
 

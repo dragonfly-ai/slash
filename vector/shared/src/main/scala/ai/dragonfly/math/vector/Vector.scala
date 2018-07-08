@@ -1,5 +1,6 @@
 package ai.dragonfly.math.vector
 
+import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 
 /**
@@ -8,6 +9,8 @@ import scala.scalajs.js.annotation.JSExport
 trait Vector {
 
   def values: Array[Double]
+
+  @JSExport("values") def jsValues: js.Array[Double]
 
   @JSExport def dimension: Int
 
@@ -39,6 +42,8 @@ trait Vector {
 
   @JSExport def subtract(v0: Vector): Vector
 
+
+  @JSExport def center(vectors: js.Array[Vector]): Array[Vector] = center(vectors.toArray)
 
   @JSExport def center(vectors: Array[Vector]): Array[Vector] = {
     for (v: Vector <- vectors) v.subtract(this)
