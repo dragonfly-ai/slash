@@ -53,3 +53,5 @@ trait Vector {
   @JSExport def copy(): Vector
 
 }
+
+case class MismatchedVectorDimensionsException(message: String) extends Exception(message)

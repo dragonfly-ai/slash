@@ -6,13 +6,14 @@ import scala.scalajs.js.annotation.JSExport
 /**
  * Created by clifton on 1/10/17.
  */
+@JSExport
 case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override val dimension: Int = 3
 
   override def values: Array[Double] = Array[Double](x, y, z)
 
-  def jsValues: js.Array[Double] = js.Array[Double](x, y, z)
+  override def jsValues: js.Array[Double] = js.Array[Double](x, y, z)
 
   override def distanceSquaredTo(v0: Vector): Double = {
     if (v0.dimension == dimension) {
@@ -38,7 +39,7 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
     )
   }
 
-  def X (v0: Vector): Vector3 = cross(v0)
+  @JSExport def X (v0: Vector): Vector3 = cross(v0)
 
   @JSExport def cross(v0: Vector): Vector3 = {
     if (v0.dimension == dimension) new Vector3(

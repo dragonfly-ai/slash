@@ -7,6 +7,7 @@ import scala.scalajs.js.annotation.JSExport
  * Created by clifton on 1/10/17.
  */
 
+@JSExport
 case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override val dimension: Int = 2
@@ -96,9 +97,9 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
     )
   }
 
-  def rotateDegrees(degrees: Double): Vector2 = rotate(degrees * 0.01745329252)
+  @JSExport def rotateDegrees(degrees: Double): Vector2 = rotate(degrees * 0.01745329252)
 
-  def rotate(radians: Double): Vector2 = {
+  @JSExport def rotate(radians: Double): Vector2 = {
     val cos = Math.cos( radians )
     val sin = Math.sin( radians )
 
