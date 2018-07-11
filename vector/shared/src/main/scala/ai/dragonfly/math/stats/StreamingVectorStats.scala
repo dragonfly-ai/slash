@@ -13,20 +13,28 @@ class StreamingVectorStats(val dimension: Int) {
   val s1: Array[Double] = Array.fill[Double](dimension)(0.0)
   val s2: Array[Double] = Array.fill[Double](dimension)(0.0)
 
+  val minValues: Array[Double] = Array.fill[Double](dimension)(Double.MaxValue)
+  val maxValues: Array[Double] = Array.fill[Double](dimension)(Double.MinValue)
+
   @JSExport def reset():Unit = {
     s0 = 0.0
     for (i <- 0 until dimension) {
       s1(i) = 0.0
       s2(i) = 0.0
+      minValues(i) = Double.MaxValue
+      maxValues(i) = Double.MinValue
     }
   }
 
   @JSExport("apply") def apply(c: Vector, weight: Double = 1.0): StreamingVectorStats = {
     s0 = s0 + weight
     for (i <- 0 until dimension) {
-      val wci = c.component(i) * weight
+      val cv = c.component(i)
+      val wci = cv * weight
       s1(i) = s1(i) + wci
       s2(i) = s2(i) + wci * wci
+      minValues(i) = Math.min(minValues(i), cv)
+      maxValues(i) = Math.max(maxValues(i), cv)
     }
     this
   }
@@ -80,6 +88,8 @@ class StreamingVectorStats(val dimension: Int) {
         new VectorN(values)
     }
   }
+
+  def bounds(): VectorBounds = VectorBounds(VectorN(minValues), VectorN(maxValues))
 
   override def toString(): String = s"StreamingVectorStats(\n\t$s0\n\t${new VectorN(s1)}\n\t${new VectorN(s2)}\n)"
 }
