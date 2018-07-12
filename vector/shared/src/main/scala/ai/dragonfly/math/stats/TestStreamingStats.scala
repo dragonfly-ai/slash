@@ -1,6 +1,5 @@
 package ai.dragonfly.math.stats
 
-import ai.dragonfly.math.vector._
 import ai.dragonfly.math.stats.kernel.GaussianKernel
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -22,8 +21,8 @@ object TestStreamingStats {
     println(vectorStats)
 
     println("Average: " + vectorStats.average())
-    println("Average: " + vectorStats.variance())
-    println("Average: " + vectorStats.standardDeviation())
+    println("Variance: " + vectorStats.variance())
+    println("Standard Deviation: " + vectorStats.standardDeviation())
   }
 
 }

@@ -89,7 +89,7 @@ class StreamingVectorStats(val dimension: Int) {
     }
   }
 
-  def bounds(): VectorBounds = VectorBounds(VectorN(minValues), VectorN(maxValues))
+  def bounds(): VectorBounds = VectorBounds(new VectorN(minValues), new VectorN(maxValues))
 
   override def toString(): String = s"StreamingVectorStats(\n\t$s0\n\t${new VectorN(s1)}\n\t${new VectorN(s2)}\n)"
 }
