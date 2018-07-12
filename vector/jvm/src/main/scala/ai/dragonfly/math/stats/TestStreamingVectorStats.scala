@@ -5,5 +5,5 @@ package ai.dragonfly.math.stats
  */
 
 object TestStreamingVectorStats extends App {
-  TestStreamingStats.test0()
+  //TestStreamingStats.test0()
 }
