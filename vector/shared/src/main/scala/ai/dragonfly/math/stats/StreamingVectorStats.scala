@@ -55,10 +55,10 @@ class StreamingVectorStats(val dimension: Int) {
 
   private def variance(s1d: Double, s2d: Double): Double = (s0 * s2d - s1d * s1d)/(s0 * (s0 - 1))
 
-  @JSExport def variance(): Vector = {
+  @JSExport def variance: Vector = {
     dimension match {
-      case 2 => new Vector2(variance(s1(0), s2(0)), variance(s1(1), s2(1)))
-      case 3 => new Vector3(variance(s1(0), s2(0)), variance(s1(1), s2(1)), variance(s1(2), s2(2)))
+      case 2 => Vector2(variance(s1(0), s2(0)), variance(s1(1), s2(1)))
+      case 3 => Vector3(variance(s1(0), s2(0)), variance(s1(1), s2(1)), variance(s1(2), s2(2)))
       case _ => {
         val values:Array[Double] = Array.fill[Double](dimension)(0.0)
         for (i <- 0 until dimension) {
@@ -69,8 +69,8 @@ class StreamingVectorStats(val dimension: Int) {
     }
   }
 
-  @JSExport def standardDeviation(): Vector = {
-    variance() match {
+  @JSExport def standardDeviation: Vector = {
+    variance match {
       case v: Vector2 =>
         v.x = Math.sqrt(v.x)
         v.y = Math.sqrt(v.y)
@@ -83,7 +83,7 @@ class StreamingVectorStats(val dimension: Int) {
       case v: Vector =>
         val values:Array[Double] = v.values
         for (i <- 0 until dimension) {
-          values(i) = variance(s1(i), s2(i))
+          values(i) = Math.sqrt(variance(s1(i), s2(i)))
         }
         new VectorN(values)
     }
@@ -91,5 +91,5 @@ class StreamingVectorStats(val dimension: Int) {
 
   def bounds(): VectorBounds = VectorBounds(new VectorN(minValues), new VectorN(maxValues))
 
-  override def toString(): String = s"StreamingVectorStats(\n\t$s0\n\t${new VectorN(s1)}\n\t${new VectorN(s2)}\n)"
+  override def toString(): String = s"StreamingVectorStats(\n\t$s0\n\t${new VectorN(s1)}\n\t${new VectorN(s2)}\n\tVariance: $variance\n\tStandard Deviation: $standardDeviation)"
 }

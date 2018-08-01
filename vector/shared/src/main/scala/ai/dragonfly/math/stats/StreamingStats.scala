@@ -22,11 +22,16 @@ class StreamingStats {
   def max = maxObservation
   def average = s1 / s0
 
-  def standardDeviation: Option[Double] = {
+  def variance: Option[Double] = {
     if (s0 < 2) None
-    else Some(Math.sqrt(s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0)))
+    else Some((s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0)))
   }
 
-  override def toString(): String = s"Min: $min Max: $max Avg: $average STDV: $standardDeviation"
+  def standardDeviation: Option[Double] = variance match {
+    case Some(v) => Some(Math.sqrt(v))
+    case None => None
+  }
+
+  override def toString(): String = s"Min: $min Max: $max Avg: $average Variance: $variance STDV: $standardDeviation"
 
 }
