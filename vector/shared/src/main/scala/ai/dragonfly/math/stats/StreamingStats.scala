@@ -32,6 +32,6 @@ class StreamingStats {
     case None => None
   }
 
-  override def toString(): String = s"Min: $min Max: $max Avg: $average Variance: $variance STDV: $standardDeviation"
+  override def toString(): String = s"Min: $min Max: $max Avg: $average Variance: $variance STDV: $standardDeviation Sample size: $s0"
 
 }
