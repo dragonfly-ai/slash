@@ -8,7 +8,7 @@ trait Histogram {
   val max: Double
   val bucketWidth: Double
   var totalMass: Double
-  def apply(x: Double, weight: Double): Histogram
+  def apply(x: Double, weight: Double = 1.0): Histogram
   def mass: Double
   def bins: Iterable[Int]
   def getBindex(observation: Double): Int = ((observation - min) / bucketWidth).toInt
@@ -29,25 +29,23 @@ trait Histogram {
 class DenseDiscreteHistogram(override val binCount: Int, override val min: Double, override val max: Double) extends Histogram {
 
   override val bucketWidth: Double = (max - min) / binCount
+  println(bucketWidth)
 
   val hist: Array[Double] = Array.fill[Double](binCount)(0.0)
   override var totalMass: Double = 0.0
 
   def apply(observation: Double, weight: Double = 1.0): DenseDiscreteHistogram = {
     val bindex = getBindex(observation)
+
     hist(bindex) = hist(bindex) + weight
     totalMass = totalMass + weight
+
     this
   }
 
   override def mass: Double = totalMass
 
-  def bins: Iterable[Int] = {
-    val arr = hist.indices.toArray
-    println(hist.indices)
-    for (i <- arr) print(s"$i, ")
-    arr
-  }
+  def bins: Iterable[Int] = hist.indices.toArray
 
   override protected def getFrequency(bindex: Int): Double = hist(bindex)
 }
@@ -138,7 +136,8 @@ class UnivariateGenerativeModel(
     //println(s"$cpX => $low, $high, ${cumulative.getOrElse(low, 1)}")
     val remainder = (cpX - low) / (high - low)
 
-    ((cumulative.getOrElse(high, 0) + remainder) * bucketWidth) - min
+    val bin = cumulative.getOrElse(high, 0)
+    ((bin + remainder) * bucketWidth) + min
   }
 
   override def toString(): String = cumulative.toString()

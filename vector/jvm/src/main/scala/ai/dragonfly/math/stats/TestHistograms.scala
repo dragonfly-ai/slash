@@ -39,21 +39,26 @@ object TestHistograms extends App {
   println(sodh2 + "\n" + sodh3)
 
   // DenseDiscreteHistogram
-  val ddh: Histogram = new DenseDiscreteHistogram(10, 0.0, 10.0)
+  val ddh: Histogram = new DenseDiscreteHistogram(10, -10.0, 10.0)
 
-  ddh(1 + Math.random(), 5)
-  ddh(2 + Math.random(), 39)
-  ddh(6 + Math.random(), 15)
-  ddh(9 + Math.random(), 25)
+  for (i <- 0 until 10000) {
+    val observation = 20 * (Math.random() - 0.5)
+    ddh(observation)
+    //println(s"ddh.getBindex($observation) returns ${ddh.getBindex(observation)}")
+  }
 
   val gm2 = UnivariateGenerativeModel(ddh)
 
-  val ddh1: Histogram = new DenseDiscreteHistogram(10, 0.0, 10.0)
+  val ddh1: Histogram = new DenseDiscreteHistogram(10, -10.0, 10.0)
 
-  for (i <- 0 until 10000) ddh1( gm2(), 1.0 )
+  for (i <- 0 until 10000) {
+    val obs = gm2()
+    ddh1( obs )
+  }
+
+//  for (i <- 0 until 10) println(gm2())
 
   println(ddh + "\n" + ddh1)
-
 
   val sdh: Histogram = new SparseDiscreteHistogram(10, 0.0, 10.0)
 
