@@ -1,5 +1,7 @@
 package ai.dragonfly.math.stats
 
+import ai.dragonfly.math.vector.Vector3
+
 import scala.collection.mutable
 
 trait Histogram {
@@ -15,7 +17,7 @@ trait Histogram {
   protected def getFrequency(bindex: Int): Double
   def getFrequency(query: Double): Double = getFrequency(getBindex(query))
 
-  override def toString(): String = {
+  override def toString: String = {
     val sb = new mutable.StringBuilder("Histogram: { ")
     for (b <- bins) {
       sb.append(s"$b, ${getFrequency(b)/totalMass}\n")
@@ -140,5 +142,29 @@ class UnivariateGenerativeModel(
     ((bin + remainder) * bucketWidth) + min
   }
 
-  override def toString(): String = cumulative.toString()
+  override def toString: String = cumulative.toString()
+}
+
+class UnorderedSampleableObjectDistribution[T >: Sampleable3] {
+
+  private var totalMass: Double = 0.0
+  private val cumulative: mutable.HashMap[Double, T] = new mutable.HashMap[Double, T]()
+  private val keys: java.util.TreeSet[Double] = new java.util.TreeSet[Double]()
+
+  def apply(o: T, w: Double): UnorderedSampleableObjectDistribution[T] = {
+    totalMass = totalMass + w
+    keys.add(totalMass)
+    cumulative.put(totalMass, o)
+    this
+  }
+
+  def apply(): Vector3 = {
+    val cpX = Math.random() * totalMass
+
+    cumulative.get(keys.ceiling(cpX)) match {
+      case Some(s: Sampleable3) => s.draw()
+      case _ => throw new Exception(s"Could not find a bin for $cpX / $totalMass.  Was the histogram initialized?")
+    }
+  }
+
 }
