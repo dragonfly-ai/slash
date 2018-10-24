@@ -151,7 +151,7 @@ class UnorderedSampleableObjectDistribution[T >: Sampleable3] {
   private val cumulative: mutable.HashMap[Double, T] = new mutable.HashMap[Double, T]()
   private val keys: java.util.TreeSet[Double] = new java.util.TreeSet[Double]()
 
-  def apply(o: T, w: Double): UnorderedSampleableObjectDistribution[T] = {
+  def apply(o: T, w: Double = 1.0): UnorderedSampleableObjectDistribution[T] = {
     totalMass = totalMass + w
     keys.add(totalMass)
     cumulative.put(totalMass, o)
