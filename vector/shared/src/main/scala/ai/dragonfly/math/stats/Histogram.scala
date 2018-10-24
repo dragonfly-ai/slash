@@ -145,7 +145,7 @@ class UnivariateGenerativeModel(
   override def toString: String = cumulative.toString()
 }
 
-class UnorderedSampleableObjectDistribution[T >: Sampleable3] {
+class UnorderedSampleableObjectDistribution[T <: Sampleable3] {
 
   private var totalMass: Double = 0.0
   private val cumulative: mutable.HashMap[Double, T] = new mutable.HashMap[Double, T]()
