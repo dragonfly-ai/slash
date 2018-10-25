@@ -1,5 +1,6 @@
 package ai.dragonfly.math.stats.mesh
 
+import ai.dragonfly.math.stats.UnorderedSampleableObjectDistribution
 import ai.dragonfly.math.vector.Vector3
 
 object TestSampleableTetrahedron extends App {
@@ -17,5 +18,7 @@ object TestSampleableTetrahedron extends App {
     val s = t.draw()
     println(s"v ${s.x} ${s.y} ${s.z}")
   }
+
+  val generativeModel = new UnorderedSampleableObjectDistribution[Tetrahedron]
 
 }
