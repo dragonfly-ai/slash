@@ -151,6 +151,9 @@ class UnorderedSampleableObjectDistribution[T <: Sampleable3] {
   private val cumulative: mutable.HashMap[Double, T] = new mutable.HashMap[Double, T]()
   private val keys: java.util.TreeSet[Double] = new java.util.TreeSet[Double]()
 
+  /*
+  Assumes no duplicates.
+   */
   def apply(o: T, w: Double = 1.0): UnorderedSampleableObjectDistribution[T] = {
     totalMass = totalMass + w
     keys.add(totalMass)
@@ -165,6 +168,35 @@ class UnorderedSampleableObjectDistribution[T <: Sampleable3] {
       case Some(s: Sampleable3) => s.draw()
       case _ => throw new Exception(s"Could not find a bin for $cpX / $totalMass.  Was the histogram initialized?")
     }
+  }
+
+}
+
+
+class DiscreteHistogram[T] {
+
+  val hist = mutable.HashMap[T, Int]()
+
+  def apply (bucket: T, i: Int): DiscreteHistogram[T] = {
+    hist.get(bucket) match {
+      case Some(frequency: Int) => hist.put(bucket, frequency + i)
+      case None => hist.put(bucket, i)
+    }
+    this
+  }
+
+}
+
+class DiscreteOrderedHistogram[T <: Comparable[T]] {
+
+  val hist = mutable.TreeMap[T, Int]()
+
+  def apply (bucket: T, i: Int): DiscreteOrderedHistogram[T] = {
+    hist.get(bucket) match {
+      case Some(frequency: Int) => hist.put(bucket, frequency + i)
+      case None => hist.put(bucket, i)
+    }
+    this
   }
 
 }
