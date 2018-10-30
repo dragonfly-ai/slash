@@ -9,6 +9,10 @@ case class Tetrahedron(v1: Vector3, v2: Vector3, v3: Vector3, v4: Vector3 = Vect
   private val v2_ = v2.copy().subtract(v4)
   private val v3_ = v3.copy().subtract(v4)
 
+  // Formula for the Volume of a tetrahedron taken from:
+  // https://n-e-r-v-o-u-s.com/blog/?p=4415
+  def volume: Double = v1_.cross(v2).dot(v3) / 6.0
+
   override def draw(): Vector3 = {
 
     var w1 = Math.random()
