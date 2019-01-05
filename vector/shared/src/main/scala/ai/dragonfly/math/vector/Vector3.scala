@@ -1,11 +1,35 @@
 package ai.dragonfly.math.vector
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 /**
  * Created by clifton on 1/10/17.
  */
+
+@JSExportTopLevel("ai.dragonfly.math.vector.Vector3")
+object Vector3 {
+
+  @JSExport def fill(value:Double): Vector3 = new Vector3(value, value, value)
+
+  @JSExport def random(maxNorm:Double = 1.0): Vector3 = new Vector3(Math.random() * maxNorm, Math.random() * maxNorm, Math.random() * maxNorm)
+
+  @JSExport def midpoint(v0: Vector3, v1: Vector3): Vector3 = v0.copy().add(v1).scale(0.5)
+
+  @JSExport def average(vectors: Array[Vector3]): Vector = {
+    val averageVector = vectors(0).copy()
+    for (i <- 1 until vectors.length) averageVector.add(vectors(i))
+    averageVector.scale(1.0 / vectors.length)
+  }
+
+  @JSExport def average(vectors: js.Array[Vector3]): Vector = {
+    val averageVector = vectors(0).copy()
+    for (i <- 1 until vectors.length) averageVector.add(vectors(i))
+    averageVector.scale(1.0 / vectors.length)
+  }
+
+}
+
 @JSExport
 case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
@@ -53,6 +77,7 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
         s"dim($v0) = ${v0.dimension}"
     )
   }
+
   override def scale(scalar: Double): Vector3 = {
     x = x * scalar
     y = y * scalar

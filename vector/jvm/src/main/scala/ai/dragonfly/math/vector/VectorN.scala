@@ -2,7 +2,6 @@ package ai.dragonfly.math.vector
 
 import scala.scalajs.js
 import js.JSConverters._
-import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 
 
 object VectorN {
