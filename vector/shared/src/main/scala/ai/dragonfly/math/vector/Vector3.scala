@@ -30,7 +30,7 @@ object Vector3 {
 
 }
 
-@JSExport
+@JSExportTopLevel("ai.dragonfly.math.vector.Vector3")
 case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override val dimension: Int = 3

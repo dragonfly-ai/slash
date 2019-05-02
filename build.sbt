@@ -1,25 +1,21 @@
-import sbt.Keys._
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
-scalaVersion in ThisBuild := "2.12.3"
-
-name in ThisBuild := "vector"
-
-organization in ThisBuild := "ai.dragonfly.code"
-
-version in ThisBuild := "0.1"
-
-publishTo in ThisBuild := Some(Resolver.file("file",  new File( "/var/www/maven" )) )
-
-val vector = crossProject.settings(
-  // shared settings
-  libraryDependencies += "org.scala-js" %% "scalajs-dom_sjs0.6" % "0.9.1",
-).jsSettings(
-  // JS-specific settings here
-).jvmSettings(
-  // JVM-specific settings here
-  libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
+val sharedSettings = Seq(
+  version in ThisBuild := "0.2",
+  scalaVersion := "2.12.6",
+  organization in ThisBuild := "ai.dragonfly.code",
+  publishTo in ThisBuild := Some(Resolver.file("file",  new File( "/var/www/maven" )) ),
+  scalacOptions in ThisBuild ++= Seq("-feature"),
+  mainClass in (Compile, run) := Some("ai.dragonfly.math.vector.VectorTests")
 )
 
-lazy val js = vector.js
-
-lazy val jvm = vector.jvm
+val vector = crossProject(JSPlatform, JVMPlatform)
+  .settings(sharedSettings)
+  .jsSettings(
+    scalaJSUseMainModuleInitializer := true
+  ).jvmSettings(
+    libraryDependencies ++= Seq(
+      "org.scala-js" %% "scalajs-dom_sjs0.6" % "0.9.7",
+      "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
+    )
+  )

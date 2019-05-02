@@ -53,17 +53,17 @@ object VectorN {
 /**
   * Created by clifton on 1/9/17.
   */
-@JSExport @JSExportAll
+@JSExportTopLevel("ai.dragonfly.math.vector.VectorN") @JSExportAll
 class VectorN(override val jsValues: js.Array[Double]) extends Vector {
 
-  @JSExport def this(vals: Double*) = this(vals.toJSArray)
+  @JSExportTopLevel("ai.dragonfly.math.vector.VectorN") def this(vals: Double*) = this(vals.toJSArray)
 
-  @JSExport def this(values: Array[Double]) { this(values.toJSArray) }
+  @JSExportTopLevel("ai.dragonfly.math.vector.VectorN") def this(values: Array[Double]) { this(values.toJSArray) }
 
   // dont' call this method.
   @JSExport def values: Array[Double] = jsValues.toArray
 
-  def apply(i: Int): Double = jsValues(i)
+  @JSExport("apply") def apply(i: Int): Double = jsValues(i)
 
   @JSExport override def clone(): VectorN = {
     val clonedValues = new Array[Double](jsValues.length)

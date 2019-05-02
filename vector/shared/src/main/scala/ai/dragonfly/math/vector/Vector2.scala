@@ -1,13 +1,13 @@
 package ai.dragonfly.math.vector
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 /**
  * Created by clifton on 1/10/17.
  */
 
-@JSExport
+@JSExportTopLevel("ai.dragonfly.math.vector.Vector2")
 case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override val dimension: Int = 2
