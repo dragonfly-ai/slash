@@ -7,7 +7,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
  * Created by clifton on 1/10/17.
  */
 
-@JSExportTopLevel("ai.dragonfly.math.vector.Vector3Util")
+@JSExportTopLevel("Vector3Util")
 object Vector3 {
 
   @JSExport def fill(value:Double): Vector3 = new Vector3(value, value, value)
@@ -30,7 +30,7 @@ object Vector3 {
 
 }
 
-@JSExportTopLevel("ai.dragonfly.math.vector.Vector3")
+@JSExportTopLevel("Vector3")
 case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override val dimension: Int = 3

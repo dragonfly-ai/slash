@@ -7,7 +7,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
  * Created by clifton on 1/10/17.
  */
 
-@JSExportTopLevel("ai.dragonfly.math.vector.Vector2")
+@JSExportTopLevel("Vector2")
 case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override val dimension: Int = 2
