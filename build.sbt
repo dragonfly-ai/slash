@@ -1,6 +1,8 @@
 ThisBuild / scalaVersion := "2.13.3"
 
-lazy val root = project.in(file(".")).aggregate(vector.js, vector.jvm)
+lazy val root = project.in(file(".")).aggregate(vector.js, vector.jvm).settings(
+  publishTo := Some( Resolver.file("file",  new File( "/var/www/maven" ) ) )
+)
 
 lazy val vector = crossProject(JSPlatform, JVMPlatform).settings(
   publishTo := Some(Resolver.file("file",  new File( "/var/www/maven" )) ),
