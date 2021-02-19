@@ -1,7 +1,6 @@
 package ai.dragonfly.math.vector
 
 import scala.scalajs.js
-import js.JSConverters._
 
 
 object VectorN {
@@ -38,8 +37,6 @@ object VectorN {
     avg.scale(1.0/l)
   }
 
-  def average(vectors: js.Array[VectorN]): Vector = average(vectors.toArray)
-
 }
 
 /**
@@ -50,12 +47,7 @@ class VectorN(val values: Array[Double]) extends Vector {
 
   def this(vals: Double*) = this(vals.toArray[Double])
 
-  def this(values: js.Array[Double]) = this(values.toArray)
-
   def apply(i: Int): Double = values(i)
-
-  // Don't call this method.
-  override def jsValues: js.Array[Double] = values.toJSArray
 
   override def clone(): VectorN = {
     val clonedValues = new Array[Double](values.length)
@@ -63,7 +55,7 @@ class VectorN(val values: Array[Double]) extends Vector {
     new VectorN(clonedValues)
   }
 
-  def copy = clone()
+  def copy():VectorN = clone()
 
   def dimension: Int = values.length
 
@@ -122,7 +114,7 @@ class VectorN(val values: Array[Double]) extends Vector {
   }
 
   def round(): VectorN = {
-    for (i <- values.indices) values(i) = Math.round(values(i))
+    for (i <- values.indices) values(i) = Math.round(values(i)).toDouble
     this
   }
 

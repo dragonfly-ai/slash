@@ -58,7 +58,7 @@ class VectorN(override val jsValues: js.Array[Double]) extends Vector {
 
   @JSExportTopLevel("VectorN") def this(vals: Double*) = this(vals.toJSArray)
 
-  @JSExportTopLevel("VectorN") def this(values: Array[Double]) { this(values.toJSArray) }
+  @JSExportTopLevel("VectorN") def this(values: Array[Double]) = { this(values.toJSArray) }
 
   // dont' call this method.
   def values: Array[Double] = jsValues.toArray
@@ -128,7 +128,7 @@ class VectorN(override val jsValues: js.Array[Double]) extends Vector {
   }
 
   def round(): VectorN = {
-    for (i <- jsValues.indices) jsValues(i) = Math.round(jsValues(i))
+    for (i <- jsValues.indices) jsValues(i) = Math.round(jsValues(i)).toDouble
     this
   }
 

@@ -36,7 +36,7 @@ object TestHistograms extends App {
 
   for (i <- 0 until 10000) sodh3( gm1(), 1.0 )
 
-  println(sodh2 + "\n" + sodh3)
+  println(s"$sodh2\n$sodh3")
 
   // DenseDiscreteHistogram
   val ddh: Histogram = new DenseDiscreteHistogram(10, -10.0, 10.0)
@@ -58,7 +58,7 @@ object TestHistograms extends App {
 
 //  for (i <- 0 until 10) println(gm2())
 
-  println(ddh + "\n" + ddh1)
+  println(s"$ddh\n$ddh1")
 
   val sdh: Histogram = new SparseDiscreteHistogram(10, 0.0, 10.0)
 
@@ -73,6 +73,6 @@ object TestHistograms extends App {
 
   for (i <- 0 until 10000) sdh1(gm3(), 1.0)
 
-  println(sdh + "\n" + sdh1)
+  println(s"$sdh\n$sdh1")
 
 }

@@ -14,8 +14,6 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override def values: Array[Double] = Array[Double](x, y)
 
-  override def jsValues: js.Array[Double] = js.Array[Double](x, y)
-
   override def divide(denominator: Double): Vector2 = scale(1.0 / denominator)
 
   override def distanceSquaredTo(v0: Vector): Double = {
@@ -110,13 +108,13 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
     this
   }
 
-  override def copy(): Vector2 = new Vector2(x, y)
+  override def copy(): Vector2 = Vector2(x, y)
 
-  override def toString(): String = s"[$x,$y]"
+  override def toString: String = s"[$x,$y]"
 
   override def round(): Vector = {
-    x = Math.round(x)
-    y = Math.round(y)
+    x = Math.round(x).toDouble
+    y = Math.round(y).toDouble
     this
   }
 }

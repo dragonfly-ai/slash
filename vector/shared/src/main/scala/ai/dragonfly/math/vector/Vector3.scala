@@ -22,12 +22,6 @@ object Vector3 {
     averageVector.scale(1.0 / vectors.length)
   }
 
-  @JSExport def average(vectors: js.Array[Vector3]): Vector = {
-    val averageVector = vectors(0).copy()
-    for (i <- 1 until vectors.length) averageVector.add(vectors(i))
-    averageVector.scale(1.0 / vectors.length)
-  }
-
 }
 
 @JSExportTopLevel("Vector3")
@@ -36,8 +30,6 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
   override val dimension: Int = 3
 
   override def values: Array[Double] = Array[Double](x, y, z)
-
-  override def jsValues: js.Array[Double] = js.Array[Double](x, y, z)
 
   override def distanceSquaredTo(v0: Vector): Double = {
     if (v0.dimension == dimension) {
@@ -139,9 +131,9 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
   override def toString(): String = s"[$x,$y,$z]"
 
   override def round(): Vector = {
-    x = Math.round(x)
-    y = Math.round(y)
-    z = Math.round(z)
+    x = Math.round(x).toDouble
+    y = Math.round(y).toDouble
+    z = Math.round(z).toDouble
     this
   }
 }

@@ -15,8 +15,8 @@ trait Kernel {
   def weight(v1: Vector, v2: Vector): Double = weight(v1.copy().subtract(v2))
 //  def scaledWeight(v1: VectorN, v2: VectorN): Double = weight(v1, v2) * v1.getFrequency * v2.getFrequency
 
-  def distance(v: Vector): Double = v.magnitude
-  def distance(v1: Vector, v2: Vector): Double = v1.copy().subtract(v2).magnitude
+  def distance(v: Vector): Double = v.magnitude()
+  def distance(v1: Vector, v2: Vector): Double = v1.copy().subtract(v2).magnitude()
 
   lazy val discretize: DiscreteKernel = DiscreteKernel(this)
 }
