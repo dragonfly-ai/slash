@@ -31,8 +31,8 @@ class Gaussian extends Sampleable[Double] {
   private var s2 = 0.0
 
   def apply(observation: Double, frequency: Double = 1.0): Unit = {
-    maxObservation = Math.max(observation, maxObservation)
     minObservation = Math.min(observation, minObservation)
+    maxObservation = Math.max(observation, maxObservation)
 
     s0 = s0 + frequency
     s1 = s1 + observation * frequency
@@ -42,11 +42,13 @@ class Gaussian extends Sampleable[Double] {
   def min:Double = minObservation
   def max:Double = maxObservation
 
+  def sampleSize:Double = s0
+
   @inline def average:Double = s1 / s0
 
   @inline def variance:Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
 
-  def standardDeviation:Double = Math.sqrt(variance)
+  @inline def standardDeviation:Double = Math.sqrt(variance)
 
   override def toString: String = s"Min: $min Max: $max Avg: $average Variance: $variance STDV: $standardDeviation Sample size: $s0"
 

@@ -21,6 +21,7 @@ object Poisson extends Demonstrable {
 }
 
 class Poisson extends Sampleable[Int] {
+  private var minObservation = Double.MaxValue
   private var maxObservation:Long = Long.MinValue
 
   private var s0 = 0.0 // weighted count
@@ -34,13 +35,17 @@ class Poisson extends Sampleable[Int] {
   def apply(observation: Int, frequency: Int = 1): Unit = if (observation < 0) {
     throw PoissonDistributionUndefinedForNegativeNumbers(observation)
   } else {
+    minObservation = Math.min(observation, minObservation)
     maxObservation = Math.max(observation, maxObservation)
 
     s0 = s0 + frequency
     s1 = s1 + observation * frequency
   }
 
+  def min:Double = minObservation
   def max:Long = maxObservation
+
+  def sampleSize:Double = s0
 
   @inline def average:Double = s1 / s0 // λ
 

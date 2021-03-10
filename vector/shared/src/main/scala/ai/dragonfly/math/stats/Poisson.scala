@@ -20,9 +20,10 @@ object Poisson extends Demonstrable {
 
 @JSExportAll
 case class Poisson(lambda:Double) extends Sampleable[Int] {
-  val average:Double = lambda
-  val variance:Double = lambda
-  val standardDeviation:Double = Math.sqrt(lambda)
+  def average:Double = lambda
+  def variance:Double = lambda
+  lazy val stdDev:Double = Math.sqrt(lambda)
+  def standardDeviation:Double = stdDev
 
   // Knuth's method:
   override def random(): Int = {
