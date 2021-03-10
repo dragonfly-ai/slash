@@ -1,8 +1,7 @@
 package ai.dragonfly.math.stats.stream
 
-import ai.dragonfly.math.stats.{Sampleable, SparseDiscreteHistogram}
+import ai.dragonfly.math.stats.Sampleable
 import ai.dragonfly.math.util.Demonstrable
-import ai.dragonfly.math.util.Factorial._
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
@@ -51,18 +50,18 @@ class Poisson extends Sampleable[Int] {
 
   override def toString: String = s"Poisson Distribution: Max: $max Avg: $average Variance: $variance STDV: $standardDeviation Sample size: $s0"
 
-  /**
-   * Approximate probability of x, given this Poisson distribution.
-   * @param x a value in the probability distribution
-   * @return P(x)
-   */
-  def P(x:Int):Double = {
-    if (x > max || x < 0) return 0 // ugly hack!
-    val scalar:Double = 100.0 / max
-    val scaledX:Int = Math.round(x*scalar).toInt
-    val lambda:Double = average * scalar
-    (BigDecimal(Math.pow(Math.E, -lambda) * Math.pow(lambda, scaledX)) / (scaledX!) ).toDouble
-  }
+//  /**
+//   * Approximate probability of x, given this Poisson distribution.
+//   * @param x a value in the probability distribution
+//   * @return P(x)
+//   */
+//  def P(x:Int):Double = {
+//    if (x > max || x < 0) return 0 // ugly hack!
+//    val scalar:Double = 100.0 / max
+//    val scaledX:Int = Math.round(x*scalar).toInt
+//    val lambda:Double = average * scalar
+//    (BigDecimal(Math.pow(Math.E, -lambda) * Math.pow(lambda, scaledX)) / (scaledX!) ).toDouble
+//  }
 
   /**
    * Generate a random variable from this Poisson Distribution.

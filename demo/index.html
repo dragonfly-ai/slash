@@ -3,9 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Vector for Scala.js Demo</title>
-    <script type="text/javascript" src="../vector/js/target/scala-2.12/vector-fastopt.js"></script>
+    <script type="text/javascript" src="../vector/js/target/scala-2.13/vector-fastopt.js"></script>
+    <script type="text/javascript">
+var output = "";
+var outputToDom = function(){
+  output = Demo.consolidateDemoOutput.replaceAll("\n","<br>").replaceAll("{","<pre>").replaceAll("}","</pre>");
+  if (output.length > 100) {
+    document.getElementsByTagName("body")[0].innerHTML = output;
+  } else {
+    console.log("Keep Trying.");
+    setTimeout(outputToDom, 1000);
+  }
+}
+setTimeout(outputToDom, 1000);
+    </script>
 </head>
 <body>
-See Console for Output.
+Running Demos ...
 </body>
 </html>
