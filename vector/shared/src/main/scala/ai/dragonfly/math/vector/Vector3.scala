@@ -1,35 +1,49 @@
 package ai.dragonfly.math.vector
 
-import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import ai.dragonfly.math.util.Demonstrable
+
+import scala.scalajs.js.annotation.JSExportAll
 
 /**
  * Created by clifton on 1/10/17.
  */
 
-@JSExportTopLevel("Vector3Util")
-object Vector3 {
+@JSExportAll
+object Vector3 extends Demonstrable {
+  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
+    val i = Vector3(1, 0, 0)
+    val j = Vector3(0, 1, 0)
+    val k = Vector3(0, 0, 1)
 
-  @JSExport def fill(value:Double): Vector3 = new Vector3(value, value, value)
+    sb.append("i X j -> " + (i X j))
+    sb.append("j X i -> " + (j X i))
 
-  @JSExport def random(maxNorm:Double = 1.0): Vector3 = new Vector3(Math.random() * maxNorm, Math.random() * maxNorm, Math.random() * maxNorm)
+    sb.append("i X k -> " + (i X k))
+    sb.append("k X i -> " + (k X i))
 
-  @JSExport def midpoint(v0: Vector3, v1: Vector3): Vector3 = v0.copy().add(v1).scale(0.5)
+    sb.append("j X k -> " + (j X k))
+    sb.append("k X j -> " + (k X j))
 
-  @JSExport def average(vectors: Array[Vector3]): Vector = {
-    val averageVector = vectors(0).copy()
-    for (i <- 1 until vectors.length) averageVector.add(vectors(i))
-    averageVector.scale(1.0 / vectors.length)
+
+    sb.append("i dot j -> " + (i dot j))
+    sb.append("j dot i -> " + (j dot i))
+
+    sb.append("i dot k -> " + (i dot k))
+    sb.append("k dot i -> " + (k dot i))
+
+    sb.append("j dot k -> " + (j dot k))
+    sb.append("k dot j -> " + (k dot j))
   }
 
+  override def name: String = "Vector3"
 }
 
-@JSExportTopLevel("Vector3")
+@JSExportAll
 case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override val dimension: Int = 3
 
-  override def values: Array[Double] = Array[Double](x, y, z)
+  override def values: VectorValues = VectorValues(x, y, z)
 
   override def distanceSquaredTo(v0: Vector): Double = {
     if (v0.dimension == dimension) {
@@ -37,37 +51,24 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
       val dy = y - v0.component(1)
       val dz = z - v0.component(2)
       dx * dx + dy * dy + dz * dz
-    } else throw MismatchedVectorDimensionsException(
-      s"distanceSquaredTo undefined on vectors with different dimensions:\n" +
-      s"dim($this) = ${dimension}\n" +
-      s"dim($v0) = ${v0.dimension}"
-    )
+    } else throw MismatchedVectorDimensionsException(this, v0)
   }
 
   override def divide(denominator: Double): Vector3 = scale(1.0/denominator)
 
   override def dot(v0: Vector): Double = {
     if (v0.dimension == dimension) x * v0.component(0) + y * v0.component(1) + z * v0.component(2)
-    else throw MismatchedVectorDimensionsException(
-      s"dot undefined on vectors with different dimensions:\n" +
-      s"dim($this) = ${dimension}\n" +
-      s"dim($v0) = ${v0.dimension}"
-    )
+    else throw MismatchedVectorDimensionsException(this, v0)
   }
 
-  @JSExport def X (v0: Vector): Vector3 = cross(v0)
+  def X (v0: Vector): Vector3 = cross(v0)
 
-  @JSExport def cross(v0: Vector): Vector3 = {
+  def cross(v0: Vector): Vector3 = {
     if (v0.dimension == dimension) new Vector3(
       y * v0.component(2) - z * v0.component(1), // u2*v3 - u3*v2,
       z * v0.component(0) - x * v0.component(2), // u3*v1 - u1*v3,
       x * v0.component(1) - y * v0.component(0)  // u1*v2 - u2*v1
-    )
-    else throw MismatchedVectorDimensionsException(
-      s"pseudoCross undefined on vectors with different dimensions:\n" +
-        s"dim($this) = ${dimension}\n" +
-        s"dim($v0) = ${v0.dimension}"
-    )
+    ) else throw MismatchedVectorDimensionsException(this, v0)
   }
 
   override def scale(scalar: Double): Vector3 = {
@@ -106,11 +107,7 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
       y = y + v0.component(1)
       z = z + v0.component(2)
       this
-    } else throw MismatchedVectorDimensionsException(
-      s"add undefined on vectors with different dimensions:\n" +
-        s"dim($this) = ${dimension}\n" +
-        s"dim($v0) = ${v0.dimension}"
-    )
+    } else throw MismatchedVectorDimensionsException(this, v0)
   }
 
   override def subtract(v0: Vector): Vector3 = {
@@ -119,16 +116,12 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
       y = y - v0.component(1)
       z = z - v0.component(2)
       this
-    } else throw MismatchedVectorDimensionsException(
-      s"add undefined on vectors with different dimensions:\n" +
-        s"dim($this) = ${dimension}\n" +
-        s"dim($v0) = ${v0.dimension}"
-    )
+    } else throw MismatchedVectorDimensionsException(this, v0)
   }
 
   override def copy(): Vector3 = Vector3(x, y, z)
 
-  override def toString(): String = s"[$x,$y,$z]"
+  override def toString: String = s"[$x,$y,$z]"
 
   override def round(): Vector = {
     x = Math.round(x).toDouble

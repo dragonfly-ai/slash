@@ -1,21 +1,31 @@
 package ai.dragonfly.math.vector
 
-trait WeightedVector[V <: Vector] {
-  var weight: Double
-  def addWeight(w: Double): Unit = {
-    weight = weight + w
+import ai.dragonfly.math.util.Demonstrable
+
+import scala.scalajs.js.annotation.{JSExport, JSExportAll}
+
+@JSExportAll
+object WeightedVector extends Demonstrable {
+  @JSExport("apply")
+  def apply(weight:Double, vector:Vector):WeightedVector = {
+    new WeightedVector(vector).addWeight(weight)
   }
-  def weighted: V
+
+  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
+    val wv0 = WeightedVector(0.5, Vector3(1.1, 2.5, 0.1))
+    sb.append(s"\tWeightedVector: $wv0")
+    sb.append(s"\tWeightedVector.weighted: ${wv0.weighted}")
+  }
+
+  override def name: String = "WeightedVector"
 }
 
-case class WeightedVector2(override var weight: Double, v2: Vector2) extends WeightedVector[Vector2] {
-  override def weighted: Vector2 = v2.copy().scale(weight)
-}
-
-case class WeightedVector3(override var weight: Double, v3: Vector3) extends WeightedVector[Vector3] {
-  override def weighted: Vector3 = v3.copy().scale(weight)
-}
-
-case class WeightedVectorN(override var weight: Double, vN: VectorN) extends WeightedVector[VectorN] {
-  override def weighted: VectorN = vN.copy().scale(weight).asInstanceOf[VectorN]
+@JSExportAll
+case class WeightedVector(unweighted:Vector) {
+  private var weight:Double = 0.0
+  def addWeight(w: Double): WeightedVector = {
+    weight = weight + w
+    this
+  }
+  def weighted: Vector = unweighted.copy().scale(weight)
 }

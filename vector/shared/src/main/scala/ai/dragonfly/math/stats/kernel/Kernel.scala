@@ -4,11 +4,31 @@ package ai.dragonfly.math.stats.kernel
  * Created by clifton on 5/16/15.
  */
 
+import ai.dragonfly.math.util.Demonstrable
 import ai.dragonfly.math.vector.Vector
 
+import scala.scalajs.js.annotation.{JSExport, JSExportAll}
+
+@JSExportAll
+object Kernel extends Demonstrable {
+  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
+    val r = 32
+    val dk = DiscreteKernel(GaussianKernel(r))
+
+    sb.append(dk.totalWeights)
+
+    var count = 0
+    for (dy <- -r to r; dx <- -r to r) count = count + 1
+    sb.append(count)
+  }
+
+  override def name: String = "Kernel"
+}
+
+@JSExportAll
 trait Kernel {
   val radius: Double
-  lazy val radiusSquared = radius * radius
+  lazy val radiusSquared:Double = radius * radius
 
   def weight(magnitudeSquared: Double): Double
   def weight(v: Vector): Double
@@ -21,7 +41,9 @@ trait Kernel {
   lazy val discretize: DiscreteKernel = DiscreteKernel(this)
 }
 
+@JSExportAll
 object GaussianKernel {
+  @JSExport("apply")
   def apply(radius: Double): GaussianKernel = {
     val sigma: Double = radius / 3.0
     val denominator: Double = 2.0 * (sigma * sigma)
@@ -29,6 +51,7 @@ object GaussianKernel {
   }
 }
 
+@JSExportAll
 case class GaussianKernel(radius: Double, sigma: Double, denominator: Double, c: Double) extends Kernel {
   def weight(v: Vector): Double = weight(v.magnitudeSquared())
 
@@ -36,9 +59,9 @@ case class GaussianKernel(radius: Double, sigma: Double, denominator: Double, c:
     if (magnitudeSquared > radiusSquared) 0.0
     else c * Math.pow(Math.E, -(magnitudeSquared / denominator))
   }
-
 }
 
+@JSExportAll
 case class EpanechnikovKernel(radius: Double) extends Kernel {
   def weight(v: Vector): Double = weight(v.magnitudeSquared())
 
@@ -56,6 +79,7 @@ case class EpanechnikovKernel(radius: Double) extends Kernel {
   //  }
 }
 
+@JSExportAll
 case class UniformKernel(radius: Double) extends Kernel {
   def weight(v: Vector): Double = weight(v.magnitudeSquared())
 
@@ -65,7 +89,9 @@ case class UniformKernel(radius: Double) extends Kernel {
   }
 }
 
+@JSExportAll
 object DiscreteKernel {
+  @JSExport("apply")
   def apply(k: Kernel): DiscreteKernel = {
     val maxMagSquared: Int = Math.ceil(k.radiusSquared).toInt
     val weights = new Array[Double](maxMagSquared + 1)
@@ -74,9 +100,10 @@ object DiscreteKernel {
   }
 }
 
+@JSExportAll
 case class DiscreteKernel(radius: Double, weights: Array[Double]) extends Kernel {
 
-  lazy val totalWeights = {
+  lazy val totalWeights:Double = {
     var total = 0.0
     val r = radius.toInt
     for (dy <- -r to r; dx <- -r to r) total = total + weight(dx*dx + dy*dy)

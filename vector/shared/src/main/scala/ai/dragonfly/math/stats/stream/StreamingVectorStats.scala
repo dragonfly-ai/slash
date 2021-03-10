@@ -1,22 +1,35 @@
-package ai.dragonfly.math.stats
+package ai.dragonfly.math.stats.stream
 
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import ai.dragonfly.math.util.Demonstrable
 import ai.dragonfly.math.vector._
+
+import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
 /**
  * Created by clifton on 1/10/17.
  */
 
-@JSExportTopLevel("StreamingVectorStats")
+@JSExportAll
+object StreamingVectorStats extends Demonstrable {
+  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
+    val svs = new StreamingVectorStats(4)
+    for (i <- 0 until 10000) svs(Vector.random(4, 1000))
+    sb.append(svs)
+  }
+
+  override def name: String = "StreamingVectorStats"
+}
+
+@JSExportAll
 class StreamingVectorStats(val dimension: Int) {
   var s0: Double = 0.0
-  val s1: Array[Double] = Array.fill[Double](dimension)(0.0)
-  val s2: Array[Double] = Array.fill[Double](dimension)(0.0)
+  val s1: VectorValues = VectorValues.fill(dimension)((_:Int) => 0.0)
+  val s2: VectorValues = VectorValues.fill(dimension)((_:Int) => 0.0)
 
-  val minValues: Array[Double] = Array.fill[Double](dimension)(Double.MaxValue)
-  val maxValues: Array[Double] = Array.fill[Double](dimension)(Double.MinValue)
+  val minValues: VectorValues = VectorValues.fill(dimension)((_:Int) => Double.MaxValue)
+  val maxValues: VectorValues = VectorValues.fill(dimension)((_:Int) => Double.MinValue)
 
-  @JSExport def reset():Unit = {
+  def reset():Unit = {
     s0 = 0.0
     for (i <- 0 until dimension) {
       s1(i) = 0.0
@@ -39,37 +52,25 @@ class StreamingVectorStats(val dimension: Int) {
     this
   }
 
-  @JSExport def average(): Vector = {
+  def average(): Vector = {
     dimension match {
-      case 2 => new Vector2(s1(0)/s0, s1(1)/s0)
-      case 3 => new Vector3(s1(0)/s0, s1(1)/s0, s1(2)/s0)
-      case _ => {
-        val values:Array[Double] = Array.fill[Double](dimension)(0.0)
-        for (i <- 0 until dimension) {
-          values(i) = s1(i)/s0
-        }
-        new VectorN(values)
-      }
+      case 2 => Vector2(s1(0)/s0, s1(1)/s0)
+      case 3 => Vector3(s1(0)/s0, s1(1)/s0, s1(2)/s0)
+      case _ => VectorN(VectorValues.fill(dimension)((i:Int) => s1(i)/s0))
     }
   }
 
   private def variance(s1d: Double, s2d: Double): Double = (s0 * s2d - s1d * s1d)/(s0 * (s0 - 1))
 
-  @JSExport def variance: Vector = {
+  def variance: Vector = {
     dimension match {
       case 2 => Vector2(variance(s1(0), s2(0)), variance(s1(1), s2(1)))
       case 3 => Vector3(variance(s1(0), s2(0)), variance(s1(1), s2(1)), variance(s1(2), s2(2)))
-      case _ => {
-        val values:Array[Double] = Array.fill[Double](dimension)(0.0)
-        for (i <- 0 until dimension) {
-          values(i) = variance(s1(i), s2(i))
-        }
-        new VectorN(values)
-      }
+      case _ => VectorN(VectorValues.fill(dimension)((i:Int) => variance(s1(i), s2(i))))
     }
   }
 
-  @JSExport def standardDeviation: Vector = {
+  def standardDeviation: Vector = {
     variance match {
       case v: Vector2 =>
         v.x = Math.sqrt(v.x)
@@ -81,7 +82,7 @@ class StreamingVectorStats(val dimension: Int) {
         v.y = Math.sqrt(v.y)
         v
       case v: Vector =>
-        val values:Array[Double] = v.values
+        val values:native.VectorValues = v.values
         for (i <- 0 until dimension) {
           values(i) = Math.sqrt(variance(s1(i), s2(i)))
         }

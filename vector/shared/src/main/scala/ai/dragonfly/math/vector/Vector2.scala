@@ -1,18 +1,33 @@
 package ai.dragonfly.math.vector
 
+import ai.dragonfly.math.util.Demonstrable
+
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 
 /**
  * Created by clifton on 1/10/17.
  */
+@JSExportAll
+object Vector2 extends Demonstrable {
+  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
+    for (deg <- Array[Double](10, 25, 33.333333, 45, 60, 75, 90)) {
+      val i = Vector2(1, 0)
+      i.rotateDegrees(deg)
+      sb.append(s"${Vector2(1, 0)}.rotateDegrees($deg) -> " + i)
+    }
+    sb
+  }
 
-@JSExportTopLevel("Vector2")
+  override def name: String = "Vector2"
+}
+
+@JSExportAll
 case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override val dimension: Int = 2
 
-  override def values: Array[Double] = Array[Double](x, y)
+  override def values: VectorValues = VectorValues(x, y)
 
   override def divide(denominator: Double): Vector2 = scale(1.0 / denominator)
 
@@ -21,29 +36,17 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
       val dx = x - v0.component(0)
       val dy = y - v0.component(1)
       dx * dx + dy * dy
-    } else throw MismatchedVectorDimensionsException(
-      s"distanceSquaredTo undefined on vectors with different dimensions:\n" +
-      s"dim($this) = ${dimension}\n" +
-      s"dim($v0) = ${v0.dimension}"
-    )
+    } else throw MismatchedVectorDimensionsException(this, v0)
   }
 
   override def dot(v0: Vector): Double = {
     if (v0.dimension == dimension) x * v0.component(0) + y * v0.component(1)
-    else throw MismatchedVectorDimensionsException(
-      s"dot undefined on vectors with different dimensions:\n" +
-      s"dim($this) = ${dimension}\n" +
-      s"dim($v0) = ${v0.dimension}"
-    )
+    else throw MismatchedVectorDimensionsException(this, v0)
   }
 
-  @JSExport def pseudoCross(v0: Vector): Double = {
+  def pseudoCross(v0: Vector): Double = {
     if (v0.dimension == dimension) x * v0.component(1) + y * v0.component(0)
-    else throw MismatchedVectorDimensionsException(
-      s"pseudoCross undefined on vectors with different dimensions:\n" +
-      s"dim($this) = ${dimension}\n" +
-      s"dim($v0) = ${v0.dimension}"
-    )
+    else throw MismatchedVectorDimensionsException(this, v0)
   }
 
   override def scale(scalar: Double): Vector2 = {
@@ -76,11 +79,7 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
       x = x + v0.component(0)
       y = y + v0.component(1)
       this
-    } else throw MismatchedVectorDimensionsException(
-      s"add undefined on vectors with different dimensions:\n" +
-      s"dim($this) = ${dimension}\n" +
-      s"dim($v0) = ${v0.dimension}"
-    )
+    } else throw MismatchedVectorDimensionsException(this, v0)
   }
 
   override def subtract(v0: Vector): Vector2 = {
@@ -88,16 +87,12 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
       x = x - v0.component(0)
       y = y - v0.component(1)
       this
-    } else throw MismatchedVectorDimensionsException(
-      s"add undefined on vectors with different dimensions:\n" +
-      s"dim($this) = ${dimension}\n" +
-      s"dim($v0) = ${v0.dimension}"
-    )
+    } else throw MismatchedVectorDimensionsException(this, v0)
   }
 
-  @JSExport def rotateDegrees(degrees: Double): Vector2 = rotate(degrees * 0.01745329252)
+  def rotateDegrees(degrees: Double): Vector2 = rotate(degrees * 0.01745329252)
 
-  @JSExport def rotate(radians: Double): Vector2 = {
+  def rotate(radians: Double): Vector2 = {
     val cos = Math.cos( radians )
     val sin = Math.sin( radians )
 
