@@ -20,7 +20,7 @@ object Poisson extends Demonstrable {
 
 @JSExportAll
 case class Poisson(lambda:Double) extends Sampleable[Int] {
-  def average:Double = lambda
+  def mean:Double = lambda
   def variance:Double = lambda
   lazy val stdDev:Double = Math.sqrt(lambda)
   def standardDeviation:Double = stdDev
@@ -37,4 +37,6 @@ case class Poisson(lambda:Double) extends Sampleable[Int] {
     }
     k - 1
   }
+
+  override def toString: String = s"Poisson(λ = $lambda, √λ = $standardDeviation)"
 }

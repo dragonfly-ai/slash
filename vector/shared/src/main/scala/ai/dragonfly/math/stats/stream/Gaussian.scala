@@ -8,14 +8,12 @@ import scala.util.Random
 object Gaussian extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val mean:Double = 25.0
-    val standardDeviation:Double = 10.0
-    sb.append(s"\tGenerating 1000 samples with Mean:$mean Standard Deviation: $standardDeviation")
-    val g:ai.dragonfly.math.stats.Gaussian = ai.dragonfly.math.stats.Gaussian(mean, standardDeviation)
+    val variance:Double = 100.0
+    val idealGaussian:ai.dragonfly.math.stats.Gaussian = ai.dragonfly.math.stats.Gaussian(mean, variance)
+    sb.append(s"Populate stream.Gaussian by sampling from: $idealGaussian")
     val sg:Gaussian = new Gaussian()
-    for (i <- 0 until 1000) {
-      sg(g.random())
-    }
-    sb.append(s"\tEstimated Mean: ${sg.average} Estimated Standard Deviation: ${sg.standardDeviation}")
+    for (i <- 0 until 1000) { sg(idealGaussian.random()) }
+    sb.append(sg)
   }
 
   override def name: String = "Streaming Gaussian"
@@ -44,13 +42,21 @@ class Gaussian extends Sampleable[Double] {
 
   def sampleSize:Double = s0
 
-  @inline def average:Double = s1 / s0
+  @inline def mean:Double = s1 / s0
 
+  /**
+   * σ
+   * @return
+   */
   @inline def variance:Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
 
+  /**
+   * 	√σ
+   * @return
+   */
   @inline def standardDeviation:Double = Math.sqrt(variance)
 
-  override def toString: String = s"Min: $min Max: $max Avg: $average Variance: $variance STDV: $standardDeviation Sample size: $s0"
+  override def toString: String = s"stream.Gaussian(min = $min, max = $max, μ = $mean, σ = $variance, √σ = $standardDeviation, n = $s0)"
 
-  override def random(): Double = average + ( Random.nextGaussian() * standardDeviation )
+  override def random(): Double = mean + ( Random.nextGaussian() * standardDeviation )
 }

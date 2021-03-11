@@ -9,15 +9,15 @@ import scala.language.implicitConversions
 object Poisson extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val idealPoisson:ai.dragonfly.math.stats.Poisson = ai.dragonfly.math.stats.Poisson(20)
-    sb.append(s"Testing Streaming Poisson with ideal Poisson: $idealPoisson")
+    sb.append(s"Populate stream.Poisson by sampling from: $idealPoisson")
     val p1:Poisson = new Poisson
     for (i <- 0 until 10000) {
       p1(idealPoisson.random())
     }
-    sb.append(s"Generated $p1 with estimatedPoisson(${idealPoisson.average}}")
+    sb.append(s"$p1")
   }
 
-  override def name: String = "Streaming Poisson"
+  override def name: String = "stream.Poisson"
 }
 
 class Poisson extends Sampleable[Int] {
@@ -47,13 +47,13 @@ class Poisson extends Sampleable[Int] {
 
   def sampleSize:Double = s0
 
-  @inline def average:Double = s1 / s0 // λ
+  @inline def mean:Double = s1 / s0 // λ
 
   @inline def variance: Double = s1 / s0 // also λ
 
   def standardDeviation:Double = Math.sqrt(variance)
 
-  override def toString: String = s"Poisson Distribution: Max: $max Avg: $average Variance: $variance STDV: $standardDeviation Sample size: $s0"
+  override def toString: String = s"stream.Poisson(min = $min, max = $max, λ = $mean, √λ = $standardDeviation, n = $s0)"
 
 //  /**
 //   * Approximate probability of x, given this Poisson distribution.
@@ -72,7 +72,7 @@ class Poisson extends Sampleable[Int] {
    * Generate a random variable from this Poisson Distribution.
    * @return
    */
-  override def random(): Int = ai.dragonfly.math.stats.Poisson(average).random()
+  override def random(): Int = ai.dragonfly.math.stats.Poisson(mean).random()
 
     /*
     val scalar:Double = 100.0 / max
