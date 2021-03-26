@@ -32,7 +32,7 @@ class Poisson extends Sampleable[Int] {
    * @param observation the value observed.
    * @param frequency the number of times this value has been observed, default 1L
    */
-  def apply(observation: Int, frequency: Int = 1): Unit = if (observation < 0) {
+  def apply(observation: Int, frequency: Int = 1):Poisson = if (observation < 0) {
     throw PoissonDistributionUndefinedForNegativeNumbers(observation)
   } else {
     minObservation = Math.min(observation, minObservation)
@@ -40,6 +40,8 @@ class Poisson extends Sampleable[Int] {
 
     s0 = s0 + frequency
     s1 = s1 + observation * frequency
+
+    this
   }
 
   def min:Double = minObservation

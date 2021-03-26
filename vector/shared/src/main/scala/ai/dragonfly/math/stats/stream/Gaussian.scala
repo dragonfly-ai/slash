@@ -28,13 +28,15 @@ class Gaussian extends Sampleable[Double] {
   private var s1 = 0.0
   private var s2 = 0.0
 
-  def apply(observation: Double, frequency: Double = 1.0): Unit = {
+  def apply(observation: Double, frequency: Double = 1.0):Gaussian = {
     minObservation = Math.min(observation, minObservation)
     maxObservation = Math.max(observation, maxObservation)
 
     s0 = s0 + frequency
     s1 = s1 + observation * frequency
     s2 = s2 + observation * observation * frequency
+
+    this
   }
 
   def min:Double = minObservation
