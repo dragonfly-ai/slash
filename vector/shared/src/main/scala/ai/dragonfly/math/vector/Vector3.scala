@@ -15,24 +15,23 @@ object Vector3 extends Demonstrable {
     val j = Vector3(0, 1, 0)
     val k = Vector3(0, 0, 1)
 
-    sb.append("i X j -> " + (i X j))
-    sb.append("j X i -> " + (j X i))
+    sb.append(s"i3 X j3 -> ${i X j}\n")
+    sb.append(s"j3 X i3 -> ${j X i}\n")
 
-    sb.append("i X k -> " + (i X k))
-    sb.append("k X i -> " + (k X i))
+    sb.append(s"i3 X k3 -> ${i X k}\n")
+    sb.append(s"k3 X i3 -> ${k X i}\n")
 
-    sb.append("j X k -> " + (j X k))
-    sb.append("k X j -> " + (k X j))
+    sb.append(s"j3 X k3 -> ${j X k}\n")
+    sb.append(s"k3 X j3 -> ${k X j}\n")
 
+    sb.append(s"i3 dot j3 -> ${i dot j}\n")
+    sb.append(s"j3 dot i3 -> ${j dot i}\n")
 
-    sb.append("i dot j -> " + (i dot j))
-    sb.append("j dot i -> " + (j dot i))
+    sb.append(s"i3 dot k3 -> ${i dot k}\n")
+    sb.append(s"k3 dot i3 -> ${k dot i}\n")
 
-    sb.append("i dot k -> " + (i dot k))
-    sb.append("k dot i -> " + (k dot i))
-
-    sb.append("j dot k -> " + (j dot k))
-    sb.append("k dot j -> " + (k dot j))
+    sb.append(s"j3 dot k3 -> ${j dot k}\n")
+    sb.append(s"k3 dot j3 -> ${k dot j}\n")
   }
 
   override def name: String = "Vector3"
@@ -53,8 +52,6 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
       dx * dx + dy * dy + dz * dz
     } else throw MismatchedVectorDimensionsException(this, v0)
   }
-
-  override def divide(denominator: Double): Vector3 = scale(1.0/denominator)
 
   override def dot(v0: Vector): Double = {
     if (v0.dimension == dimension) x * v0.component(0) + y * v0.component(1) + z * v0.component(2)
@@ -83,23 +80,12 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
       case 0 => x
       case 1 => y
       case 2 => z
-      case _ => throw new ArrayIndexOutOfBoundsException(s"index: $i exceeds the range [0, 1] for Vector2 components.")
+      case _ => throw ExtraDimensionalAccessException(this, i)
     }
   }
 
   override def magnitudeSquared(): Double = x*x + y*y + z*z
 
-
-  override def normalize(): Vector3 = {
-    val mag2 = x*x + y*y + z*z
-    if (mag2 > 0.0) {
-      val mag = Math.sqrt(mag2)
-      x = x / mag
-      y = y / mag
-      z = z / mag
-    }
-    this
-  }
 
   override def add(v0: Vector): Vector3 = {
     if (v0.dimension == dimension) {

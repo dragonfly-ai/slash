@@ -8,13 +8,14 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 /**
  * Created by clifton on 1/10/17.
  */
+
 @JSExportAll
 object Vector2 extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     for (deg <- Array[Double](10, 25, 33.333333, 45, 60, 75, 90)) {
       val i = Vector2(1, 0)
       i.rotateDegrees(deg)
-      sb.append(s"${Vector2(1, 0)}.rotateDegrees($deg) -> " + i)
+      sb.append(s"${Vector2(1, 0)}.rotateDegrees($deg) -> $i\n")
     }
     sb
   }
@@ -28,8 +29,6 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
   override val dimension: Int = 2
 
   override def values: VectorValues = VectorValues(x, y)
-
-  override def divide(denominator: Double): Vector2 = scale(1.0 / denominator)
 
   override def distanceSquaredTo(v0: Vector): Double = {
     if (v0.dimension == dimension) {
@@ -57,22 +56,10 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override def component(i: Int): Double = {
     if (i == 0) x else if (i == 1) y
-    else throw new ArrayIndexOutOfBoundsException(s"index: $i exceeds the range [0, 1] for Vector2 components.")
+    else throw ExtraDimensionalAccessException(this, i)
   }
 
   override def magnitudeSquared(): Double = x*x + y*y
-
-
-  override def normalize(): Vector2 = {
-    val mag2 = x*x + y*y
-    if (mag2 > 0.0) {
-      val mag = Math.sqrt(mag2)
-      x = x / mag
-      y = y / mag
-    }
-    this
-  }
-
 
   override def add(v0: Vector): Vector2 = {
     if (v0.dimension == dimension) {

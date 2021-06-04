@@ -38,7 +38,7 @@ object VectorN extends Demonstrable {
     }
 
     sb.append(Vector.fill(9, 0))
-    sb.append(Vector.fill(9, 0).normalize())
+
     sb.append("Vector.random(40, Integer.MAX_VALUE) => " + Vector.random(40, Integer.MAX_VALUE))
 
     sb.append("midpoint: " + Vector.midpoint(new VectorN(1.0, 2.0, 3.0, 4.0, 5.0), new VectorN(5.0, 4.0, 3.0, 2.0, 1.0)))
@@ -63,9 +63,11 @@ case class VectorN(values:VectorValues) extends Vector {
 
   def dimension: Int = values.length
 
-  def divide(denominator: Double): VectorN = scale(1.0/denominator)
-
-  def component(i: Int): Double = values(i)
+  def component(i: Int): Double = try {
+    values(i)
+  } catch {
+    case aioobe:ArrayIndexOutOfBoundsException => throw ExtraDimensionalAccessException(this, i)
+  }
 
   def magnitudeSquared(): Double = { var mag2 = 0.0; for (v:Double <- values) mag2 = mag2 + (v*v); mag2 }
 
@@ -99,14 +101,6 @@ case class VectorN(values:VectorValues) extends Vector {
     this
   }
 
-  def normalize(): VectorN = {
-    val mag2 = magnitudeSquared()
-    if (mag2 > 0.0) {
-      val mag = Math.sqrt(mag2)
-      for (i <- values.indices) values(i) = values(i) / mag
-    }
-    this
-  }
 
   def round(): VectorN = {
     for (i <- values.indices) values(i) = Math.round(values(i)).toDouble
@@ -130,7 +124,7 @@ case class VectorN(values:VectorValues) extends Vector {
   }
 
   override def toString:String = {
-    val sb = new StringBuilder(dimension * 10)
+    val sb = new StringBuilder(Math.min(dimension * 10, 160))
     sb.append(s"[${values(0)}")
     if (dimension > 16) {
       for (i <- 1 until 8) sb.append(s",${values(i)}")

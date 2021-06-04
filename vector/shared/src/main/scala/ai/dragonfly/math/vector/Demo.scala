@@ -10,11 +10,11 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("Demo") @JSExportAll
 object Demo {
-
   val allDemos:Array[Demonstrable] = Array[Demonstrable](
-    Vector2,
-    Vector3,
-    VectorN,
+    V2,
+    V3,
+    V4,
+    VN,
     WeightedVector,
     ai.dragonfly.math.stats.Gaussian,
     ai.dragonfly.math.stats.Poisson,
