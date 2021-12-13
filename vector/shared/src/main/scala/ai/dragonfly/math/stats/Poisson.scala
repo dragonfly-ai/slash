@@ -2,9 +2,6 @@ package ai.dragonfly.math.stats
 
 import ai.dragonfly.math.util.Demonstrable
 
-import scala.scalajs.js.annotation.JSExportAll
-
-@JSExportAll
 object Poisson extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val idealPoisson:Poisson = Poisson(15)
@@ -18,7 +15,6 @@ object Poisson extends Demonstrable {
   override def name: String = "Poisson"
 }
 
-@JSExportAll
 case class Poisson(lambda:Double) extends Sampleable[Int] {
   def mean:Double = lambda
   def variance:Double = lambda

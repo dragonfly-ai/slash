@@ -3,13 +3,11 @@ package ai.dragonfly.math.stats.stream
 import ai.dragonfly.math.util.Demonstrable
 import ai.dragonfly.math.vector._
 
-import scala.scalajs.js.annotation.{JSExport, JSExportAll}
-
 /**
  * Created by clifton on 1/10/17.
  */
 
-@JSExportAll
+
 object StreamingVectorStats extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val svs = new StreamingVectorStats(4)
@@ -20,7 +18,7 @@ object StreamingVectorStats extends Demonstrable {
   override def name: String = "StreamingVectorStats"
 }
 
-@JSExportAll
+
 class StreamingVectorStats(val dimension: Int) {
   var s0: Double = 0.0
   val s1: VectorValues = VectorValues.fill(dimension)((_:Int) => 0.0)
@@ -39,7 +37,7 @@ class StreamingVectorStats(val dimension: Int) {
     }
   }
 
-  @JSExport("apply") def apply(c: Vector, weight: Double = 1.0): StreamingVectorStats = {
+  def apply(c: Vector, weight: Double = 1.0): StreamingVectorStats = {
     s0 = s0 + weight
     for (i <- 0 until dimension) {
       val cv = c.component(i)

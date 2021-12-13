@@ -2,13 +2,10 @@ package ai.dragonfly.math.vector
 
 import ai.dragonfly.math.util.Demonstrable
 
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
-
 /**
  * Created by clifton on 1/9/17.
  */
 
-@JSExportTopLevel("Demo") @JSExportAll
 object Demo {
   val allDemos:Array[Demonstrable] = Array[Demonstrable](
     V2,

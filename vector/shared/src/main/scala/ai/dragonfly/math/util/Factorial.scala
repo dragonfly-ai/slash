@@ -1,7 +1,6 @@
 package ai.dragonfly.math.util
 
 import scala.language.postfixOps
-import scala.scalajs.js.annotation.JSExport
 
 object Factorial {
   // 0! - 20! Source: https://en.wikipedia.org/wiki/Factorial
@@ -114,7 +113,6 @@ object Factorial {
     BigDecimal("93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000") // 100!
   )
 
-  @JSExport("Factorial")
   def apply:PartialFunction[Int,BigDecimal] = {
     case i: Int if i > -1 && i < 101 => table(i)
   }

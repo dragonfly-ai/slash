@@ -88,7 +88,7 @@ trait Histogram {
   val min: Double
   val max: Double
   val bucketWidth: Double
-  var totalMass: Double
+  def getTotalMass: Double
   def apply(x: Double, weight: Double = 1.0): Histogram
   def mass: Double
   def bins: Iterable[Int]
@@ -99,7 +99,7 @@ trait Histogram {
   override def toString: String = {
     val sb = new mutable.StringBuilder("Histogram: { ")
     for (b <- bins) {
-      sb.append(b+min).append(",").append(getFrequency(b)/totalMass).append("\n")
+      sb.append(b+min).append(",").append(getFrequency(b)/getTotalMass).append("\n")
     }
     sb.append("}")
     sb.toString()
@@ -113,7 +113,8 @@ class DenseDiscreteHistogram(override val binCount: Int, override val min: Doubl
   //println(bucketWidth)
 
   val hist: Array[Double] = Array.fill[Double](binCount)(0.0)
-  override var totalMass: Double = 0.0
+  private var totalMass: Double = 0.0
+  def getTotalMass:Double = totalMass
 
   def apply(observation: Double, weight: Double = 1.0): DenseDiscreteHistogram = {
     val bindex = getBindex(observation)
@@ -136,8 +137,8 @@ class SparseDiscreteHistogram(override val binCount: Int, override val min: Doub
   override val bucketWidth: Double = (max - min) / binCount
 
   val hist: mutable.HashMap[Int, Double] = mutable.HashMap[Int, Double]()
-  override var totalMass = 0.0
-
+  private var totalMass = 0.0
+  def getTotalMass:Double = totalMass
   def apply(observation: Double, weight: Double = 1.0): SparseDiscreteHistogram = {
     val bindex = getBindex(observation)
 
@@ -161,8 +162,8 @@ class SparseOrderedDiscreteHistogram(override val binCount: Int, override val mi
   override val bucketWidth: Double = (max - min) / binCount
 
   val hist: mutable.TreeMap[Int, Double] = mutable.TreeMap[Int, Double]()
-  override var totalMass = 0.0
-
+  private var totalMass = 0.0
+  override def getTotalMass: Double = totalMass
   def apply(observation: Double, weight: Double = 1.0): SparseOrderedDiscreteHistogram = {
     val bindex = getBindex(observation)
     hist.get(bindex) match {
@@ -227,11 +228,11 @@ class UnivariateGenerativeModel(
 class UnorderedSampleableObjectDistribution[T] extends Sampleable[T] {
 
   private var totalMass: Double = 0.0
-  private val cumulative: mutable.HashMap[Double, T] = new mutable.HashMap[Double, T]()
+  private val cumulative: mutable.HashMap[Double, Sampleable[T]] = new mutable.HashMap[Double, Sampleable[T]]()
   private val keys: java.util.TreeSet[Double] = new java.util.TreeSet[Double]()
 
   /* Assumes no duplicates. */
-  def apply(o: T, w: Double = 1.0): UnorderedSampleableObjectDistribution[T] = {
+  def apply(o: Sampleable[T], w: Double = 1.0): UnorderedSampleableObjectDistribution[T] = {
     totalMass = totalMass + w
     keys.add(totalMass)
     cumulative.put(totalMass, o)

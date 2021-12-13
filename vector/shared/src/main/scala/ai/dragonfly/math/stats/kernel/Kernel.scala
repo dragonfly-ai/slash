@@ -7,9 +7,6 @@ package ai.dragonfly.math.stats.kernel
 import ai.dragonfly.math.util.Demonstrable
 import ai.dragonfly.math.vector.Vector
 
-import scala.scalajs.js.annotation.{JSExport, JSExportAll}
-
-@JSExportAll
 object Kernel extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val r = 32
@@ -25,7 +22,6 @@ object Kernel extends Demonstrable {
   override def name: String = "Kernel"
 }
 
-@JSExportAll
 trait Kernel {
   val radius: Double
   lazy val radiusSquared:Double = radius * radius
@@ -41,9 +37,7 @@ trait Kernel {
   lazy val discretize: DiscreteKernel = DiscreteKernel(this)
 }
 
-@JSExportAll
 object GaussianKernel {
-  @JSExport("apply")
   def apply(radius: Double): GaussianKernel = {
     val sigma: Double = radius / 3.0
     val denominator: Double = 2.0 * (sigma * sigma)
@@ -51,7 +45,7 @@ object GaussianKernel {
   }
 }
 
-@JSExportAll
+
 case class GaussianKernel(radius: Double, sigma: Double, denominator: Double, c: Double) extends Kernel {
   def weight(v: Vector): Double = weight(v.magnitudeSquared())
 
@@ -61,7 +55,7 @@ case class GaussianKernel(radius: Double, sigma: Double, denominator: Double, c:
   }
 }
 
-@JSExportAll
+
 case class EpanechnikovKernel(radius: Double) extends Kernel {
   def weight(v: Vector): Double = weight(v.magnitudeSquared())
 
@@ -79,7 +73,7 @@ case class EpanechnikovKernel(radius: Double) extends Kernel {
   //  }
 }
 
-@JSExportAll
+
 case class UniformKernel(radius: Double) extends Kernel {
   def weight(v: Vector): Double = weight(v.magnitudeSquared())
 
@@ -89,9 +83,8 @@ case class UniformKernel(radius: Double) extends Kernel {
   }
 }
 
-@JSExportAll
+
 object DiscreteKernel {
-  @JSExport("apply")
   def apply(k: Kernel): DiscreteKernel = {
     val maxMagSquared: Int = Math.ceil(k.radiusSquared).toInt
     val weights = new Array[Double](maxMagSquared + 1)
@@ -100,7 +93,7 @@ object DiscreteKernel {
   }
 }
 
-@JSExportAll
+
 case class DiscreteKernel(radius: Double, weights: Array[Double]) extends Kernel {
 
   lazy val totalWeights:Double = {

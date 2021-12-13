@@ -1,7 +1,6 @@
 package ai.dragonfly.math.vector
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportAll}
 
 object Vector {
 
@@ -14,8 +13,7 @@ object Vector {
       case _ => VectorN(VectorValues(d:_*))
     }
   }
-
-  @JSExport
+  
   def fill(dimension: Int, value:Double): Vector = dimension match {
     case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
     case 2 => Vector2(value, value)
@@ -24,9 +22,9 @@ object Vector {
     case _ => VectorN(VectorValues.fill(dimension)((_:Int) => value))
   }
 
-  @JSExport
+  
   def random(dimension: Int, maxNorm:Double = 1.0): Vector = {
-    @inline def r(i:Int = 0): Double = Math.random() * maxNorm
+    def r(i:Int = 0): Double = Math.random() * maxNorm
     dimension match {
       case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
       case 2 => Vector2(r(), r())
@@ -36,7 +34,7 @@ object Vector {
     }
   }
 
-  @JSExport
+  
   def midpoint(v0: Vector, v1: Vector): Vector = average(v0, v1)
 
   def average(vectors:Vector*): Vector = {
@@ -47,7 +45,7 @@ object Vector {
     avg.scale(1.0/vectors.size)
   }
 
-  @JSExport
+  
   def average(vectors: native.VECTORS): Vector = {
     val avg:Vector = vectors.head.copy()
     for (vector <- vectors.tail) {
@@ -61,18 +59,18 @@ object Vector {
  * Created by clifton on 1/9/17.
  */
 
-@JSExportAll
+
 trait Vector {
 
-  @inline def values: VectorValues
+  def values: VectorValues
 
-  @inline def dimension: Int
+  def dimension: Int
 
-  @inline def component(i: Int): Double
+  def component(i: Int): Double
 
-  @inline def magnitudeSquared(): Double
+  def magnitudeSquared(): Double
 
-  @inline def magnitude(): Double = Math.sqrt( magnitudeSquared() )
+  def magnitude(): Double = Math.sqrt( magnitudeSquared() )
 
   def normalize(): Vector = {
     val m2:Double = magnitudeSquared()
@@ -80,29 +78,29 @@ trait Vector {
     else throw VectorNormalizationException(this)
   }
 
-  @inline def distanceSquaredTo(v0: Vector): Double
+  def distanceSquaredTo(v0: Vector): Double
 
-  @inline def distanceTo(v0: Vector): Double = Math.sqrt(distanceSquaredTo(v0))
+  def distanceTo(v0: Vector): Double = Math.sqrt(distanceSquaredTo(v0))
 
 
-  @inline def dot(v0: Vector): Double
+  def dot(v0: Vector): Double
 
-  @inline def scale(scalar: Double): Vector
+  def scale(scalar: Double): Vector
 
-  @inline def divide(denominator: Double): Vector = scale(1.0/denominator)
+  def divide(denominator: Double): Vector = scale(1.0/denominator)
 
-  @inline def round(): Vector
+  def round(): Vector
 
-  @inline def add(v0: Vector): Vector
+  def add(v0: Vector): Vector
 
-  @inline def subtract(v0: Vector): Vector
+  def subtract(v0: Vector): Vector
 
-  @inline def center(vectors: VECTORS): VECTORS = {
+  def center(vectors: VECTORS): VECTORS = {
     for (v: Vector <- vectors) v.subtract(this)
     vectors
   }
 
-  @inline def copy(): Vector
+  def copy(): Vector
 
 }
 

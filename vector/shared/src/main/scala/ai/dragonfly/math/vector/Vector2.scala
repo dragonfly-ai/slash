@@ -3,13 +3,11 @@ package ai.dragonfly.math.vector
 import ai.dragonfly.math.util.Demonstrable
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 
 /**
  * Created by clifton on 1/10/17.
  */
 
-@JSExportAll
 object Vector2 extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     for (deg <- Array[Double](10, 25, 33.333333, 45, 60, 75, 90)) {
@@ -23,7 +21,6 @@ object Vector2 extends Demonstrable {
   override def name: String = "Vector2"
 }
 
-@JSExportAll
 case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override val dimension: Int = 2

@@ -1,10 +1,6 @@
 package ai.dragonfly.math.vector
 
-import scala.scalajs.js.annotation.{JSExport, JSExportAll}
-
-@JSExportAll
 object VectorValues {
-  @JSExport("apply")
   def apply(values:Double*):VectorValues = {
     fill(values.size)((i:Int) => values(i))
   }

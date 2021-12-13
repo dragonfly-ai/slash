@@ -2,9 +2,6 @@ package ai.dragonfly.math.vector
 
 import ai.dragonfly.math.util.Demonstrable
 
-import scala.scalajs.js.annotation.JSExportAll
-
-@JSExportAll
 object Vector4 extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val i = Vector4(1, 0, 0, 0)

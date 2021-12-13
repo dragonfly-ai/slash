@@ -2,13 +2,10 @@ package ai.dragonfly.math.vector
 
 import ai.dragonfly.math.util.Demonstrable
 
-import scala.scalajs.js.annotation.{JSExport, JSExportAll}
-
 /**
  * Created by clifton on 1/9/17.
  */
 
-@JSExportAll
 object VectorN extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val v0 = Vector(0.5, 0.0, 1.0, 0.75)
@@ -47,31 +44,30 @@ object VectorN extends Demonstrable {
   override def name: String = "VectorN"
 }
 
-@JSExportAll
 case class VectorN(values:VectorValues) extends Vector {
 
   def this(vals:Double*) = this(VectorValues(vals:_*))
 
-  @JSExport("apply")
+  //@JSExport("apply")
   def apply(i: Int): Double = values(i)
 
-  def copy():VectorN = new VectorN({
+  override def copy():VectorN = new VectorN({
     val cp:VectorValues = new VectorValues(values.length)
     for (i <- values.indices) cp(i) = values(i)
     cp
   })
 
-  def dimension: Int = values.length
+  override def dimension: Int = values.length
 
-  def component(i: Int): Double = try {
+  override def component(i: Int): Double = try {
     values(i)
   } catch {
     case aioobe:ArrayIndexOutOfBoundsException => throw ExtraDimensionalAccessException(this, i)
   }
 
-  def magnitudeSquared(): Double = { var mag2 = 0.0; for (v:Double <- values) mag2 = mag2 + (v*v); mag2 }
+  override def magnitudeSquared(): Double = { var mag2 = 0.0; for (v:Double <- values) mag2 = mag2 + (v*v); mag2 }
 
-  def distanceSquaredTo(v0: Vector): Double = {
+  override def distanceSquaredTo(v0: Vector): Double = {
     if (values.length != v0.values.length) throw MismatchedVectorDimensionsException(this, v0)
     else {
       var distance = 0.0
@@ -84,7 +80,7 @@ case class VectorN(values:VectorValues) extends Vector {
 
   }
 
-  def dot(v0: Vector): Double = {
+  override def dot(v0: Vector): Double = {
     if (values.length != v0.values.length) throw MismatchedVectorDimensionsException(this, v0)
     else {
       var accumulator = 0.0
@@ -96,18 +92,18 @@ case class VectorN(values:VectorValues) extends Vector {
   }
 
 
-  def scale(scalar: Double): VectorN = {
+  override def scale(scalar: Double): VectorN = {
     for (i <- values.indices) values(i) = values(i) * scalar
     this
   }
 
 
-  def round(): VectorN = {
+  override def round(): VectorN = {
     for (i <- values.indices) values(i) = Math.round(values(i)).toDouble
     this
   }
 
-  def add(v0: Vector): VectorN = {
+  override def add(v0: Vector): VectorN = {
     if (values.length != v0.values.length) throw MismatchedVectorDimensionsException(this, v0)
     else {
       for (i <- values.indices) values(i) = values(i) + v0.values(i)
@@ -115,7 +111,7 @@ case class VectorN(values:VectorValues) extends Vector {
     }
   }
 
-  def subtract(v0: Vector): VectorN = {
+  override def subtract(v0: Vector): VectorN = {
     if (values.length != v0.values.length) throw MismatchedVectorDimensionsException(this, v0)
     else {
       for (i <- values.indices) values(i) = values(i) - v0.values(i)

@@ -2,13 +2,10 @@ package ai.dragonfly.math.vector
 
 import ai.dragonfly.math.util.Demonstrable
 
-import scala.scalajs.js.annotation.JSExportAll
-
 /**
  * Created by clifton on 1/10/17.
  */
 
-@JSExportAll
 object Vector3 extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val i = Vector3(1, 0, 0)
@@ -37,7 +34,6 @@ object Vector3 extends Demonstrable {
   override def name: String = "Vector3"
 }
 
-@JSExportAll
 case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override val dimension: Int = 3

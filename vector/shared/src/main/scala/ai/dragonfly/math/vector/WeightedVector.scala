@@ -2,11 +2,7 @@ package ai.dragonfly.math.vector
 
 import ai.dragonfly.math.util.Demonstrable
 
-import scala.scalajs.js.annotation.{JSExport, JSExportAll}
-
-@JSExportAll
 object WeightedVector extends Demonstrable {
-  @JSExport("apply")
   def apply(weight:Double, vector:Vector):WeightedVector = {
     new WeightedVector(vector).addWeight(weight)
   }
@@ -20,7 +16,6 @@ object WeightedVector extends Demonstrable {
   override def name: String = "WeightedVector"
 }
 
-@JSExportAll
 case class WeightedVector(unweighted:Vector) {
   private var weight:Double = 0.0
   def addWeight(w: Double): WeightedVector = {

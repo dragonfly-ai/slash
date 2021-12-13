@@ -4,9 +4,6 @@ import ai.dragonfly.math.stats.Sampleable
 import ai.dragonfly.math.util.Demonstrable
 import ai.dragonfly.math.vector.Vector3
 
-import scala.scalajs.js.annotation.JSExportAll
-
-@JSExportAll
 object Tetrahedron extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val t = Tetrahedron(
@@ -28,7 +25,6 @@ object Tetrahedron extends Demonstrable {
   override def name: String = "Tetrahedron"
 }
 
-@JSExportAll
 case class Tetrahedron(v1: Vector3, v2: Vector3, v3: Vector3, v4: Vector3 = Vector3(0.0, 0.0, 0.0)) extends Sampleable[Vector3] {
 
   private val v1_ = v1.copy().subtract(v4)
