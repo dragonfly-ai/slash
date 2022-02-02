@@ -18,5 +18,5 @@ object Gaussian extends Demonstrable {
 case class Gaussian(mean:Double, variance:Double) extends Sampleable[Double] {
   lazy val standardDeviation:Double = Math.sqrt(variance)
   override def random(): Double = mean + ( Random.nextGaussian() * standardDeviation )
-  override def toString: String = s"stream.Gaussian(μ = $mean, σ = $variance, √σ = $standardDeviation)"
+  override def toString: String = s"stream.Gaussian(μ = $mean, σ² = $variance, σ = $standardDeviation)"
 }

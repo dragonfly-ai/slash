@@ -58,7 +58,7 @@ class Gaussian extends Sampleable[Double] {
    */
   @inline def standardDeviation:Double = Math.sqrt(variance)
 
-  override def toString: String = s"stream.Gaussian(min = $min, max = $max, μ = $mean, σ = $variance, √σ = $standardDeviation, n = $s0)"
+  override def toString: String = s"stream.Gaussian(min = $min, max = $max, μ = $mean, σ² = $variance, σ = $standardDeviation, n = $s0)"
 
   override def random(): Double = mean + ( Random.nextGaussian() * standardDeviation )
 }
