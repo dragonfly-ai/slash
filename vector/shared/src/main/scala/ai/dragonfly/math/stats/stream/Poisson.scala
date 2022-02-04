@@ -55,7 +55,7 @@ class Poisson extends Sampleable[Int] {
 
   def standardDeviation:Double = Math.sqrt(variance)
 
-  override def toString: String = s"stream.Poisson(min = $min, max = $max, λ = $mean, √λ = $standardDeviation, n = $s0)"
+  override def toString: String = s"stream.Poisson(min = $min, MAX = $max, λ = $mean, √λ = $standardDeviation, n = $s0)"
 
 //  /**
 //   * Approximate probability of x, given this Poisson distribution.
