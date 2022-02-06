@@ -22,7 +22,7 @@ object Vector {
     case _ => VectorN(VectorValues.fill(dimension)((_:Int) => value))
   }
 
-  def fill(dimension:Int)(f: Int => Double):Vector = {
+  def fill(dimension:Int)(f: Int => Double):Vector = dimension match {
     case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
     case 2 => Vector2(f(0), f(1))
     case 3 => Vector3(f(0), f(1), f(2))

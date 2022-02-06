@@ -8,7 +8,7 @@ object LogNormal {
 
 case class LogNormal(gaussian: Gaussian) extends Sampleable[Double] {
 
-  lazy val mean: Math.exp( gaussian.mean + (gaussian.variance / 2) )
+  lazy val mean: Double = Math.exp( gaussian.mean + (gaussian.variance / 2) )
   lazy val variance: Double = (Math.exp(gaussian.variance) - 1) * Math.exp((2 * gaussian.mean) + (gaussian.variance))
   lazy val standardDeviation: Double = Math.sqrt(variance)
 

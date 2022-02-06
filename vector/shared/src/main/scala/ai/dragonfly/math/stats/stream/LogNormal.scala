@@ -2,7 +2,7 @@ package ai.dragonfly.math.stats.stream
 
 import ai.dragonfly.math.stats.Sampleable
 
-class LogNormal(gaussian:Gaussain = Gaussian()) extends Sampleable[Double] {
+class LogNormal(gaussian:Gaussian = Gaussian()) extends Sampleable[Double] {
   def apply(observation: Double, frequency: Double = 1.0):LogNormal = {
     gaussian.apply(Math.log(observation), frequency)
     this
