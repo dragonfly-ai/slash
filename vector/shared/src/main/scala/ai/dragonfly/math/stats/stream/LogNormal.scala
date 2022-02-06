@@ -12,7 +12,7 @@ class LogNormal(gaussian:Gaussain = Gaussian()) extends Sampleable[Double] {
     Math.exp(gaussian.random())
   }
 
-  def mean: Math.exp( gaussian.mean + (gaussian.variance / 2) )
+  def mean: Double = Math.exp( gaussian.mean + (gaussian.variance / 2) )
 
   def variance: Double = (Math.exp(gaussian.variance) - 1) * Math.exp((2 * gaussian.mean) + (gaussian.variance))
 

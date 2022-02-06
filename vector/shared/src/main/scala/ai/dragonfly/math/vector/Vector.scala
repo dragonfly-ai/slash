@@ -22,7 +22,14 @@ object Vector {
     case _ => VectorN(VectorValues.fill(dimension)((_:Int) => value))
   }
 
-  
+  def fill(dimension:Int)(f: Int => Double):Vector = {
+    case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
+    case 2 => Vector2(f(0), f(1))
+    case 3 => Vector3(f(0), f(1), f(2))
+    case 4 => Vector4(f(0), f(1), f(2), f(3))
+    case _ => VectorN(VectorValues.fill(dimension)(f))
+  }
+
   def random(dimension: Int, maxNorm:Double = 1.0): Vector = {
     def r(i:Int = 0): Double = Math.random() * maxNorm
     dimension match {
