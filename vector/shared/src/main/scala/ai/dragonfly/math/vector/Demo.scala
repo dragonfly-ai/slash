@@ -8,10 +8,10 @@ import ai.dragonfly.math.util.Demonstrable
 
 object Demo {
   val allDemos:Array[Demonstrable] = Array[Demonstrable](
-    V2,
-    V3,
-    V4,
-    VN,
+    Vector2,
+    Vector3,
+    Vector4,
+    VectorN,
     WeightedVector,
     ai.dragonfly.math.stats.Gaussian,
     ai.dragonfly.math.stats.Poisson,

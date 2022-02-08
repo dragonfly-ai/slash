@@ -64,7 +64,7 @@ case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) e
     } else throw MismatchedVectorDimensionsException(this, v0)
   }
 
-  override def dot(v0: V): Double = {
+  override def dot(v0: Vector): Double = {
     if (v0.dimension == dimension) x * v0.component(0) + y * v0.component(1) + z * v0.component(2) + w * v0.component(3)
     else throw MismatchedVectorDimensionsException(this, v0)
   }
