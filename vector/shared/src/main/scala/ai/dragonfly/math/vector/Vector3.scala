@@ -7,6 +7,12 @@ import ai.dragonfly.math.util.Demonstrable
  */
 
 object Vector3 extends Demonstrable {
+
+  def apply(values:VectorValues): Vector3 = {
+    if (values.length == 3) Vector3(values(0), values(1), values(2))
+    else throw UnsupportedVectorDimension(values.length)
+  }
+
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val i = Vector3(1, 0, 0)
     val j = Vector3(0, 1, 0)

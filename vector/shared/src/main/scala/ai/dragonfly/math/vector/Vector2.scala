@@ -18,6 +18,11 @@ object Vector2 extends Demonstrable {
     sb
   }
 
+  def apply(values:VectorValues): Vector2 = {
+    if (values.length == 2) Vector2(values(0), values(1))
+    else throw UnsupportedVectorDimension(values.length)
+  }
+
   override def name: String = "Vector2"
 }
 

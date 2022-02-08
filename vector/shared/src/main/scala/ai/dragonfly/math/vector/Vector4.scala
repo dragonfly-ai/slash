@@ -3,6 +3,12 @@ package ai.dragonfly.math.vector
 import ai.dragonfly.math.util.Demonstrable
 
 object Vector4 extends Demonstrable {
+
+  def apply(values:VectorValues): Vector4 = {
+    if (values.length == 4) Vector4(values(0), values(1), values(2), values(3))
+    else throw UnsupportedVectorDimension(values.length)
+  }
+
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val i = Vector4(1, 0, 0, 0)
     val j = Vector4(0, 1, 0, 0)

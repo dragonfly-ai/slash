@@ -4,6 +4,16 @@ import scala.scalajs.js
 
 object Vector {
 
+  def apply(values: VectorValues): Vector = {
+    values.length match {
+      case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
+      case 2 => Vector2(values(0), values(1))
+      case 3 => Vector3(values(0), values(1), values(2))
+      case 4 => Vector4(values(0), values(1), values(2), values(3))
+      case _ => VectorN(values)
+    }
+  }
+
   def apply(d:Double*): Vector = {
     d.size match {
       case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
@@ -109,6 +119,12 @@ trait Vector {
 
   def copy(): Vector
 
+  def csv: String = {
+    val sb:StringBuilder = new StringBuilder()
+    sb.append(values.head)
+    for (v <- values.tail) sb.append(", ").append(v)
+    sb.toString
+  }
 }
 
 case class UnsupportedVectorDimension(d:Int) extends Exception(
