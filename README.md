@@ -6,7 +6,7 @@ To use this library with SBT:
 
 <pre>
 resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/"
-libraryDependencies += "ai.dragonfly.code" %%% "versionedjson" % "0.306"
+libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.308"
 </pre><br />
 
 Projects that rely on this Library:
