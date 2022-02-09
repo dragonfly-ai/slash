@@ -99,14 +99,14 @@ trait Vector {
 
   def distanceTo(v0: Vector): Double = Math.sqrt(distanceSquaredTo(v0))
 
-
   def dot(v0: Vector): Double
 
+  def round(): Vector
+
+  // in place operators
   def scale(scalar: Double): Vector
 
-  def divide(denominator: Double): Vector = scale(1.0/denominator)
-
-  def round(): Vector
+  def divide(denominator: Double): Vector = scale(1.0 / denominator)
 
   def add(v0: Vector): Vector
 
@@ -118,6 +118,13 @@ trait Vector {
   }
 
   def copy(): Vector
+
+  // copy operators
+  def *(scalar:Double) = this.copy().scale(scalar)
+  def /(scalar:Double) = this.copy().divide(scalar)
+
+  def +(v: Vector) = this.copy().add(v)
+  def -(v: Vector) = this.copy().subtract(v)
 
   def csv: String = {
     val sb:StringBuilder = new StringBuilder()
