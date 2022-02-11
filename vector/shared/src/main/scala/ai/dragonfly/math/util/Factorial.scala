@@ -113,12 +113,14 @@ object Factorial {
     BigDecimal("93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000") // 100!
   )
 
-  def apply:PartialFunction[Int,BigDecimal] = {
-    case i: Int if i > -1 && i < 101 => table(i)
-  }
+  def apply(i:Int):BigDecimal = table(i) //if (i > -1 && i < 101) table(i) else throw ArrayIndexOutOfBounds(i.toDouble, s"Factorial table only defined for 0 <= x <= 100.")
 
-  implicit class IntFactorial(i:Int) {
-    def ! :BigDecimal = apply(i)
-  }
+//  def apply:PartialFunction[Int,BigDecimal] = {
+//    case i: Int if i > -1 && i < 101 => table(i)
+//  }
+//
+//  implicit class IntFactorial(i:Int) {
+//    def ! :BigDecimal = apply(i)
+//  }
 
 }

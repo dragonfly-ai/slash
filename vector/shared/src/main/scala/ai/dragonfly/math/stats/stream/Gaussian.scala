@@ -1,25 +1,15 @@
 package ai.dragonfly.math.stats.stream
 
 import ai.dragonfly.math.stats.Sampleable
-import ai.dragonfly.math.util.Demonstrable
+import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo}
 
 import scala.util.Random
 
-object Gaussian extends Demonstrable {
-  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
-    val mean:Double = 25.0
-    val variance:Double = 100.0
-    val idealGaussian:ai.dragonfly.math.stats.Gaussian = ai.dragonfly.math.stats.Gaussian(mean, variance)
-    sb.append(s"Populate stream.Gaussian by sampling from: $idealGaussian")
-    val sg:Gaussian = new Gaussian()
-    for (i <- 0 until 1000) { sg(idealGaussian.random()) }
-    sb.append(sg)
-  }
-
-  override def name: String = "Streaming Gaussian"
+object Gaussian {
+  val demo = OnlineProbDistDemo[ai.dragonfly.math.stats.Gaussian]("Streaming Gaussian", ai.dragonfly.math.stats.Gaussian(42.0, 7.0), Gaussian(), 1000)
 }
 
-class Gaussian extends Sampleable[Double] {
+class Gaussian extends Online[ai.dragonfly.math.stats.Gaussian] {
 
   private var minObservation = Double.MaxValue
   private var maxObservation = Double.MinValue
@@ -44,21 +34,25 @@ class Gaussian extends Sampleable[Double] {
 
   def sampleSize:Double = s0
 
-  @inline def mean:Double = s1 / s0
+  inline def mean:Double = s1 / s0
 
   /**
    * σ
    * @return
    */
-  @inline def variance:Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
+  inline def variance:Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
 
   /**
    * 	√σ
    * @return
    */
-  @inline def standardDeviation:Double = Math.sqrt(variance)
+  inline def standardDeviation:Double = Math.sqrt(variance)
+
+  def p(x:Double):Double = ???
 
   override def toString: String = s"stream.Gaussian(min = $min, MAX = $max, μ = $mean, σ² = $variance, σ = $standardDeviation, n = $s0)"
 
   override def random(): Double = mean + ( Random.nextGaussian() * standardDeviation )
+
+  def freeze:ai.dragonfly.math.stats.Gaussian = ai.dragonfly.math.stats.Gaussian(this.mean, this.variance)
 }

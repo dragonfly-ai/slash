@@ -97,9 +97,9 @@ trait Histogram {
   def getFrequency(query: Double): Double = getFrequency(getBindex(query))
 
   override def toString: String = {
-    val sb = new mutable.StringBuilder("Histogram: { ")
+    val sb = new mutable.StringBuilder("Histogram: { \n")
     for (b <- bins) {
-      sb.append(b+min).append(",").append(getFrequency(b)/getTotalMass).append("\n")
+      sb.append("\t").append(b+min).append(",").append(getFrequency(b)/getTotalMass).append("\n")
     }
     sb.append("}")
     sb.toString()

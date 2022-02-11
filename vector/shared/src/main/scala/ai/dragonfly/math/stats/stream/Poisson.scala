@@ -1,28 +1,18 @@
 package ai.dragonfly.math.stats.stream
 
 import ai.dragonfly.math.stats.Sampleable
-import ai.dragonfly.math.util.Demonstrable
+import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo, gamma}
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
 
-object Poisson extends Demonstrable {
-  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
-    val idealPoisson:ai.dragonfly.math.stats.Poisson = ai.dragonfly.math.stats.Poisson(20)
-    sb.append(s"Populate stream.Poisson by sampling from: $idealPoisson")
-    val p1:Poisson = new Poisson
-    for (i <- 0 until 10000) {
-      p1(idealPoisson.random())
-    }
-    sb.append(s"$p1")
-  }
-
-  override def name: String = "stream.Poisson"
+object Poisson {
+  val demo = OnlineProbDistDemo[ai.dragonfly.math.stats.Poisson]("Streaming Poisson", ai.dragonfly.math.stats.Poisson(69), Poisson(), 10000)
 }
 
-class Poisson extends Sampleable[Int] {
+class Poisson extends Online[ai.dragonfly.math.stats.Poisson] {
   private var minObservation = Double.MaxValue
-  private var maxObservation:Long = Long.MinValue
+  private var maxObservation = Double.MinValue
 
   private var s0 = 0.0 // weighted count
   private var s1 = 0.0 // weighted sum
@@ -32,7 +22,7 @@ class Poisson extends Sampleable[Int] {
    * @param observation the value observed.
    * @param frequency the number of times this value has been observed, default 1L
    */
-  def apply(observation: Int, frequency: Int = 1):Poisson = if (observation < 0) {
+  override def apply(observation: Double, frequency: Double):Online[ai.dragonfly.math.stats.Poisson] = if (observation < 0) {
     throw PoissonDistributionUndefinedForNegativeNumbers(observation)
   } else {
     minObservation = Math.min(observation, minObservation)
@@ -45,19 +35,23 @@ class Poisson extends Sampleable[Int] {
   }
 
   def min:Double = minObservation
-  def max:Long = maxObservation
+  def max:Double = maxObservation
 
   def sampleSize:Double = s0
 
-  @inline def mean:Double = s1 / s0 // λ
+  inline def mean:Double = s1 / s0 // λ
 
-  @inline def variance: Double = s1 / s0 // also λ
+  inline def variance: Double = s1 / s0 // also λ
 
   def standardDeviation:Double = Math.sqrt(variance)
 
+  def p(x:Double):Double = Math.exp( x * Math.log(mean) - mean - Math.log(gamma(x+1)) )
+
   override def toString: String = s"stream.Poisson(min = $min, MAX = $max, λ = $mean, √λ = $standardDeviation, n = $s0)"
 
-//  /**
+  def freeze:ai.dragonfly.math.stats.Poisson = ai.dragonfly.math.stats.Poisson(this.mean)
+
+  //  /**
 //   * Approximate probability of x, given this Poisson distribution.
 //   * @param x a value in the probability distribution
 //   * @return P(x)
@@ -74,7 +68,7 @@ class Poisson extends Sampleable[Int] {
    * Generate a random variable from this Poisson Distribution.
    * @return
    */
-  override def random(): Int = ai.dragonfly.math.stats.Poisson(mean).random()
+  override def random(): Double = ai.dragonfly.math.stats.Poisson(mean).random()
 
     /*
     val scalar:Double = 100.0 / max
@@ -108,4 +102,4 @@ class Poisson extends Sampleable[Int] {
  */
 }
 
-case class PoissonDistributionUndefinedForNegativeNumbers(negative:Int) extends Exception(s"Poisson distribution undefined for observation: $negative")
+case class PoissonDistributionUndefinedForNegativeNumbers(negative:Double) extends Exception(s"Poisson distribution undefined for observation: $negative")
