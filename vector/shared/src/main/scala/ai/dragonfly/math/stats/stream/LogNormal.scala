@@ -31,5 +31,5 @@ class LogNormal() extends Online[ai.dragonfly.math.stats.LogNormal] {
 
   def freeze:ai.dragonfly.math.stats.LogNormal = ai.dragonfly.math.stats.LogNormal(μ, `σ²`)
 
-  override def toString: String = s"stream.LogNormal( min = $min, MAX = $MAX, μ = $μ, σ² = ${`σ²`}, σ = $σ, N = ${G.s0})" // ${gaussian.toString} )"
+  override def toString: String = s"stream.LogNormal( min = $min, MAX = $MAX, μ = $μ, σ² = ${`σ²`}, σ = $σ, N = ${G.sampleSize})" // ${gaussian.toString} )"
 }

@@ -39,7 +39,7 @@ class Beta extends Online[ai.dragonfly.math.stats.Beta] {
 
   override def toString: String = {
     val frozen:ai.dragonfly.math.stats.Beta = freeze
-    s"stream.Beta(α = ${frozen.α}, β = ${frozen.β}, min = ${frozen.min}, MAX = ${frozen.MAX}, μ = ${frozen.μ}, σ² = ${frozen.`σ²`}, σ = ${frozen.σ}, N = ${G.s0})"
+    s"stream.Beta(α = ${frozen.α}, β = ${frozen.β}, min = ${frozen.min}, MAX = ${frozen.MAX}, μ = ${frozen.μ}, σ² = ${frozen.`σ²`}, σ = ${frozen.σ}, N = ${G.sampleSize})"
   }
 
 }
