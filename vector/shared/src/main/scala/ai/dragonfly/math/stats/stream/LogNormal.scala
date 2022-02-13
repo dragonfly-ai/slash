@@ -1,6 +1,5 @@
 package ai.dragonfly.math.stats.stream
 
-import ai.dragonfly.math.stats.Sampleable
 import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo}
 
 
@@ -9,28 +8,28 @@ object LogNormal {
 }
 
 class LogNormal() extends Online[ai.dragonfly.math.stats.LogNormal] {
-  val gaussian:Gaussian = Gaussian()
+  val G:Gaussian = Gaussian()
   def apply(observation: Double, frequency: Double = 1.0):LogNormal = {
-    gaussian.apply(Math.log(observation), frequency)
+    G.apply(Math.log(observation), frequency)
     this
   }
 
   override def random(): Double = {
-    Math.exp(gaussian.random())
+    Math.exp(G.random())
   }
 
-  def min:Double = Math.exp( gaussian.min )
-  def max:Double = Math.exp( gaussian.max )
+  override def min:Double = Math.exp( G.min )
+  override def MAX:Double = Math.exp( G.MAX )
 
-  def mean: Double = Math.exp( gaussian.mean + (gaussian.variance / 2) )
+  def μ: Double = Math.exp( G.μ + (G.`σ²` / 2) )
 
-  def variance: Double = (Math.exp(gaussian.variance) - 1) * Math.exp((2 * gaussian.mean) + (gaussian.variance))
+  def `σ²`: Double = (Math.exp(G.`σ²`) - 1) * Math.exp((2 * G.μ) + (G.`σ²`))
 
-  def standardDeviation: Double = Math.sqrt(variance)
+  def σ: Double = Math.sqrt(`σ²`)
 
-  def p(x:Double):Double = ai.dragonfly.math.stats.LogNormal.p(x, gaussian.mean, gaussian.standardDeviation)
+  def p(x:Double):Double = ai.dragonfly.math.stats.LogNormal.p(x, G.μ, G.σ)
 
-  def freeze:ai.dragonfly.math.stats.LogNormal = ai.dragonfly.math.stats.LogNormal(mean, variance)
+  def freeze:ai.dragonfly.math.stats.LogNormal = ai.dragonfly.math.stats.LogNormal(μ, `σ²`)
 
-  override def toString: String = s"stream.LogNormal( min = $min, MAX = $max, μ = $mean, σ² = $variance, σ = $standardDeviation )" // ${gaussian.toString} )"
+  override def toString: String = s"stream.LogNormal( min = $min, MAX = $MAX, μ = $μ, σ² = ${`σ²`}, σ = $σ, N = ${G.s0})" // ${gaussian.toString} )"
 }

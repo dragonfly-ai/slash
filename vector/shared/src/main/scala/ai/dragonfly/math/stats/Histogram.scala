@@ -92,14 +92,15 @@ trait Histogram {
   def apply(x: Double, weight: Double = 1.0): Histogram
   def mass: Double
   def bins: Iterable[Int]
-  def getBindex(observation: Double): Int = ((observation - min) / bucketWidth).toInt
+  def getBindex(observation: Double): Int = Math.min((observation - min) / bucketWidth, binCount - 1.0).toInt
   protected def getFrequency(bindex: Int): Double
   def getFrequency(query: Double): Double = getFrequency(getBindex(query))
+  def bucketLabel(b:Int):Double = min + ((1000.0 * ((b*bucketWidth) + (0.5 * bucketWidth))).toInt / 1000.0)
 
   override def toString: String = {
     val sb = new mutable.StringBuilder("Histogram: { \n")
     for (b <- bins) {
-      sb.append("\t").append(b+min).append(",").append(getFrequency(b)/getTotalMass).append("\n")
+      sb.append("\t").append(bucketLabel(b)).append(",").append(getFrequency(b)/getTotalMass).append("\n")
     }
     sb.append("}")
     sb.toString()

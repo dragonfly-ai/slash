@@ -33,7 +33,8 @@ package object util {
     sum
   }
 
-  def gamma(x:Double):Double = Math.exp(logGamma(x))
+  def Γ(x:Double):Double = Math.exp(logGamma(x))
+  def gamma(x:Double):Double = Γ(x)
 
 
   private inline val c1 = 0.5 + (607.0 / 128.0)
@@ -166,6 +167,10 @@ package object util {
       if (x > 0.5) (t / x) * ((c - 0.5) - 0.5)
       else x * c
     }
+  }
+
+  def beta(alpha:Double, beta:Double):Double = {
+    (gamma(alpha) * gamma(beta)) / gamma(alpha + beta)
   }
 }
 

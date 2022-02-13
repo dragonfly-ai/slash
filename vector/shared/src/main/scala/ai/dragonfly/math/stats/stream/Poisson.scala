@@ -1,6 +1,5 @@
 package ai.dragonfly.math.stats.stream
 
-import ai.dragonfly.math.stats.Sampleable
 import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo, gamma}
 
 import scala.language.postfixOps
@@ -34,22 +33,24 @@ class Poisson extends Online[ai.dragonfly.math.stats.Poisson] {
     this
   }
 
-  def min:Double = minObservation
-  def max:Double = maxObservation
+  override def min:Double = minObservation
+  override def MAX:Double = maxObservation
 
   def sampleSize:Double = s0
 
-  inline def mean:Double = s1 / s0 // λ
+  inline def λ:Double = s1 / s0
 
-  inline def variance: Double = s1 / s0 // also λ
+  def μ:Double = λ
 
-  def standardDeviation:Double = Math.sqrt(variance)
+  inline def `σ²`: Double = λ //  s1 / s0
 
-  def p(x:Double):Double = Math.exp( x * Math.log(mean) - mean - Math.log(gamma(x+1)) )
+  def σ:Double = Math.sqrt(λ) // Math.sqrt(`σ²`)
 
-  override def toString: String = s"stream.Poisson(min = $min, MAX = $max, λ = $mean, √λ = $standardDeviation, n = $s0)"
+  def p(x:Double):Double = Math.exp( x * Math.log(λ) - λ - Math.log(gamma(x+1)) )
 
-  def freeze:ai.dragonfly.math.stats.Poisson = ai.dragonfly.math.stats.Poisson(this.mean)
+  override def toString: String = s"stream.Poisson(min = $min, MAX = $MAX, λ = μ = σ² = $λ, σ = √λ = $σ, N = $s0)"
+
+  def freeze:ai.dragonfly.math.stats.Poisson = ai.dragonfly.math.stats.Poisson(λ)
 
   //  /**
 //   * Approximate probability of x, given this Poisson distribution.
@@ -68,7 +69,7 @@ class Poisson extends Online[ai.dragonfly.math.stats.Poisson] {
    * Generate a random variable from this Poisson Distribution.
    * @return
    */
-  override def random(): Double = ai.dragonfly.math.stats.Poisson(mean).random()
+  override def random(): Double = ai.dragonfly.math.stats.Poisson(λ).random()
 
     /*
     val scalar:Double = 100.0 / max

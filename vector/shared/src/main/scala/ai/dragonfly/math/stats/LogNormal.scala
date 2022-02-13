@@ -6,39 +6,40 @@ import ai.dragonfly.math.util.{Demonstrable, ProbDistDemo}
 
 object LogNormal {
 
-  val demo: ProbDistDemo = ProbDistDemo("LogNormal", LogNormal(15.0, 5.0), 1000)
+  val demo: ProbDistDemo = ProbDistDemo("LogNormal", LogNormal(15.0, 5.0))
 
-  def fromGaussianParameters(mean:Double, variance:Double): LogNormal = fromGaussian( Gaussian(mean, variance) )
-  def fromGaussian(gaussian: Gaussian): LogNormal = LogNormal(
-    Math.exp( gaussian.mean + (gaussian.variance / 2) ),
-    (Math.exp(gaussian.variance) - 1) * Math.exp((2 * gaussian.mean) + (gaussian.variance))
+  def fromGaussianParameters(Gμ:Double, `Gσ²`: Double): LogNormal = fromGaussian( Gaussian(Gμ, `Gσ²`) )
+  def fromGaussian(g: Gaussian): LogNormal = LogNormal(
+    Math.exp( g.μ + (g.`σ²` / 2) ),
+    (Math.exp(g.`σ²`) - 1) * Math.exp((2 * g.μ) + (g.`σ²`))
   )
 
   private val c1:Double = Math.sqrt(2.0 * Math.PI)
-  def p(x:Double, gaussianMean:Double, gaussianStandardDeviation: Double):Double = {
-    val c2:Double = Math.log(x) - gaussianMean
-    (1.0 / (x * (gaussianStandardDeviation * c1))) * Math.exp(-0.5 * ((c2*c2) / (gaussianStandardDeviation * gaussianStandardDeviation)))
+  def p(x:Double, μG:Double, σG: Double):Double = {
+    val c2:Double = Math.log(x) - μG
+    (1.0 / (x * (σG * c1))) * Math.exp(-0.5 * ((c2*c2) / (σG * σG)))
   }
 }
 
-case class LogNormal(mean:Double, variance: Double) extends ProbabilityDistribution {
+case class LogNormal(μ:Double, `σ²`: Double) extends ProbabilityDistribution {
 
-  val gaussian:Gaussian = {
-    val mean2:Double = mean * mean
+  val G:Gaussian = {
+    val `μ²`:Double = μ * μ
     Gaussian(
-      Math.log( mean2 / Math.sqrt(mean2 + variance) ), // transform mean
-      Math.log( 1.0 + (variance / mean2) ) // transform variance
+      Math.log( `μ²` / Math.sqrt(`μ²` + `σ²`) ), // transform mean
+      Math.log( 1.0 + (`σ²` / `μ²`) ) // transform variance
     )
   }
 
-  lazy val standardDeviation: Double = Math.sqrt(variance)
+  lazy val σ: Double = Math.sqrt(`σ²`)
 
+  override val min:Double = 0.0
 
-  def p(x:Double):Double = LogNormal.p(x, gaussian.mean, gaussian.standardDeviation)
+  def p(x:Double):Double = LogNormal.p(x, G.μ, G.σ)
 
   override def random(): Double = {
-    Math.exp(gaussian.random())
+    Math.exp(G.random())
   }
 
-  override def toString: String = s"LogNormal( μ = $mean, σ² = $variance, σ = $standardDeviation )" //, gaussian = $gaussian )"
+  override def toString: String = s"LogNormal( μ = $μ, σ² = ${`σ²`}, σ = $σ )" //, gaussian = $gaussian )"
 }

@@ -1,6 +1,5 @@
 package ai.dragonfly.math.stats.stream
 
-import ai.dragonfly.math.stats.Sampleable
 import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo}
 
 import scala.util.Random
@@ -29,30 +28,30 @@ class Gaussian extends Online[ai.dragonfly.math.stats.Gaussian] {
     this
   }
 
-  def min:Double = minObservation
-  def max:Double = maxObservation
+  override def min:Double = minObservation
+  override def MAX:Double = maxObservation
 
   def sampleSize:Double = s0
 
-  inline def mean:Double = s1 / s0
+  inline def μ:Double = s1 / s0
 
   /**
    * σ
    * @return
    */
-  inline def variance:Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
+  inline def `σ²`:Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
 
   /**
    * 	√σ
    * @return
    */
-  inline def standardDeviation:Double = Math.sqrt(variance)
+  inline def σ:Double = Math.sqrt(`σ²`)
 
-  def p(x:Double):Double = ???
+  def p(x:Double):Double = freeze.p(x)
 
-  override def toString: String = s"stream.Gaussian(min = $min, MAX = $max, μ = $mean, σ² = $variance, σ = $standardDeviation, n = $s0)"
+  override def toString: String = s"stream.Gaussian(min = $min, MAX = $MAX, μ = $μ, σ² = ${`σ²`}, σ = $σ, N = $s0)"
 
-  override def random(): Double = mean + ( Random.nextGaussian() * standardDeviation )
+  override def random(): Double = μ + ( Random.nextGaussian() * σ )
 
-  def freeze:ai.dragonfly.math.stats.Gaussian = ai.dragonfly.math.stats.Gaussian(this.mean, this.variance)
+  def freeze:ai.dragonfly.math.stats.Gaussian = ai.dragonfly.math.stats.Gaussian(μ, `σ²`)
 }
