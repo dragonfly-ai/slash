@@ -17,7 +17,6 @@ lazy val vector = crossProject(JSPlatform, JVMPlatform).settings(
   libraryDependencies ++= Seq(
     "org.scala-js" %%% "scalajs-dom" % "2.0.0"
   ),
-  //excludeDependencies += ExclusionRule(organization = "org.scala-js"),
   scalaJSUseMainModuleInitializer := true
 )
 
