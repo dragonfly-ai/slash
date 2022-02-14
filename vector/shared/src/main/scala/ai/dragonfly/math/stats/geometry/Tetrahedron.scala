@@ -17,7 +17,7 @@ object Tetrahedron extends Demonstrable {
     sb.append("o tetrahedronSamples")
     for (i <- 0 until 25) {
       val s = t.random()
-      sb.append(s"v ${s.x} ${s.y} ${s.z}")
+      sb.append(s"v ${s.x} ${s.y} ${s.z}\n")
     }
     sb
   }

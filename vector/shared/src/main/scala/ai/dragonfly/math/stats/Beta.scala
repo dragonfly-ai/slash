@@ -20,7 +20,7 @@ case class Beta(α:Double, β:Double, override val min:Double = 0.0, override va
   private val αβ:Double = α * β
   private val `α+β`:Double = (α + β)
   private val `(α+β)²`:Double = `α+β` * `α+β`
-  private lazy val `B(α,β)`:Double = {(Γ(α) * Γ(β)) / Γ(`α+β`)}
+  private lazy val `B(α,β)`:Double = (Γ(α) * Γ(β)) / Γ(`α+β`)
 
   override val μ:Double = transform(α / (αβ))
   override val `σ²`:Double = (αβ / ( `(α+β)²` * (`α+β` + 1.0) )) * (scale * scale)

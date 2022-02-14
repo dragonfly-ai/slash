@@ -36,6 +36,8 @@ package object util {
   def Γ(x:Double):Double = Math.exp(logGamma(x))
   def gamma(x:Double):Double = Γ(x)
 
+  def B(α:Double, β:Double):Double = ( Γ(α) * Γ(β) ) / Γ(α + β)
+  def beta(α:Double, β:Double):Double = B(α, β)
 
   private inline val c1 = 0.5 + (607.0 / 128.0)
   private inline val c2 = 0.9189385332046727 //(Math.log(2.0 * Math.PI) / 2.0).toDouble
@@ -169,9 +171,6 @@ package object util {
     }
   }
 
-  def beta(alpha:Double, beta:Double):Double = {
-    (gamma(alpha) * gamma(beta)) / gamma(alpha + beta)
-  }
 }
 
 object TestGamma extends Demonstrable {
@@ -185,7 +184,7 @@ object TestGamma extends Demonstrable {
     }
     sb
   }
-  override def name:String = "TestGamma"
+  override def name:String = "Gamma"
 }
 
 case class InvalidArgumentToGammaFunction(x:Double, s:String) extends Exception(s) {

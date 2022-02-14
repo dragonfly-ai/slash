@@ -28,7 +28,7 @@ case class ProbDistDemo(override val name: String, dist: ProbabilityDistribution
     for (i <- 0 until sampleSize) {
       histogram(dist.random())
     }
-    sb.append(s"\n$histogram")
+    sb.append(s"\n$histogram\n")
   }
 }
 

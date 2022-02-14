@@ -10,7 +10,7 @@ object WeightedVector extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val wv0 = WeightedVector(0.5, Vector3(1.1, 2.5, 0.1))
     sb.append(s"\tWeightedVector: $wv0")
-    sb.append(s"\tWeightedVector.weighted: ${wv0.weighted}")
+    sb.append(s"\tWeightedVector.weighted: ${wv0.weighted}\n")
   }
 
   override def name: String = "WeightedVector"

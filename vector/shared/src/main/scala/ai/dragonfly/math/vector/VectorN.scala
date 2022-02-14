@@ -38,7 +38,7 @@ object VectorN extends Demonstrable {
 
     sb.append("Vector.random(40, Integer.MAX_VALUE) => " + Vector.random(40, Integer.MAX_VALUE))
 
-    sb.append("midpoint: " + Vector.midpoint(new VectorN(1.0, 2.0, 3.0, 4.0, 5.0), new VectorN(5.0, 4.0, 3.0, 2.0, 1.0)))
+    sb.append("midpoint: " + Vector.midpoint(new VectorN(1.0, 2.0, 3.0, 4.0, 5.0), new VectorN(5.0, 4.0, 3.0, 2.0, 1.0))).append("\n")
   }
 
   override def name: String = "VectorN"

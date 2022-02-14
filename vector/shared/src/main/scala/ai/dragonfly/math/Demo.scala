@@ -26,7 +26,8 @@ object Demo {
     ai.dragonfly.math.stats.stream.StreamingVectorStats,
     ai.dragonfly.math.stats.kernel.Kernel,
     ai.dragonfly.math.stats.geometry.Tetrahedron,
-    TestGamma
+    TestGamma,
+    ai.dragonfly.math.util.Factorial.demo
   )
 
   lazy val consolidateDemoOutput: String = {

@@ -16,7 +16,7 @@ object Kernel extends Demonstrable {
 
     var count = 0
     for (dy <- -r to r; dx <- -r to r) count = count + 1
-    sb.append(count)
+    sb.append(count).append("\n")
   }
 
   override def name: String = "Kernel"
