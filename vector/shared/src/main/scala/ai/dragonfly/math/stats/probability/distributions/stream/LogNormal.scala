@@ -1,13 +1,14 @@
-package ai.dragonfly.math.stats.stream
+package ai.dragonfly.math.stats.probability.distributions.stream
 
+import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo}
 
 
 object LogNormal {
-  val demo = OnlineProbDistDemo[ai.dragonfly.math.stats.LogNormal]("Streaming LogNormal", ai.dragonfly.math.stats.LogNormal(69, 21), LogNormal(), 1000)
+  val demo = OnlineProbDistDemo[distributions.LogNormal]("Streaming LogNormal", distributions.LogNormal(69, 21), LogNormal(), 1000)
 }
 
-class LogNormal() extends Online[ai.dragonfly.math.stats.LogNormal] {
+class LogNormal() extends Online[distributions.LogNormal] {
   val G:Gaussian = Gaussian()
   def apply(observation: Double, frequency: Double = 1.0):LogNormal = {
     G.apply(Math.log(observation), frequency)
@@ -27,9 +28,9 @@ class LogNormal() extends Online[ai.dragonfly.math.stats.LogNormal] {
 
   def σ: Double = Math.sqrt(`σ²`)
 
-  def p(x:Double):Double = ai.dragonfly.math.stats.LogNormal.p(x, G.μ, G.σ)
+  def p(x:Double):Double = ai.dragonfly.math.stats.probability.distributions.LogNormal.p(x, G.μ, G.σ)
 
-  def freeze:ai.dragonfly.math.stats.LogNormal = ai.dragonfly.math.stats.LogNormal(μ, `σ²`)
+  def freeze:distributions.LogNormal = distributions.LogNormal(μ, `σ²`)
 
   override def toString: String = s"stream.LogNormal( min = $min, MAX = $MAX, μ = $μ, σ² = ${`σ²`}, σ = $σ, N = ${G.sampleSize})" // ${gaussian.toString} )"
 }

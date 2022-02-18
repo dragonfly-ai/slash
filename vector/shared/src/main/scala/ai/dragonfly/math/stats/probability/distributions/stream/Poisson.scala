@@ -1,15 +1,16 @@
-package ai.dragonfly.math.stats.stream
+package ai.dragonfly.math.stats.probability.distributions.stream
 
+import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo, gamma}
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
 
 object Poisson {
-  val demo = OnlineProbDistDemo[ai.dragonfly.math.stats.Poisson]("Streaming Poisson", ai.dragonfly.math.stats.Poisson(69), Poisson(), 10000)
+  val demo = OnlineProbDistDemo[distributions.Poisson]("Streaming Poisson", distributions.Poisson(69), Poisson(), 10000)
 }
 
-class Poisson extends Online[ai.dragonfly.math.stats.Poisson] {
+class Poisson extends Online[distributions.Poisson] {
   private var minObservation = Double.MaxValue
   private var maxObservation = Double.MinValue
 
@@ -21,7 +22,7 @@ class Poisson extends Online[ai.dragonfly.math.stats.Poisson] {
    * @param observation the value observed.
    * @param frequency the number of times this value has been observed, default 1L
    */
-  override def apply(observation: Double, frequency: Double):Online[ai.dragonfly.math.stats.Poisson] = if (observation < 0) {
+  override def apply(observation: Double, frequency: Double):Online[distributions.Poisson] = if (observation < 0) {
     throw PoissonDistributionUndefinedForNegativeNumbers(observation)
   } else {
     minObservation = Math.min(observation, minObservation)
@@ -50,7 +51,7 @@ class Poisson extends Online[ai.dragonfly.math.stats.Poisson] {
 
   override def toString: String = s"stream.Poisson(min = $min, MAX = $MAX, λ = μ = σ² = $λ, σ = √λ = $σ, N = $s0)"
 
-  def freeze:ai.dragonfly.math.stats.Poisson = ai.dragonfly.math.stats.Poisson(λ)
+  def freeze:distributions.Poisson = distributions.Poisson(λ)
 
   //  /**
 //   * Approximate probability of x, given this Poisson distribution.
@@ -69,7 +70,7 @@ class Poisson extends Online[ai.dragonfly.math.stats.Poisson] {
    * Generate a random variable from this Poisson Distribution.
    * @return
    */
-  override def random(): Double = ai.dragonfly.math.stats.Poisson(λ).random()
+  override def random(): Double = distributions.Poisson(λ).random()
 
     /*
     val scalar:Double = 100.0 / max

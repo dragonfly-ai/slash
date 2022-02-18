@@ -1,5 +1,6 @@
-package ai.dragonfly.math.stats
+package ai.dragonfly.math.stats.probability.distributions
 
+import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
 import ai.dragonfly.math.util.{Demonstrable, ProbDistDemo, Γ}
 
 object Poisson {

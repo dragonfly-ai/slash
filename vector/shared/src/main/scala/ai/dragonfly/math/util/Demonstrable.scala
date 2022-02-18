@@ -6,8 +6,9 @@ trait Demonstrable {
 }
 
 
-import ai.dragonfly.math.stats.{DenseDiscreteHistogram, ProbabilityDistribution}
-import ai.dragonfly.math.stats.stream.Online
+import ai.dragonfly.math.stats.DenseDiscreteHistogram
+import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
+import ai.dragonfly.math.stats.probability.distributions.stream.Online
 
 object ProbDistDemo {
   def apply(name: String, dist: ProbabilityDistribution):ProbDistDemo = {

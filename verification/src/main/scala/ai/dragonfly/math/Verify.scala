@@ -1,6 +1,7 @@
 package ai.dragonfly.math
 
-import ai.dragonfly.math.stats.{Beta, DenseDiscreteHistogram}
+import ai.dragonfly.math.stats.DenseDiscreteHistogram
+import ai.dragonfly.math.stats.probability.distributions.Beta
 import org.apache.commons.math3.distribution.BetaDistribution
 
 object Verify extends App {

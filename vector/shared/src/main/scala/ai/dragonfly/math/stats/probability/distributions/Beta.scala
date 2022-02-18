@@ -1,5 +1,6 @@
-package ai.dragonfly.math.stats
+package ai.dragonfly.math.stats.probability.distributions
 
+import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
 import ai.dragonfly.math.util.{ProbDistDemo, Γ}
 
 import scala.util.Random
@@ -7,6 +8,23 @@ import scala.util.Random
 object Beta {
   val demo2param:ProbDistDemo = ProbDistDemo("Beta", Beta(0.5, 5.0))
   val demo4param:ProbDistDemo = ProbDistDemo("Beta", Beta(2.0, 1.0, 33, 42))//, 14, 33, 42)
+
+  def fromPERT(pert:PERT):Beta = {
+    fromMeanVarianceMinMax(pert.μ, pert.`σ²`, pert.min, pert.MAX)
+  }
+
+  def fromMeanVarianceMinMax(μ:Double, `σ²`:Double, min:Double = 0.0, MAX:Double = 0.0):Beta = {
+    val scale:Double = MAX - min
+    val μS:Double = (μ - min) / scale
+
+    val `σ²S`:Double = `σ²` / (scale * scale)
+    val `1-μS`:Double = 1.0 - μS
+
+    val α = μS * (((μS * `1-μS`)/`σ²S`) - 1.0)
+    val β = `1-μS` * (((μS * `1-μS`)/`σ²S`) - 1.0)
+
+    Beta(α, β, min, MAX)
+  }
 }
 
 case class Beta(α:Double, β:Double, override val min:Double = 0.0, override val MAX:Double = 1.0) extends ProbabilityDistribution {

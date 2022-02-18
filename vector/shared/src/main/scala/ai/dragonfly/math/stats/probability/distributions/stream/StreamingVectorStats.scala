@@ -1,4 +1,4 @@
-package ai.dragonfly.math.stats.stream
+package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.util.Demonstrable
 import ai.dragonfly.math.vector._

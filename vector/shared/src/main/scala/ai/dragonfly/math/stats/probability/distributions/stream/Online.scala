@@ -1,6 +1,6 @@
-package ai.dragonfly.math.stats.stream
+package ai.dragonfly.math.stats.probability.distributions.stream
 
-import ai.dragonfly.math.stats.ProbabilityDistribution
+import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
 
 trait Online[PD <: ProbabilityDistribution] extends ProbabilityDistribution  {
   def freeze:PD
