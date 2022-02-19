@@ -1,6 +1,6 @@
 package ai.dragonfly.math.vector
 
-import ai.dragonfly.math.util.Demonstrable
+import ai.dragonfly.math.examples.Demonstrable
 
 object Vector4 extends Demonstrable {
 

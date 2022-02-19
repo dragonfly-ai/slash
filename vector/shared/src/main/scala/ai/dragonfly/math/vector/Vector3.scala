@@ -1,6 +1,6 @@
 package ai.dragonfly.math.vector
 
-import ai.dragonfly.math.util.Demonstrable
+import ai.dragonfly.math.examples.Demonstrable
 
 /**
  * Created by clifton on 1/10/17.

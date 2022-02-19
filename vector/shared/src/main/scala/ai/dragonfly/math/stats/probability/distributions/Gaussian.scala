@@ -1,21 +1,33 @@
 package ai.dragonfly.math.stats.probability.distributions
 
 import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
-import ai.dragonfly.math.util.ProbDistDemo
+import ai.dragonfly.math.*
+import examples.*
 
 import scala.util.Random
 
 object Gaussian {
-  val demo:ProbDistDemo = ProbDistDemo("Gaussian", Gaussian(10.0, 42.25))
+  val demo = ProbabilityDistributionDemonstration("Gaussian", Gaussian(10.0, 42.25))
 }
 
-case class Gaussian(μ:Double, `σ²`:Double) extends ProbabilityDistribution {
+case class Gaussian(μ:Double, `σ²`:Double) extends ContinuousProbabilityDistribution {
+
+  override def min: Double = Double.NegativeInfinity
+  override def MAX: Double = Double.PositiveInfinity
+
   lazy val σ:Double = Math.sqrt(`σ²`)
-  override def random(): Double = μ + ( Random.nextGaussian() * σ )
+
   override def toString: String = s"Gaussian(μ = $μ, σ² = ${`σ²`}, σ = $σ)"
-  private val s0: Double = 1.0 / (σ * Math.sqrt( 2.0 * Math.PI))
+  // precomputed constants
+  private lazy val `1 / (σ * √(2π))`: Double = 1.0 / (σ * Math.sqrt( 2.0 * π))
+
   override def p(x: Double):Double = {
-    val s1: Double = (x - μ) / σ
-    s0 * Math.exp(-0.5 * (s1*s1))
+    var `-(((x-μ)/σ)²)/2`: Double = {
+      val t = (x - μ) / σ
+      -((t * t) / 2.0)
+    }
+    `1 / (σ * √(2π))` * Math.exp(`-(((x-μ)/σ)²)/2`)
   }
+
+  override def random(): Double = μ + ( Random.nextGaussian() * σ )
 }

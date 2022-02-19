@@ -1,6 +1,6 @@
-package ai.dragonfly.math
+package ai.dragonfly.math.examples
 
-import ai.dragonfly.math.util.Demonstrable
+import ai.dragonfly.math.*
 import ai.dragonfly.math.vector.*
 
 /**
@@ -21,6 +21,7 @@ object Demo {
     ai.dragonfly.math.stats.probability.distributions.PERT.demo,
     ai.dragonfly.math.stats.probability.distributions.Beta.demo2param,
     ai.dragonfly.math.stats.probability.distributions.Beta.demo4param,
+    ai.dragonfly.math.stats.probability.distributions.Binomial.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.Gaussian.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.Poisson.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.LogNormal.demo,
@@ -30,7 +31,7 @@ object Demo {
     ai.dragonfly.math.stats.kernel.Kernel,
     ai.dragonfly.math.stats.geometry.Tetrahedron,
     TestGamma,
-    ai.dragonfly.math.util.Factorial.demo
+    Factorial.demo
   )
 
   lazy val consolidateDemoOutput: String = {
@@ -42,7 +43,6 @@ object Demo {
     }
     sb.toString()
   }
-
 
 
   def main(args: Array[String]): Unit = {

@@ -1,6 +1,6 @@
 package ai.dragonfly.math.vector
 
-import ai.dragonfly.math.util.Demonstrable
+import ai.dragonfly.math.examples.Demonstrable
 
 object WeightedVector extends Demonstrable {
   def apply(weight:Double, vector:Vector):WeightedVector = {

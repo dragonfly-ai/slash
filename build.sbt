@@ -4,11 +4,11 @@ ThisBuild / publishTo := Some( Resolver.file( "file",  new File("/var/www/maven"
 lazy val vector = crossProject(JSPlatform, JVMPlatform).settings(
   publishTo := Some(Resolver.file("file",  new File( "/var/www/maven" ))),
   name := "vector",
-  version := "0.331",
+  version := "0.4",
   organization := "ai.dragonfly.code",
   resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/",
   scalacOptions ++= Seq("-feature","-deprecation"),
-  Compile / mainClass := Some("ai.dragonfly.math.Demo")
+  Compile / mainClass := Some("ai.dragonfly.math.examples.Demo")
 ).jvmSettings(
   libraryDependencies ++= Seq(
     "org.scala-js" %% "scalajs-stubs" % "1.1.0"

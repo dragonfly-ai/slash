@@ -1,6 +1,6 @@
 package ai.dragonfly.math
 
-import ai.dragonfly.math.stats.DenseDiscreteHistogram
+import ai.dragonfly.math.stats.DenseHistogramOfDiscreteDistribution
 import ai.dragonfly.math.stats.probability.distributions.Beta
 import org.apache.commons.math3.distribution.BetaDistribution
 
@@ -13,8 +13,8 @@ object Verify extends App {
       val dragonfly: Beta = Beta(alpha, beta)
       val apache: BetaDistribution = BetaDistribution(alpha, beta)
 
-      val dragonflyHist: DenseDiscreteHistogram = new DenseDiscreteHistogram(10, dragonfly.min, dragonfly.MAX)
-      val apacheHist: DenseDiscreteHistogram = new DenseDiscreteHistogram(10, dragonfly.min, dragonfly.MAX)
+      val dragonflyHist: DenseHistogramOfDiscreteDistribution = new DenseHistogramOfDiscreteDistribution(10, dragonfly.min, dragonfly.MAX)
+      val apacheHist: DenseHistogramOfDiscreteDistribution = new DenseHistogramOfDiscreteDistribution(10, dragonfly.min, dragonfly.MAX)
 
       for (i <- 0 until 10000) {
         dragonflyHist(dragonfly.random())
@@ -26,10 +26,10 @@ object Verify extends App {
     }
   }
 
-  def compareHistograms(h1:DenseDiscreteHistogram, h2:DenseDiscreteHistogram): String = {
+  def compareHistograms(h1:DenseHistogramOfDiscreteDistribution, h2:DenseHistogramOfDiscreteDistribution): String = {
     val sb:StringBuilder = new StringBuilder()
-    for (i <- 0 until h1.binCount) {
-      sb.append(s"${h1.bucketLabel(i)}\t${h1.hist(i)}\t${h2.hist(i)}\n")
+    for (i <- 0 until h1.size) {
+      sb.append(s"${h1.binLabel(i)}\t${h1.hist(i)}\t${h2.hist(i)}\n")
     }
     sb.toString()
   }

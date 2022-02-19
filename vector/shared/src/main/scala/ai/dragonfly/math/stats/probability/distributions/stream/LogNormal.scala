@@ -1,14 +1,14 @@
 package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.probability.distributions
-import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo}
+import ai.dragonfly.math.examples.*
 
 
 object LogNormal {
-  val demo = OnlineProbDistDemo[distributions.LogNormal]("Streaming LogNormal", distributions.LogNormal(69, 21), LogNormal(), 1000)
+  val demo = ContinuousOnlineProbDistDemo("Streaming LogNormal", distributions.LogNormal(69, 21), LogNormal(), 1000)
 }
 
-class LogNormal() extends Online[distributions.LogNormal] {
+class LogNormal() extends OnlineContinuous {
   val G:Gaussian = Gaussian()
   def apply(observation: Double, frequency: Double = 1.0):LogNormal = {
     G.apply(Math.log(observation), frequency)
@@ -21,6 +21,8 @@ class LogNormal() extends Online[distributions.LogNormal] {
 
   override def min:Double = Math.exp( G.min )
   override def MAX:Double = Math.exp( G.MAX )
+
+  override def n:Double = G.n
 
   def μ: Double = Math.exp( G.μ + (G.`σ²` / 2) )
 

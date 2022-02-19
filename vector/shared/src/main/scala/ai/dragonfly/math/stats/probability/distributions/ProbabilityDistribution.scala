@@ -2,7 +2,8 @@ package ai.dragonfly.math.stats.probability.distributions
 
 import ai.dragonfly.math.stats.probability.distributions.Sampleable
 
-trait ProbabilityDistribution extends Sampleable[Double] {
+trait ProbabilityDistribution[DOMAIN] extends Sampleable[DOMAIN] {
+
   def μ: Double
 
   def mean: Double = μ
@@ -22,7 +23,7 @@ trait ProbabilityDistribution extends Sampleable[Double] {
    * @param x a sample
    * @return Probability(x)
    */
-  def p(x: Double): Double
+  def p(x: DOMAIN): Double
 
   //  /**
   //   * Cumulative Density Function: CDF
@@ -33,7 +34,15 @@ trait ProbabilityDistribution extends Sampleable[Double] {
   //  TODO: maybe someday.
   //  def cumulative(x:Double):Double
 
-  def min: Double = Double.MinValue
+  def min: DOMAIN
 
-  def MAX: Double = Double.MaxValue
+  def MAX: DOMAIN
+}
+
+trait ContinuousProbabilityDistribution extends ProbabilityDistribution[Double] {
+  val MultiplicativeIdentity: Double = 1.0
+}
+
+trait DiscreteProbabilityDistribution extends ProbabilityDistribution[Long] {
+  val MultiplicativeIdentity: Long = 1L
 }

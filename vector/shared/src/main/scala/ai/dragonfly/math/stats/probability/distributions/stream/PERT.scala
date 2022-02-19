@@ -2,7 +2,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
-import ai.dragonfly.math.util.Demonstrable
+import ai.dragonfly.math.examples.Demonstrable
 
 object PERT {
   val doNotUse:String = "" +
@@ -43,7 +43,7 @@ object PERT {
  */
 
 
-class PERT extends Online[distributions.PERT] {
+class PERT extends OnlineContinuous {
   private var minObservation = Double.MaxValue
   private var maxObservation = Double.MinValue
 
@@ -59,6 +59,11 @@ class PERT extends Online[distributions.PERT] {
 
     this
   }
+
+  override def min:Double = minObservation
+  override def MAX:Double = maxObservation
+
+  override def n:Double = s0
 
   override def μ: Double = s1 / s0
   override def `σ²`: Double = ((μ - min) * (MAX - μ)) / 7.0

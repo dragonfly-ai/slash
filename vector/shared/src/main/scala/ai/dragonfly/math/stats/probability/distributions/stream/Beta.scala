@@ -1,13 +1,13 @@
 package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.probability.distributions
-import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo}
+import ai.dragonfly.math.examples.*
 
 object Beta {
-  val demo = OnlineProbDistDemo[distributions.Beta]("Streaming Beta", distributions.Beta(3.0, 0.75, 42.0, 69.0), Beta(), 1000000)
+  val demo = ContinuousOnlineProbDistDemo("Streaming Beta", distributions.Beta(3.0, 0.75, 42.0, 69.0), Beta(), 1000000)
 }
 
-class Beta extends Online[distributions.Beta] {
+class Beta extends OnlineContinuous {
   private val G: Gaussian = Gaussian()
 
   override def apply(observation: Double, frequency: Double): Beta = {
@@ -27,6 +27,11 @@ class Beta extends Online[distributions.Beta] {
     distributions.Beta(α, β, G.min, G.MAX)
   }
 
+  override def min:Double = G.min
+  override def MAX:Double = G.MAX
+
+  override def n:Double = G.n
+
   def μ: Double = freeze.μ
   def `σ²`: Double = freeze.`σ²`
   def σ: Double = freeze.σ
@@ -34,9 +39,6 @@ class Beta extends Online[distributions.Beta] {
   def random():Double = freeze.random()
 
   def p(x:Double): Double = freeze.p(x)
-
-  override def min:Double = G.min
-  override def MAX:Double = G.MAX
 
   override def toString: String = {
     val frozen:distributions.Beta = freeze

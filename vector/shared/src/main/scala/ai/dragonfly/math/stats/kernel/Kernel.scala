@@ -4,8 +4,9 @@ package ai.dragonfly.math.stats.kernel
  * Created by clifton on 5/16/15.
  */
 
-import ai.dragonfly.math.util.Demonstrable
-import ai.dragonfly.math.vector.Vector
+import ai.dragonfly.math.*
+import examples.*
+import vector.Vector
 
 object Kernel extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
@@ -41,7 +42,7 @@ object GaussianKernel {
   def apply(radius: Double): GaussianKernel = {
     val sigma: Double = radius / 3.0
     val denominator: Double = 2.0 * (sigma * sigma)
-    GaussianKernel(radius, sigma, denominator, 1.0 / Math.sqrt(Math.PI * denominator))
+    GaussianKernel(radius, sigma, denominator, 1.0 / Math.sqrt(π * denominator))
   }
 }
 
@@ -79,7 +80,7 @@ case class UniformKernel(radius: Double) extends Kernel {
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0
-    else 1.0 / (Math.PI * radiusSquared)
+    else 1.0 / (π * radiusSquared)
   }
 }
 

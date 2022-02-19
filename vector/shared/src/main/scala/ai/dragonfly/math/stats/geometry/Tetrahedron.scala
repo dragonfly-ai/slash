@@ -1,7 +1,7 @@
 package ai.dragonfly.math.stats.geometry
 
 import ai.dragonfly.math.stats.probability.distributions.Sampleable
-import ai.dragonfly.math.util.Demonstrable
+import ai.dragonfly.math.examples.Demonstrable
 import ai.dragonfly.math.vector.Vector3
 
 object Tetrahedron extends Demonstrable {

@@ -1,9 +1,9 @@
-package ai.dragonfly.math
+package ai.dragonfly
 
-import ai.dragonfly.math.util.{Demonstrable, Factorial, logGamma}
+import ai.dragonfly.math.examples.*
 import ai.dragonfly.math.vector.VectorValues
 
-package object util {
+package object math {
 
   // ported from https://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/src-html/org/apache/commons/math3/special/Gamma.html
 
@@ -171,21 +171,9 @@ package object util {
     }
   }
 
+  val π:Double = Math.PI
 }
 
-object TestGamma extends Demonstrable {
-  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
-    import scala.language.postfixOps
-
-    sb.append("Demonstrate Gamma Function on Integers 1 - 10\n")
-    for ( i <- 1 until 10 ) {
-      val i_1:Int = i - 1
-      sb.append(s"\tΓ($i):$i_1! => ${util.gamma(i.toDouble)} : ${Factorial(i_1)}\n")
-    }
-    sb
-  }
-  override def name:String = "Gamma"
-}
 
 case class InvalidArgumentToGammaFunction(x:Double, s:String) extends Exception(s) {
 

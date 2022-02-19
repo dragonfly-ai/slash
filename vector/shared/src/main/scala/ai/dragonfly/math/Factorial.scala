@@ -1,4 +1,7 @@
-package ai.dragonfly.math.util
+package ai.dragonfly.math
+
+import ai.dragonfly.math.*
+import examples.*
 
 import scala.language.postfixOps
 
@@ -203,6 +206,11 @@ object Factorial {
   extension (x: Int)
     def ! : BigInt = apply(x)
 
+  extension (x: Long)
+    def ! : BigInt = apply(x)
+
+  extension (x: BigInt)
+    def ! : BigInt = apply(x)
 
 
   object demo extends Demonstrable {

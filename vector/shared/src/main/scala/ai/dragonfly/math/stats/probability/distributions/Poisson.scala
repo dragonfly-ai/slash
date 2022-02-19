@@ -1,30 +1,32 @@
 package ai.dragonfly.math.stats.probability.distributions
 
 import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
-import ai.dragonfly.math.util.{Demonstrable, ProbDistDemo, Γ}
+import ai.dragonfly.math.*
+import examples.*
 
 object Poisson {
-  val demo: ProbDistDemo = ProbDistDemo("Poisson", Poisson(15))
+  val demo = ProbabilityDistributionDemonstration("Poisson", Poisson(15))
 }
 
-case class Poisson(λ:Double) extends ProbabilityDistribution {
+case class Poisson(λ:Double) extends DiscreteProbabilityDistribution {
+
+  def min: Long = 0L
+  def MAX: Long = Long.MaxValue
+
   def lambda:Double = λ
   override val μ:Double = λ
   override val `σ²`:Double = λ
   lazy val σ:Double = Math.sqrt(λ)
 
-  override val min:Double = 0.0
-
-  def p(x:Double):Double = Math.exp( x * Math.log(λ) - λ - Math.log(Γ(x+1)) )
+  def p(x:Long):Double = Math.exp( x * Math.log(λ) - λ - Math.log(Γ(x+1)) )
 
   // Knuth's method:
-  override def random(): Double = {
-    val e = Math.E
-    val L = BigDecimal(Math.pow(e, -λ))
-    var k = 0
+  override def random(): Long = {
+    val L = BigDecimal(Math.pow(Math.E, -λ))
+    var k = 0L
     var p = 1.0
     while (p > L) {
-      k = k + 1
+      k = k + 1L
       p = p * Math.random()
     }
     k - 1

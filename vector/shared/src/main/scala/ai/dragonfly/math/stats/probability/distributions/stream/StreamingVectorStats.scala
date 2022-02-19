@@ -1,6 +1,6 @@
 package ai.dragonfly.math.stats.probability.distributions.stream
 
-import ai.dragonfly.math.util.Demonstrable
+import ai.dragonfly.math.examples.Demonstrable
 import ai.dragonfly.math.vector._
 
 /**

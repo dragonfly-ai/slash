@@ -1,15 +1,15 @@
 package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.probability.distributions
-import ai.dragonfly.math.util.{Demonstrable, OnlineProbDistDemo}
+import ai.dragonfly.math.examples.*
 
 import scala.util.Random
 
 object Gaussian {
-  val demo = OnlineProbDistDemo[distributions.Gaussian]("Streaming Gaussian", distributions.Gaussian(42.0, 7.0), Gaussian(), 1000)
+  val demo = ContinuousOnlineProbDistDemo("Streaming Gaussian", distributions.Gaussian(42.0, 7.0), Gaussian(), 1000)
 }
 
-class Gaussian extends Online[distributions.Gaussian] {
+class Gaussian extends OnlineContinuous {
 
   private var minObservation = Double.MaxValue
   private var maxObservation = Double.MinValue
@@ -32,7 +32,7 @@ class Gaussian extends Online[distributions.Gaussian] {
   override def min:Double = minObservation
   override def MAX:Double = maxObservation
 
-  def sampleSize:Double = s0
+  override def n:Double = s0
 
   inline def μ:Double = s1 / s0
 
