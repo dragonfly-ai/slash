@@ -3,6 +3,7 @@ package ai.dragonfly.math.stats
 import ai.dragonfly.math.stats.probability.distributions.{ProbabilityDistribution, Sampleable}
 import ai.dragonfly.math.examples.Demonstrable
 
+import java.text.NumberFormat
 import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag
 
@@ -19,18 +20,62 @@ trait UnivariateHistogram[T] {
   def binMass(bINdex:Int):Double
   def binLabel(bINdex:Int):String
 
+  val theme: Array[String] = Array[String](
+    "🌑", "🌒", "🌓", "🌔", "🌕" // "🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘", "🌑"
+  )
+
   override def toString: String = {
-    val eightBlocks: Array[String] = Array[String](" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█" )
+    val capBlocks: Array[String] = Array[String](" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█" )  //
+
     val sb = new mutable.StringBuilder("Histogram:").append(" { \n")
+
+    var cumulative = 0.0
     for (bIndex <- index(min) to index(MAX)) {
-      val bnms:Double = binMass(bIndex)/mass
-      val m = (1000.0 * bnms).toInt
+
       sb.append("\t").append(binLabel(bIndex)).append(" ")
-      for (i <- 0 until (m/8)) {
-        sb.append("█") // ░
+
+      val bnms: Double = binMass(bIndex) / mass
+      cumulative = cumulative + bnms
+
+      val glyph = theme((cumulative * (theme.length - 1)).toInt)
+      sb.append(glyph).append(" ")
+
+      if (bnms > Double.MinPositiveValue) {
+        val m = 1000.0 * bnms
+        var wholeCount = m / capBlocks.length
+        val `1/8`:Double = 1.0/8.0
+        // base
+        sb.append(
+          if (wholeCount >= `1/8`) {
+            wholeCount = wholeCount - `1/8`
+            "▕"
+          } else {
+            if (wholeCount > `1/8` / 10.0) {
+              wholeCount = wholeCount - `1/8` / 10.0
+              "︙"
+            } else if (wholeCount > `1/8` / 100.0) {
+              wholeCount = wholeCount - `1/8` / 100.0
+              "︰"
+            } else if (wholeCount > `1/8` / 1000.0){
+              wholeCount = wholeCount - `1/8` / 1000.0
+              "￤"
+            } else if (wholeCount > `1/8` / 10000.0) {
+              wholeCount = wholeCount - `1/8` / 10000.0
+              "︲"
+            }
+            else ""
+          }
+        )
+        // bar
+        while (wholeCount > 1.0) {
+          sb.append("█") // ░ ▒ ▓
+          wholeCount = wholeCount - 1.0
+        }
+        // cap
+        sb.append(capBlocks((wholeCount * capBlocks.length).toInt))
+        if (bnms > Double.MinPositiveValue) sb.append(s"   ∝ $bnms")
       }
-      sb.append(eightBlocks(m % 8))
-      sb.append(s" = $bnms").append("\n")
+      sb.append("\n")
     }
     sb.append("}")
     sb.toString()
@@ -42,7 +87,7 @@ class DenseHistogramOfDiscreteDistribution(override val size: Int, override val 
 
   val bucketWidth: Double = (MAX - min).toDouble / size.toDouble
 
-  val hist: Array[Double] = Array.fill(size+1)(0.0)
+  val hist: Array[Double] = Array.fill(size)(0.0)
 
   private var totalMass: Double = 0.0
 
@@ -59,17 +104,34 @@ class DenseHistogramOfDiscreteDistribution(override val size: Int, override val 
 
   def binMass(bINdex: Int): Double = hist(bINdex)
 
-  private val LeftOfDecimal: Int = (Math.log10(MAX) + 1.0).toInt
-  private val RightOfDecimal: Int = (Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)) + 1.0).toInt
-
-  override def index(x: Long): Int = Math.floor((x - min)/bucketWidth).toInt
+  override def index(x: Long): Int = Math.min(Math.floor((x - min)/bucketWidth).toInt, hist.length - 1)
 
   override def bINTerpolator(bINdex: Int, alpha: Double): Long = {
     ((alpha * (min + (bINdex * bucketWidth))) + ((1.0 - alpha) * (min + ((bINdex + 1) * bucketWidth)))).toLong
   }
 
+  private val integerDigits: Int = Math.log10(MAX.toDouble).toInt + 1
+  private val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)).toInt + 1
+
+  val binLabelFormat:NumberFormat = {
+    val nf = NumberFormat.getInstance()
+    nf.setMinimumIntegerDigits(integerDigits)
+    nf.setMaximumIntegerDigits(integerDigits)
+    nf.setMinimumFractionDigits(fractionDigits)
+    nf.setMaximumFractionDigits(fractionDigits)
+    nf
+  }
+
+  private val binsCrossOrigin:Boolean = min * MAX < 0.0
+
+  private def pad(d:Double):String = {
+    (if (d >= 0.0) " " else "") + binLabelFormat.format(d)
+  }
   override def binLabel(bINdex:Int):String = {
-    (s"%1${LeftOfDecimal}.${RightOfDecimal}f").format(min + (bINdex * bucketWidth))
+    var floor = min + (bINdex * bucketWidth)
+    var ceiling = floor + bucketWidth
+    val lastBracket = if (bINdex >= hist.length - 1) "]" else ")"
+    s"[${pad(floor)},${pad(ceiling)} $lastBracket"
   }
 }
 
@@ -77,7 +139,7 @@ class DenseHistogramOfContinuousDistribution(override val size: Int, override va
 
   val bucketWidth: Double = (MAX - min) / size
 
-  val hist: Array[Double] = Array.fill(size+1)(0.0)
+  val hist: Array[Double] = Array.fill(size)(0.0)
 
   private var totalMass: Double = 0.0
 
@@ -94,17 +156,34 @@ class DenseHistogramOfContinuousDistribution(override val size: Int, override va
 
   override def binMass(bINdex: Int): Double = hist(bINdex)
 
-  private val LeftOfDecimal: Int = (Math.log10(MAX) + 1.0).toInt
-  private val RightOfDecimal: Int = (Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)) + 1.0).toInt
-
-  override def index(x: Double): Int = Math.floor((x - min)/bucketWidth).toInt
+  override def index(x: Double): Int = Math.min(Math.floor((x - min)/bucketWidth).toInt, hist.length - 1)
 
   override def bINTerpolator(bINdex: Int, alpha: Double): Double = {
     (alpha * (min + (bINdex * bucketWidth))) + ((1.0 - alpha) * (min + ((bINdex + 1) * bucketWidth)))
   }
 
+  private val integerDigits: Int = Math.log10(MAX).toInt + 1
+  private val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)).toInt + 1
+
+  val binLabelFormat:NumberFormat = {
+    val nf = NumberFormat.getInstance()
+    nf.setMinimumIntegerDigits(integerDigits)
+    nf.setMaximumIntegerDigits(integerDigits)
+    nf.setMinimumFractionDigits(fractionDigits)
+    nf.setMaximumFractionDigits(fractionDigits)
+    nf
+  }
+
+  private val binsCrossOrigin:Boolean = min * MAX < 0.0
+
+  private def pad(d:Double):String = {
+    (if (d >= 0.0) " " else "") + binLabelFormat.format(d)
+  }
   override def binLabel(bINdex:Int):String = {
-    (s"%1${LeftOfDecimal}.${RightOfDecimal}f").format(min + (bINdex * bucketWidth))
+    var floor = min + (bINdex * bucketWidth)
+    var ceiling = floor + bucketWidth
+    val lastBracket = if (bINdex >= hist.length - 1) "]" else ")"
+    s"[${pad(floor)},${pad(ceiling)} $lastBracket"
   }
 }
 //
@@ -250,3 +329,27 @@ class UnivariateGenerativeModel[T](
 //  }
 //
 //}
+
+/*
+︲
+￤
+︰
+︙
+▕
+▐
+⋮
+⁝
+⁞
+:
+¦
+┆
+┊
+╎
+╏
+┋
+⁞
+┆
+┊
+‖
+⸠
+ */

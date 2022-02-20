@@ -8,6 +8,21 @@ Features:
 - Parametric and Estimated (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
 - Geometry: Sample points uniformly from the volumes defined by 3D tetrahedrons.
+- Plain text histogram plotting for console friendly output.
+```
+Histogram generated from Beta(5.0, 5.0): {
+    [ 0.00, 0.10 ) 🌑 ▕    ∝ 0.0013
+    [ 0.10, 0.20 ) 🌑 ▕█▉   ∝ 0.0176
+    [ 0.20, 0.30 ) 🌑 ▕█████████▍   ∝ 0.0852
+    [ 0.30, 0.40 ) 🌒 ▕██████████████████    ∝ 0.1634
+    [ 0.40, 0.50 ) 🌓 ▕██████████████████████████▏   ∝ 0.237
+    [ 0.50, 0.60 ) 🌓 ▕█████████████████████████▋   ∝ 0.232
+    [ 0.60, 0.70 ) 🌔 ▕██████████████████▉   ∝ 0.1703
+    [ 0.70, 0.80 ) 🌔 ▕████████▎   ∝ 0.0755
+    [ 0.80, 0.90 ) 🌔 ▕█▊   ∝ 0.0168
+    [ 0.90, 1.00 ] 🌕 ︙    ∝ 9.0E-4
+}
+```
 
 To use this library with SBT:
 

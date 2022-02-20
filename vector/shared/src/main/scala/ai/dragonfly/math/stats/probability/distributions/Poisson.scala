@@ -18,7 +18,7 @@ case class Poisson(λ:Double) extends DiscreteProbabilityDistribution {
   override val `σ²`:Double = λ
   lazy val σ:Double = Math.sqrt(λ)
 
-  def p(x:Long):Double = Math.exp( x * Math.log(λ) - λ - Math.log(Γ(x+1)) )
+  def p(x:Long):Double = Math.exp( x.toDouble * Math.log(λ) - λ - Math.log(Γ(x.toDouble+1.0)) )
 
   // Knuth's method:
   override def random(): Long = {

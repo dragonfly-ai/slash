@@ -15,8 +15,8 @@ class Poisson extends OnlineDiscrete {
   private var minObservation = Long.MaxValue
   private var maxObservation = Long.MinValue
 
-  private var s0 = 0L // weighted count
-  private var s1 = 0L // weighted sum
+  private var s0:Long = 0L // weighted count
+  private var s1:Long = 0L // weighted sum
 
   /**
    * Assumes only positive valued observations.
@@ -40,7 +40,7 @@ class Poisson extends OnlineDiscrete {
 
   def n:Long = s0
 
-  inline def λ:Double = s1 / s0
+  inline def λ:Double = (s1 / s0).toDouble
 
   def μ:Double = λ
 
@@ -50,7 +50,7 @@ class Poisson extends OnlineDiscrete {
 
   def freeze:distributions.Poisson = distributions.Poisson(λ)
 
-  def p(x:Long):Double = Math.exp( x * Math.log(λ) - λ - Math.log(gamma(x+1)) )
+  def p(x:Long):Double = Math.exp( x * Math.log(λ) - λ - Math.log(gamma(x.toDouble+1.0)) )
 
   override def random(): Long = freeze.random()
 
