@@ -56,13 +56,13 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOM
 
     var cumulative = 0.0
     for (bIndex <- index(min) to index(MAX)) {
-
       sb.append("\t").append(binLabel(bIndex)).append(" ")
 
-      val bnms: Double = binMass(bIndex) / mass
+      var bnms: Double = binMass(bIndex)
       cumulative = cumulative + bnms
+      bnms = bnms / mass
 
-      val glyph = theme((cumulative * (theme.length - 1)).toInt)
+      val glyph = theme(((cumulative/mass) * (theme.length - 1)).toInt)
       sb.append(glyph).append(" ")
 
       if (bnms > Double.MinPositiveValue) {
