@@ -1,34 +1,34 @@
 package ai.dragonfly.math.stats.probability.distributions
 
 import ai.dragonfly.math.*
+import stats.*
 import ai.dragonfly.math.Factorial.!
 import ai.dragonfly.math.examples.ProbabilityDistributionDemonstration
+import ai.dragonfly.math.interval.{Domain, Interval, `[]`}
 
 import scala.util.Random
 import scala.language.postfixOps
 
 object Binomial {
-  val demo = ProbabilityDistributionDemonstration("Binomial", Binomial(21, 0.42))
+  val demo = ProbabilityDistributionDemonstration("Binomial", Binomial(21, 0.42), DenseHistogramOfDiscreteDistribution(11, 0, 21))
+  lazy val domain:Domain[Long] = Domain.ℕ_Long
 }
 
 /**
  * Binomial Distribution: https://en.wikipedia.org/wiki/Binomial_distribution
  *
  * @param n number of trials in process or experiment with two possible outcomes, i.e. a boolean valued random function.
- * @param `P(Success)` probability of a successful outcome.
+ * @param P probability of a successful outcome on any single trial.
  */
-case class Binomial(n:Long, `P(Success)`:Double) extends DiscreteProbabilityDistribution {
-
-  override val min: Long = 0
-  override val MAX: Long = n
+case class Binomial(n:Long, P:Double) extends ParametricProbabilityDistribution[Long] {
 
   /**
    * `1-p` is the probability of failure.
    */
-  val `1-p`:Double = 1.0 - `P(Success)`
+  val `1-p`:Double = 1.0 - P
 
-  override val μ: Double = n * `P(Success)`
-  override val `σ²`: Double = n * `P(Success)` * `1-p`
+  override val μ: Double = n * P
+  override val `σ²`: Double = n * P * `1-p`
   override val σ: Double = Math.sqrt(`σ²`)
 
   lazy val `n!`:BigInt = n!
@@ -47,13 +47,8 @@ case class Binomial(n:Long, `P(Success)`:Double) extends DiscreteProbabilityDist
     else {
       val `k!`:BigInt = k!
       val `n-k`:Long = n - k
-      (`n!`/ (`k!` * (`n-k`!))).toDouble * Math.pow(`P(Success)`, k.toDouble) * Math.pow(1.0 - `P(Success)`, `n-k`.toDouble)
+      (`n!`/ (`k!` * (`n-k`!))).toDouble * Math.pow(P, k.toDouble) * Math.pow(1.0 - P, `n-k`.toDouble)
     }
-  }
-
-  inline def squaredDist(a:Double, b:Double):Double = {
-    val amb = a - b
-    amb*amb
   }
 
   /**
@@ -63,9 +58,19 @@ case class Binomial(n:Long, `P(Success)`:Double) extends DiscreteProbabilityDist
   override def random(): Long = {
     var successCount = 0L
     for (i <- 0L until n) {
-      if (Math.random() < `P(Success)`) successCount = successCount + 1L
+      if (Math.random() < P) successCount = successCount + 1L
     }
     successCount
   }
 
+  override def toString: String = s"Binomial(n = $n, P = $P, μ = $μ, σ² = ${`σ²`}, σ = $σ)"
+
+}
+
+
+case class EstimatedBinomial(override val interval:Interval[Long], override val idealized: Binomial, override val ℕ̂:Long) extends EstimatedProbabilityDistribution[Long, Binomial]{
+  def n̂:Long = idealized.n
+  def P̂:Double = idealized.P
+
+  override def toString: String = s"BinomialEstimate(n̂ = $n̂, P̂ = $P̂, min = ${interval.min}, MAX = ${interval.MAX}, μ̂ = $μ̂, σ̂² = ${`σ̂²`}, σ̂ = $σ̂, ℕ̂ = $ℕ̂)"
 }

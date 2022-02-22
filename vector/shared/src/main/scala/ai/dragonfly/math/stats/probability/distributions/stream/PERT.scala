@@ -3,6 +3,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
 import ai.dragonfly.math.examples.Demonstrable
+import ai.dragonfly.math.stats.BoundedMean
 
 object PERT {
   val doNotUse:String = "" +
@@ -43,38 +44,22 @@ object PERT {
  */
 
 
-class PERT extends OnlineContinuous {
-  private var minObservation = Double.MaxValue
-  private var maxObservation = Double.MinValue
+class PERT extends OnlineProbabilityDistributionEstimator[Double, distributions.PERT] {
 
-  private var s0 = 0.0
-  private var s1 = 0.0
+  val estimator = new BoundedMeanEstimator[Double](distributions.PERT.domain)
 
-  def apply(observation: Double, frequency: Double = 1.0):PERT = {
-    minObservation = Math.min(observation, minObservation)
-    maxObservation = Math.max(observation, maxObservation)
-
-    s0 = s0 + frequency
-    s1 = s1 + observation * frequency
-
+  override def apply(frequency: Double, observation: Double):PERT = {
+    estimator.observe(Array[Double](frequency, observation))
     this
   }
 
-  override def min:Double = minObservation
-  override def MAX:Double = maxObservation
-
-  override def n:Double = s0
-
-  override def μ: Double = s1 / s0
-  override def `σ²`: Double = ((μ - min) * (MAX - μ)) / 7.0
-  override def σ: Double = Math.sqrt(`σ²`)
-
-  override def freeze: distributions.PERT = distributions.PERT(minObservation, s1 / s0, maxObservation)
-
-  override def p(x: Double):Double = freeze.p(x)
-  override def random():Double = freeze.random()
-
-  override def toString:String = s"stream.PERT(min = $min, MAX = $MAX, μ = $μ, σ² = ${`σ²`}, σ = $σ, N = $s0)"
+  override def estimate: distributions.EstimatedPERT = {
+    val bμ̂ = estimator.sampleBoundedMean
+    distributions.EstimatedPERT(
+      distributions.PERT(bμ̂),
+      bμ̂.ℕ̂
+    )
+  }
 
   throw new UseBetaDistributionInstead(this)
 }

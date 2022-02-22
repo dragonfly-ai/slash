@@ -3,7 +3,28 @@ package ai.dragonfly
 import ai.dragonfly.math.examples.*
 import ai.dragonfly.math.vector.VectorValues
 
+import scala.language.postfixOps
+import scala.reflect.ClassTag
+
 package object math {
+
+  extension (x: Int)
+    inline def ⚁ : BigInt = x * x
+
+  extension (x: Long)
+    inline def ⚁ : BigInt =  x * x
+
+  extension (x: BigInt)
+    inline def ⚁ : BigInt =  x * x
+
+  extension (x:Float)
+    inline def ⚁ : Float = x * x
+
+  extension (x:Double)
+    inline def ⚁ : Double = x * x
+//
+//  extension[DOMAIN: Numeric] (x: DOMAIN)
+//    inline def ⚁ : DOMAIN = x * x
 
   // ported from https://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/src-html/org/apache/commons/math3/special/Gamma.html
 
@@ -172,6 +193,7 @@ package object math {
   }
 
   val π:Double = Math.PI
+
 }
 
 

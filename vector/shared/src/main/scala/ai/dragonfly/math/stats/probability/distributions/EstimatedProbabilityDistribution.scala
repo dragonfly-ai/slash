@@ -1,0 +1,25 @@
+package ai.dragonfly.math.stats.probability.distributions
+
+import ai.dragonfly.math.interval.Interval
+
+trait EstimatedProbabilityDistribution[DOMAIN: Numeric, PPD <: ParametricProbabilityDistribution[DOMAIN]] {
+  val idealized: PPD
+
+  def ℕ̂:DOMAIN
+  def sampleSize:DOMAIN = ℕ̂
+
+  def interval:Interval[DOMAIN]
+
+  def μ̂: Double = idealized.μ
+  def sampleMean: Double = μ̂
+
+  def `σ̂²`: Double = idealized.`σ²`
+  def sampleVariance: Double = `σ̂²`
+
+  def σ̂: Double = idealized.σ
+  def sampleStandardDeviation: Double = σ̂
+
+  def p(x: DOMAIN): Double = idealized.p(x)
+
+  def random(): DOMAIN = idealized.random()
+}

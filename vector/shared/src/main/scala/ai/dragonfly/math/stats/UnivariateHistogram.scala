@@ -8,15 +8,15 @@ import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag
 
 
-trait UnivariateHistogram[T] {
+trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOMAIN]) {
 
   val size: Int // number of bins
-  val min: T
-  val MAX: T
-  def apply(x: T, weight: Double = 1.0): UnivariateHistogram[T]
+  val min: DOMAIN
+  val MAX: DOMAIN
+  def apply(x: DOMAIN, weight: Double = 1.0): UnivariateHistogram[DOMAIN]
   def mass: Double
-  def index(x:T):Int
-  def bINTerpolator(bINdex:Int, alpha:Double):T
+  def index(x:DOMAIN):Int
+  def bINTerpolator(bINdex:Int, alpha:Double):DOMAIN
   def binMass(bINdex:Int):Double
   def binLabel(bINdex:Int):String
 
@@ -104,7 +104,7 @@ class DenseHistogramOfDiscreteDistribution(override val size: Int, override val 
 
   def binMass(bINdex: Int): Double = hist(bINdex)
 
-  override def index(x: Long): Int = Math.min(Math.floor((x - min)/bucketWidth).toInt, hist.length - 1)
+  override def index(x: Long): Int = Math.min(((x - min).toDouble/bucketWidth).toInt, hist.length - 1)
 
   override def bINTerpolator(bINdex: Int, alpha: Double): Long = {
     ((alpha * (min + (bINdex * bucketWidth))) + ((1.0 - alpha) * (min + ((bINdex + 1) * bucketWidth)))).toLong

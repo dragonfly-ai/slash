@@ -1,20 +1,13 @@
 package ai.dragonfly.math.stats.probability.distributions
 
+import ai.dragonfly.math.interval.{Domain, Interval}
 import ai.dragonfly.math.stats.probability.distributions.Sampleable
 
-trait ProbabilityDistribution[DOMAIN] extends Sampleable[DOMAIN] {
+// ℕ population size symbol for future reference.
 
-  def μ: Double
-
-  def mean: Double = μ
-
-  def `σ²`: Double
-
-  def variance: Double = `σ²`
-
-  def σ: Double
-
-  def standardDeviation: Double = σ
+trait ProbabilityDistribution[DOMAIN: Numeric] extends Sampleable[DOMAIN] {
+  val `#` = implicitly[Numeric[DOMAIN]]
+  import `#`._
 
   /**
    * Probability Densidy Function: PDF
@@ -34,15 +27,16 @@ trait ProbabilityDistribution[DOMAIN] extends Sampleable[DOMAIN] {
   //  TODO: maybe someday.
   //  def cumulative(x:Double):Double
 
-  def min: DOMAIN
-
-  def MAX: DOMAIN
 }
 
-trait ContinuousProbabilityDistribution extends ProbabilityDistribution[Double] {
-  val MultiplicativeIdentity: Double = 1.0
-}
 
-trait DiscreteProbabilityDistribution extends ProbabilityDistribution[Long] {
-  val MultiplicativeIdentity: Long = 1L
+trait ParametricProbabilityDistribution[DOMAIN] extends ProbabilityDistribution[DOMAIN] {
+  def μ: Double
+  def mean: Double = μ
+
+  def `σ²`: Double
+  def variance: Double = `σ²`
+
+  def σ: Double
+  def standardDeviation: Double = σ
 }

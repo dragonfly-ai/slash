@@ -1,20 +1,21 @@
 package ai.dragonfly.math.stats.probability.distributions
 
-import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
 import ai.dragonfly.math.*
+import stats.*
+import interval.*
 import examples.*
 
 import scala.util.Random
 
 object Beta {
-  val demo2param = ProbabilityDistributionDemonstration("Beta", Beta(0.5, 5.0))
-  val demo4param = ProbabilityDistributionDemonstration("Beta", Beta(2.0, 1.0, 33, 42))//, 14, 33, 42)
+  val demo2param = ProbabilityDistributionDemonstration("Beta", Beta(0.5, 5.0), DenseHistogramOfContinuousDistribution(9, 0, 1))
+  val demo4param = ProbabilityDistributionDemonstration("Beta", Beta(2.0, 1.0, 33, 42), DenseHistogramOfContinuousDistribution(15, 33, 42))
 
   def fromPERT(pert:PERT):Beta = {
-    fromMeanVarianceMinMax(pert.μ, pert.`σ²`, pert.min, pert.MAX)
+    fromMeanVarianceMinMax(pert.μ, pert.`σ²`, pert.interval.min, pert.interval.MAX)
   }
 
-  def fromMeanVarianceMinMax(μ:Double, `σ²`:Double, min:Double = 0.0, MAX:Double = 0.0):Beta = {
+  inline def fromMeanVarianceMinMax(μ:Double, `σ²`:Double, min:Double = 0.0, MAX:Double = 0.0):Beta = {
     val scale:Double = MAX - min
     val μS:Double = (μ - min) / scale
 
@@ -26,9 +27,11 @@ object Beta {
 
     Beta(α, β, min, MAX)
   }
+
+  val domain:Domain[Double] = Domain.ℝ_Double
 }
 
-case class Beta(α:Double, β:Double, override val min:Double = 0.0, override val MAX:Double = 1.0) extends ContinuousProbabilityDistribution {
+case class Beta(α:Double, β:Double, val min:Double = 0.0, val MAX:Double = 1.0) extends ParametricProbabilityDistribution[Double] {
   def alpha:Double = α
   def beta:Double = β
 
@@ -119,4 +122,13 @@ case class Beta(α:Double, β:Double, override val min:Double = 0.0, override va
     val x1:Double = (x - min) / scale
     (Math.pow(x1, α - 1.0) * Math.pow(1.0 - x1, β - 1.0)) / (scale * `B(α,β)`)
   }
+}
+
+case class EstimatedBeta(override val idealized: Beta, override val ℕ̂:Double) extends EstimatedProbabilityDistribution[Double, Beta]{
+  def α̂:Double = idealized.α
+  def β̂:Double = idealized.β
+
+  override val interval: Interval[Double] = `[]`[Double](idealized.min, idealized.MAX)
+
+  override def toString: String = s"BetaEstimate(α̂ = $α̂, β̂ = $β̂, min = ${interval.min}, MAX = ${interval.MAX}, μ̂ = $μ̂, σ̂² = ${`σ̂²`}, σ̂ = $σ̂, ℕ̂ = $ℕ̂)"
 }

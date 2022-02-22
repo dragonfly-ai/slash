@@ -15,6 +15,11 @@ object Demo {
     Vector4,
     VectorN,
     WeightedVector,
+    ai.dragonfly.math.stats.kernel.Kernel,
+    ai.dragonfly.math.stats.geometry.Tetrahedron,
+    TestGamma,
+    Factorial.demo,
+    ai.dragonfly.math.stats.probability.distributions.stream.StreamingVectorStats,
     ai.dragonfly.math.stats.probability.distributions.Gaussian.demo,
     ai.dragonfly.math.stats.probability.distributions.Poisson.demo,
     ai.dragonfly.math.stats.probability.distributions.LogNormal.demo,
@@ -22,16 +27,14 @@ object Demo {
     ai.dragonfly.math.stats.probability.distributions.Beta.demo2param,
     ai.dragonfly.math.stats.probability.distributions.Beta.demo4param,
     ai.dragonfly.math.stats.probability.distributions.Binomial.demo,
+    ai.dragonfly.math.stats.probability.distributions.Uniform.demo,
+    ai.dragonfly.math.stats.probability.distributions.DiscreteUniform.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.Gaussian.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.Poisson.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.LogNormal.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.PERT.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.Beta.demo,
-    ai.dragonfly.math.stats.probability.distributions.stream.StreamingVectorStats,
-    ai.dragonfly.math.stats.kernel.Kernel,
-    ai.dragonfly.math.stats.geometry.Tetrahedron,
-    TestGamma,
-    Factorial.demo
+    ai.dragonfly.math.stats.probability.distributions.stream.Binomial.demo,
   )
 
   lazy val consolidateDemoOutput: String = {
