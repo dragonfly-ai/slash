@@ -3,7 +3,6 @@ package ai.dragonfly.math.stats
 import ai.dragonfly.math.stats.probability.distributions.{ProbabilityDistribution, Sampleable}
 import ai.dragonfly.math.examples.Demonstrable
 
-import java.text.NumberFormat
 import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag
 
@@ -112,15 +111,7 @@ class DenseHistogramOfDiscreteDistribution(override val size: Int, override val 
 
   private val integerDigits: Int = Math.log10(MAX.toDouble).toInt + 1
   private val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)).toInt + 1
-
-  val binLabelFormat:NumberFormat = {
-    val nf = NumberFormat.getInstance()
-    nf.setMinimumIntegerDigits(integerDigits)
-    nf.setMaximumIntegerDigits(integerDigits)
-    nf.setMinimumFractionDigits(fractionDigits)
-    nf.setMaximumFractionDigits(fractionDigits)
-    nf
-  }
+  val binLabelFormat:String = s"%${integerDigits + fractionDigits + 1}.${fractionDigits}f"
 
   private val binsCrossOrigin:Boolean = min * MAX < 0.0
 
@@ -164,15 +155,7 @@ class DenseHistogramOfContinuousDistribution(override val size: Int, override va
 
   private val integerDigits: Int = Math.log10(MAX).toInt + 1
   private val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)).toInt + 1
-
-  val binLabelFormat:NumberFormat = {
-    val nf = NumberFormat.getInstance()
-    nf.setMinimumIntegerDigits(integerDigits)
-    nf.setMaximumIntegerDigits(integerDigits)
-    nf.setMinimumFractionDigits(fractionDigits)
-    nf.setMaximumFractionDigits(fractionDigits)
-    nf
-  }
+  val binLabelFormat:String = s"%${integerDigits + fractionDigits + 1}.${fractionDigits}f"
 
   private val binsCrossOrigin:Boolean = min * MAX < 0.0
 
