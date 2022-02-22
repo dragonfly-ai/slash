@@ -8,6 +8,7 @@ import scala.reflect.ClassTag
 
 
 trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOMAIN]) {
+  import `#`._
 
   val size: Int // number of bins
   val min: DOMAIN
@@ -17,7 +18,32 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOM
   def index(x:DOMAIN):Int
   def bINTerpolator(bINdex:Int, alpha:Double):DOMAIN
   def binMass(bINdex:Int):Double
-  def binLabel(bINdex:Int):String
+  val bucketWidth: Double =  (MAX - min).toDouble / size.toDouble
+
+  protected val integerDigits: Int = Math.log10(MAX.toDouble).toInt + 1
+  protected val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)).toInt + 1
+  println(s"$integerDigits $fractionDigits")
+  protected val binLabelFormat:String = s"%${integerDigits + fractionDigits + 1}.${fractionDigits}f"
+
+  protected def pad(d:Double):String = {
+    val padded:String = binLabelFormat.format(Math.abs(d))
+    if (d < 0.0) {
+      var s = "-" + padded.trim
+      while (s.length <= padded.length) {
+        s = " " + s
+      }
+      s
+    } else {
+      " " + padded
+    }
+  }
+
+  def binLabel(bINdex:Int):String = {
+    var floor = min.toDouble + (bINdex * bucketWidth)
+    var ceiling = floor + bucketWidth
+    val lastBracket = if (bINdex >= size - 1) "]" else ")"
+    s"[${pad(floor)},${pad(ceiling)} $lastBracket"
+  }
 
   val theme: Array[String] = Array[String](
     "🌑", "🌒", "🌓", "🌔", "🌕" // "🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘", "🌑"
@@ -84,8 +110,6 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOM
 
 class DenseHistogramOfDiscreteDistribution(override val size: Int, override val min: Long, override val MAX: Long) extends UnivariateHistogram[Long] {
 
-  val bucketWidth: Double = (MAX - min).toDouble / size.toDouble
-
   val hist: Array[Double] = Array.fill(size)(0.0)
 
   private var totalMass: Double = 0.0
@@ -109,26 +133,9 @@ class DenseHistogramOfDiscreteDistribution(override val size: Int, override val 
     ((alpha * (min + (bINdex * bucketWidth))) + ((1.0 - alpha) * (min + ((bINdex + 1) * bucketWidth)))).toLong
   }
 
-  private val integerDigits: Int = Math.log10(MAX.toDouble).toInt + 1
-  private val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)).toInt + 1
-  val binLabelFormat:String = s"%${integerDigits + fractionDigits + 1}.${fractionDigits}f"
-
-  private val binsCrossOrigin:Boolean = min * MAX < 0.0
-
-  private def pad(d:Double):String = {
-    (if (d >= 0.0) " " else "") + binLabelFormat.format(d)
-  }
-  override def binLabel(bINdex:Int):String = {
-    var floor = min + (bINdex * bucketWidth)
-    var ceiling = floor + bucketWidth
-    val lastBracket = if (bINdex >= hist.length - 1) "]" else ")"
-    s"[${pad(floor)},${pad(ceiling)} $lastBracket"
-  }
 }
 
 class DenseHistogramOfContinuousDistribution(override val size: Int, override val min: Double, override val MAX: Double) extends UnivariateHistogram[Double] {
-
-  val bucketWidth: Double = (MAX - min) / size
 
   val hist: Array[Double] = Array.fill(size)(0.0)
 
@@ -153,21 +160,6 @@ class DenseHistogramOfContinuousDistribution(override val size: Int, override va
     (alpha * (min + (bINdex * bucketWidth))) + ((1.0 - alpha) * (min + ((bINdex + 1) * bucketWidth)))
   }
 
-  private val integerDigits: Int = Math.log10(MAX).toInt + 1
-  private val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)).toInt + 1
-  val binLabelFormat:String = s"%${integerDigits + fractionDigits + 1}.${fractionDigits}f"
-
-  private val binsCrossOrigin:Boolean = min * MAX < 0.0
-
-  private def pad(d:Double):String = {
-    (if (d >= 0.0) " " else "") + binLabelFormat.format(d)
-  }
-  override def binLabel(bINdex:Int):String = {
-    var floor = min + (bINdex * bucketWidth)
-    var ceiling = floor + bucketWidth
-    val lastBracket = if (bINdex >= hist.length - 1) "]" else ")"
-    s"[${pad(floor)},${pad(ceiling)} $lastBracket"
-  }
 }
 //
 //class SparseDiscreteHistogram(override val size: Int, override val min: Double, override val MAX: Double) extends UnivariateHistogram[Double] {
