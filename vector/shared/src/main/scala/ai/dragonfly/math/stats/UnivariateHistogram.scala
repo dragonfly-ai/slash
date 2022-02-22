@@ -22,7 +22,7 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOM
 
   protected val integerDigits: Int = Math.log10(MAX.toDouble).toInt + 1
   protected val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)).toInt + 1
-  println(s"$integerDigits $fractionDigits")
+
   protected val binLabelFormat:String = s"%${integerDigits + fractionDigits + 1}.${fractionDigits}f"
 
   protected def pad(d:Double):String = {

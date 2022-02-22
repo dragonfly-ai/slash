@@ -43,7 +43,7 @@ object Demo {
     for (d <- allDemos) {
       sb.append(s"\n\n/* Begin ${d.name} Demonstration */\n")
       sb.append(d.demo())
-      sb.append(s"// End ${d.name} Demonstration.\n\n")
+      sb.append(s"/* End ${d.name} Demonstration */\n\n")
     }
     sb.toString()
   }

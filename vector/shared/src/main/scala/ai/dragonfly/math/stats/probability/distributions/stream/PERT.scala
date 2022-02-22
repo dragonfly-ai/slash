@@ -15,7 +15,7 @@ object PERT {
     "val onlinePERT = try {\n" +
       "\tnew ai.dragonfly.math.stats.probability.distributions.stream.PERT\n" +
     "} catch {\n" +
-      "\t// I understand the superiority of stream.Beta over stream.PERT, but I have reasons!\n" +
+      "\t/* I understand the superiority of stream.Beta over stream.PERT, but I have reasons! */\n" +
       "\tcase ai.dragonfly.math.stats.probability.distributions.stream.UseBetaDistributionInstead(pert) => pert\n" +
     "}"
 
@@ -38,7 +38,7 @@ object PERT {
  * val onlinePERT = try {
  * 	new ai.dragonfly.math.stats.probability.distributions.stream.PERT
  * } catch {
- * 	// I understand the superiority of stream.Beta over stream.PERT, but I have reasons!
+ * 	/* I understand the superiority of stream.Beta over stream.PERT, but I have reasons! */
  * 	case ai.dragonfly.math.stats.probability.distributions.stream.UseBetaDistributionInstead(pert) => pert
  * }
  */
