@@ -6,11 +6,11 @@ import ai.dragonfly.math.examples.*
 import ai.dragonfly.math.stats.PointStatistics
 
 
-class LogNormal extends OnlineProbabilityDistributionEstimator[Double, distributions.LogNormal]  {
+class LogNormal extends OnlineUnivariateProbabilityDistributionEstimator[Double, distributions.LogNormal]  {
 
   val estimator = new PointStatisticsEstimator[Double](distributions.LogNormal.domain)
 
-  override def apply(frequency: Double, observation: Double):LogNormal = {
+  override def observe(frequency: Double, observation: Double):LogNormal = {
     estimator.observe(Array[Double](frequency, Math.log(observation)))
     this
   }

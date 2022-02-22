@@ -11,11 +11,11 @@ object Poisson {
   val demo = OnlineProbDistDemo[Long, distributions.Poisson, Poisson]("Streaming Poisson", distributions.Poisson(69), Poisson(), 10000)
 }
 
-class Poisson extends OnlineProbabilityDistributionEstimator[Long, distributions.Poisson] {
+class Poisson extends OnlineUnivariateProbabilityDistributionEstimator[Long, distributions.Poisson] {
 
   val estimator = new BoundedMeanEstimator[Long](distributions.Poisson.domain)
 
-  override def apply(frequency: Long, observation: Long):Poisson = {
+  override def observe(frequency: Long, observation: Long):Poisson = {
     estimator.observe(Array[Long](frequency, observation))
     this
   }

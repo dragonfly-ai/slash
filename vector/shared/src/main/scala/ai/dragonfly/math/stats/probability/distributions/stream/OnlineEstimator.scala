@@ -15,10 +15,21 @@ trait OnlineEstimator[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOMAIN]
   protected var s:Array[DOMAIN] = null
 }
 
-trait OnlineProbabilityDistributionEstimator[DOMAIN, PPD <: ParametricProbabilityDistribution[DOMAIN]](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOMAIN]) {
-  def apply(p1:DOMAIN, p2:DOMAIN):OnlineProbabilityDistributionEstimator[DOMAIN, PPD]
+trait OnlineProbabilityDistributionEstimator[DOMAIN, PPD <: ParametricProbabilityDistribution[DOMAIN]](using `#`: Numeric[DOMAIN]) {
   def estimate:EstimatedProbabilityDistribution[DOMAIN, PPD]
 }
+
+trait OnlineUnivariateProbabilityDistributionEstimator[DOMAIN, PPD <: ParametricProbabilityDistribution[DOMAIN]](using `#`: Numeric[DOMAIN])extends OnlineProbabilityDistributionEstimator[DOMAIN, PPD] {
+  def observe(observation:DOMAIN):OnlineProbabilityDistributionEstimator[DOMAIN, PPD] = observe(`#`.one, observation)
+  def observe(frequency:DOMAIN, observation:DOMAIN):OnlineUnivariateProbabilityDistributionEstimator[DOMAIN, PPD]
+}
+
+trait OnlineBivariateProbabilityDistributionEstimator[DOMAIN, PPD <: ParametricProbabilityDistribution[DOMAIN]](using `#`: Numeric[DOMAIN])extends OnlineProbabilityDistributionEstimator[DOMAIN, PPD] {
+  def observe(observation1:DOMAIN, observation2:DOMAIN):OnlineBivariateProbabilityDistributionEstimator[DOMAIN, PPD] = observe(`#`.one, observation1, observation2)
+  def observe(frequency:DOMAIN, observation1:DOMAIN, observation2:DOMAIN):OnlineBivariateProbabilityDistributionEstimator[DOMAIN, PPD]
+}
+
+
 
 trait EstimatesRange[DOMAIN] {
   def sampleRange:Interval[DOMAIN]

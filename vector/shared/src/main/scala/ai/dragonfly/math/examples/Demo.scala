@@ -34,7 +34,8 @@ object Demo {
     ai.dragonfly.math.stats.probability.distributions.stream.LogNormal.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.PERT.demo,
     ai.dragonfly.math.stats.probability.distributions.stream.Beta.demo,
-    ai.dragonfly.math.stats.probability.distributions.stream.Binomial.demo,
+    ai.dragonfly.math.stats.probability.distributions.stream.Binomial.fixedBinomialDemo,
+    ai.dragonfly.math.stats.probability.distributions.stream.Binomial.openBinomialDemo
   )
 
   lazy val consolidateDemoOutput: String = {

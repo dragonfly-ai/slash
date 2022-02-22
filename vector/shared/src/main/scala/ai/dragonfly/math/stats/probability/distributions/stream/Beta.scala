@@ -8,11 +8,11 @@ object Beta {
   val demo = OnlineProbDistDemo[Double, distributions.Beta, Beta]("Streaming Beta", distributions.Beta(3.0, 0.75, 42.0, 69.0), Beta(), 1000000)
 }
 
-class Beta extends OnlineProbabilityDistributionEstimator[Double, distributions.Beta]  {
+class Beta extends OnlineUnivariateProbabilityDistributionEstimator[Double, distributions.Beta]  {
 
   val estimator: PointStatisticsEstimator[Double] = new PointStatisticsEstimator[Double](distributions.Beta.domain)
 
-  override def apply(frequency: Double, observation: Double): Beta = {
+  override def observe(frequency: Double, observation: Double): Beta = {
     estimator.observe( Array[Double](frequency, observation) )
     this
   }

@@ -3,30 +3,40 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import ai.dragonfly.math.interval.Domain
+import ai.dragonfly.math.stats.BoundedMean
 import examples.*
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
 
 object Binomial {
-  val demo = new Demonstrable {
+
+  val fixedBinomialDemo = OnlineProbDistDemo[Long, distributions.Binomial, FixedBinomial]("Streaming FixedBinomial", distributions.Binomial(42L, 0.69), FixedBinomial(42L), 1000)
+
+
+  val openBinomialDemo = new Demonstrable {
     override def name: String = "Streaming Binomial"
+
+    def si:Double = 1 + ((Math.random() - 0.5) / 8.0)
 
     override def demo(implicit sb: StringBuilder): StringBuilder = {
       val sampleSize = 1000
       val idealDist = distributions.Binomial(69, 0.42)
       val streamingDist = Binomial()
-      sb.append(s"Estimate ${this.name} by sampling from: $idealDist")
+      sb.append(s"Estimate $name:\n\tSampling: $idealDist")
       val blockSize:Int = sampleSize / 5
-      streamingDist(idealDist.random(), 69)
-      for (i <- 1 until sampleSize) {
-        streamingDist(idealDist.random(), 69)
+      val end = sampleSize + 1
+      for (i <- 1 until end) {
+        val ki = idealDist.random() * si
+        val ni = idealDist.n * si
+        streamingDist.observe(ki.toLong, ni.toLong)
         if (i % blockSize == 0) {
-          sb.append(s"\n\tIteration $i estimated: ${streamingDist.estimate} ideal: $idealDist")
+          sb.append(s"\n\t\testimation after $i samples: ${streamingDist.estimate}")
         }
       }
-      sb.append(s"\n\tEstimated Distribution: ${streamingDist.estimate}\n\tFrom Distribution: $idealDist\n")
+      sb.append(s"\n\tEstimate: ${streamingDist.estimate}\n\tIdeal Distribution: $idealDist\n")
       sb.append(s"\nTest $idealDist.p($idealDist.random())")
+
       for (i <- 0 until 5) {
         val x = idealDist.random()
         sb.append(s"\n\tp($x) = ${idealDist.p(x)}")
@@ -38,14 +48,33 @@ object Binomial {
 }
 
 
+case class FixedBinomial(n: Long) extends OnlineUnivariateProbabilityDistributionEstimator[Long, distributions.Binomial]  {
 
-class Binomial extends OnlineProbabilityDistributionEstimator[Long, distributions.Binomial] {
+  val estimator: BoundedMeanEstimator[Long] = new BoundedMeanEstimator[Long](distributions.Binomial.domain)
+
+  override def observe(frequency: Long, observation: Long): FixedBinomial = {
+    estimator.observe(Array[Long](frequency, observation))
+    this
+  }
+
+  override def estimate:distributions.EstimatedBinomial = {
+    val bμ̂:BoundedMean[Long] = estimator.sampleBoundedMean
+    distributions.EstimatedBinomial(
+      bμ̂.bounds,
+      distributions.Binomial(n, bμ̂.μ / n),
+      bμ̂.ℕ̂
+    )
+  }
+
+}
+
+
+
+class Binomial extends OnlineBivariateProbabilityDistributionEstimator[Long, distributions.Binomial] {
 
   val estimator = new BinomialEstimator()
 
-  def apply(successCount:Long, trialCount:Long): Binomial = apply(1L, successCount, trialCount)
-
-  def apply(experimentCount:Long, successCount:Long, trialCount:Long): Binomial = {
+  def observe(experimentCount:Long, successCount:Long, trialCount:Long): Binomial = {
     estimator.observe(Array[Long](experimentCount, successCount, trialCount))
     this
   }

@@ -44,11 +44,11 @@ object PERT {
  */
 
 
-class PERT extends OnlineProbabilityDistributionEstimator[Double, distributions.PERT] {
+class PERT extends OnlineUnivariateProbabilityDistributionEstimator[Double, distributions.PERT] {
 
   val estimator = new BoundedMeanEstimator[Double](distributions.PERT.domain)
 
-  override def apply(frequency: Double, observation: Double):PERT = {
+  override def observe(frequency: Double, observation: Double):PERT = {
     estimator.observe(Array[Double](frequency, observation))
     this
   }

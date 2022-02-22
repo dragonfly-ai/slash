@@ -27,23 +27,23 @@ case class ProbabilityDistributionDemonstration[DOMAIN] (
 
 
 
-case class OnlineProbDistDemo[DOMAIN, PPD <: ParametricProbabilityDistribution[DOMAIN], EPPD <: OnlineProbabilityDistributionEstimator[DOMAIN, PPD]](
+case class OnlineProbDistDemo[DOMAIN, PPD <: ParametricProbabilityDistribution[DOMAIN], EPPD <: OnlineUnivariateProbabilityDistributionEstimator[DOMAIN, PPD]](
   name: String,
   idealDist: PPD,
   streamingDist: EPPD,
   sampleSize: Int
 )(using `#`: Numeric[DOMAIN]) extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
-    sb.append(s"Estimate $name by sampling from: $idealDist")
+    sb.append(s"Estimate $name:\n\tSampling: $idealDist")
     val blockSize:Int = sampleSize / 5
-    streamingDist(`#`.one, idealDist.random())
-    for (i <- 1 until sampleSize) {
-      streamingDist(`#`.one, idealDist.random())
+    val end = sampleSize + 1
+    for (i <- 1 until end) {
+      streamingDist.observe(idealDist.random())
       if (i % blockSize == 0) {
-        sb.append(s"\n\tIteration $i estimated: ${streamingDist.estimate} ideal: $idealDist")
+        sb.append(s"\n\t\testimation after $i samples: ${streamingDist.estimate}")
       }
     }
-    sb.append(s"\n\tEstimated Distribution: ${streamingDist.estimate}\n\tFrom Distribution: $idealDist\n")
+    sb.append(s"\n\tEstimate: ${streamingDist.estimate}\n\tIdeal Distribution: $idealDist\n")
     sb.append(s"\nTest $idealDist.p($idealDist.random())")
     for (i <- 0 until 5) {
       val x = idealDist.random()
