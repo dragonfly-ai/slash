@@ -26,7 +26,7 @@ case class DiscreteUniform(interval:Interval[Long]) extends ParametricProbabilit
 
   override val μ = (interval.min + interval.MAX).toDouble / 2.0
 
-  override lazy val `σ²`:Double = ( (`MAX-min` ⚁) - 1.0 ) / 12.0
+  override lazy val `σ²`:Double = ( (`MAX-min` * `MAX-min`) - 1.0 ) / 12.0
   override lazy val σ:Double = Math.sqrt(`σ²`)
 
 

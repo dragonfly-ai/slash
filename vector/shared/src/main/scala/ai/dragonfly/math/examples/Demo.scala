@@ -37,20 +37,21 @@ object Demo {
     ai.dragonfly.math.stats.probability.distributions.stream.Binomial.fixedBinomialDemo,
     ai.dragonfly.math.stats.probability.distributions.stream.Binomial.openBinomialDemo
   )
+  import Console.{GREEN, RED, RESET, YELLOW, UNDERLINED, RED_B}
 
   lazy val consolidateDemoOutput: String = {
     implicit val sb: StringBuilder = new StringBuilder()
     for (d <- allDemos) {
-      sb.append(s"\n\n/* Begin ${d.name} Demonstration */\n")
-      sb.append(d.demo())
-      sb.append(s"/* End ${d.name} Demonstration */\n\n")
+      sb.append(s"\n\n/* ${RESET}${GREEN}Begin ${d.name} Demonstration${RESET}*/\n")
+      sb.append(s"${d.demo()}")
+      sb.append(s"/* ${RESET}${RED}End ${d.name} Demonstration${RESET} */\n\n")
     }
     sb.toString()
   }
 
 
   def main(args: Array[String]): Unit = {
-    println(consolidateDemoOutput)
+    println(s"${RESET}${GREEN}$consolidateDemoOutput${RESET}")
   }
 
 }

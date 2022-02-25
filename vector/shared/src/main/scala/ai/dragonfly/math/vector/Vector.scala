@@ -51,24 +51,27 @@ object Vector {
     }
   }
 
-  
-  def midpoint(v0: Vector, v1: Vector): Vector = average(v0, v1)
+  def midpoint(`v⃑₀`: Vector, `v⃑₁`: Vector): Vector = {
+    //average(`v⃑₀`, `v⃑₁`)
+    (`v⃑₀` + `v⃑₁`) * 0.5
+  }
 
-  def average(vectors:Vector*): Vector = {
-    val avg:Vector = vectors.head.copy()
-    for (vector <- vectors.tail) {
-      avg.add(vector)
+  def average(`[v⃑₁v⃑₂⋯v⃑ₙ]`:Vector*): Vector = {
+    val μ⃑:Vector = `[v⃑₁v⃑₂⋯v⃑ₙ]`.head.copy()
+    for (vector <- `[v⃑₁v⃑₂⋯v⃑ₙ]`.tail) {
+      μ⃑.add(vector)
     }
-    avg.scale(1.0/vectors.size)
+    μ⃑.scale(1.0/`[v⃑₁v⃑₂⋯v⃑ₙ]`.size)
   }
 
   
-  def average(vectors: native.VECTORS): Vector = {
-    val avg:Vector = vectors.head.copy()
-    for (vector <- vectors.tail) {
-      avg.add(vector)
+  def average(`[v⃑₀v⃑₁⋯v⃑₍ₙ₋₁₎]`: VECTORS): Vector = {
+    val `¹/ₙ`:Double = 1.0 / `[v⃑₀v⃑₁⋯v⃑₍ₙ₋₁₎]`.length
+    val μ⃑:Vector = `[v⃑₀v⃑₁⋯v⃑₍ₙ₋₁₎]`.head.copy()
+    for (vector <- `[v⃑₀v⃑₁⋯v⃑₍ₙ₋₁₎]`.tail) {
+      μ⃑.add(vector)
     }
-    avg.scale(1.0/vectors.size)
+    μ⃑.scale(`¹/ₙ`)
   }
 }
 
@@ -95,11 +98,11 @@ trait Vector {
     else throw VectorNormalizationException(this)
   }
 
-  def distanceSquaredTo(v0: Vector): Double
+  def distanceSquaredTo(v⃑: Vector): Double
 
-  def distanceTo(v0: Vector): Double = Math.sqrt(distanceSquaredTo(v0))
+  def distanceTo(v⃑: Vector): Double = Math.sqrt(distanceSquaredTo(v⃑))
 
-  def dot(v0: Vector): Double
+  def dot(v⃑: Vector): Double
 
   def round(): Vector
 
@@ -108,12 +111,12 @@ trait Vector {
 
   def divide(denominator: Double): Vector = scale(1.0 / denominator)
 
-  def add(v0: Vector): Vector
+  def add(v⃑: Vector): Vector
 
-  def subtract(v0: Vector): Vector
+  def subtract(v⃑: Vector): Vector
 
   def center(vectors: VECTORS): VECTORS = {
-    for (v: Vector <- vectors) v.subtract(this)
+    for (v⃑: Vector <- vectors) v⃑.subtract(this)
     vectors
   }
 
@@ -123,14 +126,56 @@ trait Vector {
   def *(scalar:Double) = this.copy().scale(scalar)
   def /(scalar:Double) = this.copy().divide(scalar)
 
-  def +(v: Vector) = this.copy().add(v)
-  def -(v: Vector) = this.copy().subtract(v)
+  def +(v⃑: Vector) = this.copy().add(v⃑)
+  def -(v⃑: Vector) = this.copy().subtract(v⃑)
 
-  def csv: String = {
-    val sb:StringBuilder = new StringBuilder()
+  /**
+   * For exotic vector formatting, provide lambdas for generating prefix, delimiter, and suffix.
+   *
+   * @param prefix maps a vector to a prefix.
+   * @param delimiter maps vector element at index i to a delimiter.
+   * @param suffix maps vector to a suffix.
+   * @return
+   */
+  def dynamicCustomToString(
+                            prefix:Vector => String,
+                            delimiter:Int => String,
+                            suffix:Vector => String,
+                            sb:StringBuilder = new StringBuilder(),
+                            numberFormatter:Double => String = (d:Double) => d.toString ):StringBuilder = {
+
+    sb.append(prefix(this))
+    for (i <- 0 until values.length - 1) {
+      sb.append(numberFormatter(this.values(i)))
+        .append(delimiter(i))
+    }
+    sb.append(numberFormatter(this.values(values.length - 1)))
+      .append(suffix(this))
+  }
+
+  def customToString(
+                prefix:String,
+                delimiter:String,
+                suffix:String,
+                sb:StringBuilder = new StringBuilder(),
+                numberFormatter:Double => String = (d:Double) => d.toString ):StringBuilder = {
+    sb.append(prefix)
+      .append(delimitedValues(delimiter, sb, numberFormatter))
+      .append(suffix)
+  }
+
+  def commaSeparatedValues( sb:StringBuilder = new StringBuilder(),
+                            numberFormatter:Double => String = (d:Double) => d.toString ):StringBuilder = delimitedValues(", ", sb, numberFormatter)
+
+  def tabSeparatedValues( sb:StringBuilder = new StringBuilder(),
+                          numberFormatter:Double => String = (d:Double) => d.toString ):StringBuilder = delimitedValues("\t", sb, numberFormatter)
+
+  def delimitedValues( separator:String,
+                       sb:StringBuilder = new StringBuilder(),
+                       numberFormatter:Double => String = (d:Double) => d.toString ): StringBuilder = {
     sb.append(values.head)
-    for (v <- values.tail) sb.append(", ").append(v)
-    sb.toString
+    for (v <- values.tail) sb.append(separator).append(numberFormatter(v))
+    sb
   }
 }
 
@@ -138,12 +183,12 @@ case class UnsupportedVectorDimension(d:Int) extends Exception(
   s"Vector dimensions must exceed 1.  Cannot create a vector of dimension: $d"
 )
 
-case class MismatchedVectorDimensionsException(v0:Vector, v1:Vector) extends Exception(
-  s"Operation undefined on vectors with different dimensions:\n\tdim($v0) = ${v0.dimension}\n\tdim($v1) = ${v1.dimension}"
+case class MismatchedVectorDimensionsException(`v⃑₀`: Vector, `v⃑₁`: Vector) extends Exception(
+  s"Operation undefined on vectors with different dimensions:\n\tdim(${`v⃑₀`}) = ${`v⃑₀`.dimension}\n\tdim(${`v⃑₁`}) = ${`v⃑₁`.dimension}"
 )
 
-case class ExtraDimensionalAccessException(v:Vector, ci: Int) extends Exception(
-  s"Index: $ci exceeds dimensionality of Vector${v.dimension}: $v"
+case class ExtraDimensionalAccessException(v⃑:Vector, ci: Int) extends Exception(
+  s"Index: $ci exceeds dimensionality of Vector${v⃑.dimension}: $v⃑"
 )
 
-case class VectorNormalizationException(v:Vector) extends Exception(s"Can't normalize $v")
+case class VectorNormalizationException(v⃑:Vector) extends Exception(s"Can't normalize $v⃑")

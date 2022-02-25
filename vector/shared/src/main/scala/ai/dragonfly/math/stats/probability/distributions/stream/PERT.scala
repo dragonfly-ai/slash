@@ -2,7 +2,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
-import ai.dragonfly.math.examples.Demonstrable
+import ai.dragonfly.math.examples.{Demonstrable, OnlineProbDistDemo}
 import ai.dragonfly.math.stats.BoundedMean
 
 object PERT {
@@ -20,8 +20,16 @@ object PERT {
     "}"
 
   val demo = new Demonstrable {
+    val d:Demonstrable = OnlineProbDistDemo[Double, distributions.PERT, PERT](
+      "Streaming PERT",
+      distributions.PERT(21, 42.0, 69.0),
+      /* I understand the superiority of stream.Beta over stream.PERT, but I have reasons! */
+      try { new PERT } catch { case UseBetaDistributionInstead(pert) => pert },
+      1000
+    )
     override def demo(implicit sb: StringBuilder): StringBuilder = {
-      sb.append(doNotUse)
+      sb.append(doNotUse).append("\n")
+      d.demo(sb).append("\n")
     }
 
     override def name: String = "stream.PERT"

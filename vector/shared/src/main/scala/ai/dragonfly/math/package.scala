@@ -8,23 +8,30 @@ import scala.reflect.ClassTag
 
 package object math {
 
-  extension (x: Int)
-    inline def ⚁ : BigInt = x * x
+  val superscriptDigits: Array[String] = Array[String]("⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹" )
+  val subscriptDigits: Array[String] = Array[String]("₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉", "₊" )
 
-  extension (x: Long)
-    inline def ⚁ : BigInt =  x * x
+  private def digitMapper(i:Int, digitMap:Array[String]):String = {
 
-  extension (x: BigInt)
-    inline def ⚁ : BigInt =  x * x
+    var in:Int = i / 10
+    var out:String = digitMap(i % 10)
 
-  extension (x:Float)
-    inline def ⚁ : Float = x * x
+    while (in > 0) {
+      out = digitMap(in % 10) + out
+      in = in / 10
+    }
+    out
+  }
 
-  extension (x:Double)
-    inline def ⚁ : Double = x * x
-//
-//  extension[DOMAIN: Numeric] (x: DOMAIN)
-//    inline def ⚁ : DOMAIN = x * x
+  private def exalt(i:Int):String = {
+    if (i < 0) "⁻" + digitMapper(i * -1, superscriptDigits)
+    else digitMapper(i, superscriptDigits)
+  }
+
+  private def abase(i:Int):String = {
+    if (i < 0) "⁻" + digitMapper(i * -1, subscriptDigits)
+    else digitMapper(i, subscriptDigits)
+  }
 
   // ported from https://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/src-html/org/apache/commons/math3/special/Gamma.html
 

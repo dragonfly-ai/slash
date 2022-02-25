@@ -32,22 +32,22 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override def values: VectorValues = VectorValues(x, y)
 
-  override def distanceSquaredTo(v0: Vector): Double = {
-    if (v0.dimension == dimension) {
-      val dx = x - v0.component(0)
-      val dy = y - v0.component(1)
+  override def distanceSquaredTo(v⃑: Vector): Double = {
+    if (v⃑.dimension == dimension) {
+      val dx = x - v⃑.component(0)
+      val dy = y - v⃑.component(1)
       dx * dx + dy * dy
-    } else throw MismatchedVectorDimensionsException(this, v0)
+    } else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
-  override def dot(v0: Vector): Double = {
-    if (v0.dimension == dimension) x * v0.component(0) + y * v0.component(1)
-    else throw MismatchedVectorDimensionsException(this, v0)
+  override def dot(v⃑: Vector): Double = {
+    if (v⃑.dimension == dimension) x * v⃑.component(0) + y * v⃑.component(1)
+    else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
-  def pseudoCross(v0: Vector): Double = {
-    if (v0.dimension == dimension) x * v0.component(1) + y * v0.component(0)
-    else throw MismatchedVectorDimensionsException(this, v0)
+  def pseudoCross(v⃑: Vector): Double = {
+    if (v⃑.dimension == dimension) x * v⃑.component(1) + y * v⃑.component(0)
+    else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
   override def scale(scalar: Double): Vector2 = {
@@ -63,20 +63,20 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override def magnitudeSquared(): Double = x*x + y*y
 
-  override def add(v0: Vector): Vector2 = {
-    if (v0.dimension == dimension) {
-      x = x + v0.component(0)
-      y = y + v0.component(1)
+  override def add(v⃑: Vector): Vector2 = {
+    if (v⃑.dimension == dimension) {
+      x = x + v⃑.component(0)
+      y = y + v⃑.component(1)
       this
-    } else throw MismatchedVectorDimensionsException(this, v0)
+    } else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
-  override def subtract(v0: Vector): Vector2 = {
-    if (v0.dimension == dimension) {
-      x = x - v0.component(0)
-      y = y - v0.component(1)
+  override def subtract(v⃑: Vector): Vector2 = {
+    if (v⃑.dimension == dimension) {
+      x = x - v⃑.component(0)
+      y = y - v⃑.component(1)
       this
-    } else throw MismatchedVectorDimensionsException(this, v0)
+    } else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
   def rotateDegrees(degrees: Double): Vector2 = rotate(degrees * 0.01745329252)
@@ -94,7 +94,7 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override def copy(): Vector2 = Vector2(x, y)
 
-  override def toString: String = s"[$x,$y]"
+  override def toString: String = s"《²↗〉${x}ᵢ ${y}ⱼ〉" // ₂⃗ ²↗ ↗²
 
   override def round(): Vector = {
     x = Math.round(x).toDouble

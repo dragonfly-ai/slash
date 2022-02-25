@@ -46,28 +46,30 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override def values: VectorValues = VectorValues(x, y, z)
 
-  override def distanceSquaredTo(v0: Vector): Double = {
-    if (v0.dimension == dimension) {
-      val dx = x - v0.component(0)
-      val dy = y - v0.component(1)
-      val dz = z - v0.component(2)
+  override def distanceSquaredTo(v⃑: Vector): Double = {
+    if (v⃑.dimension == dimension) {
+      val dx = x - v⃑.component(0)
+      val dy = y - v⃑.component(1)
+      val dz = z - v⃑.component(2)
       dx * dx + dy * dy + dz * dz
-    } else throw MismatchedVectorDimensionsException(this, v0)
+    } else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
-  override def dot(v0: Vector): Double = {
-    if (v0.dimension == dimension) x * v0.component(0) + y * v0.component(1) + z * v0.component(2)
-    else throw MismatchedVectorDimensionsException(this, v0)
+  override def dot(v⃑: Vector): Double = {
+    if (v⃑.dimension == dimension) x * v⃑.component(0) + y * v⃑.component(1) + z * v⃑.component(2)
+    else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
-  def X (v0: Vector): Vector3 = cross(v0)
+  def ⨯ (v⃑: Vector): Vector3 = cross(v⃑)
 
-  def cross(v0: Vector): Vector3 = {
-    if (v0.dimension == dimension) new Vector3(
-      y * v0.component(2) - z * v0.component(1), // u2*v3 - u3*v2,
-      z * v0.component(0) - x * v0.component(2), // u3*v1 - u1*v3,
-      x * v0.component(1) - y * v0.component(0)  // u1*v2 - u2*v1
-    ) else throw MismatchedVectorDimensionsException(this, v0)
+  def X (v⃑: Vector): Vector3 = cross(v⃑)
+
+  def cross(v⃑: Vector): Vector3 = {
+    if (v⃑.dimension == dimension) new Vector3(
+      y * v⃑.component(2) - z * v⃑.component(1), // u2*v3 - u3*v2,
+      z * v⃑.component(0) - x * v⃑.component(2), // u3*v1 - u1*v3,
+      x * v⃑.component(1) - y * v⃑.component(0)  // u1*v2 - u2*v1
+    ) else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
   override def scale(scalar: Double): Vector3 = {
@@ -89,27 +91,27 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
   override def magnitudeSquared(): Double = x*x + y*y + z*z
 
 
-  override def add(v0: Vector): Vector3 = {
-    if (v0.dimension == dimension) {
-      x = x + v0.component(0)
-      y = y + v0.component(1)
-      z = z + v0.component(2)
+  override def add(v⃑: Vector): Vector3 = {
+    if (v⃑.dimension == dimension) {
+      x = x + v⃑.component(0)
+      y = y + v⃑.component(1)
+      z = z + v⃑.component(2)
       this
-    } else throw MismatchedVectorDimensionsException(this, v0)
+    } else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
-  override def subtract(v0: Vector): Vector3 = {
-    if (v0.dimension == dimension) {
-      x = x - v0.component(0)
-      y = y - v0.component(1)
-      z = z - v0.component(2)
+  override def subtract(v⃑: Vector): Vector3 = {
+    if (v⃑.dimension == dimension) {
+      x = x - v⃑.component(0)
+      y = y - v⃑.component(1)
+      z = z - v⃑.component(2)
       this
-    } else throw MismatchedVectorDimensionsException(this, v0)
+    } else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
   override def copy(): Vector3 = Vector3(x, y, z)
 
-  override def toString: String = s"[$x,$y,$z]"
+  override def toString: String = s"《³↗〉${x}ᵢ ${y}ⱼ ${z}ₖ〉"
 
   override def round(): Vector = {
     x = Math.round(x).toDouble

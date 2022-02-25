@@ -54,19 +54,19 @@ case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) e
 
   override def magnitudeSquared(): Double = x*x + y*y + z*z + w*w
 
-  override def distanceSquaredTo(v0: Vector): Double = {
-    if (v0.dimension == dimension) {
-      val dx = x - v0.component(0)
-      val dy = y - v0.component(1)
-      val dz = z - v0.component(2)
-      val dw = w - v0.component(3)
+  override def distanceSquaredTo(v⃑: Vector): Double = {
+    if (v⃑.dimension == dimension) {
+      val dx = x - v⃑.component(0)
+      val dy = y - v⃑.component(1)
+      val dz = z - v⃑.component(2)
+      val dw = w - v⃑.component(3)
       dx * dx + dy * dy + dz * dz + dw * dw
-    } else throw MismatchedVectorDimensionsException(this, v0)
+    } else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
-  override def dot(v0: Vector): Double = {
-    if (v0.dimension == dimension) x * v0.component(0) + y * v0.component(1) + z * v0.component(2) + w * v0.component(3)
-    else throw MismatchedVectorDimensionsException(this, v0)
+  override def dot(v⃑: Vector): Double = {
+    if (v⃑.dimension == dimension) x * v⃑.component(0) + y * v⃑.component(1) + z * v⃑.component(2) + w * v⃑.component(3)
+    else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
   override def scale(scalar: Double): Vector4 = {
@@ -85,25 +85,28 @@ case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) e
     this
   }
 
-  override def add(v0: Vector): Vector4 = {
-    if (v0.dimension == dimension) {
-      x = x + v0.component(0)
-      y = y + v0.component(1)
-      z = z + v0.component(2)
-      w = w + v0.component(3)
+  override def add(v⃑: Vector): Vector4 = {
+    if (v⃑.dimension == dimension) {
+      x = x + v⃑.component(0)
+      y = y + v⃑.component(1)
+      z = z + v⃑.component(2)
+      w = w + v⃑.component(3)
       this
-    } else throw MismatchedVectorDimensionsException(this, v0)
+    } else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
-  override def subtract(v0: Vector): Vector4 = {
-    if (v0.dimension == dimension) {
-      x = x - v0.component(0)
-      y = y - v0.component(1)
-      z = z - v0.component(2)
-      w = w - v0.component(3)
+  override def subtract(v⃑: Vector): Vector4 = {
+    if (v⃑.dimension == dimension) {
+      x = x - v⃑.component(0)
+      y = y - v⃑.component(1)
+      z = z - v⃑.component(2)
+      w = w - v⃑.component(3)
       this
-    } else throw MismatchedVectorDimensionsException(this, v0)
+    } else throw MismatchedVectorDimensionsException(this, v⃑)
   }
 
   override def copy(): Vector4 = Vector4(x, y, z, w)
+
+  override def toString: String = s"《⁴↗〉${x}ᵢ ${y}ⱼ ${z}ₖ ${w}ₗ〉"
+
 }
