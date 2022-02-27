@@ -1,6 +1,7 @@
 package ai.dragonfly.math.vector
 
 import scala.scalajs.js
+import ai.dragonfly.math.vector.given_VectorOps_Vector
 
 object Vector {
 
@@ -23,62 +24,40 @@ object Vector {
       case _ => VectorN(VectorValues(d:_*))
     }
   }
-  
-  def fill(dimension: Int, value:Double): Vector = dimension match {
-    case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
-    case 2 => Vector2(value, value)
-    case 3 => Vector3(value, value, value)
-    case 4 => Vector4(value, value, value, value)
-    case _ => VectorN(VectorValues.fill(dimension)((_:Int) => value))
-  }
 
-  def fill(dimension:Int)(f: Int => Double):Vector = dimension match {
-    case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
-    case 2 => Vector2(f(0), f(1))
-    case 3 => Vector3(f(0), f(1), f(2))
-    case 4 => Vector4(f(0), f(1), f(2), f(3))
-    case _ => VectorN(VectorValues.fill(dimension)(f))
-  }
+  def midpoint[V <: Vector](v0: Vector, v1: Vector): V = ((v0 + v1) * 0.5).asInstanceOf[V]
 
-  def random(dimension: Int, maxNorm:Double = 1.0): Vector = {
-    def r(i:Int = 0): Double = Math.random() * maxNorm
-    dimension match {
-      case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
-      case 2 => Vector2(r(), r())
-      case 3 => Vector3(r(), r(), r())
-      case 4 => Vector4(r(), r(), r(), r())
-      case _ => new VectorN(VectorValues.fill(dimension)(r))
-    }
-  }
-
-  def midpoint(`v⃑₀`: Vector, `v⃑₁`: Vector): Vector = {
-    //average(`v⃑₀`, `v⃑₁`)
-    (`v⃑₀` + `v⃑₁`) * 0.5
-  }
-
-  def average(`[v⃑₁v⃑₂⋯v⃑ₙ]`:Vector*): Vector = {
-    val μ⃑:Vector = `[v⃑₁v⃑₂⋯v⃑ₙ]`.head.copy()
-    for (vector <- `[v⃑₁v⃑₂⋯v⃑ₙ]`.tail) {
+  def average[V <: Vector](`[v₁v₂⋯vₙ]`:Vector*): V = ({
+    val μ⃑:V = `[v₁v₂⋯vₙ]`.head.copy().asInstanceOf[V]
+    for (vector <- `[v₁v₂⋯vₙ]`.tail) {
       μ⃑.add(vector)
     }
-    μ⃑.scale(1.0/`[v⃑₁v⃑₂⋯v⃑ₙ]`.size)
-  }
+    μ⃑.scale(1.0/`[v₁v₂⋯vₙ]`.size)
+  }).asInstanceOf[V]
 
-  
-  def average(`[v⃑₀v⃑₁⋯v⃑₍ₙ₋₁₎]`: VECTORS): Vector = {
-    val `¹/ₙ`:Double = 1.0 / `[v⃑₀v⃑₁⋯v⃑₍ₙ₋₁₎]`.length
-    val μ⃑:Vector = `[v⃑₀v⃑₁⋯v⃑₍ₙ₋₁₎]`.head.copy()
-    for (vector <- `[v⃑₀v⃑₁⋯v⃑₍ₙ₋₁₎]`.tail) {
+  def average[V <: Vector](`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS): V = ({
+    val `¹/ₙ`:Double = 1.0 / `[v₀v₁⋯v₍ₙ₋₁₎]`.length
+    val μ⃑:V = `[v₀v₁⋯v₍ₙ₋₁₎]`.head.copy().asInstanceOf[V]
+    for (vector <- `[v₀v₁⋯v₍ₙ₋₁₎]`.tail) {
       μ⃑.add(vector)
     }
     μ⃑.scale(`¹/ₙ`)
-  }
+  }).asInstanceOf[V]
+
 }
 
-/**
- * Created by clifton on 1/9/17.
- */
+// trait for Vector Companion Objects
+trait VectorCompanion[ᵥ⃑ <: Vector] {
+  def apply(values: VectorValues): Vector
 
+  def blend(α: Double, v0: Vector, v1: Vector): Vector = (v0 * α) + (v1 * (1.0 - α))
+
+  def average(`[v₁v₂⋯vₙ]`:Vector*): Vector = Vector.average[ᵥ⃑](`[v₁v₂⋯vₙ]`:_*)
+
+  def average(`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS): Vector = Vector.average(`[v₀v₁⋯v₍ₙ₋₁₎]`)
+
+  def midpoint(v0: Vector, v1: Vector): Vector = blend(0.5, v0, v1)
+}
 
 trait Vector {
 
@@ -92,42 +71,7 @@ trait Vector {
 
   def magnitude(): Double = Math.sqrt( magnitudeSquared() )
 
-  def normalize(): Vector = {
-    val m2:Double = magnitudeSquared()
-    if (m2 > 0.0) divide(Math.sqrt(m2))
-    else throw VectorNormalizationException(this)
-  }
-
-  def distanceSquaredTo(v⃑: Vector): Double
-
-  def distanceTo(v⃑: Vector): Double = Math.sqrt(distanceSquaredTo(v⃑))
-
-  def dot(v⃑: Vector): Double
-
-  def round(): Vector
-
-  // in place operators
-  def scale(scalar: Double): Vector
-
-  def divide(denominator: Double): Vector = scale(1.0 / denominator)
-
-  def add(v⃑: Vector): Vector
-
-  def subtract(v⃑: Vector): Vector
-
-  def center(vectors: VECTORS): VECTORS = {
-    for (v⃑: Vector <- vectors) v⃑.subtract(this)
-    vectors
-  }
-
-  def copy(): Vector
-
-  // copy operators
-  def *(scalar:Double) = this.copy().scale(scalar)
-  def /(scalar:Double) = this.copy().divide(scalar)
-
-  def +(v⃑: Vector) = this.copy().add(v⃑)
-  def -(v⃑: Vector) = this.copy().subtract(v⃑)
+  def copy():Vector
 
   /**
    * For exotic vector formatting, provide lambdas for generating prefix, delimiter, and suffix.
@@ -138,9 +82,9 @@ trait Vector {
    * @return
    */
   def dynamicCustomToString(
-                            prefix:Vector => String,
+                            prefix: Vector => String,
                             delimiter:Int => String,
-                            suffix:Vector => String,
+                            suffix: Vector => String,
                             sb:StringBuilder = new StringBuilder(),
                             numberFormatter:Double => String = (d:Double) => d.toString ):StringBuilder = {
 
@@ -183,12 +127,12 @@ case class UnsupportedVectorDimension(d:Int) extends Exception(
   s"Vector dimensions must exceed 1.  Cannot create a vector of dimension: $d"
 )
 
-case class MismatchedVectorDimensionsException(`v⃑₀`: Vector, `v⃑₁`: Vector) extends Exception(
-  s"Operation undefined on vectors with different dimensions:\n\tdim(${`v⃑₀`}) = ${`v⃑₀`.dimension}\n\tdim(${`v⃑₁`}) = ${`v⃑₁`.dimension}"
+case class MismatchedVectorDimensionsException(v0:Vector, v1:Vector) extends Exception(
+  s"Operation undefined on vectors with different dimensions:\n\tdim($v0) = ${v0.dimension}\n\tdim($v1) = ${v1.dimension}"
 )
 
-case class ExtraDimensionalAccessException(v⃑:Vector, ci: Int) extends Exception(
-  s"Index: $ci exceeds dimensionality of Vector${v⃑.dimension}: $v⃑"
+case class ExtraDimensionalAccessException(v:Vector, ci: Int) extends Exception(
+  s"Index: $ci exceeds dimensionality of Vector${v.dimension}: $v"
 )
 
-case class VectorNormalizationException(v⃑:Vector) extends Exception(s"Can't normalize $v⃑")
+case class VectorNormalizationException(v:Vector) extends Exception(s"Can't normalize $v")

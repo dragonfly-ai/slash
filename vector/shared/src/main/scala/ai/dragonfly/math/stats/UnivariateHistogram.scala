@@ -6,7 +6,6 @@ import ai.dragonfly.math.examples.Demonstrable
 import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag
 
-
 trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOMAIN]) {
   import `#`._
 
@@ -52,57 +51,65 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOM
   override def toString: String = {
     val capBlocks: Array[String] = Array[String](" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█" )  //
 
-    val sb = new mutable.StringBuilder("Histogram:").append(" { \n")
+    var maxBinMass:Double = Double.MinValue
+    for (bIndex <- index(min) to index(MAX)) {
+      maxBinMass = Math.max(maxBinMass, binMass((bIndex)) / mass)
+    }
+
+    val scale:Double = 100.0 / maxBinMass
+
+    val sb = new mutable.StringBuilder("Histogram:\n")
 
     var cumulative = 0.0
     for (bIndex <- index(min) to index(MAX)) {
-      sb.append("\t").append(binLabel(bIndex)).append(" ")
 
       var bnms: Double = binMass(bIndex)
       cumulative = cumulative + bnms
-      bnms = bnms / mass
+      if (cumulative > 0.0 && (cumulative < mass || bnms > 0.0)) {
+        bnms = bnms / mass
 
-      val glyph = theme(((cumulative/mass) * (theme.length - 1)).toInt)
-      sb.append(glyph).append(" ")
+        sb.append(binLabel(bIndex)).append(" ")
 
-      if (bnms > Double.MinPositiveValue) {
-        val m = 1000.0 * bnms
-        var wholeCount = m / capBlocks.length
-        val `1/8`:Double = 1.0/8.0
-        // base
-        sb.append(
-          if (wholeCount >= `1/8`) {
-            wholeCount = wholeCount - `1/8`
-            "▕"
-          } else {
-            if (wholeCount > `1/8` / 10.0) {
-              wholeCount = wholeCount - `1/8` / 10.0
-              "︙"
-            } else if (wholeCount > `1/8` / 100.0) {
-              wholeCount = wholeCount - `1/8` / 100.0
-              "︰"
-            } else if (wholeCount > `1/8` / 1000.0){
-              wholeCount = wholeCount - `1/8` / 1000.0
-              "￤"
-            } else if (wholeCount > `1/8` / 10000.0) {
-              wholeCount = wholeCount - `1/8` / 10000.0
-              "︲"
+        val glyph = theme(((cumulative / mass) * (theme.length - 1)).toInt)
+        sb.append(glyph).append(" ")
+
+        if (bnms > Double.MinPositiveValue) {
+          val m = scale * bnms
+          var wholeCount = m / capBlocks.length
+          val `1/8`: Double = 1.0 / 8.0
+          // base
+          sb.append(
+            if (wholeCount >= `1/8`) {
+              wholeCount = wholeCount - `1/8`
+              "▕"
+            } else {
+              if (wholeCount > `1/8` / 2.0) {
+                wholeCount = wholeCount - `1/8` / 2.0
+                "⢸"
+              } else if (m > `1/8` / 10.0) {
+                wholeCount = wholeCount - `1/8` / 10.0
+//                "︙"
+//              } else if (m > `1/8` / 16.0) {
+//                wholeCount = wholeCount - `1/8` / 16.0
+                "⠰"
+              } else if (m > `1/8` / 100.0) {
+                wholeCount = wholeCount - `1/8` / 100.0
+                "⠐"
+              } else ""
             }
-            else ""
+          )
+          // bar
+          while (wholeCount > 1.0) {
+            sb.append("█") // ░ ▒ ▓
+            wholeCount = wholeCount - 1.0
           }
-        )
-        // bar
-        while (wholeCount > 1.0) {
-          sb.append("█") // ░ ▒ ▓
-          wholeCount = wholeCount - 1.0
+          // cap
+          sb.append(capBlocks((wholeCount * capBlocks.length).toInt))
+          if (bnms > Double.MinPositiveValue) sb.append(s"   ∝ $bnms")
         }
-        // cap
-        sb.append(capBlocks((wholeCount * capBlocks.length).toInt))
-        if (bnms > Double.MinPositiveValue) sb.append(s"   ∝ $bnms")
+        sb.append("\n")
       }
-      sb.append("\n")
     }
-    sb.append("}")
     sb.toString()
   }
 
@@ -318,13 +325,26 @@ class UnivariateGenerativeModel[T](
 :
 ¦
 ┆
-┊
-╎
-╏
-┋
-⁞
-┆
-┊
-‖
-⸠
+┊|
+╎|
+╏|
+┋|
+⦀|
+⁞|
+┆|
+┊|
+‖|
+⸠|
+⦙|
+𝇐|
+𝇔|
+▏
+▎
+▍
+▌
+▋
+▊
+▉
+█
+⃒
  */

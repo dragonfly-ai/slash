@@ -7,6 +7,7 @@ package ai.dragonfly.math.stats.kernel
 import ai.dragonfly.math.*
 import examples.*
 import vector.Vector
+import ai.dragonfly.math.vector.given_VectorOps_Vector
 
 object Kernel extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
@@ -29,11 +30,11 @@ trait Kernel {
 
   def weight(magnitudeSquared: Double): Double
   def weight(v: Vector): Double
-  def weight(v1: Vector, v2: Vector): Double = weight(v1.copy().subtract(v2))
+  def weight(v1: Vector, v2: Vector): Double = weight(v1 - v2)
 //  def scaledWeight(v1: VectorN, v2: VectorN): Double = weight(v1, v2) * v1.getFrequency * v2.getFrequency
 
   def distance(v: Vector): Double = v.magnitude()
-  def distance(v1: Vector, v2: Vector): Double = v1.copy().subtract(v2).magnitude()
+  def distance(v1: Vector, v2: Vector): Double = (v1 - v2).magnitude()
 
   lazy val discretize: DiscreteKernel = DiscreteKernel(this)
 }

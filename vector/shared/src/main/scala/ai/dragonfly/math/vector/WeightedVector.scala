@@ -16,11 +16,11 @@ object WeightedVector extends Demonstrable {
   override def name: String = "WeightedVector"
 }
 
-case class WeightedVector(unweighted:Vector) {
+case class WeightedVector(unweighted: Vector) {
   private var weight:Double = 0.0
   def addWeight(w: Double): WeightedVector = {
     weight = weight + w
     this
   }
-  def weighted: Vector = unweighted.copy().scale(weight)
+  def weighted: Vector = unweighted * weight
 }

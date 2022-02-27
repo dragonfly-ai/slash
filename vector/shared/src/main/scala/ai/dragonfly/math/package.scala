@@ -1,12 +1,12 @@
 package ai.dragonfly
 
 import ai.dragonfly.math.examples.*
-import ai.dragonfly.math.vector.VectorValues
-
-import scala.language.postfixOps
-import scala.reflect.ClassTag
+import ai.dragonfly.math.vector.*
 
 package object math {
+
+  inline def squareInPlace(x:Double): Double = x*x
+  //inline def squareInPlace(x:Double):Double = x*x
 
   val superscriptDigits: Array[String] = Array[String]("⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹" )
   val subscriptDigits: Array[String] = Array[String]("₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉", "₊" )

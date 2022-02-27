@@ -11,7 +11,7 @@ import ai.dragonfly.math.vector._
 object StreamingVectorStats extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val svs = new StreamingVectorStats(4)
-    for (i <- 0 until 10000) svs(Vector.random(4, 1000))
+    for (i <- 0 until 10000) svs(VectorN.random(4, 1000))
     sb.append(svs).append("\n")
   }
 
