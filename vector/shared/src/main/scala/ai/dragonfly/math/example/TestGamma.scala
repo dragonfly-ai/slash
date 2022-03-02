@@ -1,4 +1,4 @@
-package ai.dragonfly.math.examples
+package ai.dragonfly.math.example
 
 import ai.dragonfly.math
 

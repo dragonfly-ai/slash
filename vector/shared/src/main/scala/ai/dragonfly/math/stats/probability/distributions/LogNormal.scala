@@ -3,7 +3,7 @@ package ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import stats.*
 import interval.*
-import examples.*
+import example.*
 
 // https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters
 

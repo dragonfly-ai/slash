@@ -1,6 +1,6 @@
 package ai.dragonfly.math.vector
 
-import ai.dragonfly.math.examples.Demonstrable
+import ai.dragonfly.math.example.Demonstrable
 import ai.dragonfly.math.squareInPlace
 
 import scala.scalajs.js
@@ -23,6 +23,8 @@ object Vector2 extends VectorCompanion[Vector2] with Demonstrable {
   def fill(f: Int => Double):Vector2 = Vector2(f(0), f(1))
 
   def random(maxNorm:Double = 1.0): Vector2 = Vector2(maxNorm * Math.random(), maxNorm * Math.random())
+
+  def random(xMAX:Double, yMAX:Double): Vector2 = Vector2(xMAX * Math.random(), yMAX * Math.random())
 
 
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {

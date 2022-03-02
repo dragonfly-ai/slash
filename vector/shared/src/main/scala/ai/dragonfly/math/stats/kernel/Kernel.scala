@@ -5,7 +5,7 @@ package ai.dragonfly.math.stats.kernel
  */
 
 import ai.dragonfly.math.*
-import examples.*
+import example.*
 import vector.Vector
 import ai.dragonfly.math.vector.given_VectorOps_Vector
 

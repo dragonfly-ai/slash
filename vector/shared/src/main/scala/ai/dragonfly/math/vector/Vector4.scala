@@ -1,6 +1,6 @@
 package ai.dragonfly.math.vector
 
-import ai.dragonfly.math.examples.Demonstrable
+import ai.dragonfly.math.example.Demonstrable
 import scala.language.postfixOps
 import ai.dragonfly.math.squareInPlace
 

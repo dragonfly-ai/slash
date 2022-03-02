@@ -1,7 +1,7 @@
 package ai.dragonfly.math
 
 import ai.dragonfly.math.*
-import examples.*
+import example.*
 
 import scala.language.postfixOps
 

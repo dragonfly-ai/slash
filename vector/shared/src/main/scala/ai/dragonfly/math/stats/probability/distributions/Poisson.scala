@@ -2,7 +2,7 @@ package ai.dragonfly.math.stats.probability.distributions
 
 import ai.dragonfly.math.*
 import stats.*
-import examples.*
+import example.*
 import interval.*
 
 object Poisson {

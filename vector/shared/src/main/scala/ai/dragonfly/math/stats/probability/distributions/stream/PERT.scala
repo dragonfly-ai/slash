@@ -2,7 +2,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
-import ai.dragonfly.math.examples.{Demonstrable, OnlineProbDistDemo}
+import ai.dragonfly.math.example.{Demonstrable, OnlineProbDistDemo}
 import ai.dragonfly.math.stats.BoundedMean
 
 object PERT {

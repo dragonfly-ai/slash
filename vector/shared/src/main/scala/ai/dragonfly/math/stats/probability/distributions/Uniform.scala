@@ -3,7 +3,7 @@ package ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import stats.*
 import ai.dragonfly.math.interval.*
-import ai.dragonfly.math.examples.ProbabilityDistributionDemonstration
+import ai.dragonfly.math.example.ProbabilityDistributionDemonstration
 
 import scala.language.postfixOps
 

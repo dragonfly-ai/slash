@@ -4,7 +4,7 @@ import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import ai.dragonfly.math.interval.Domain
 import ai.dragonfly.math.stats.BoundedMean
-import examples.*
+import example.*
 
 import scala.language.postfixOps
 import scala.language.implicitConversions

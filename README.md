@@ -8,11 +8,14 @@ Features:
 - Parametric and Estimated (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
 - Geometry: Sample points uniformly from the volumes defined by 3D tetrahedrons.
-- Plain text histogram plotting for console friendly output.
+- Visualization: Text based visualization, inspired by [https://github.com/JuliaPlots/UnicodePlots.jl].  Currently supports line charts, scatter plots, and histograms.
+
+Unicode Plot:
+
+![Unicode plot of a Linear Regression Model and its Sample Data.](/home/c/source/ai.dragonfly/vector/RegressionPlot.png "Linear Plot with Scatter Plot")
+
 ```
 Histogram: { 
-	[-29.00,-23.00 ) 🌑 
-	[-23.00,-17.00 ) 🌑 
 	[-17.00,-11.00 ) 🌑 ︙    ∝ 3.0E-4
 	[-11.00, -5.00 ) 🌑 ▕█   ∝ 0.0094
 	[ -5.00,  1.00 ) 🌑 ▕████████    ∝ 0.0732
@@ -23,7 +26,6 @@ Histogram: {
 	[ 25.00, 31.00 ) 🌔 ▕█   ∝ 0.0101
 	[ 31.00, 37.00 ) 🌔 ︙    ∝ 5.0E-4
 	[ 37.00, 43.00 ) 🌕 ︰    ∝ 1.0E-4
-	[ 43.00, 49.00 ] 🌕 
 }
 ```
 
@@ -31,7 +33,7 @@ To use this library with SBT:
 
 <pre>
 resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/"
-libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.43"
+libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.44"
 </pre><br />
 
 Projects that rely on this Library:

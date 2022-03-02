@@ -2,7 +2,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.*
 import probability.distributions
-import ai.dragonfly.math.examples.*
+import ai.dragonfly.math.example.*
 import jdk.jfr.Frequency
 
 import scala.util.Random

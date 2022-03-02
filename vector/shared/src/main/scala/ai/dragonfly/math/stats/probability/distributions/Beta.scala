@@ -3,7 +3,7 @@ package ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import stats.*
 import interval.*
-import examples.*
+import example.*
 
 import scala.util.Random
 

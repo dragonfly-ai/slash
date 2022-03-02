@@ -2,7 +2,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
-import examples.*
+import example.*
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
