@@ -12,7 +12,7 @@ Features:
 
 Unicode Plot:
 
-![Unicode plot of a Linear Regression Model and its Sample Data.](/home/c/source/ai.dragonfly/vector/RegressionPlot.png "Linear Plot with Scatter Plot")
+![Unicode plot of a Linear Regression Model and its Sample Data.](https://github.com/dragonfly-ai/vector/blob/master/RegressionPlot.png "Linear Plot with Scatter Plot")
 
 ```
 Histogram: { 
