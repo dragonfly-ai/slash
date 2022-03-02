@@ -35,7 +35,7 @@ case class PERT(boundedMean:BoundedMean[Double]) extends ParametricProbabilityDi
 }
 
 
-case class EstimatedPERT(override val idealized: PERT, override val ℕ̂:Double) extends EstimatedProbabilityDistribution[Double, PERT]{
+case class EstimatedPERT(override val idealized: PERT, override val ℕ:Double) extends EstimatedProbabilityDistribution[Double, PERT]{
   override val interval = idealized.interval
-  override def toString: String = s"EstimatedPERT(min = ${interval.min}, μ̂ = $μ̂, MAX = ${interval.MAX}, σ̂² = ${`σ̂²`}, σ̂ = $σ̂, ℕ̂ = $ℕ̂)"
+  override def toString: String = s"EstimatedPERT(min = ${interval.min},  μ = $μ, MAX = ${interval.MAX}, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }

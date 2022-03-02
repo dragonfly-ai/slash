@@ -36,9 +36,9 @@ case class Poisson(λ:Double) extends ParametricProbabilityDistribution[Long] {
   override def toString: String = s"Poisson(λ = μ = σ² = $λ, √λ = $σ)"
 }
 
-case class EstimatedPousson(override val interval:Interval[Long], override val idealized: Poisson, override val ℕ̂:Long) extends EstimatedProbabilityDistribution[Long, Poisson]{
-  def λ̂:Double = idealized.λ
+case class EstimatedPousson(override val interval:Interval[Long], override val idealized: Poisson, override val ℕ:Long) extends EstimatedProbabilityDistribution[Long, Poisson]{
+  def λ:Double = idealized.λ
   def sampleLambda:Double = idealized.λ
 
-  override def toString: String = s"PoissonEstimate(min = ${interval.min}, MAX = ${interval.MAX}, λ̂ = μ̂ = σ̂² = $λ̂, √λ = $σ̂, ℕ̂ = $ℕ̂)"
+  override def toString: String = s"PoissonEstimate(min = ${interval.min}, MAX = ${interval.MAX}, λ = μ = σ² = $λ, √λ = $σ, ℕ = $ℕ)"
 }

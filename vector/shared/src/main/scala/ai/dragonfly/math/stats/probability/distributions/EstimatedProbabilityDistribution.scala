@@ -5,19 +5,19 @@ import ai.dragonfly.math.interval.Interval
 trait EstimatedProbabilityDistribution[DOMAIN: Numeric, PPD <: ParametricProbabilityDistribution[DOMAIN]] {
   val idealized: PPD
 
-  def ℕ̂:DOMAIN
-  def sampleSize:DOMAIN = ℕ̂
+  def ℕ:DOMAIN
+  def sampleSize:DOMAIN = ℕ
 
   def interval:Interval[DOMAIN]
 
-  def μ̂: Double = idealized.μ
-  def sampleMean: Double = μ̂
+  def μ: Double = idealized.μ
+  def sampleMean: Double = μ
 
-  def `σ̂²`: Double = idealized.`σ²`
-  def sampleVariance: Double = `σ̂²`
+  def `σ²`: Double = idealized.`σ²`
+  def sampleVariance: Double = `σ²`
 
-  def σ̂: Double = idealized.σ
-  def sampleStandardDeviation: Double = σ̂
+  def σ: Double = idealized.σ
+  def sampleStandardDeviation: Double = σ
 
   def p(x: DOMAIN): Double = idealized.p(x)
 

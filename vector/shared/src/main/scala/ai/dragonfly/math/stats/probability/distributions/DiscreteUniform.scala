@@ -40,6 +40,6 @@ case class DiscreteUniform(interval:Interval[Long]) extends ParametricProbabilit
 }
 
 
-case class EstimatedDiscreteUniform(override val interval: Interval[Long], override val idealized: DiscreteUniform, override val ℕ̂:Long) extends EstimatedProbabilityDistribution[Long, DiscreteUniform]{
-  override def toString: String = s"DiscreteUniformEstimate(min = ${interval.min}, μ̂ = $μ̂, MAX = ${interval.MAX}, σ̂² = ${`σ̂²`}, σ̂ = $σ̂, ℕ̂ = $ℕ̂)"
+case class EstimatedDiscreteUniform(override val interval: Interval[Long], override val idealized: DiscreteUniform, override val ℕ:Long) extends EstimatedProbabilityDistribution[Long, DiscreteUniform]{
+  override def toString: String = s"DiscreteUniformEstimate(min = ${interval.min}, μ = $μ, MAX = ${interval.MAX}, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }

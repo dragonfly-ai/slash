@@ -124,11 +124,11 @@ case class Beta(α:Double, β:Double, val min:Double = 0.0, val MAX:Double = 1.0
   }
 }
 
-case class EstimatedBeta(override val idealized: Beta, override val ℕ̂:Double) extends EstimatedProbabilityDistribution[Double, Beta]{
-  def α̂:Double = idealized.α
-  def β̂:Double = idealized.β
+case class EstimatedBeta(override val idealized: Beta, override val ℕ:Double) extends EstimatedProbabilityDistribution[Double, Beta]{
+  def α:Double = idealized.α
+  def β:Double = idealized.β
 
   override val interval: Interval[Double] = `[]`[Double](idealized.min, idealized.MAX)
 
-  override def toString: String = s"BetaEstimate(α̂ = $α̂, β̂ = $β̂, min = ${interval.min}, MAX = ${interval.MAX}, μ̂ = $μ̂, σ̂² = ${`σ̂²`}, σ̂ = $σ̂, ℕ̂ = $ℕ̂)"
+  override def toString: String = s"BetaEstimate(α = $α, β = $β, min = ${interval.min}, MAX = ${interval.MAX}, μ = $μ, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }

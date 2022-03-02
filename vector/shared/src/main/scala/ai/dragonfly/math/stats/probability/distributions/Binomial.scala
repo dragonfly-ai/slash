@@ -68,9 +68,9 @@ case class Binomial(n:Long, P:Double) extends ParametricProbabilityDistribution[
 }
 
 
-case class EstimatedBinomial(override val interval:Interval[Long], override val idealized: Binomial, override val ℕ̂:Long) extends EstimatedProbabilityDistribution[Long, Binomial]{
-  def n̂:Long = idealized.n
-  def P̂:Double = idealized.P
+case class EstimatedBinomial(override val interval:Interval[Long], override val idealized: Binomial, override val ℕ:Long) extends EstimatedProbabilityDistribution[Long, Binomial]{
+  def n:Long = idealized.n
+  def P:Double = idealized.P
 
-  override def toString: String = s"BinomialEstimate(n̂ = $n̂, P̂ = $P̂, min = ${interval.min}, MAX = ${interval.MAX}, μ̂ = $μ̂, σ̂² = ${`σ̂²`}, σ̂ = $σ̂, ℕ̂ = $ℕ̂)"
+  override def toString: String = s"BinomialEstimate(n = $n, P = $P, min = ${interval.min}, MAX = ${interval.MAX}, μ = $μ, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }

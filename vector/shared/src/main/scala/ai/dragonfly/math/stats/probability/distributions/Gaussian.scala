@@ -33,6 +33,6 @@ case class Gaussian(override val μ:Double, override val `σ²`:Double) extends 
   override def toString: String = s"Gaussian(μ = $μ, σ² = ${`σ²`}, σ = $σ)"
 }
 
-case class EstimatedGaussian(override val interval: Interval[Double], override val idealized: Gaussian, override val ℕ̂:Double) extends EstimatedProbabilityDistribution[Double, Gaussian]{
-  override def toString: String = s"GaussianEstimate(min = ${interval.min}, MAX = ${interval.MAX}, μ̂ = $μ̂, σ̂² = ${`σ̂²`}, σ̂ = $σ̂, ℕ̂ = $ℕ̂)"
+case class EstimatedGaussian(override val interval: Interval[Double], override val idealized: Gaussian, override val ℕ:Double) extends EstimatedProbabilityDistribution[Double, Gaussian]{
+  override def toString: String = s"GaussianEstimate(min = ${interval.min}, MAX = ${interval.MAX}, μ = $μ, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }

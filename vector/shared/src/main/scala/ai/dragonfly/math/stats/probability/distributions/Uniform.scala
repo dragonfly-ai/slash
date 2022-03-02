@@ -34,9 +34,9 @@ case class Uniform(interval:Interval[Double]) extends ParametricProbabilityDistr
 }
 
 
-case class EstimatedUniform(override val idealized: Uniform, override val ℕ̂:Double) extends EstimatedProbabilityDistribution[Double, Uniform]{
+case class EstimatedUniform(override val idealized: Uniform, override val ℕ:Double) extends EstimatedProbabilityDistribution[Double, Uniform]{
 
   override val interval:Interval[Double] = idealized.interval
 
-  override def toString: String = s"UniformEstimate(min = ${interval.min}, μ̂ = $μ̂, MAX = ${interval.MAX}, σ̂² = ${`σ̂²`}, σ̂ = $σ̂, ℕ̂ = $ℕ̂)"
+  override def toString: String = s"UniformEstimate(min = ${interval.min}, μ = $μ, MAX = ${interval.MAX}, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }
