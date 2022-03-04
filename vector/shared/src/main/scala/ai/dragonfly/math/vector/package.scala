@@ -85,8 +85,7 @@ package object vector {
       case vN: VectorN => vN.normalize()
     }
   }
-  extension (v: Vector) def dot(v1: Vector): Double = v * v1
-  extension (v: Vector) def *(v1: Vector): Double = {
+  extension (v: Vector) def dot(v1: Vector): Double = {
     v match {
       case v2: Vector2 => v2.dot(v1.asInstanceOf[Vector2])
       case v3: Vector3 => v3.dot(v1.asInstanceOf[Vector3])
