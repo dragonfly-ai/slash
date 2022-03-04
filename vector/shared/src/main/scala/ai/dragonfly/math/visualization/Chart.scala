@@ -54,7 +54,7 @@ object Chart extends Demonstrable {
     sb.append(scatterPlot).append("\n")
 
 
-    val regressionPlot:Chart = Chart("Test Scatter Plot", "Hours Studying", "Grade", `[]`(-10.0, 10.0), `[]`(-5.0, 5.0), 100, 50)
+    val regressionPlot:Chart = Chart("Test Regression Plot", "Hours Studying", "Grade", `[]`(-10.0, 10.0), `[]`(-5.0, 5.0), 50, 25)
 
     val point:Vector2 = Vector2(1, 0)
     val slope:Double = 1.0 / 3.0

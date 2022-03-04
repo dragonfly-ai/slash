@@ -7,7 +7,7 @@ package ai.dragonfly.math.stats.kernel
 import ai.dragonfly.math.*
 import example.*
 import vector.Vector
-import ai.dragonfly.math.vector.given_VectorOps_Vector
+import ai.dragonfly.math.vector.*
 
 object Kernel extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {

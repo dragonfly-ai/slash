@@ -1,7 +1,7 @@
 package ai.dragonfly.math.vector
 
 import scala.scalajs.js
-import ai.dragonfly.math.vector.given_VectorOps_Vector
+import ai.dragonfly.math.vector.*
 
 object Vector {
 

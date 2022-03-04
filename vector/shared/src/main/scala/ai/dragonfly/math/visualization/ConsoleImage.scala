@@ -100,7 +100,7 @@ object ConsoleImage extends Demonstrable {
 
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
 
-    val ci: ConsoleImage = new ConsoleImage(200, 200)
+    val ci: ConsoleImage = new ConsoleImage(40, 200)
     for (i <- 0 until 7) {
       randomSpiral(ci, 1 << (i % 3))
     }
