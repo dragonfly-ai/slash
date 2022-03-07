@@ -33,7 +33,7 @@ To use this library with SBT:
 
 <pre>
 resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/"
-libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.44"
+libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.4521"
 </pre><br />
 
 Projects that rely on this Library:
