@@ -99,7 +99,7 @@ package object vector {
 
 
   // other operators
-  extension (v: Vector) def *(v1: Vector): Double = v * v1
+  extension (v: Vector) def *(v1: Vector): Double = v dot v1
 
   extension (v: Vector) def dot(v1: Vector): Double = {
     v match {
