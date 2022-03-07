@@ -130,7 +130,7 @@ case class Chart(title:String, xLabel:String, yLabel:String, domain:Interval[Dou
   private val legend:mutable.TreeMap[String, Glyph] = mutable.TreeMap[String, Glyph]()
 
   def glyphLine(point: Vector2, slope:Double, name:String, glyph:Glyph):Chart = {
-    val b:Double = (-point.x * slope) - point.y
+    val b:Double = (-point.x * slope) + point.y
 
     val xScale:Int = 2
     val yScale:Int = 5
@@ -172,7 +172,7 @@ case class Chart(title:String, xLabel:String, yLabel:String, domain:Interval[Dou
     if (glyph.overlay) {
       glyphLine(point, slope, name, glyph)
     } else {
-      val b:Double = (-point.x * slope) - point.y
+      val b:Double = (-point.x * slope) + point.y
 
       val start:Vector2 = Vector2(0, sY * ((domain.min * slope + b) - range.min))
       val end:Vector2 = Vector2(cimg.width-1, sY * ((domain.MAX * slope + b) - range.min))
