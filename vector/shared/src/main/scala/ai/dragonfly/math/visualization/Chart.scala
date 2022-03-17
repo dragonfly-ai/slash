@@ -33,7 +33,7 @@ object Chart extends Demonstrable {
     )
 
     for ((point:Vector2, slope:Double) <- lines) {
-      val b: Double = (-point.x * slope) - point.y
+      val b: Double = (-point.x * slope) + point.y
       val title:String = s" Y = ${if (slope != 0.0) {
         "%4.2f".format(slope) + "X"
       } else ""} ${if (b == 0.0) "" else if (b > 0.0) s" + ${Math.abs(b)}" else s"- ${Math.abs(b)}"} "
@@ -53,12 +53,19 @@ object Chart extends Demonstrable {
     scatterPlot.scatter("Scatter 1", v2s:_*)
     sb.append(scatterPlot).append("\n")
 
+    val scatterPlot1:Chart = Chart("Test Connected Scatter Plot", "X", "Y", `[]`(-10.0, 10.0), `[]`(-10.0, 10.0), 100, 100)
+    for (i <- v2s.indices) v2s(i) = Vector2(
+      (i * (20.0 / v2s.length)) - 10.0,
+      (Math.random() * (20.0*(i+1.0) / v2s.length)) - (10.0*(i+1.0) / v2s.length)
+    )
+    scatterPlot1.connectedScatter("Connected Scatter 1", v2s:_*)
+    sb.append(scatterPlot1).append("\n")
 
     val regressionPlot:Chart = Chart("Test Regression Plot", "Hours Studying", "Grade", `[]`(-10.0, 10.0), `[]`(-5.0, 5.0), 50, 25)
 
     val point:Vector2 = Vector2(1, 0)
     val slope:Double = 1.0 / 3.0
-    val b:Double = (-point.x * slope) - point.y
+    val b:Double = (-point.x * slope) + point.y
 
     regressionPlot.line(point, slope, "Theory")
 
@@ -129,14 +136,23 @@ case class Chart(title:String, xLabel:String, yLabel:String, domain:Interval[Dou
 
   private val legend:mutable.TreeMap[String, Glyph] = mutable.TreeMap[String, Glyph]()
 
-  def glyphLine(point: Vector2, slope:Double, name:String, glyph:Glyph):Chart = {
-    val b:Double = (-point.x * slope) + point.y
 
+  def glyphLineSegment(p1: Vector2, p2: Vector2, name:String, glyph:Glyph):Chart = {
     val xScale:Int = 2
     val yScale:Int = 5
 
-    val start:Vector2 = Vector2(0.0, (sY / yScale) * ((domain.min * slope + b) - range.min))
-    val end:Vector2 = Vector2((cimg.width - 1)/xScale, (sY / yScale) * ((domain.MAX * slope + b) - range.min))
+//    val start:Vector2 = Vector2(0.0, (sY / yScale) * ((domain.min * slope + b) - range.min))
+//    val end:Vector2 = Vector2((cimg.width - 1)/xScale, (sY / yScale) * ((domain.MAX * slope + b) - range.min))
+
+    val start:Vector2 = Vector2(
+      (sX / xScale) * (p1.x - domain.min),
+      (sY / yScale) * (p1.y - range.min)
+    )
+
+    val end:Vector2 = Vector2(
+      (sX / xScale) * (p2.x - domain.min),
+      (sY / yScale) * (p2.y - range.min)
+    )
 
     val hm:mutable.TreeMap[Int, Interval[Int]] = mutable.TreeMap[Int, Interval[Int]]()
 
@@ -163,7 +179,41 @@ case class Chart(title:String, xLabel:String, yLabel:String, domain:Interval[Dou
     this
   }
 
+  def glyphLine(point: Vector2, slope:Double, name:String, glyph:Glyph):Chart = {
+    val b:Double = (-point.x * slope) + point.y
+
+    val start:Vector2 = Vector2(domain.min, domain.min * slope + b)
+    val end:Vector2 = Vector2(domain.MAX, domain.MAX * slope + b)
+
+    glyphLineSegment(start, end, name, glyph)
+  }
+
   private var maxItemNameLength:Int = 0
+
+  def lineSegment(p1: Vector2, p2:Vector2, name:String):Chart = {
+    val glyph = legend.getOrElseUpdate(name, Glyph(legend.size))
+    maxItemNameLength = Math.max(maxItemNameLength, name.length + 2)
+
+    if (glyph.overlay) {
+      glyphLineSegment(p1, p2, name, glyph)
+    } else {
+
+      val start:Vector2 = Vector2(
+        sX * (p1.x - domain.min),
+        sY * (p1.y - range.min)
+      )
+
+      val end:Vector2 = Vector2(
+        sX * (p2.x - domain.min),
+        sY * (p2.y - range.min)
+      )
+
+      ai.dragonfly.math.geometry.Line.discrete(start, end, (dX:Int, dY:Int) => {
+        cimg.setPixel(dX, (cimg.height - 1) - dY, glyph.color)
+      })
+      this
+    }
+  }
 
   def line(point: Vector2, slope:Double, name:String):Chart = {
     val glyph = legend.getOrElseUpdate(name, Glyph(legend.size))
@@ -174,20 +224,17 @@ case class Chart(title:String, xLabel:String, yLabel:String, domain:Interval[Dou
     } else {
       val b:Double = (-point.x * slope) + point.y
 
-      val start:Vector2 = Vector2(0, sY * ((domain.min * slope + b) - range.min))
-      val end:Vector2 = Vector2(cimg.width-1, sY * ((domain.MAX * slope + b) - range.min))
+      val start:Vector2 = Vector2(domain.min, domain.min * slope + b)
+      val end:Vector2 = Vector2(domain.MAX, domain.MAX * slope + b)
 
-      ai.dragonfly.math.geometry.Line.discrete(start, end, (dX:Int, dY:Int) => {
-        cimg.setPixel(dX, (cimg.height - 1) - dY, glyph.color)
-      })
-      this
+      lineSegment(start, end, name)
     }
   }
 
   def scatter(name:String, points:Vector2*):Chart = {
     val glyph = legend.getOrElseUpdate(name, Glyph(legend.size))
     maxItemNameLength = Math.max(maxItemNameLength, name.length + 2)
-      if (glyph.overlay) {
+    if (glyph.overlay) {
         for (p <- points) {
           cimg.setGlyph(
             (sX * (p.x - domain.min)).toInt,
@@ -205,6 +252,19 @@ case class Chart(title:String, xLabel:String, yLabel:String, domain:Interval[Dou
           )
         }
       }
+    this
+  }
+
+  def connectedScatter(name:String, points:Vector2*):Chart = {
+    var p = points.head
+    var tail = points.tail
+
+    while(tail.nonEmpty) {
+      lineSegment(p, tail.head, name)
+
+      p = tail.head
+      tail = tail.tail
+    }
     this
   }
 
