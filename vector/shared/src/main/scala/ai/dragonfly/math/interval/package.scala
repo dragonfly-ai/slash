@@ -10,8 +10,18 @@ package object interval {
     val min:DOMAIN
     val MAX:DOMAIN
 
-    protected val min_bd:BigDecimal = BigDecimal(min.toDouble).min(BigDecimal(min.toLong))
-    protected val MAX_BD:BigDecimal = BigDecimal(MAX.toDouble).max(BigDecimal(MAX.toLong))
+    protected val min_bd:BigDecimal = min match {
+      case minL:Long => BigDecimal(minL)
+      case minI:Int => BigDecimal(minI)
+      case minD:Double => BigDecimal(minD)
+      case minF:Float => BigDecimal(minF)
+    }
+    protected val MAX_BD:BigDecimal = MAX match {
+      case lMAX:Long => BigDecimal(lMAX)
+      case iMAX:Int => BigDecimal(iMAX)
+      case dMAX:Double => BigDecimal(dMAX)
+      case fMAX:Float => BigDecimal(fMAX)
+    }
 
 //    override def random(): DOMAIN = {
 //      val r = ai.dragonfly.math.Random.For[DOMAIN]

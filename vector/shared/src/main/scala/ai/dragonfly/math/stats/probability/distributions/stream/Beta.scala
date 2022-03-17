@@ -26,3 +26,23 @@ class Beta extends OnlineUnivariateProbabilityDistributionEstimator[Double, dist
   }
 
 }
+
+/*
+NaN values for:
+
+		"weighted": 0.25,
+		"close": 0.2466,
+		"high": 0.2509,
+		"low": 0.1235,
+		"open": 0.1328,
+		"volume": 15609373.78
+
+and
+
+		"weighted": 0.38,
+		"close": 0.3828,
+		"high": 0.4011,
+		"low": 0.3808,
+		"open": 0.4139,
+		"volume": 5823196.09
+ */
