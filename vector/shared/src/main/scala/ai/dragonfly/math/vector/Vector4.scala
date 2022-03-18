@@ -88,10 +88,11 @@ case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) e
 
   override inline def magnitudeSquared(): Double = squareInPlace(x) + squareInPlace(y) + squareInPlace(z) + squareInPlace(w)
 
-  inline def distanceSquaredTo(v: Vector): Double = {
-    val v0:Vector4 = v.asInstanceOf[Vector4]
-    squareInPlace(x - v0.x) + squareInPlace(y - v0.y) + squareInPlace(z - v0.z) + squareInPlace(w - v0.w)
+  inline def distanceSquaredTo(v: Vector4): Double = {
+    squareInPlace(x - v.x) + squareInPlace(y - v.y) + squareInPlace(z - v.z) + squareInPlace(w - v.w)
   }
+
+  inline def distanceTo(v: Vector4): Double = Math.sqrt(distanceSquaredTo(v))
 
   def normalize():Vector4 = {
     val m2:Double = magnitudeSquared()

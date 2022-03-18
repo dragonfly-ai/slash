@@ -61,7 +61,7 @@ class VectorN(override val values:VectorValues) extends Vector {
 
   override def magnitudeSquared(): Double = { var mag2 = 0.0; for (v:Double <- values) mag2 = mag2 + (v*v); mag2 }
 
-  def distanceSquaredTo(v: Vector): Double = {
+  def distanceSquaredTo(v: VectorN): Double = {
     if (values.length != v.values.length) throw MismatchedVectorDimensionsException(this, v)
     else {
       var distance = 0.0
@@ -73,6 +73,7 @@ class VectorN(override val values:VectorValues) extends Vector {
     }
   }
 
+  inline def distanceTo(v: VectorN): Double = Math.sqrt(distanceSquaredTo(v))
 
   def normalize():VectorN = {
     val m2:Double = magnitudeSquared()

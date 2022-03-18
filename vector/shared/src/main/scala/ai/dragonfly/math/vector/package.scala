@@ -6,8 +6,8 @@ package object vector {
   type VECTORS = native.VECTORS
 
   // in place mutator operations:
-  extension (v: Vector) def scale(scalar: Double): Vector = {
-    v match {
+  extension (v0: Vector) def scale(scalar: Double): Vector = {
+    v0 match {
       case v2: Vector2 => v2.scale(scalar)
       case v3: Vector3 => v3.scale(scalar)
       case v4: Vector4 => v4.scale(scalar)
@@ -15,8 +15,8 @@ package object vector {
     }
   }
 
-  extension (v: Vector) def divide(divisor: Double): Vector = {
-    v match {
+  extension (v0: Vector) def divide(divisor: Double): Vector = {
+    v0 match {
       case v2: Vector2 => v2.divide(divisor)
       case v3: Vector3 => v3.divide(divisor)
       case v4: Vector4 => v4.divide(divisor)
@@ -24,26 +24,26 @@ package object vector {
     }
   }
 
-  extension (v: Vector) def add(v1: Vector): Vector = {
-    v match {
-      case v2: Vector2 => v2.add(v1.asInstanceOf[Vector2])
-      case v3: Vector3 => v3.add(v1.asInstanceOf[Vector3])
-      case v4: Vector4 => v4.add(v1.asInstanceOf[Vector4])
-      case vN: VectorN => vN.add(v1.asInstanceOf[VectorN])
+  extension (v0: Vector) def add(v: Vector): Vector = {
+    v0 match {
+      case v2: Vector2 => v2.add(v.asInstanceOf[Vector2])
+      case v3: Vector3 => v3.add(v.asInstanceOf[Vector3])
+      case v4: Vector4 => v4.add(v.asInstanceOf[Vector4])
+      case vN: VectorN => vN.add(v.asInstanceOf[VectorN])
     }
   }
 
-  extension (v: Vector) def subtract(v1: Vector): Vector = {
-    v match {
-      case v2: Vector2 => v2.subtract(v1.asInstanceOf[Vector2])
-      case v3: Vector3 => v3.subtract(v1.asInstanceOf[Vector3])
-      case v4: Vector4 => v4.subtract(v1.asInstanceOf[Vector4])
-      case vN: VectorN => vN.subtract(v1.asInstanceOf[VectorN])
+  extension (v0: Vector) def subtract(v: Vector): Vector = {
+    v0 match {
+      case v2: Vector2 => v2.subtract(v.asInstanceOf[Vector2])
+      case v3: Vector3 => v3.subtract(v.asInstanceOf[Vector3])
+      case v4: Vector4 => v4.subtract(v.asInstanceOf[Vector4])
+      case vN: VectorN => vN.subtract(v.asInstanceOf[VectorN])
     }
   }
 
-  extension (v: Vector) def normalize: Vector = {
-    v match {
+  extension (v0: Vector) def normalize: Vector = {
+    v0 match {
       case v2: Vector2 => v2.normalize()
       case v3: Vector3 => v3.normalize()
       case v4: Vector4 => v4.normalize()
@@ -52,26 +52,26 @@ package object vector {
   }
 
   // copy operations
-  extension (v: Vector) def +(v1: Vector): Vector = {
-    v match {
-      case v2: Vector2 => v2 + v1.asInstanceOf[Vector2]
-      case v3: Vector3 => v3 + v1.asInstanceOf[Vector3]
-      case v4: Vector4 => v4 + v1.asInstanceOf[Vector4]
-      case vN: VectorN => vN + v1.asInstanceOf[VectorN]
+  extension (v0: Vector) def +(v: Vector): Vector = {
+    v0 match {
+      case v2: Vector2 => v2 + v.asInstanceOf[Vector2]
+      case v3: Vector3 => v3 + v.asInstanceOf[Vector3]
+      case v4: Vector4 => v4 + v.asInstanceOf[Vector4]
+      case vN: VectorN => vN + v.asInstanceOf[VectorN]
     }
   }
 
-  extension (v: Vector) def -(v1: Vector): Vector = {
-    v match {
-      case v2: Vector2 => v2 - v1.asInstanceOf[Vector2]
-      case v3: Vector3 => v3 - v1.asInstanceOf[Vector3]
-      case v4: Vector4 => v4 - v1.asInstanceOf[Vector4]
-      case vN: VectorN => vN - v1.asInstanceOf[VectorN]
+  extension (v0: Vector) def -(v: Vector): Vector = {
+    v0 match {
+      case v2: Vector2 => v2 - v.asInstanceOf[Vector2]
+      case v3: Vector3 => v3 - v.asInstanceOf[Vector3]
+      case v4: Vector4 => v4 - v.asInstanceOf[Vector4]
+      case vN: VectorN => vN - v.asInstanceOf[VectorN]
     }
   }
 
-  extension (scalar: Double) def *(v: Vector): Vector = {
-    v match {
+  extension (scalar: Double) def *(v0: Vector): Vector = {
+    v0 match {
       case v2: Vector2 => v2 * scalar
       case v3: Vector3 => v3 * scalar
       case v4: Vector4 => v4 * scalar
@@ -79,8 +79,8 @@ package object vector {
     }
   }
 
-  extension (v: Vector) def *(scalar: Double): Vector = {
-    v match {
+  extension (v0: Vector) def *(scalar: Double): Vector = {
+    v0 match {
       case v2: Vector2 => v2 * scalar
       case v3: Vector3 => v3 * scalar
       case v4: Vector4 => v4 * scalar
@@ -88,8 +88,8 @@ package object vector {
     }
   }
 
-  extension (v: Vector) def /(divisor: Double): Vector = {
-    v match {
+  extension (v0: Vector) def /(divisor: Double): Vector = {
+    v0 match {
       case v2: Vector2 => v2 / divisor
       case v3: Vector3 => v3 / divisor
       case v4: Vector4 => v4 / divisor
@@ -99,34 +99,27 @@ package object vector {
 
 
   // other operators
-  extension (v: Vector) def *(v1: Vector): Double = v dot v1
+  extension (v0: Vector) def *(v: Vector): Double = v dot v
 
-  extension (v: Vector) def dot(v1: Vector): Double = {
-    v match {
-      case v2: Vector2 => v2.dot(v1.asInstanceOf[Vector2])
-      case v3: Vector3 => v3.dot(v1.asInstanceOf[Vector3])
-      case v4: Vector4 => v4.dot(v1.asInstanceOf[Vector4])
-      case vN: VectorN => vN.dot(v1.asInstanceOf[VectorN])
+  extension (v0: Vector) def dot(v: Vector): Double = {
+    v0 match {
+      case v2: Vector2 => v2.dot(v.asInstanceOf[Vector2])
+      case v3: Vector3 => v3.dot(v.asInstanceOf[Vector3])
+      case v4: Vector4 => v4.dot(v.asInstanceOf[Vector4])
+      case vN: VectorN => vN.dot(v.asInstanceOf[VectorN])
     }
   }
 
-  extension (v: Vector) def distanceSquaredTo(v1: Vector): Double = {
-    v match {
-      case v2: Vector2 => v2.distanceSquaredTo(v1.asInstanceOf[Vector2])
-      case v3: Vector3 => v3.distanceSquaredTo(v1.asInstanceOf[Vector3])
-      case v4: Vector4 => v4.distanceSquaredTo(v1.asInstanceOf[Vector4])
-      case vN: VectorN => vN.distanceSquaredTo(v1.asInstanceOf[VectorN])
+  extension (v0: Vector) def distanceSquaredTo(v: Vector): Double = {
+    v0 match {
+      case v2: Vector2 => v2.distanceSquaredTo(v.asInstanceOf[Vector2])
+      case v3: Vector3 => v3.distanceSquaredTo(v.asInstanceOf[Vector3])
+      case v4: Vector4 => v4.distanceSquaredTo(v.asInstanceOf[Vector4])
+      case vN: VectorN => vN.distanceSquaredTo(v.asInstanceOf[VectorN])
     }
   }
 
-  extension (v: Vector) def distanceTo(v1: Vector): Double = {
-    v match {
-      case v2: Vector2 => v2.distanceTo(v1.asInstanceOf[Vector2])
-      case v3: Vector3 => v3.distanceTo(v1.asInstanceOf[Vector3])
-      case v4: Vector4 => v4.distanceTo(v1.asInstanceOf[Vector4])
-      case vN: VectorN => vN.distanceTo(v1.asInstanceOf[VectorN])
-    }
-  }
+  extension (v0: Vector) def distanceTo(v: Vector): Double = Math.sqrt(v0.distanceSquaredTo(v))
 
 }
 

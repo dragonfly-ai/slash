@@ -53,10 +53,11 @@ case class Vector2(var x: Double, var y: Double) extends Vector {
 
   override inline def magnitudeSquared(): Double = squareInPlace(x) + squareInPlace(y)
 
-  inline def distanceSquaredTo(v: Vector): Double = {
-    val v0:Vector2 = v.asInstanceOf[Vector2]
-    squareInPlace(x - v0.x) + squareInPlace(y - v0.y)
+  inline def distanceSquaredTo(v: Vector2): Double = {
+    squareInPlace(x - v.x) + squareInPlace(y - v.y)
   }
+
+  inline def distanceTo(v: Vector2): Double = Math.sqrt(distanceSquaredTo(v))
 
   def normalize():Vector2 = {
     val m2:Double = magnitudeSquared()
