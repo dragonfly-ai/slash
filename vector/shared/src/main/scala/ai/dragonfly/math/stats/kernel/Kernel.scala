@@ -5,6 +5,7 @@ package ai.dragonfly.math.stats.kernel
  */
 
 import ai.dragonfly.math.*
+import Constant.π
 import example.*
 import vector.Vector
 import ai.dragonfly.math.vector.*

@@ -4,6 +4,7 @@ import ai.dragonfly.math.*
 import stats.*
 import interval.*
 import example.*
+import Constant.π
 
 // https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters
 

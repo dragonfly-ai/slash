@@ -199,7 +199,10 @@ package object math {
     }
   }
 
-  val π:Double = Math.PI
+  object Constant {
+    val π: Double = Math.PI
+    val ℇ: Double = Math.E
+  }
 
 }
 

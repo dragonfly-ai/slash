@@ -1,6 +1,7 @@
 package ai.dragonfly.math.example
 
 import ai.dragonfly.math.*
+import ai.dragonfly.math.stats.geometry.Tetrahedron
 import vector.*
 
 /**
@@ -10,6 +11,7 @@ import vector.*
 object Demo {
 
   val allDemos: Array[Demonstrable] = Array[Demonstrable](
+    Tetrahedron,
     Vector2,
     Vector3,
     Vector4,
@@ -19,6 +21,7 @@ object Demo {
     stats.geometry.Tetrahedron,
     TestGamma,
     Factorial.demo,
+    // add Interval demo
     visualization.ConsoleImage,
     visualization.Chart,
     stats.probability.distributions.stream.StreamingVectorStats,
@@ -51,9 +54,8 @@ object Demo {
     sb.toString()
   }
 
-
   def main(args: Array[String]): Unit = {
-    println(s"${RESET}${GREEN}$consolidateDemoOutput${RESET}")
+    println(s"$RESET$GREEN$consolidateDemoOutput$RESET")
   }
 
 }

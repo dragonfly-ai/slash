@@ -8,6 +8,7 @@ import stream.*
 trait Demonstrable {
   def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder
   def name:String
+  def main(args:Array[String]):Unit = println(demo())
 }
 
 case class ProbabilityDistributionDemonstration[DOMAIN] (

@@ -9,26 +9,29 @@ import visualization.ConsoleImage.{BLACK, GRAY, WHITE, colorBytes}
 object ConsoleImage extends Demonstrable {
 
 /*
-⠒̀ 	⠒́ 	⠒̂ 	⠒̃ 	⠒̄ 	⠒̅ 	⠒̆ 	⠒̇ 	⠒̈ 	⠒̉ 	⠒̊ 	⠒̋ 	⠒̌ 	⠒̍ 	⠒̎ 	⠒̏
-⠒̐ 	⠒̑ 	⠒̒ 	⠒̓ 	⠒̔ 	⠒̕ 	⠒̖ 	⠒̗ 	⠒̘ 	⠒̙ 	⠒̚ 	⠒̛ 	⠒̜ 	⠒̝ 	⠒̞ 	⠒̟
-⠒̠ 	⠒̡ 	⠒̢ 	⠒̣ 	⠒̤ 	⠒̥ 	⠒̦ 	⠒̧ 	⠒̨ 	⠒̩ 	⠒̪ 	⠒̫ 	⠒̬ 	⠒̭ 	⠒̮ 	⠒̯
-⠒̰ 	⠒̱ 	⠒̲ 	⠒̳ 	⠒̴ 	⠒̵ 	⠒̶ 	⠒̷ 	⠒̸ 	⠒̹ 	⠒̺ 	⠒̻ 	⠒̼ 	⠒̽ 	⠒̾ 	⠒̿
-⠒̀ 	⠒́ 	⠒͂ 	⠒̓ 	⠒̈́ 	⠒ͅ 	⠒͆ 	⠒͇ 	⠒͈ 	⠒͉ 	⠒͊ 	⠒͋ 	⠒͌ 	⠒͍ 	⠒͎
-⠒͐ 	⠒͑ 	⠒͒ 	⠒͓ 	⠒͔ 	⠒͕ 	⠒͖ 	⠒͗ 	⠒͘ 	⠒͙ 	⠒͚ 	⠒͛ 	⠒͜⠒ 	⠒͝⠒ 	⠒͞⠒ 	⠒͟⠒
-⠒͠⠒ 	⠒͡⠒ 	⠒͢⠒ 	⠒ͣ 	⠒ͤ 	⠒ͥ 	⠒ͦ 	⠒ͧ 	⠒ͨ 	⠒ͩ 	⠒ͪ 	⠒ͫ 	⠒ͬ 	⠒ͭ
-⠒᷀ 	⠒᷁ 	⠒᷂ 	⠒᷃ 	⠒᷄ 	⠒᷅ 	⠒᷆ 	⠒᷇ 	⠒᷈ 	⠒᷉ 	⠒᷊ 	⠒᷋ 	⠒᷌ 	⠒᷍ 	⠒᷎ 	⠒᷏
-⠒⃐ 	⠒⃑ 	⠒⃒ 	⠒⃓ 	⠒⃔ 	⠒⃕ 	⠒⃖ 	⠒⃗ 	⠒⃘ 	⠒⃙ 	⠒⃚ 	⠒⃛ 	⠒⃜ 	⠒⃝ 	⠒⃞ 	⠒⃟
-⠒⃠ 	⠒⃡ 	⠒⃢ 	⠒⃣ 	⠒⃤ 	⠒⃥ 	⠒⃦ 	⠒⃧ 	⠒ 	⠒⃩ 	⠒⃪ 	⠒⃫ 	⠒⃬ 	⠒⃭ 	⠒⃮ 	⠒⃯
-⠒⃰ 	⠒ᷓ 	⠒ᷔ 	⠒ᷕ 	⠒ᷖ 	⠒ᷗ 	⠒ᷘ 	⠒ᷙ 	⠒ᷚ 	⠒ᷛ 	⠒ᷜ 	⠒ᷝ 	⠒ᷞ 	⠒ᷟ  	⠒ͮ 	⠒ͯ
-⠒ᷠ 	⠒ᷡ 	⠒ᷢ 	⠒ᷣ 	⠒ᷤ 	⠒ᷥ 	⠒ᷦ 	⠒᷼ 	⠒᷽ 	⠒᷾ 	⠒᷿
-⠒︠ 	⠒︡ 	⠒︢ 	⠒︣ 	⠒︤ 	⠒︥ 	⠒︦
+⣉̀ 	⣉́ 	⣉̂ 	⣉̃ 	⣉̄ 	⣉̅ 	⣉̆ 	⣉̇ 	⣉̈ 	⣉̉ 	⣉̊ 	⣉̋ 	⣉̌ 	⣉̍ 	⣉̎ 	⣉̏
+⣉̐ 	⣉̑ 	⣉̒ 	⣉̓ 	⣉̔ 	⣉̕ 	⣉̖ 	⣉̗ 	⣉̘ 	⣉̙ 	⣉̚ 	⣉̛ 	⣉̜ 	⣉̝ 	⣉̞ 	⣉̟
+⣉̠ 	⣉̡ 	⣉̢ 	⣉̣ 	⣉̤ 	⣉̥ 	⣉̦ 	⣉̧ 	⣉̨ 	⣉̩ 	⣉̪ 	⣉̫ 	⣉̬ 	⣉̭ 	⣉̮ 	⣉̯
+⣉̰ 	⣉̱ 	⣉̲ 	⣉̳ 	⣉̴ 	⣉̵ 	⣉̶ 	⣉̷ 	⣉̸ 	⣉̹ 	⣉̺ 	⣉̻ 	⣉̼ 	⣉̽ 	⣉̾ 	⣉̿
+⣉̀ 	⣉́ 	⣉͂ 	⣉̓ 	⣉̈́ 	⣉ͅ 	⣉͆ 	⣉͇ 	⣉͈ 	⣉͉ 	⣉͊ 	⣉͋ 	⣉͌ 	⣉͍ 	⣉͎
+⣉͐ 	⣉͑ 	⣉͒ 	⣉͓ 	⣉͔ 	⣉͕ 	⣉͖ 	⣉͗ 	⣉͘ 	⣉͙ 	⣉͚ 	⣉͛ 	⣉͜⣉ 	⣉͝⣉ 	⣉͞⣉ 	⣉͟⣉
+⣉͠⣉ 	⣉͡⣉ 	⣉͢⣉ 	⣉ͣ 	⣉ͤ 	⣉ͥ 	⣉ͦ 	⣉ͧ 	⣉ͨ 	⣉ͩ 	⣉ͪ 	⣉ͫ 	⣉ͬ 	⣉ͭ
+⣉᷀ 	⣉᷁ 	⣉᷂ 	⣉᷃ 	⣉᷄ 	⣉᷅ 	⣉᷆ 	⣉᷇ 	⣉᷈ 	⣉᷉ 	⣉᷊ 	⣉᷋ 	⣉᷌ 	⣉᷍ 	⣉᷎ 	⣉᷏
+⣉⃐ 	⣉⃑ 	⣉⃒ 	⣉⃓ 	⣉⃔ 	⣉⃕ 	⣉⃖ 	⣉⃗ 	⣉⃘ 	⣉⃙ 	⣉⃚ 	⣉⃛ 	⣉⃜ 	⣉⃝ 	⣉⃞ 	⣉⃟
+⣉⃠ 	⣉⃡ 	⣉⃢ 	⣉⃣ 	⣉⃤ 	⣉⃥ 	⣉⃦ 	⣉⃧ 	⣉ 	⣉⃩ 	⣉⃪ 	⣉⃫ 	⣉⃬ 	⣉⃭ 	⣉⃮ 	⣉⃯
+⣉⃰ 	⣉ᷓ 	⣉ᷔ 	⣉ᷕ 	⣉ᷖ 	⣉ᷗ 	⣉ᷘ 	⣉ᷙ 	⣉ᷚ 	⣉ᷛ 	⣉ᷜ 	⣉ᷝ 	⣉ᷞ 	⣉ᷟ  	⣉ͮ 	⣉ͯ
+⣉ᷠ 	⣉ᷡ 	⣉ᷢ 	⣉ᷣ 	⣉ᷤ 	⣉ᷥ 	⣉ᷦ 	⣉᷼ 	⣉᷽ 	⣉᷾ 	⣉᷿
+⣉︠ 	⣉︡ 	⣉︢ 	⣉︣ 	⣉︤ 	⣉︥ 	⣉︦
 
+ͯ⣉ͯ
+
+⃐ 	⃑ 	⃒ 	⃓ 	⃔ 	⃕ 	⃖ 	⃗ 	⃘ 	⃙ 	⃚ 	⃛ 	⃜ 	⃝ 	⃞ 	⃟   ͯ
 ⠀⃡ 	⠀᷃ 	⠀᷄ 	⠀᷅ 	⠀᷆ 	⠀᷇ 	⠀᷈ 	⠀᷉ 	⠀᷋ 	⠀᷌ 	⠀᷎ 	⠀⃐ 	⠀⃑ 	⠀⃔ 	⠀⃕ 	⠀⃖ 	⠀⃗
-⠀͋ 	⠀͌ 	⠀᷀ 	⠀᷁ 	⠀⃛ 	⠀⃜ 	⠀︦ 	⠀ᷠ 	⠀ᷡ 	⠀ᷢ 	⠀ᷣ 	⠀ᷤ 	⠀ᷥ 	⠀ᷦ 	⠀᷾ 	⠀︠ 	⠀︡ 	⠀︢ 	⠀︣ 	⠀︤ 	⠀︥
-⠀⃩ 	⠀⃰ 	⠀ᷓ 	⠀ᷔ 	⠀ᷕ 	⠀ᷖ 	⠀ᷗ 	⠀ᷘ 	⠀ᷙ 	⠀ᷚ 	⠀ᷛ 	⠀ᷜ 	⠀ᷝ 	⠀ᷞ 	⠀ᷟ
+⠀͋ 	⠀͌ 	⠀᷀ 	⠀᷁ 	⠀⃛ 	⠀⃜ 	⡇︦ 	⠀ᷠ 	⠀ᷡ 	⠀ᷢ 	⠀ᷣ 	⠀ᷤ 	⠀ᷥ 	⠀ᷦ 	⠀᷾ 	⠀︠ 	⠀︡ 	⠀︢ 	⠀︣ 	⠀︤ 	⡇︥
+⠀⃩ 	⠀⃰ 	⠀ᷓ 	⠀ᷔ 	⠀ᷕ 	⠀ᷖ 	⠀ᷗ 	⠀ᷘ 	⠀ᷙ 	⠀ᷚ 	⠀ᷛ 	⠀ᷜ 	⡇ᷝ 	⠀ᷞ 	⠀ᷟ
 ⠀ͮ 	⠀ͯ 	⠀͐ 	⠀͑ 	⠀͒ 	⠀͗ 	⠀͛ 	⠀ͣ 	⠀ͤ 	⠀ͥ 	⠀̀ 	⠀́ 	⠀͂ 	⠀̈́ 	⠀͆ 	⠀͊ 	⠀ͦ 	⠀ͧ 	⠀ͨ 	⠀ͩ 	⠀ͪ 	⠀ͫ 	⠀ͬ 	⠀ͭ
 ⠀⃪ 	⠀⃘ 	⠀⃙ 	⠀⃚
-⠀͓ 	⠀͔ 	⠀͕ 	⠀͖ 	⠀͙ 	⠀͚ 	⠀᷼ 	⠀᷽ 	⠀᷿
+⠀͓ 	⠀͔ 	⡇͕ 	⠀͖ 	⡇͙ 	⠀͚ 	⠀᷼ 	⠀᷽ 	⠀᷿
 
 ⠒⃞ 	⠒⃟ 	⠒⃠ 	⠒⃢ 	⠒⃣ 	⠒⃤
 ⠒⃫ 	⠒⃥ 	⠒⃦ 	⠒⃧
@@ -39,7 +42,7 @@ object ConsoleImage extends Demonstrable {
 
   val layerGlyphs:Array[String] = Array[String](
     //  "᷎", "᷀", "ᷘ", "͐᷾", "͒", "́̀", "͚͚ͣ", "͂", "ͦͦͦͦ", "ͨͨͨͨͨ", "᷃",
-    "⃘", "⃟", "⃣" //, "⃠"
+    "⃘", "⃟", "⃞", "⃠"
   )
 
   val brailleBytes:Array[String] = Array[String](
@@ -83,7 +86,7 @@ object ConsoleImage extends Demonstrable {
     while (v.magnitudeSquared() < end){
       pV = p + v
       v.rotate(dT).scale(s)
-      Line.discrete(
+      Line.trace2D(
         pV,
         p + v,
         (dX:Int, dY:Int) => {
@@ -117,18 +120,30 @@ class ConsoleImage(val width:Int, val height:Int) {
 
   import Console.{BOLD, RESET}
 
-  private val w:Int = width / 2
-  private val h:Int = height / 4
+  private val w:Int = width >> 1   // width / 2
+  private val h:Int = height >> 2  // height / 4
 
-  inline def linearIndexOf(x: Int, y: Int): Int = ((y / 4) * w ) + (x / 2)
+  val pixelCount:Int = w * (h + 1)
 
-  val pixels:Array[Int] = Array.fill(linearIndexOf(width, height))(0)
+  inline def linearIndexOf(x: Int, y: Int): Int = {
+    var out = -1
+    if (x > -1) {  // && y > -1  // left out y positive check because negative y will always cause negative output
+      val x0 = x >> 1
+      if (x0 < w) {
+        val y0 = y >> 2
+        if (y0 < h ) out = x0 + (y0 * w)
+      }
+    }
+    out
+  }
 
-  val layer:Array[String] = Array.fill(linearIndexOf(width, height))("")
+  val pixels:Array[Int] = Array.fill(pixelCount)(0)
+
+  val layer:Array[String] = Array.fill(pixelCount)("")
 
   def setPixel(x:Int, y:Int, color:Int):ConsoleImage = {
     val i:Int = linearIndexOf(x, y)
-    if (i > -1 && i < pixels.length) {
+    if (i > -1) {
       pixels(i) = pixels(i) | ((color << 16) | ((1 << (y % 4)) << (x % 2 * 4)))
       // erasing? (if (color == K) pixels(i) & ~byte else pixels(i) | byte)
     }
@@ -137,7 +152,7 @@ class ConsoleImage(val width:Int, val height:Int) {
 
   def setGlyph(x:Int, y:Int, glyph:String, color:Int):ConsoleImage = {
     val i:Int = linearIndexOf(x, y)
-    if (i > -1 && i < pixels.length) {
+    if (i > -1) {
       layer(i) = layer(i) + glyph
       pixels(i) = pixels(i) | (color << 16)
     }
@@ -310,19 +325,19 @@ class ConsoleImage(val width:Int, val height:Int) {
 ▤ ▥ ▦ ▧ ▨ ▩
 ⚄
 x̣
-⠒̀ 	⠒́ 	⠒̂ 	⠒̃ 	⠒̄ 	⠒̅ 	⠒̆ 	⠒̇ 	⠒̈ 	⠒̉ 	⠒̊ 	⠒̋ 	⠒̌ 	⠒̍ 	⠒̎ 	⠒̏
-⠒̐ 	⠒̑ 	⠒̒ 	⠒̓ 	⠒̔ 	⠒̕ 	⠒̖ 	⠒̗ 	⠒̘ 	⠒̙ 	⠒̚ 	⠒̛ 	⠒̜ 	⠒̝ 	⠒̞ 	⠒̟
-⠒̠ 	⠒̡ 	⠒̢ 	⠒̣ 	⠒̤ 	⠒̥ 	⠒̦ 	⠒̧ 	⠒̨ 	⠒̩ 	⠒̪ 	⠒̫ 	⠒̬ 	⠒̭ 	⠒̮ 	⠒̯
-⠒̰ 	⠒̱ 	⠒̲ 	⠒̳ 	⠒̴ 	⠒̵ 	⠒̶ 	⠒̷ 	⠒̸ 	⠒̹ 	⠒̺ 	⠒̻ 	⠒̼ 	⠒̽ 	⠒̾ 	⠒̿
-⠒̀ 	⠒́ 	⠒͂ 	⠒̓ 	⠒̈́ 	⠒ͅ 	⠒͆ 	⠒͇ 	⠒͈ 	⠒͉ 	⠒͊ 	⠒͋ 	⠒͌ 	⠒͍ 	⠒͎
-⠒͐ 	⠒͑ 	⠒͒ 	⠒͓ 	⠒͔ 	⠒͕ 	⠒͖ 	⠒͗ 	⠒͘ 	⠒͙ 	⠒͚ 	⠒͛ 	⠒͜⠒ 	⠒͝⠒ 	⠒͞⠒ 	⠒͟⠒
- 	⠒͠⠒ 	⠒͡⠒ 	⠒͢⠒ 	⠒ͣ 	⠒ͤ 	⠒ͥ 	⠒ͦ 	⠒ͧ 	⠒ͨ 	⠒ͩ 	⠒ͪ 	⠒ͫ 	⠒ͬ 	⠒ͭ
-⠒᷀ 	⠒᷁ 	⠒᷂ 	⠒᷃ 	⠒᷄ 	⠒᷅ 	⠒᷆ 	⠒᷇ 	⠒᷈ 	⠒᷉ 	⠒᷊ 	⠒᷋ 	⠒᷌ 	⠒᷍ 	⠒᷎ 	⠒᷏
-⠒⃐ 	⠒⃑ 	⠒⃒ 	⠒⃓ 	⠒⃔ 	⠒⃕ 	⠒⃖ 	⠒⃗ 	⠒⃘ 	⠒⃙ 	⠒⃚ 	⠒⃛ 	⠒⃜ 	⠒⃝ 	⠒⃞ 	⠒⃟
-⠒⃠ 	⠒⃡ 	⠒⃢ 	⠒⃣ 	⠒⃤ 	⠒⃥ 	⠒⃦ 	⠒⃧ 	⠒ 	⠒⃩ 	⠒⃪ 	⠒⃫ 	⠒⃬ 	⠒⃭ 	⠒⃮ 	⠒⃯
-⠒⃰ 	⠒ᷓ 	⠒ᷔ 	⠒ᷕ 	⠒ᷖ 	⠒ᷗ 	⠒ᷘ 	⠒ᷙ 	⠒ᷚ 	⠒ᷛ 	⠒ᷜ 	⠒ᷝ 	⠒ᷞ 	⠒ᷟ  	⠒ͮ 	⠒ͯ
-⠒ᷠ 	⠒ᷡ 	⠒ᷢ 	⠒ᷣ 	⠒ᷤ 	⠒ᷥ 	⠒ᷦ 	⠒᷼ 	⠒᷽ 	⠒᷾ 	⠒᷿
-⠒︠ 	⠒︡ 	⠒︢ 	⠒︣ 	⠒︤ 	⠒︥ 	⠒︦
+⣿̀ 	⣿́ 	⣿̂ 	⣿̃ 	⣿̄ 	⣿̅ 	⣿̆ 	⣿̇ 	⣿̈ 	⣿̉ 	⣿̊ 	⣿̋ 	⣿̌ 	⣿̍ 	⣿̎ 	⣿̏
+⣿̐ 	⣿̑ 	⣿̒ 	⣿̓ 	⣿̔ 	⣿̕ 	⣿̖ 	⣿̗ 	⣿̘ 	⣿̙ 	⣿̚ 	⣿̛ 	⣿̜ 	⣿̝ 	⣿̞ 	⣿̟
+⣿̠ 	⣿̡ 	⣿̢ 	⣿̣ 	⣿̤ 	⣿̥ 	⣿̦ 	⣿̧ 	⣿̨ 	⣿̩ 	⣿̪ 	⣿̫ 	⣿̬ 	⣿̭ 	⣿̮ 	⣿̯
+⣿̰ 	⣿̱ 	⣿̲ 	⣿̳ 	⣿̴ 	⣿̵ 	⣿̶ 	⣿̷ 	⣿̸ 	⣿̹ 	⣿̺ 	⣿̻ 	⣿̼ 	⣿̽ 	⣿̾ 	⣿̿
+⣿̀ 	⣿́ 	⣿͂ 	⣿̓ 	⣿̈́ 	⣿ͅ 	⣿͆ 	⣿͇ 	⣿͈ 	⣿͉ 	⣿͊ 	⣿͋ 	⣿͌ 	⣿͍ 	⣿͎
+⣿͐ 	⣿͑ 	⣿͒ 	⣿͓ 	⣿͔ 	⣿͕ 	⣿͖ 	⣿͗ 	⣿͘ 	⣿͙ 	⣿͚ 	⣿͛ 	⣿͜⣿ 	⣿͝⣿ 	⣿͞⣿ 	⣿͟⣿̅
+ 	⣿͠⣿ 	⣿͡⣿ 	⣿͢⣿ 	⣿ͣ 	⣿ͤ 	⣿ͥ 	⣿ͦ 	⣿ͧ 	⣿ͨ 	⣿ͩ 	⣿ͪ 	⣿ͫ 	⣿ͬ 	⣿ͭ
+⣿᷀ 	⣿᷁ 	⣿᷂ 	⣿᷃ 	⣿᷄ 	⣿᷅ 	⣿᷆ 	⣿᷇ 	⣿᷈ 	⣿᷉ 	⣿᷊ 	⣿᷋ 	⣿᷌ 	⣿᷍ 	⣿᷎ 	⣿᷏
+⣿⃐ 	⣿⃑ 	⣿⃒ 	⣿⃓ 	⣿⃔ 	⣿⃕ 	⣿⃖ 	⣿⃗ 	⣿⃘ 	⣿⃙ 	⣿⃚ 	⣿⃛ 	⣿⃜ 	⣿⃝ 	⣿⃞ 	⣿⃟
+⣿⃠ 	⣿⃡ 	⣿⃢ 	⣿⃣ 	⣿⃤ 	⣿⃥ 	⣿⃦ 	⣿⃧ 	⣿ 	⣿⃩ 	⣿⃪ 	⣿⃫ 	⣿⃬ 	⣿⃭ 	⣿⃮ 	⣿⃯
+⣿⃰ 	⣿ᷓ 	⣿ᷔ 	⣿ᷕ 	⣿ᷖ 	⣿ᷗ 	⣿ᷘ 	⣿ᷙ 	⣿ᷚ 	⣿ᷛ 	⣿ᷜ 	⣿ᷝ 	⣿ᷞ 	⣿ᷟ  	⣿ͮ 	⣿ͯ
+⣿ᷠ 	⣿ᷡ 	⣿ᷢ 	⣿ᷣ 	⣿ᷤ 	⣿ᷥ 	⣿ᷦ 	⣿᷼ 	⣿᷽ 	⣿᷾ 	⣿᷿
+⣿︠ 	⣿︡ 	⣿︢ 	⣿︣ 	⣿︤ 	⣿︥ 	⣿︦
 
 Combining Char᷍acters:
 ⠀⃐ 	⠀⃑ 	⠀⃒ 	⠀⃓ 	⠀⃔ 	⠀⃕ 	⠀⃖ 	⠀⃗ 	⠀⃘ 	⠀⃙ 	⠀⃚ 	⠀⃛ 	⠀⃜ 	⠀⃝ 	⠀⃞ 	⠀⃟

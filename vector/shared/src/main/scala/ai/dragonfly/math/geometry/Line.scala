@@ -4,14 +4,14 @@ import ai.dragonfly.math.vector.Vector2
 
 object Line {
 
-  def discrete(v0: Vector2, v1: Vector2, f: (Int, Int) => Unit): Unit = discrete(
+  def trace2D(v0: Vector2, v1: Vector2, f: (Int, Int) => Unit): Unit = trace2D(
     v0.x.toInt, v0.y.toInt,
     v1.x.toInt, v1.y.toInt,
     f
   )
 
   // Bresenham Line Drawing Algorithm.
-  def discrete(sX: Int, sY: Int, eX: Int, eY: Int, f: (Int, Int) => Unit): Unit = {
+  def trace2D(sX: Int, sY: Int, eX: Int, eY: Int, f: (Int, Int) => Unit): Unit = {
 
     val steep: Boolean = Math.abs(eY - sY) > Math.abs(eX - sX)
 
