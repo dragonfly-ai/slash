@@ -4,6 +4,7 @@ import ai.dragonfly.math.example.Demonstrable
 
 import ai.dragonfly.math.*
 
+
 /**
  * Created by clifton on 1/9/17.
  */
@@ -138,6 +139,8 @@ class VectorN(override val values:VectorValues) extends Vector {
 
   def +(v:VectorN):VectorN = copy().add(v)
   def -(v:VectorN):VectorN = copy().subtract(v)
+
+  import unicode.*
 
   def indexedExhaustiveToString(sb:StringBuilder = new StringBuilder(), numberFormatter:Double => String = d => d.toString):StringBuilder = {
     dynamicCustomToString(

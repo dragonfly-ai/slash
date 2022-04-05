@@ -9,6 +9,8 @@ Features:
 - Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
 - Geometry: Sample points uniformly from the volumes defined by 3D tetrahedrons.
 - Visualization: Text based visualization, inspired by [https://github.com/JuliaPlots/UnicodePlots.jl].  Currently supports line charts, scatter plots, and histograms.
+- Bijection[A, B]: an abstraction for bijective implicit conversions.
+- BigRandom: Generate random BigInt and BigDecimal values.
 
 Unicode Plot:
 
@@ -33,7 +35,7 @@ To use this library with SBT:
 
 <pre>
 resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/"
-libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.5"
+libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.501"
 </pre><br />
 
 Projects that rely on this Library:

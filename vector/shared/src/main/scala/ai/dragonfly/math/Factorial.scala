@@ -132,7 +132,7 @@ object Factorial {
    * @return x!
    */
 
-  def apply(x:Int):BigInt = if (x < table.length) table(x.toInt) else partialFactorial(BigInt(x))
+  def apply(x:Int):BigInt = if (x < table.length) table(x) else partialFactorial(BigInt(x))
 
   /**
    * Computes x!, the factorial(x), of Long x.

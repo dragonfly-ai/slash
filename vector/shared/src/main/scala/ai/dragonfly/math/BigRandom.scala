@@ -1,5 +1,7 @@
 package ai.dragonfly.math
 
+import ai.dragonfly.math.Constant.log2
+
 import java.math.MathContext
 import scala.util.Random
 
@@ -7,8 +9,6 @@ import scala.util.Random
 object BigRandom {
 
   lazy val defaultRandom:Random = new Random()
-
-  private val log2 = Math.log10(2.0)
 
   /**
    * Computes number of bits needed to represent an n digit positive integer.
