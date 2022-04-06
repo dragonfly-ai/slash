@@ -63,7 +63,7 @@ object BigRandom {
   def between(min: BigDecimal, MAX: BigDecimal): BigDecimal = between(min, MAX, defaultRandom)
 
   def between(min: BigDecimal, MAX: BigDecimal, r: Random): BigDecimal = {
-    min + nextBigDecimal(MAX - min, Math.max(min.scale, MAX.scale), r)
+    min + nextBigDecimal(MAX - min, Math.max(min.precision, MAX.precision), r)
   }
 
 }
