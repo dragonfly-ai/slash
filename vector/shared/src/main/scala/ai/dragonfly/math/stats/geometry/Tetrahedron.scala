@@ -2,7 +2,8 @@ package ai.dragonfly.math.stats.geometry
 
 import ai.dragonfly.math.stats.probability.distributions.Sampleable
 import ai.dragonfly.math.example.Demonstrable
-import ai.dragonfly.math.interval.`[]`
+import ai.dragonfly.math.interval.*
+import Interval.*
 import ai.dragonfly.math.vector.Vector3
 
 object Tetrahedron extends Demonstrable {
@@ -100,11 +101,11 @@ case class Tetrahedron(vertices:Array[Vector3]) extends Sampleable[Vector3] {
 
   def volume:Double = `1/6` * Math.abs(`v1-v4` dot (`v2-v4` ⨯ `v3-v4`))
 
-  override def random(): Vector3 = {
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Vector3 = {
 
-    var w1 = Math.random()
-    var w2 = Math.random()
-    var w3 = Math.random()
+    var w1 = r.nextDouble()
+    var w2 = r.nextDouble()
+    var w3 = r.nextDouble()
 
     if (w1 > w2) {
       val t = w1

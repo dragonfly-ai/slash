@@ -11,6 +11,8 @@ object Vector3 extends VectorCompanion[Vector3] with Demonstrable {
 
   given dimension: Int = 3
 
+  override def validDimension(dimension: Int): Boolean = dimension == 3
+
   override def apply(values:VectorValues): Vector3 = {
     if (values.length == 3) Vector3(values(0), values(1), values(2))
     else throw UnsupportedVectorDimension(values.length)
@@ -49,11 +51,13 @@ object Vector3 extends VectorCompanion[Vector3] with Demonstrable {
   override def name: String = "Vector3"
 }
 
-case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
+case class Vector3(var x: Double, var y: Double, var z: Double) extends VectorOps[Vector3] {
 
   override val dimension: Int = 3
 
   override def values: VectorValues = VectorValues(x, y, z)
+
+  override def recognize(v: Vector): Vector3 = v.asInstanceOf[Vector3]
 
   override def component(i: Int): Double = {
     i match {
@@ -69,23 +73,10 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
   inline def distanceSquaredTo(v: Vector3): Double = {
     squareInPlace(x - v.x) + squareInPlace(y - v.y) + squareInPlace(z - v.z)
   }
-  
-  inline def distanceTo(v: Vector3): Double = Math.sqrt(distanceSquaredTo(v))
-
-  def normalize():Vector3 = {
-    val m2:Double = magnitudeSquared()
-    if (m2 > 0.0) divide(Math.sqrt(m2))
-    else throw VectorNormalizationException(this)
-  }
 
   inline def dot(v: Vector3): Double = {
     x * v.x + y * v.y + z * v.z
   }
-
-  inline def +=(v: Vector3): Vector3 = add(v)
-  inline def -=(v: Vector3): Vector3 = subtract(v)
-  inline def *= (scalar: Double): Vector3 =  scale(scalar)
-  inline def /= (divisor: Double): Vector3 = divide(divisor)
 
   inline def scale(scalar: Double): Vector3 = {
     x = x * scalar
@@ -127,12 +118,6 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends Vector {
 
   override def copy(): Vector3 = Vector3(x, y, z)
 
-  // copy operators
-  def *(scalar:Double):Vector3 = copy().scale(scalar)
-  def /(divisor:Double):Vector3 = copy().divide(divisor)
-
-  def +(v:Vector3):Vector3 = copy().add(v)
-  def -(v:Vector3):Vector3 = copy().subtract(v)
 
   override def toString: String = s"《³↗〉${x}ᵢ ${y}ⱼ ${z}ₖ〉"
 

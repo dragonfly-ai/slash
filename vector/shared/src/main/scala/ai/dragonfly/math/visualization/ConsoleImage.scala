@@ -1,8 +1,9 @@
 package ai.dragonfly.math.visualization
 
 import ai.dragonfly.math.*
+import Random.*
 import example.Demonstrable
-import vector.{Vector, Vector2}
+import vector.*
 import geometry.Line
 import visualization.ConsoleImage.{BLACK, GRAY, WHITE, colorBytes}
 
@@ -77,7 +78,7 @@ object ConsoleImage extends Demonstrable {
   )
 
   def randomSpiral(ci:ConsoleImage, color:Int):ConsoleImage = {
-    val p:Vector2 = Vector2.random(ci.width, ci.height)
+    val p:Vector2 = defaultRandom.next[Vector2](Vector2(ci.width, ci.height))
     val v:Vector2 = Vector2(1.0, 0.0)
     val s = 1.002 + (Math.random() * 0.0002)
     val dT:Double = (Math.random() - 0.5) * Math.PI / 100.0

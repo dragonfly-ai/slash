@@ -22,13 +22,13 @@ case class Poisson(λ:Double) extends ParametricProbabilityDistribution[Long] {
   def p(x:Long):Double = Math.exp( x.toDouble * Math.log(λ) - λ - Math.log(Γ(x.toDouble+1.0)) )
 
   // Knuth's method:
-  override def random(): Long = {
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Long = {
     val L = BigDecimal(Math.pow(Math.E, -λ))
     var k = 0L
     var p = 1.0
     while (p > L) {
       k = k + 1L
-      p = p * Math.random()
+      p = p * r.nextDouble()
     }
     k - 1
   }

@@ -237,8 +237,8 @@ class UnivariateGenerativeModel[T](
   private val cumulative: immutable.TreeMap[Double, Int]
 ) extends Sampleable[T] {
 
-  override def random(): T = {
-    val pX = Math.random() * hist.mass
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): T = {
+    val pX = r.nextDouble() * hist.mass
 
     val (top, bINdex) = cumulative.rangeTo(pX).last
 
@@ -272,7 +272,7 @@ class UnivariateGenerativeModel[T](
 //  }
 //
 //  def apply(): T = {
-//    val cpX = Math.random() * totalMass
+//    val cpX = r.nextDouble() * totalMass
 //
 //    cumulative.get(keys.ceiling(cpX)) match {
 //      case Some(s: Sampleable[T]) => s.random()

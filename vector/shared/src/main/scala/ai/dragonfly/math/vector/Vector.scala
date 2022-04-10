@@ -1,9 +1,18 @@
 package ai.dragonfly.math.vector
 
+import ai.dragonfly.math.squareInPlace
+
 import scala.scalajs.js
 import ai.dragonfly.math.vector.*
 
+import scala.quoted.Type
+import scala.util.Random
+
 object Vector {
+
+  def fill(dimension:Int)(d: Double): Vector = apply(VectorValues.fill(dimension)(d))
+
+  def tabulate(dimension:Int)(f: Int => Double): Vector = apply(VectorValues.tabulate(dimension)(f))
 
   def apply(values: VectorValues): Vector = {
     values.length match {
@@ -25,38 +34,89 @@ object Vector {
     }
   }
 
-  def midpoint[V <: Vector](v0: Vector, v1: Vector): V = ((v0 + v1) * 0.5).asInstanceOf[V]
+  def midpoint[V <: VectorOps[V]](v0: V, v1: V):V = ((v0 + v1) * 0.5)
 
-  def average[V <: Vector](`[v₁v₂⋯vₙ]`:Vector*): V = ({
-    val μ⃑:V = `[v₁v₂⋯vₙ]`.head.copy().asInstanceOf[V]
-    for (vector <- `[v₁v₂⋯vₙ]`.tail) {
-      μ⃑.add(vector)
+  def mean[V <: VectorOps[V]](`[v₁v₂⋯vₙ]`:V*):V = {
+    val μ:V = `[v₁v₂⋯vₙ]`.head.copy()
+    for (v <- `[v₁v₂⋯vₙ]`.tail) {
+      μ += v
     }
-    μ⃑.scale(1.0/`[v₁v₂⋯vₙ]`.size)
-  }).asInstanceOf[V]
+    μ /= `[v₁v₂⋯vₙ]`.size
+  }
 
-  def average[V <: Vector](`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS): V = ({
-    val `¹/ₙ`:Double = 1.0 / `[v₀v₁⋯v₍ₙ₋₁₎]`.length
-    val μ⃑:V = `[v₀v₁⋯v₍ₙ₋₁₎]`.head.copy().asInstanceOf[V]
-    for (vector <- `[v₀v₁⋯v₍ₙ₋₁₎]`.tail) {
-      μ⃑.add(vector)
+  def mean[V <: VectorOps[V]](`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):V = {
+    val μ:V = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).asInstanceOf[V].copy()
+    for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
+      μ += μ.recognize(`[v₀v₁⋯v₍ₙ₋₁₎]`(i))
     }
-    μ⃑.scale(`¹/ₙ`)
-  }).asInstanceOf[V]
+    μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length
+  }
 
 }
 
 // trait for Vector Companion Objects
-trait VectorCompanion[ᵥ⃑ <: Vector] {
-  def apply(values: VectorValues): Vector
+trait VectorCompanion[V <: Vector with VectorOps[V]] {
 
-  def blend(α: Double, v0: Vector, v1: Vector): Vector = (v0 * α) + (v1 * (1.0 - α))
+  def validDimension(dimension:Int):Boolean
 
-  def average(`[v₁v₂⋯vₙ]`:Vector*): Vector = Vector.average[ᵥ⃑](`[v₁v₂⋯vₙ]`:_*)
+  def apply(values: VectorValues): V
 
-  def average(`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS): Vector = Vector.average(`[v₀v₁⋯v₍ₙ₋₁₎]`)
+  protected def fill(value: Double)(using dimension:Int):V = apply(VectorValues.fill(dimension)(value))
 
-  def midpoint(v0: Vector, v1: Vector): Vector = blend(0.5, v0, v1)
+  protected def tabulate(f: Int => Double)(using dimension:Int):V = apply(VectorValues.tabulate(dimension)(f))
+
+  def blend(alpha: Double, v0: V, v1: V):V = ((v0 * alpha) + (v1 * (1.0 - alpha))).asInstanceOf[V]
+
+  def mean(`[v₁v₂⋯vₙ]`:V*):V = Vector.mean[V](`[v₁v₂⋯vₙ]`:_*)
+
+  def mean(`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):V = Vector.mean(`[v₀v₁⋯v₍ₙ₋₁₎]`).asInstanceOf[V]
+
+  def midpoint(v0: V, v1: V):V = blend(0.5, v0, v1)
+}
+
+trait VectorOps[V <: Vector] extends Vector {
+
+  type VEC = V with VectorOps[V]
+
+  // abstract
+  def round():VEC
+
+  def scale(scalar: Double):VEC
+  def divide(divisor: Double):VEC
+
+  def dot(v0:VEC): Double
+  def distanceSquaredTo(v:VEC): Double
+
+  def add(v0:VEC):VEC
+
+  def subtract(v0:VEC):VEC
+
+  def recognize(v: Vector):VEC
+
+  // implemented
+
+  def distanceTo(v:VEC): Double = Math.sqrt(distanceSquaredTo(v))
+
+  def normalize():VEC = {
+    val m2:Double = this.magnitudeSquared()
+    if (m2 > 0.0) divide(Math.sqrt(m2))
+    else throw VectorNormalizationException(this)
+  }
+
+  def +=(v0:VEC):VEC = add(v0)
+  def -=(v0:VEC):VEC = subtract(v0)
+  def *= (scalar: Double):VEC =  scale(scalar)
+  def /= (divisor: Double):VEC = divide(divisor)
+
+  def copy():VEC
+
+  // copy operators
+  def *(scalar:Double):VEC = copy().scale(scalar)
+  def /(divisor:Double):VEC = copy().divide(divisor)
+
+  def +(v0:VEC):VEC = copy().add(v0)
+  def -(v0:VEC ):VEC = copy().subtract(v0)
+
 }
 
 trait Vector {
@@ -70,8 +130,6 @@ trait Vector {
   def magnitudeSquared(): Double
 
   def magnitude(): Double = Math.sqrt( magnitudeSquared() )
-
-  def copy():Vector
 
   /**
    * For exotic vector formatting, provide lambdas for generating prefix, delimiter, and suffix.

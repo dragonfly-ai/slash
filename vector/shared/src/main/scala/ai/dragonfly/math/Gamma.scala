@@ -1,8 +1,23 @@
 package ai.dragonfly.math
 
+import ai.dragonfly.math
+import ai.dragonfly.math.example.Demonstrable
 import ai.dragonfly.math.vector.VectorValues
 
-object Gamma {
+object Gamma extends Demonstrable {
+
+  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
+    import scala.language.postfixOps
+
+    sb.append("Demonstrate Gamma Function on Integers 1 - 10\n")
+    for ( i <- 1 until 10 ) {
+      val i_1:Int = i - 1
+      sb.append(s"\tΓ($i):$i_1! => ${math.gamma(i.toDouble)} : ${math.Factorial(i_1)}\n")
+    }
+    sb
+  }
+
+  override def name:String = "Gamma"
 
   // ported from https://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/src-html/org/apache/commons/math3/special/Gamma.html
 

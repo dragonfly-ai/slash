@@ -27,3 +27,20 @@ package object unicode {
     else digitMapper(i, subscriptDigits)
   }
 }
+
+/*
+  Unicode symbols chart:
+           Math: ℕ √ ∛ ∜ ∫ ∬ ∭ ⨌ ∑ ∏ ∂ ⌈x⌉ ⌊x⌋ ÷ ∆ ⨯ ∇ ∥ ⋆ ∗ ∘ ∙ ⋅
+     Comparison: ≤ ≥
+            Set: ∅ ⊂ ⊃ ⊄ ⊅ ⊆ ⊇ ⊈ ⊉ ⊊ ⊋ ∈ ∋ ∉ ∌ ∖ ⋂ ⋃ ℕ ℤ ℚ ℝ ℂ ⋯
+       Geometry: ∡ ⦛ ∟ ⊾ ⦝ ⊿ ∠ ⦞ ⦢ ⦣ ⦤ ⦥ ∢ ⦠ ⦡ ⟂ ∥ ∦ ⫲ ⫳ ⋕
+          Greek: α β μ σ α β δ ε θ λ μ π φ ψ Ω Σ ∏ Δ
+            Hat: o⃗ x⃑ x̂ x′ x″ x‴3⃑
+      Subscript: ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ
+                 xₐ xₑ xₕ xᵢ xⱼ xₖ xₗ xₘ xₙ xₒ xₚ xᵣ xₛ xₜ xᵤ xᵥ xₓ
+                 x₀ x₁ x₂ x₃ x₄ x₅ x₆ x₇ x₈ x₉ x₊ x₋ x₌ x₍ x₎
+Subscript Words: ᵥₐₗᵤₑₛ ₐᵥ ₘᵢₙ ₘₐₓ
+    Superscript: ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ ᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ
+                 xᵃ xᵇ xᶜ xᵈ xᵉ xᶠ xᵍ xʰ xⁱ xʲ xᵏ xˡ xᵐ xⁿ xᵒ xᵖ xʳ xˢ xᵗ xᵘ xᵛ xʷ xˣ xʸ xᶻ
+                 x⁰ x¹ xⁱ x² x³ x⁴ x⁵ x⁶ x⁷ x⁸ x⁹ x⁺ x⁻ x⁼ x⁽ x⁾ xⁿ
+  */

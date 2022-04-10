@@ -2,7 +2,8 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.*
 import stats.*
-import interval.*
+import ai.dragonfly.math.interval.*
+import Interval.*
 import probability.distributions.*
 
 import scala.reflect.ClassTag
@@ -185,12 +186,12 @@ class PointStatisticsEstimator[DOMAIN](override val domain:Domain[DOMAIN])(using
 
   override def sampleBoundedMean:BoundedMean[DOMAIN] = {
     val sps = samplePointStatistics
-    BoundedMean[DOMAIN](sps.μ, sps.bounds, sps.ℕ̂)
+    BoundedMean[DOMAIN](sps.μ, sps.bounds, sps.ℕ)
   }
 
   override def sampleMeanAndVariance:MeanAndVariance[DOMAIN] = {
     val sps = samplePointStatistics
-    MeanAndVariance[DOMAIN](sps.μ, sps.`σ²`, sps.ℕ̂)
+    MeanAndVariance[DOMAIN](sps.μ, sps.`σ²`, sps.ℕ)
   }
 
   override def samplePointStatistics:PointStatistics[DOMAIN] = {

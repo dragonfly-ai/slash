@@ -1,9 +1,12 @@
 package ai.dragonfly.math.stats.probability.distributions
 
 import ai.dragonfly.math.*
+
 import stats.*
 import ai.dragonfly.math.interval.*
+import Interval.*
 import ai.dragonfly.math.example.ProbabilityDistributionDemonstration
+
 
 import scala.language.postfixOps
 
@@ -25,9 +28,11 @@ case class Uniform(interval:Interval[Double]) extends ParametricProbabilityDistr
   override lazy val `σ²`:Double = ( `MAX-min` * `MAX-min` ) / 12.0
   override lazy val σ:Double = Math.sqrt(`σ²`)
 
-  override def p(x:Double):Double = if (interval.contains(x)) `1 / (MAX-min)` else 0.0
+  override def p(x:Double):Double = if (interval.rangeContains(x)) `1 / (MAX-min)` else 0.0
 
-  override def random(): Double = interval.min + (Math.random() * (interval.MAX - interval.min))
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = {
+    interval.random(r)
+  }
 
   override def toString: String = s"Uniform( min = ${interval.min}, μ = $μ, MAX = ${interval.MAX}, σ² = ${`σ²`}, σ = $σ )"
 

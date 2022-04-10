@@ -1,10 +1,11 @@
 package ai.dragonfly.math.stats.probability.distributions
 
 
+import ai.dragonfly.math.Random
 import ai.dragonfly.math.example.ProbabilityDistributionDemonstration
 import ai.dragonfly.math.stats.*
 import ai.dragonfly.math.interval.*
-import ai.dragonfly.math.interval.Interval
+import Interval.*
 import ai.dragonfly.math.stats.BoundedMean
 
 object PERT {
@@ -28,7 +29,7 @@ case class PERT(boundedMean:BoundedMean[Double]) extends ParametricProbabilityDi
 
   override def p(x:Double):Double = underlying.p(x)
 
-  override def random(): Double = underlying.random()
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = underlying.random(r)
 
   override def toString: String = s"PERT( min = ${interval.min}, μ = $μ, MAX = ${interval.MAX}, σ² = ${`σ²`}, σ = $σ )"
 

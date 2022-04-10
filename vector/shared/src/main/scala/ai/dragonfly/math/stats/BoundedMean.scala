@@ -3,13 +3,13 @@ package ai.dragonfly.math.stats
 import ai.dragonfly.math.interval.Interval
 
 object BoundedMean {
-  def apply[DOMAIN: Numeric](μ:Double, bounds: Interval[DOMAIN], ℕ̂:DOMAIN):BoundedMean[DOMAIN] = {
-    if (bounds.contains(μ)) new BoundedMean[DOMAIN](μ, bounds, ℕ̂)
+  def apply[DOMAIN: Numeric](μ:Double, bounds: Interval[DOMAIN], ℕ:DOMAIN):BoundedMean[DOMAIN] = {
+    if (bounds.rangeContains(μ)) new BoundedMean[DOMAIN](μ, bounds, ℕ)
     else throw MeanOutsideBounds[DOMAIN](μ, bounds)
   }
 }
 
-case class BoundedMean[DOMAIN: Numeric](μ:Double, bounds: Interval[DOMAIN], ℕ̂:DOMAIN) {
+case class BoundedMean[DOMAIN: Numeric](μ:Double, bounds: Interval[DOMAIN], ℕ:DOMAIN) {
   def min:DOMAIN = bounds.min
   def MAX:DOMAIN = bounds.MAX
 }

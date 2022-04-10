@@ -4,9 +4,9 @@ import ai.dragonfly.math.*
 import stats.*
 import ai.dragonfly.math.Factorial.!
 import ai.dragonfly.math.example.ProbabilityDistributionDemonstration
-import ai.dragonfly.math.interval.{Domain, Interval, `[]`}
+import ai.dragonfly.math.interval.*
+import Interval.*
 
-import scala.util.Random
 import scala.language.postfixOps
 
 object Binomial {
@@ -55,10 +55,10 @@ case class Binomial(n:Long, P:Double) extends ParametricProbabilityDistribution[
    * Naive implementation not suitable for large N.
    * @return a random number of successes.
    */
-  override def random(): Long = {
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Long = {
     var successCount = 0L
     for (i <- 0L until n) {
-      if (Math.random() < P) successCount = successCount + 1L
+      if (r.nextDouble() < P) successCount = successCount + 1L
     }
     successCount
   }

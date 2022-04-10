@@ -3,6 +3,7 @@ package ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import stats.*
 import ai.dragonfly.math.interval.*
+import Interval.*
 import ai.dragonfly.math.example.ProbabilityDistributionDemonstration
 
 import scala.language.postfixOps
@@ -32,8 +33,7 @@ case class DiscreteUniform(interval:Interval[Long]) extends ParametricProbabilit
 
   override def p(x:Long):Double = if (interval.contains(x)) `1 / (MAX-min)` else 0.0
 
-  private val r = scala.util.Random()
-  override def random(): Long = interval.min + r.nextLong(interval.MAX - interval.min)
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Long = interval.min + r.nextLong(interval.MAX - interval.min)
 
   override def toString: String = s"DiscreteUniform( min = ${interval.min}, μ = $μ, MAX = ${interval.MAX}, σ² = ${`σ²`}, σ = $σ )"
 

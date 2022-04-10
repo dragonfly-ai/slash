@@ -3,9 +3,8 @@ package ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import stats.*
 import interval.*
+import Interval.*
 import example.*
-
-import scala.util.Random
 
 object Beta {
   val demo2param = ProbabilityDistributionDemonstration("Beta", Beta(0.5, 5.0), DenseHistogramOfContinuousDistribution(9, 0, 1))
@@ -56,14 +55,14 @@ case class Beta(α:Double, β:Double, val min:Double = 0.0, val MAX:Double = 1.0
 
   // BB+BC version of Cheng's algorithm
   // ported from: https://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/src-html/org/apache/commons/math3/distribution/BetaDistribution.html
-  override def random(): Double = {
+  override def random(rand:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = {
     var w:Double = 0.0
     if (α > 1 && β > 1) { // Cheng's BB algorithm
       var continue:Boolean = true
 
       while (continue) {
-        val u1 = Math.random()
-        val u2 = Math.random()
+        val u1 = rand.nextDouble()
+        val u2 = rand.nextDouble()
         val v = `√( (α+β - 2) / (2αβ - α+β) )` * (Math.log(u1) - Math.log1p(-u1))
         w = `min(α,β)` * Math.exp(v)
         val z = u1 * u1 * u2
@@ -88,8 +87,8 @@ case class Beta(α:Double, β:Double, val min:Double = 0.0, val MAX:Double = 1.0
       var continue:Boolean = true
 
       while (continue) {
-        val u1 = Math.random()
-        val u2 = Math.random()
+        val u1 = rand.nextDouble()
+        val u2 = rand.nextDouble()
         val y = u1 * u2
         val z = u1 * y
         var executeLast:Boolean = true

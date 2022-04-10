@@ -8,16 +8,14 @@ object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
 
   given dimension: Int = 4
 
-  def apply(values:VectorValues): Vector4 = {
+  inline override def validDimension(dimension: Int): Boolean = dimension == 4
+
+  inline def apply(values:VectorValues): Vector4 = {
     if (values.length == 4) Vector4(values(0), values(1), values(2), values(3))
     else throw UnsupportedVectorDimension(values.length)
   }
 
-  def fill(value:Double): Vector4 = Vector4(value, value, value, value)
-  def fill(f: Int => Double):Vector4 = Vector4(f(0), f(1), f(2), f(3))
-
   def random(maxNorm:Double = 1.0): Vector4 = Vector4(maxNorm * Math.random(), maxNorm * Math.random(), maxNorm * Math.random(), maxNorm * Math.random())
-
 
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     val i = Vector4(1, 0, 0, 0)
@@ -71,10 +69,13 @@ object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
   override def name: String = "Vector4"
 }
 
-case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) extends Vector {
-  override def values: VectorValues = VectorValues(x, y, z, w)
+case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) extends VectorOps[Vector4] {
 
-  override inline def dimension: Int = 4
+  override lazy val values: VectorValues = VectorValues(x, y, z, w)
+
+  override def recognize(v: Vector): Vector4 = v.asInstanceOf[Vector4]
+
+  override val dimension: Int = Vector4.dimension
 
   override def component(i: Int): Double = {
     i match {
@@ -92,22 +93,9 @@ case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) e
     squareInPlace(x - v.x) + squareInPlace(y - v.y) + squareInPlace(z - v.z) + squareInPlace(w - v.w)
   }
 
-  inline def distanceTo(v: Vector4): Double = Math.sqrt(distanceSquaredTo(v))
-
-  def normalize():Vector4 = {
-    val m2:Double = magnitudeSquared()
-    if (m2 > 0.0) divide(Math.sqrt(m2))
-    else throw VectorNormalizationException(this)
-  }
-
   inline def dot(v0: Vector4): Double = {
     x * v0.x + y * v0.y + z * v0.z + w * v0.w
   }
-
-  inline def += : (Vector4 => Vector4) = add
-  inline def -= : (Vector4 => Vector4) = subtract
-  inline def *= (scalar: Double): Vector4 =  scale(scalar)
-  inline def /= (divisor: Double): Vector4 = divide(divisor)
 
   inline def scale(scalar: Double): Vector4 = {
     x = x * scalar
@@ -144,13 +132,6 @@ case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) e
   }
 
   override def copy(): Vector4 = Vector4(x, y, z, w)
-
-  // copy operators
-  inline def *(scalar:Double):Vector4 = copy().*=(scalar)
-  inline def /(divisor:Double):Vector4 = copy()./=(divisor)
-
-  inline def +(v0:Vector4):Vector4 = copy().+=(v0)
-  inline def -(v0:Vector4):Vector4 = copy().-=(v0)
 
   override def toString: String = s"《⁴↗〉${x}ᵢ ${y}ⱼ ${z}ₖ ${w}ₗ〉"
 

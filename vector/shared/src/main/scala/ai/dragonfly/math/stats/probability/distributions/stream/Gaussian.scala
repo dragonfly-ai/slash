@@ -25,7 +25,7 @@ class Gaussian extends OnlineUnivariateProbabilityDistributionEstimator[Double, 
     distributions.EstimatedGaussian(
       sps.bounds,
       distributions.Gaussian(sps.μ, sps.`σ²`),
-      sps.ℕ̂
+      sps.ℕ
     )
   }
 

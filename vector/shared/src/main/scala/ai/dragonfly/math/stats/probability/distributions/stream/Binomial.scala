@@ -2,7 +2,8 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
-import ai.dragonfly.math.interval.Domain
+import ai.dragonfly.math.interval.*
+import Interval.*
 import ai.dragonfly.math.stats.BoundedMean
 import example.*
 
@@ -62,7 +63,7 @@ case class FixedBinomial(n: Long) extends OnlineUnivariateProbabilityDistributio
     distributions.EstimatedBinomial(
       bμ̂.bounds,
       distributions.Binomial(n, bμ̂.μ / n),
-      bμ̂.ℕ̂
+      bμ̂.ℕ
     )
   }
 
@@ -82,7 +83,7 @@ class Binomial extends OnlineBivariateProbabilityDistributionEstimator[Long, dis
   def estimate:distributions.EstimatedBinomial = {
     val si = estimator.getS
     distributions.EstimatedBinomial(
-      interval.`[]`[Long](si(3), si(4)),
+      `[]`[Long](si(3), si(4)),
       distributions.Binomial(
         si(2) / si(0), // estimated trial count per experiment
         ( BigDecimal(si(1)) / BigDecimal(si(2)) ).toDouble  // estimated Probability of success per trial.

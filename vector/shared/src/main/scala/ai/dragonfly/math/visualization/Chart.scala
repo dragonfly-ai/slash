@@ -2,13 +2,18 @@ package ai.dragonfly.math.visualization
 
 import scala.collection.mutable
 import ai.dragonfly.math.*
+import Random.*
 import interval.*
-import vector.Vector2
+import Interval.*
+import vector.*
+import Vector.*
 import example.Demonstrable
 
 import Console.{BOLD, RESET}
 
 object Chart extends Demonstrable {
+
+  val r = defaultRandom
 
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
 
@@ -48,14 +53,14 @@ object Chart extends Demonstrable {
 
     val scatterPlot:Chart = Chart("Test Scatter Plot", "X", "Y", `[]`(-10.0, 10.0), `[]`(-10.0, 10.0), 100, 100)
     val v2s:Array[Vector2] = new Array(50)
-    for (i <- v2s.indices) v2s(i) = Vector2.random(20, 20).subtract(Vector2(10, 10))
+    for (i <- v2s.indices) v2s(i) = r.nextVector2(20).subtract(Vector2(10, 10))
     scatterPlot.scatter("Scatter 1", v2s:_*)
     sb.append(scatterPlot).append("\n")
 
     val scatterPlot1:Chart = Chart("Test Connected Scatter Plot", "X", "Y", `[]`(-10.0, 10.0), `[]`(-10.0, 10.0), 100, 100)
     for (i <- v2s.indices) v2s(i) = Vector2(
       (i * (20.0 / v2s.length)) - 10.0,
-      (Math.random() * (20.0*(i+1.0) / v2s.length)) - (10.0*(i+1.0) / v2s.length)
+      (r.nextDouble() * (20.0*(i+1.0) / v2s.length)) - (10.0*(i+1.0) / v2s.length)
     )
     scatterPlot1.connectedScatter("Connected Scatter 1", v2s:_*)
     sb.append(scatterPlot1).append("\n")
@@ -71,7 +76,7 @@ object Chart extends Demonstrable {
     var x:Double = regressionPlot.conf.domain.min
     val step = (regressionPlot.conf.domain.norm) / v2s.length
     for (i <- v2s.indices) {
-      v2s(i) = Vector2(x, (slope * x) + b + (4.0 * (Math.random() - 0.5)))
+      v2s(i) = Vector2(x, (slope * x) + b + (4.0 * (r.nextDouble() - 0.5)))
       //println(v2s(i))
       x = x + step
     }
@@ -194,7 +199,7 @@ case class Chart( conf:ChartConfig ) {
   val cimg:ConsoleImage = ConsoleImage(width, height)
 
   // vertical axis ?
-  if (domain.contains(0.0)) {
+  if (domain.rangeContains(0.0)) {
 
     glyphLineSegment(
       Vector2(0.0, range.min),
@@ -205,7 +210,7 @@ case class Chart( conf:ChartConfig ) {
   }
 
   // Horizontal Axis? "⃨⃛" "͞"
-  if (range.contains(0.0)) {
+  if (range.rangeContains(0.0)) {
     glyphLineSegment(
       Vector2(domain.min, 0.0),
       Vector2(domain.MAX, 0.0),
@@ -234,7 +239,7 @@ case class Chart( conf:ChartConfig ) {
       val xi:Int = dX * unitWidth
       val yi:Int = (height - 1) - (dY * unitHeight)
       val interval = hm.getOrElseUpdate(yi, `[]`(xi, xi))
-      hm.put(yi, `[]`(Math.min(interval.min, xi), Math.max(interval.MAX, xi)))
+      hm.put(yi, `[]`[Int](Math.min(interval.min, xi), Math.max(interval.MAX, xi)))
     })
 
     for ((yi:Int, xiv:Interval[Int]) <- hm) {

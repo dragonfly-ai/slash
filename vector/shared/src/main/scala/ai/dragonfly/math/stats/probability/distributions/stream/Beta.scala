@@ -21,7 +21,7 @@ class Beta extends OnlineUnivariateProbabilityDistributionEstimator[Double, dist
     val sps:PointStatistics[Double] = estimator.samplePointStatistics
     distributions.EstimatedBeta(
       distributions.Beta.fromMeanVarianceMinMax(sps.μ, sps.`σ²`, sps.min, sps.MAX),
-      sps.ℕ̂
+      sps.ℕ
     )
   }
 

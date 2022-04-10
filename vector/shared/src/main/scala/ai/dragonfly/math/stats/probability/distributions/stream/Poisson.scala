@@ -21,11 +21,11 @@ class Poisson extends OnlineUnivariateProbabilityDistributionEstimator[Long, dis
   }
 
   override def estimate:distributions.EstimatedPousson = {
-    val bμ̂ = estimator.sampleBoundedMean
+    val bμ = estimator.sampleBoundedMean
     distributions.EstimatedPousson(
-      bμ̂.bounds,
-      distributions.Poisson(bμ̂.μ),
-      bμ̂.ℕ̂
+      bμ.bounds,
+      distributions.Poisson(bμ.μ),
+      bμ.ℕ
     )
   }
 

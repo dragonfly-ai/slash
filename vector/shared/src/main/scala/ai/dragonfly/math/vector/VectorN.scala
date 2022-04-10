@@ -3,7 +3,8 @@ package ai.dragonfly.math.vector
 import ai.dragonfly.math.example.Demonstrable
 
 import ai.dragonfly.math.*
-
+import Random.*
+import ai.dragonfly.math.vector.Vector.*
 
 /**
  * Created by clifton on 1/9/17.
@@ -15,28 +16,36 @@ object VectorN extends VectorCompanion[VectorN] with Demonstrable {
 
   override def apply(values:VectorValues): VectorN = new VectorN(values)
 
-  def fill(dimension:Int, value:Double): VectorN = new VectorN(VectorValues.fill(dimension)((d:Int) => value))
-  def fill(dimension:Int, f: Int => Double):VectorN = new VectorN(VectorValues.fill(dimension)(f))
+  override def validDimension(dimension: Int): Boolean = dimension > 4
 
-  def random(dimension:Int, maxNorm:Double = 1.0): VectorN = new VectorN(VectorValues.fill(dimension)((d:Int) => maxNorm * Math.random()))
+  def fill(dimension:Int, d:Double):VectorN = {
+    given dim:Int = dimension
+    super.fill(d)
+  }
+  def tabulate(dimension:Int, f: Int => Double):VectorN = {
+    given dim:Int = dimension
+    super.tabulate(f)
+  }
+
+  //def random(dimension:Int, maxNorm:Double = 1.0): VectorN = new VectorN(VectorValues.tabulate(dimension)((i:Int) => maxNorm * Math.random()))
 
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     import Console.{GREEN, RED, RESET, YELLOW, UNDERLINED, RED_B}
 
     sb.append("\n\nVectorN.fill(9, 0)").append(VectorN.fill(9, 0))
 
-    val r:VectorN = VectorN.random(42, 777.777)
-    sb.append("\n\nval r:VectorN = VectorN.random(42, 777)")
-      .append("\n\tr.toString: ")
-      .append("\n\t\t").append(r)
-      .append("\n\tr.exhaustiveToString(): ")
-      .append("\n\t\t").append(r.exhaustiveToString())
-      .append("\n\tr.exhaustiveToString(numberFormatter = (d:Double) => \"%7.3f\").format(d)): ")
-      .append("\n\t\t").append(r.exhaustiveToString(numberFormatter = (d:Double) => "%7.3f".format(d)))
-      .append("\n\tr.indexedExhaustiveToString(): ")
-      .append("\n\t\t").append(r.indexedExhaustiveToString(numberFormatter = (d:Double) => "%7.3f".format(d)))
-      .append("\n\tr.indexedExhaustiveToString(numberFormatter = (d:Double) => \"%7.3f\".format(d)): ")
-      .append("\n\t\t").append(r.indexedExhaustiveToString(numberFormatter = (d:Double) => "%7.3f".format(d)))
+    val rvn:VectorN = defaultRandom.nextVector(42, 777.777).asInstanceOf[VectorN]
+    sb.append("\n\nval rvn:VectorN = VectorN.random(42, 777)")
+      .append("\n\trvn.toString: ")
+      .append("\n\t\t").append(rvn)
+      .append("\n\trvn.exhaustiveToString(): ")
+      .append("\n\t\t").append(rvn.exhaustiveToString())
+      .append("\n\trvn.exhaustiveToString(numberFormatter = (d:Double) => \"%7.3f\").format(d)): ")
+      .append("\n\t\t").append(rvn.exhaustiveToString(numberFormatter = (d:Double) => "%7.3f".format(d)))
+      .append("\n\trvn.indexedExhaustiveToString(): ")
+      .append("\n\t\t").append(rvn.indexedExhaustiveToString(numberFormatter = (d:Double) => "%7.3f".format(d)))
+      .append("\n\trvn.indexedExhaustiveToString(numberFormatter = (d:Double) => \"%7.3f\".format(d)): ")
+      .append("\n\t\t").append(rvn.indexedExhaustiveToString(numberFormatter = (d:Double) => "%7.3f".format(d)))
 
 
     sb.append("\n\nVector.midpoint(new VectorN(1.0, 2.0, 3.0, 4.0, 5.0), VectorN(5.0, 4.0, 3.0, 2.0, 1.0))\n\t")
@@ -49,8 +58,7 @@ object VectorN extends VectorCompanion[VectorN] with Demonstrable {
 
 }
 
-class VectorN(override val values:VectorValues) extends Vector {
-
+class VectorN(override val values:VectorValues) extends VectorOps[VectorN] {
 
   override def dimension: Int = values.length
 
@@ -74,16 +82,7 @@ class VectorN(override val values:VectorValues) extends Vector {
     }
   }
 
-  inline def distanceTo(v: VectorN): Double = Math.sqrt(distanceSquaredTo(v))
-
-  def normalize():VectorN = {
-    val m2:Double = magnitudeSquared()
-    if (m2 > 0.0) divide(Math.sqrt(m2))
-    else throw VectorNormalizationException(this)
-  }
-
-
-  def dot(v: VectorN): Double = {
+  override def dot(v: VectorN): Double = {
     if (values.length != v.values.length) throw MismatchedVectorDimensionsException(this, v)
     else {
       var accumulator = 0.0
@@ -93,11 +92,6 @@ class VectorN(override val values:VectorValues) extends Vector {
       accumulator
     }
   }
-
-  def += : (VectorN => VectorN) = add
-  def -= : (VectorN => VectorN) = subtract
-  def *= : (Double => VectorN) = scale
-  def /= : (Double => VectorN) = divide
 
   def scale(scalar: Double): VectorN = {
     for (i <- values.indices) values(i) = values(i) * scalar
@@ -133,12 +127,7 @@ class VectorN(override val values:VectorValues) extends Vector {
     cp
   })
 
-  // copy operators
-  def *(scalar:Double):VectorN = copy().scale(scalar)
-  def /(divisor:Double):VectorN = copy().divide(divisor).asInstanceOf[VectorN]
-
-  def +(v:VectorN):VectorN = copy().add(v)
-  def -(v:VectorN):VectorN = copy().subtract(v)
+  override def recognize(v: Vector): VectorN = v.asInstanceOf[VectorN]
 
   import unicode.*
 

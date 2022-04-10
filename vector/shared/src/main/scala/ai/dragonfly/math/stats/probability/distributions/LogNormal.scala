@@ -42,8 +42,8 @@ case class LogNormal(override val μ:Double, override val `σ²`: Double) extend
 
   def p(x:Double):Double = LogNormal.p(x, G.μ, G.σ)
 
-  override def random(): Double = {
-    Math.exp(G.random())
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = {
+    Math.exp(G.random(r))
   }
 
   override def toString: String = s"LogNormal( μ = $μ, σ² = ${`σ²`}, σ = $σ )"

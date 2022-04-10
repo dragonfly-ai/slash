@@ -22,5 +22,4 @@ package object math {
   def B(α:Double, β:Double):Double = ( Γ(α) * Γ(β) ) / Γ(α + β)
   def beta(α:Double, β:Double):Double = B(α, β)
 
-
 }

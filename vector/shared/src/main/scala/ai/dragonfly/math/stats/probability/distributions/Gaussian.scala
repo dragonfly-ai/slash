@@ -7,7 +7,6 @@ import stats.*
 import example.*
 import interval.*
 
-import scala.util.Random
 
 object Gaussian {
   val g10_42:Gaussian = Gaussian(10.0, 42.0)
@@ -29,7 +28,7 @@ case class Gaussian(override val μ:Double, override val `σ²`:Double) extends 
     `1 / (σ * √(2π))` * Math.exp(`-(((x-μ)/σ)²)/2`)
   }
 
-  override def random(): Double = μ + (Random.nextGaussian() * σ)
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = μ + (r.nextGaussian() * σ)
 
   override def toString: String = s"Gaussian(μ = $μ, σ² = ${`σ²`}, σ = $σ)"
 }

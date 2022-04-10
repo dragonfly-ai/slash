@@ -65,7 +65,7 @@ class PERT extends OnlineUnivariateProbabilityDistributionEstimator[Double, dist
     val bμ̂ = estimator.sampleBoundedMean
     distributions.EstimatedPERT(
       distributions.PERT(bμ̂),
-      bμ̂.ℕ̂
+      bμ̂.ℕ
     )
   }
 

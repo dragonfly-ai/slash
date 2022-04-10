@@ -1,6 +1,7 @@
 package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.interval.*
+import Interval.*
 import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.example.*
 import ai.dragonfly.math.stats.PointStatistics
@@ -21,7 +22,7 @@ class LogNormal extends OnlineUnivariateProbabilityDistributionEstimator[Double,
     distributions.EstimatedLogNormal(
       `[]`[Double](Math.exp(sps.min), Math.exp(sps.MAX)),
       distributions.LogNormal.fromGaussianParameters(sps.μ, sps.`σ²`),
-      sps.ℕ̂
+      sps.ℕ
     )
   }
 }
