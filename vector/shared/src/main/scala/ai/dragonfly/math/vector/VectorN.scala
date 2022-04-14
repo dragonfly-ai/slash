@@ -58,84 +58,21 @@ object VectorN extends VectorCompanion[VectorN] with Demonstrable {
 
 }
 
-class VectorN(override val values:VectorValues) extends VectorOps[VectorN] {
+class VectorN(override val values:VectorValues) extends Vector[VectorN] {
 
-  override def dimension: Int = values.length
-
-  override def component(i: Int): Double = try {
-    values(i)
-  } catch {
-    case aioobe:ArrayIndexOutOfBoundsException => throw ExtraDimensionalAccessException(this, i)
-  }
-
-  override def euclideanNormSquared: Double = { var mag2 = 0.0; for (v:Double <- values) mag2 = mag2 + squareInPlace(v); mag2 }
-
-  override def euclideanDistanceSquaredTo(v: VectorN): Double = {
-    if (values.length != v.values.length) throw MismatchedVectorDimensionsException(this, v)
-    else {
-      var distance = 0.0
-      for ( i <- 0 until v.dimension) {
-        val delta = values(i) - v.values(i)
-        distance = distance + delta * delta
-      }
-      distance
-    }
-  }
-
-  override def dot(v: VectorN): Double = {
-    if (values.length != v.values.length) throw MismatchedVectorDimensionsException(this, v)
-    else {
-      var accumulator = 0.0
-      for (i <- values.indices) {
-        accumulator = accumulator + v.values(i) * values(i)
-      }
-      accumulator
-    }
-  }
-
-  def scale(scalar: Double): VectorN = {
-    for (i <- values.indices) values(i) = values(i) * scalar
-    this
-  }
-
-  def divide(divisor: Double): VectorN = scale(1 / divisor)
-
-  def round(): VectorN = {
-    for (i <- values.indices) values(i) = Math.round(values(i)).toDouble
-    this
-  }
-
-  def add(v: VectorN): VectorN = {
-    if (values.length != v.values.length) throw MismatchedVectorDimensionsException(this, v)
-    else {
-      for (i <- values.indices) values(i) = values(i) + v.values(i)
-      this
-    }
-  }
-
-  def subtract(v: VectorN): VectorN = {
-    if (values.length != v.values.length) throw MismatchedVectorDimensionsException(this, v)
-    else {
-      for (i <- values.indices) values(i) = values(i) - v.values(i)
-      this
-    }
-  }
-
-  override def copy():VectorN = new VectorN({
+  override inline def copy():VectorN = {
     val cp:VectorValues = new VectorValues(values.length)
     for (i <- values.indices) cp(i) = values(i)
-    cp
-  })
-
-  override def recognize(v: Vector): VectorN = v.asInstanceOf[VectorN]
+    new VectorN(cp)
+  }
 
   import unicode.*
 
   def indexedExhaustiveToString(sb:StringBuilder = new StringBuilder(), numberFormatter:Double => String = d => d.toString):StringBuilder = {
     dynamicCustomToString(
-      (v:Vector) => s"《${exalt(this.dimension)}↗〉",
+      (v:VectorData) => s"《${exalt(this.dimension)}↗〉",
       (i:Int) => abase(i) + " ",
-      (v:Vector) => "〉",
+      (v:VectorData) => "〉",
       sb,
       numberFormatter
     )

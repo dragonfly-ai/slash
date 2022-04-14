@@ -1,20 +1,18 @@
 package ai.dragonfly.math.vector
 
-import ai.dragonfly.math.{Euclidean, squareInPlace}
+import ai.dragonfly.math.*
 
 import scala.scalajs.js
-import ai.dragonfly.math.vector.*
 
-import scala.quoted.Type
 import scala.util.Random
 
 object Vector {
 
-  def fill(dimension:Int)(d: Double): Vector = apply(VectorValues.fill(dimension)(d))
+  def fill(dimension:Int)(d: Double): Vector[_] = apply(VectorValues.fill(dimension)(d))
 
-  def tabulate(dimension:Int)(f: Int => Double): Vector = apply(VectorValues.tabulate(dimension)(f))
+  def tabulate(dimension:Int)(f: Int => Double): Vector[_] = apply(VectorValues.tabulate(dimension)(f))
 
-  def apply(values: VectorValues): Vector = {
+  def apply(values: VectorValues): Vector[_] = {
     values.length match {
       case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
       case 2 => Vector2(values(0), values(1))
@@ -24,7 +22,7 @@ object Vector {
     }
   }
 
-  def apply(d:Double*): Vector = {
+  def apply(d:Double*): Vector[_] = {
     d.size match {
       case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
       case 2 => Vector2(d(0), d(1))
@@ -34,9 +32,9 @@ object Vector {
     }
   }
 
-  def midpoint[V <: VectorOps[V]](v0: V, v1: V):V = ((v0 + v1) * 0.5)
+  def midpoint[V <: VectorData with Vector[V]](v0: V, v1: V):V = ((v0 + v1) * 0.5)
 
-  def mean[V <: VectorOps[V]](`[v₁v₂⋯vₙ]`:V*):V = {
+  def mean[V <: VectorData with Vector[V]](`[v₁v₂⋯vₙ]`:V*):V = {
     val μ:V = `[v₁v₂⋯vₙ]`.head.copy()
     for (v <- `[v₁v₂⋯vₙ]`.tail) {
       μ += v
@@ -44,7 +42,7 @@ object Vector {
     μ /= `[v₁v₂⋯vₙ]`.size
   }
 
-  def mean[V <: VectorOps[V]](`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):V = {
+  def mean[V <: VectorData with Vector[V]](`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):V = {
     val μ:V = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).asInstanceOf[V].copy()
     for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
       μ += μ.recognize(`[v₀v₁⋯v₍ₙ₋₁₎]`(i))
@@ -55,7 +53,7 @@ object Vector {
 }
 
 // trait for Vector Companion Objects
-trait VectorCompanion[V <: Vector with VectorOps[V]] {
+trait VectorCompanion[V <: VectorData with Vector[V]] {
 
   def validDimension(dimension:Int):Boolean
 
@@ -74,39 +72,11 @@ trait VectorCompanion[V <: Vector with VectorOps[V]] {
   def midpoint(v0: V, v1: V):V = blend(0.5, v0, v1)
 }
 
-trait VectorOps[V <: Vector] extends Vector with Euclidean[V with VectorOps[V]] {
+trait Vector[V] extends DenseVectorData {
 
-  type VEC = V with VectorOps[V]
+  type VEC = V with Vector[V]
 
   // abstract
-  def round():VEC
-
-  def scale(scalar: Double):VEC
-  def divide(divisor: Double):VEC
-
-  def dot(v0:VEC): Double
-
-  def add(v0:VEC):VEC
-
-  def subtract(v0:VEC):VEC
-
-  def recognize(v: Vector):VEC
-
-  // implemented
-  def magnitudeSquared:Double = euclideanNormSquared
-  def magnitude:Double = euclideanNorm
-
-  def normalize():VEC = {
-    val m2:Double = this.euclideanNorm
-    if (m2 > 0.0) divide(Math.sqrt(m2))
-    else throw VectorNormalizationException(this)
-  }
-
-  def +=(v0:VEC):VEC = add(v0)
-  def -=(v0:VEC):VEC = subtract(v0)
-  def *= (scalar: Double):VEC =  scale(scalar)
-  def /= (divisor: Double):VEC = divide(divisor)
-
   def copy():VEC
 
   // copy operators
@@ -116,16 +86,118 @@ trait VectorOps[V <: Vector] extends Vector with Euclidean[V with VectorOps[V]] 
   def +(v0:VEC):VEC = copy().add(v0)
   def -(v0:VEC ):VEC = copy().subtract(v0)
 
+  // implemented
+  inline def round():VEC = {
+    euclid.round()
+    recognize(this)
+  }
+
+  inline def discretize():VEC = round()
+
+  inline def discretize(r:Double):VEC = {
+    euclid.discretize(r)
+    recognize(this)
+  }
+
+  inline def normSquared: Double = {
+    euclid.normSquared
+  }
+
+  inline def norm: Double = {
+    euclid.norm
+  }
+
+
+  inline def dot(v0:VEC): Double = {
+    euclid.dot(v0)
+  }
+
+  inline def scale(scalar: Double):VEC = {
+    euclid.scale(scalar)
+    recognize(this)
+  }
+
+  inline def divide(divisor: Double):VEC = {
+    euclid.divide(divisor)
+    recognize(this)
+  }
+
+  inline def add(v0:VEC):VEC = {
+    euclid.add(v0)
+    recognize(this)
+  }
+
+  inline def subtract(v0:VEC):VEC = {
+    euclid.subtract(v0)
+      recognize(this)
+  }
+
+  inline def recognize(v: Any):VEC = v.asInstanceOf[VEC]
+
+
+  def magnitudeSquared:Double = euclid.normSquared
+  def magnitude:Double = euclid.norm
+
+  inline def normalize():VEC = {
+    val m2:Double = euclid.norm
+    if (m2 > 0.0) divide(Math.sqrt(m2))
+    else throw VectorNormalizationException(this)
+  }
+
+  inline def +=(v0:VEC):VEC = add(v0)
+  inline def -=(v0:VEC):VEC = subtract(v0)
+  inline def *= (scalar: Double):VEC = scale(scalar)
+  inline def /= (divisor: Double):VEC = divide(divisor)
+
 }
 
-trait Vector {
+trait DenseVectorData extends VectorData {
+  override val dimension:Int = values.length
 
-  def values: VectorValues
+  override inline def component(i:Int):Double = {
+    inDimensionOrThrowException(i)
+    values(i)
+  }
 
-  def dimension: Int
+  override inline def component(i: Int, d:Double): Double = {
+    inDimensionOrThrowException(i)
+    values(i) = d
+    d
+  }
+}
 
-  def component(i: Int): Double
+trait SparseVectorData extends VectorData {
+  val indices: VectorIndices
 
+  // binary search
+  private def localIndex(target: Int): Int = {
+    inDimensionOrThrowException(target)
+    var left = 0
+    var right = indices.length - 1
+    while (left <= right) {
+      val mid = (left + right) / 2
+      if (indices(mid) < target) left = mid + 1
+      else if (indices(mid) > target) right = mid - 1
+      else return mid
+    }
+    -1
+  }
+
+  override def component(i: Int): Double = localIndex(i) match {
+    case li:Int if li < 0 => 0.0
+    case li:Int => values(li)
+  }
+
+  override inline def component(i: Int, d:Double): Double = localIndex(i) match {
+    case li:Int if li < 0 => -1
+    case li:Int => values(li) = d; d
+  }
+
+}
+
+trait VectorData extends Euclidean {
+
+  val values: VectorValues
 
   /**
    * For exotic vector formatting, provide lambdas for generating prefix, delimiter, and suffix.
@@ -136,9 +208,9 @@ trait Vector {
    * @return
    */
   def dynamicCustomToString(
-                            prefix: Vector => String,
+                            prefix: VectorData => String,
                             delimiter:Int => String,
-                            suffix: Vector => String,
+                            suffix: VectorData => String,
                             sb:StringBuilder = new StringBuilder(),
                             numberFormatter:Double => String = (d:Double) => d.toString ):StringBuilder = {
 
@@ -181,12 +253,5 @@ case class UnsupportedVectorDimension(d:Int) extends Exception(
   s"Vector dimensions must exceed 1.  Cannot create a vector of dimension: $d"
 )
 
-case class MismatchedVectorDimensionsException(v0:Vector, v1:Vector) extends Exception(
-  s"Operation undefined on vectors with different dimensions:\n\tdim($v0) = ${v0.dimension}\n\tdim($v1) = ${v1.dimension}"
-)
 
-case class ExtraDimensionalAccessException(v:Vector, ci: Int) extends Exception(
-  s"Index: $ci exceeds dimensionality of Vector${v.dimension}: $v"
-)
-
-case class VectorNormalizationException(v:Vector) extends Exception(s"Can't normalize $v")
+case class VectorNormalizationException(v:VectorData) extends Exception(s"Can't normalize $v")

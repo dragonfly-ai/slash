@@ -23,12 +23,12 @@ object Random {
     def nextBigDecimal(precision: Int): BigDecimal = { val bd = BigDecimal( r.nextBigInt(precision) ); BigDecimal(bd.bigDecimal.movePointLeft(bd.precision)) }
     def nextBigDecimal(norm: BigDecimal, scale: Int): BigDecimal = norm * r.nextBigDecimal(scale)(new MathContext((norm.precision - norm.scale) + scale))
     def between(min: BigDecimal, MAX: BigDecimal): BigDecimal = min + r.nextBigDecimal(MAX - min, Math.max(min.precision, MAX.precision))
-    def nextVector(dimension:Int, maxNorm:Double = 1.0): Vector = Vector( VectorValues.tabulate(dimension)( (i:Int) => maxNorm * r.nextDouble() ) )
+    def nextVector(dimension:Int, maxNorm:Double = 1.0): Vector[_] = Vector( VectorValues.tabulate(dimension)( (i:Int) => maxNorm * r.nextDouble() ) )
     def nextVector2(maxNorm:Double = 1.0):Vector2 = r.nextVector(2, maxNorm).asInstanceOf[Vector2]
     def nextVector3(maxNorm:Double = 1.0):Vector3 = r.nextVector(3, maxNorm).asInstanceOf[Vector3]
     def nextVector4(maxNorm:Double = 1.0):Vector4 = r.nextVector(4, maxNorm).asInstanceOf[Vector4]
     def nextVectorN(dimension:Int, maxNorm:Double = 1.0):VectorN = r.nextVector(dimension, maxNorm).asInstanceOf[VectorN]
-    def next[V <: VectorOps[V]](norm:V):V = norm.recognize( Vector( VectorValues.tabulate(norm.dimension)((i:Int) => norm.values(i) * r.nextDouble() ) ) )
-    def between[V <: VectorOps[V]](min:V, MAX:V):V = r.next[V](MAX.copy().subtract(min)).add(min)
+    def next[V <: Vector[V]](norm:V):V = norm.recognize( Vector( VectorValues.tabulate(norm.dimension)((i:Int) => norm.values(i) * r.nextDouble() ) ) )
+    def between[V <: Vector[V]](min:V, MAX:V):V = r.next[V]((MAX - min).add(min))
 
 }

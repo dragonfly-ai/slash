@@ -14,9 +14,11 @@ object Vector3 extends VectorCompanion[Vector3] with Demonstrable {
   override def validDimension(dimension: Int): Boolean = dimension == 3
 
   override def apply(values:VectorValues): Vector3 = {
-    if (values.length == 3) Vector3(values(0), values(1), values(2))
+    if (values.length == 3) new Vector3(values)
     else throw UnsupportedVectorDimension(values.length)
   }
+
+  def apply(x: Double, y: Double, z: Double):Vector3 = apply(VectorValues(x, y, z))
 
   def fill(value:Double): Vector3 = Vector3(value, value, value)
   def fill(f: Int => Double):Vector3 = Vector3(f(0), f(1), f(2))
@@ -51,62 +53,12 @@ object Vector3 extends VectorCompanion[Vector3] with Demonstrable {
   override def name: String = "Vector3"
 }
 
-case class Vector3(var x: Double, var y: Double, var z: Double) extends VectorOps[Vector3] {
 
-  override val dimension: Int = 3
+case class Vector3 private (override val values:VectorValues) extends Vector[Vector3] {
 
-  override def values: VectorValues = VectorValues(x, y, z)
-
-  override def recognize(v: Vector): Vector3 = v.asInstanceOf[Vector3]
-
-  override def component(i: Int): Double = {
-    i match {
-      case 0 => x
-      case 1 => y
-      case 2 => z
-      case _ => throw ExtraDimensionalAccessException(this, i)
-    }
-  }
-
-  override inline def euclideanNormSquared: Double = squareInPlace(x) + squareInPlace(y) + squareInPlace(z)
-
-  inline def euclideanDistanceSquaredTo(v: Vector3): Double = {
-    squareInPlace(x - v.x) + squareInPlace(y - v.y) + squareInPlace(z - v.z)
-  }
-
-  inline def dot(v: Vector3): Double = {
-    x * v.x + y * v.y + z * v.z
-  }
-
-  inline def scale(scalar: Double): Vector3 = {
-    x = x * scalar
-    y = y * scalar
-    z = z * scalar
-    this
-  }
-
-  inline def divide(divisor: Double): Vector3 = scale(1 / divisor)
-
-  def round(): Vector3 = {
-    x = Math.round(x).toDouble
-    y = Math.round(y).toDouble
-    z = Math.round(z).toDouble
-    this
-  }
-
-  inline def add(v: Vector3): Vector3 = {
-    x = x + v.x
-    y = y + v.y
-    z = z + v.z
-    this
-  }
-
-  inline def subtract(v: Vector3): Vector3 = {
-    x = x - v.x
-    y = y - v.y
-    z = z - v.z
-    this
-  }
+  inline def x:Double = values(0)
+  inline def y:Double = values(1)
+  inline def z:Double = values(2)
 
   inline def ⨯ (v: Vector3): Vector3 = cross(v)
 
@@ -116,7 +68,7 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends VectorOp
     x * v.y - y * v.x  // u1*v2 - u2*v1
   )
 
-  override def copy(): Vector3 = Vector3(x, y, z)
+  override inline def copy(): Vector3 = Vector3(x, y, z)
 
 
   override def toString: String = s"《³↗〉${x}ᵢ ${y}ⱼ ${z}ₖ〉"

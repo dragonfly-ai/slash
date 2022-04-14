@@ -2,18 +2,18 @@ package ai.dragonfly.math.stats
 
 import ai.dragonfly.math.vector.*
 
-trait LabeledVector {
+trait LabeledVector[V <: VectorData with Vector[V]] {
   def label: Double
-  def vector: Vector
+  def vector: V
   def `f(x)`:Double = label
   def y:Double = label
-  def x:Vector = vector
+  def x:V = vector
 }
 
-case class SimpleLabeledVector(override val label: Double, override val vector: Vector) extends LabeledVector {
+case class SimpleLabeledVector[V <: VectorData with Vector[V]](override val label: Double, override val vector: V) extends LabeledVector[V] {
 
 }
 
-case class ContextualLabeledVector[T](override val label: Double, override val vector:Vector, context:T) extends LabeledVector {
+case class ContextualLabeledVector[T, V <: VectorData with Vector[V]](override val label: Double, override val vector:V, context:T) extends LabeledVector[V] {
 
 }

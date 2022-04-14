@@ -18,7 +18,6 @@ object Demo {
     VectorN,
     WeightedVector,
     stats.kernel.Kernel,
-    stats.geometry.Tetrahedron,
     Gamma,
     Factorial.demo,
     // add Interval demo
@@ -28,7 +27,7 @@ object Demo {
     stats.probability.distributions.Gaussian.demo,
     stats.probability.distributions.Poisson.demo,
     stats.probability.distributions.LogNormal.demo,
-//    stats.probability.distributions.PERT.demo,
+    stats.probability.distributions.PERT.demo,
     stats.probability.distributions.Beta.demo2param,
     stats.probability.distributions.Beta.demo4param,
     stats.probability.distributions.Binomial.demo,
@@ -37,7 +36,7 @@ object Demo {
     stats.probability.distributions.stream.Gaussian.demo,
     stats.probability.distributions.stream.Poisson.demo,
     stats.probability.distributions.stream.LogNormal.demo,
-//    stats.probability.distributions.stream.PERT.demo,
+    stats.probability.distributions.stream.PERT.demo,
     stats.probability.distributions.stream.Beta.demo,
     stats.probability.distributions.stream.Binomial.fixedBinomialDemo,
     stats.probability.distributions.stream.Binomial.openBinomialDemo

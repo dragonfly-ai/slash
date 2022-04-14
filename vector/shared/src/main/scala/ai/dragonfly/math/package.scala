@@ -32,4 +32,6 @@ package object math {
   def B(α:Double, β:Double):Double = ( Γ(α) * Γ(β) ) / Γ(α + β)
   def beta(α:Double, β:Double):Double = B(α, β)
 
+  inline def degreesToRadians(degrees: Double):Double = degrees * 0.017453292519943295
+  inline def radiansToDegrees(radians: Double):Double = radians * 57.29577951308232
 }

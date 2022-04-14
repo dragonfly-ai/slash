@@ -84,7 +84,7 @@ object ConsoleImage extends Demonstrable {
     val dT:Double = (Math.random() - 0.5) * Math.PI / 100.0
     var pV:Vector2 = v.copy()
     val end = squareInPlace(ci.width) + squareInPlace(ci.height)
-    while (v.euclideanNormSquared < end){
+    while (v.magnitudeSquared < end){
       pV = p + v
       v.rotate(dT).scale(s)
       Line.trace2D(
@@ -103,7 +103,6 @@ object ConsoleImage extends Demonstrable {
   }
 
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
-
     val ci: ConsoleImage = new ConsoleImage(40, 200)
     for (i <- 0 until 7) {
       randomSpiral(ci, 1 << (i % 3))

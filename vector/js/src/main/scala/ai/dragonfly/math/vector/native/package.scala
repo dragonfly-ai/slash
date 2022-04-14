@@ -1,8 +1,10 @@
 package ai.dragonfly.math.vector
 
 package object native {
+
+  type VectorIndices = scala.scalajs.js.Array[Int]
   type VectorValues = scala.scalajs.js.Array[Double]
-  type VECTORS = scala.scalajs.js.Array[Vector]
+  type VECTORS = scala.scalajs.js.Array[VectorData]
 
   //val VectorValues:VectorValuesObject = scala.scalajs.js.Array
   object VectorValues {

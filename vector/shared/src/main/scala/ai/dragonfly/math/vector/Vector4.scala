@@ -10,10 +10,13 @@ object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
 
   inline override def validDimension(dimension: Int): Boolean = dimension == 4
 
-  inline def apply(values:VectorValues): Vector4 = {
-    if (values.length == 4) Vector4(values(0), values(1), values(2), values(3))
+  def apply(values:VectorValues): Vector4 = {
+    if (values.length == 4) new Vector4(values)
     else throw UnsupportedVectorDimension(values.length)
   }
+
+  def apply(x: Double, y: Double, z: Double, w: Double):Vector4 = new Vector4(VectorValues(x, y, z, w))
+
 
   def random(maxNorm:Double = 1.0): Vector4 = Vector4(maxNorm * Math.random(), maxNorm * Math.random(), maxNorm * Math.random(), maxNorm * Math.random())
 
@@ -57,9 +60,9 @@ object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
     for (i <- 0 until 10) {
       val vT:Vector4 = Vector4.random(10.0)
       sb.append("\nval vT = Vector4.random() = ").append(vT)
-        .append("\n\t∥").append(vT).append("∥ = ").append(vT.euclideanNorm)
+        .append("\n\t∥").append(vT).append("∥ = ").append(vT.norm)
         .append("\n\tvT.normalize = ").append(vT.normalize()).append(" /* in place operation */")
-        .append("\n\t∥").append(vT).append("∥ = ").append(vT.euclideanNorm)
+        .append("\n\t∥").append(vT).append("∥ = ").append(vT.norm)
         .append("\n\t").append(vT).append(" * 2.0 = ").append(vT * 2).append(" /* Copy operation */")
         .append("\n\tvT remains unnaffected: ").append(vT)
     }
@@ -69,69 +72,14 @@ object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
   override def name: String = "Vector4"
 }
 
-case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) extends VectorOps[Vector4] {
+case class Vector4 private (override val values: VectorValues) extends Vector[Vector4] {
 
-  override lazy val values: VectorValues = VectorValues(x, y, z, w)
+  inline def x:Double = values(0)
+  inline def y:Double = values(1)
+  inline def z:Double = values(2)
+  inline def w:Double = values(3)
 
-  override def recognize(v: Vector): Vector4 = v.asInstanceOf[Vector4]
-
-  override val dimension: Int = Vector4.dimension
-
-  override def component(i: Int): Double = {
-    i match {
-      case 0 => x
-      case 1 => y
-      case 2 => z
-      case 3 => z
-      case _ => throw ExtraDimensionalAccessException(this, i)
-    }
-  }
-
-  override inline def euclideanNormSquared: Double = squareInPlace(x) + squareInPlace(y) + squareInPlace(z) + squareInPlace(w)
-
-  inline def euclideanDistanceSquaredTo(v: Vector4): Double = {
-    squareInPlace(x - v.x) + squareInPlace(y - v.y) + squareInPlace(z - v.z) + squareInPlace(w - v.w)
-  }
-
-  inline def dot(v0: Vector4): Double = {
-    x * v0.x + y * v0.y + z * v0.z + w * v0.w
-  }
-
-  inline def scale(scalar: Double): Vector4 = {
-    x = x * scalar
-    y = y * scalar
-    z = z * scalar
-    w = w * scalar
-    this
-  }
-
-  inline def divide(divisor: Double): Vector4 = scale(1 / divisor)
-
-  def round(): Vector4 = {
-    x = Math.round(x).toDouble
-    y = Math.round(y).toDouble
-    z = Math.round(z).toDouble
-    w = Math.round(w).toDouble
-    this
-  }
-
-  def add(v0: Vector4): Vector4 = {
-      x = x + v0.x
-      y = y + v0.y
-      z = z + v0.z
-      w = w + v0.w
-      this
-  }
-
-  def subtract(v0: Vector4): Vector4 = {
-      x = x - v0.x
-      y = y - v0.y
-      z = z - v0.z
-      w = w - v0.w
-      this
-  }
-
-  override def copy(): Vector4 = Vector4(x, y, z, w)
+  override inline def copy(): Vector4 = Vector4(x, y, z, w)
 
   override def toString: String = s"《⁴↗〉${x}ᵢ ${y}ⱼ ${z}ₖ ${w}ₗ〉"
 
