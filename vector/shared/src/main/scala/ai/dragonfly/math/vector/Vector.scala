@@ -1,10 +1,9 @@
 package ai.dragonfly.math.vector
 
-import ai.dragonfly.math.squareInPlace
+import ai.dragonfly.math.{Euclidean, squareInPlace}
 
 import scala.scalajs.js
 import ai.dragonfly.math.vector.*
-import ai.dragonfly.math.visualization.Euclidean
 
 import scala.quoted.Type
 import scala.util.Random
