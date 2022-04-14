@@ -4,7 +4,7 @@ package object native {
 
   type VectorIndices = scala.scalajs.js.Array[Int]
   type VectorValues = scala.scalajs.js.Array[Double]
-  type VECTORS = scala.scalajs.js.Array[VectorData]
+  type VECTORS = scala.scalajs.js.Array[Vector]
 
   //val VectorValues:VectorValuesObject = scala.scalajs.js.Array
   object VectorValues {
