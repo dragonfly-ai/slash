@@ -54,7 +54,7 @@ object Vector3 extends VectorCompanion[Vector3] with Demonstrable {
 }
 
 
-case class Vector3 private (override val values:VectorValues) extends Vector[Vector3] {
+case class Vector3 private (override val values:VectorValues) extends Vector {
 
   inline def x:Double = values(0)
   inline def y:Double = values(1)
@@ -68,7 +68,7 @@ case class Vector3 private (override val values:VectorValues) extends Vector[Vec
     x * v.y - y * v.x  // u1*v2 - u2*v1
   )
 
-  override inline def copy(): Vector3 = Vector3(x, y, z)
+  override inline def copy(): VEC = Vector3(x, y, z).asInstanceOf[VEC]
 
 
   override def toString: String = s"《³↗〉${x}ᵢ ${y}ⱼ ${z}ₖ〉"

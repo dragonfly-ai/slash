@@ -58,12 +58,12 @@ object VectorN extends VectorCompanion[VectorN] with Demonstrable {
 
 }
 
-class VectorN(override val values:VectorValues) extends Vector[VectorN] {
+class VectorN(override val values:VectorValues) extends Vector {
 
-  override inline def copy():VectorN = {
+  override inline def copy():VEC = {
     val cp:VectorValues = new VectorValues(values.length)
     for (i <- values.indices) cp(i) = values(i)
-    new VectorN(cp)
+    new VectorN(cp).asInstanceOf[VEC]
   }
 
   import unicode.*

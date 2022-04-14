@@ -8,21 +8,21 @@ import scala.util.Random
 
 object Vector {
 
-  def fill(dimension:Int)(d: Double): Vector[_] = apply(VectorValues.fill(dimension)(d))
+  def fill(dimension:Int)(d: Double): Vector = apply(VectorValues.fill(dimension)(d))
 
-  def tabulate(dimension:Int)(f: Int => Double): Vector[_] = apply(VectorValues.tabulate(dimension)(f))
+  def tabulate(dimension:Int)(f: Int => Double): Vector = apply(VectorValues.tabulate(dimension)(f))
 
-  def apply(values: VectorValues): Vector[_] = {
+  def apply(values: VectorValues): Vector = {
     values.length match {
       case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
-      case 2 => Vector2(values(0), values(1))
-      case 3 => Vector3(values(0), values(1), values(2))
-      case 4 => Vector4(values(0), values(1), values(2), values(3))
+      case 2 => Vector2(values)
+      case 3 => Vector3(values)
+      case 4 => Vector4(values)
       case _ => VectorN(values)
     }
   }
 
-  def apply(d:Double*): Vector[_] = {
+  def apply(d:Double*): Vector = {
     d.size match {
       case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
       case 2 => Vector2(d(0), d(1))
@@ -32,9 +32,9 @@ object Vector {
     }
   }
 
-  def midpoint[V <: VectorData with Vector[V]](v0: V, v1: V):V = ((v0 + v1) * 0.5)
+  def midpoint[V <: Vector](v0: V, v1: V):V = ((v0 + v1) * 0.5)
 
-  def mean[V <: VectorData with Vector[V]](`[v₁v₂⋯vₙ]`:V*):V = {
+  def mean[V <: Vector](`[v₁v₂⋯vₙ]`:V*):V = {
     val μ:V = `[v₁v₂⋯vₙ]`.head.copy()
     for (v <- `[v₁v₂⋯vₙ]`.tail) {
       μ += v
@@ -42,7 +42,7 @@ object Vector {
     μ /= `[v₁v₂⋯vₙ]`.size
   }
 
-  def mean[V <: VectorData with Vector[V]](`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):V = {
+  def mean[V <: VectorData with Vector](`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):V = {
     val μ:V = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).asInstanceOf[V].copy()
     for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
       μ += μ.recognize(`[v₀v₁⋯v₍ₙ₋₁₎]`(i))
@@ -53,7 +53,7 @@ object Vector {
 }
 
 // trait for Vector Companion Objects
-trait VectorCompanion[V <: VectorData with Vector[V]] {
+trait VectorCompanion[V <: Vector] {
 
   def validDimension(dimension:Int):Boolean
 
@@ -72,9 +72,9 @@ trait VectorCompanion[V <: VectorData with Vector[V]] {
   def midpoint(v0: V, v1: V):V = blend(0.5, v0, v1)
 }
 
-trait Vector[V] extends DenseVectorData {
+trait Vector extends DenseVectorData {
 
-  type VEC = V with Vector[V]
+  type VEC = this.type with Vector
 
   // abstract
   def copy():VEC
@@ -83,8 +83,8 @@ trait Vector[V] extends DenseVectorData {
   def *(scalar:Double):VEC = copy().scale(scalar)
   def /(divisor:Double):VEC = copy().divide(divisor)
 
-  def +(v0:VEC):VEC = copy().add(v0)
-  def -(v0:VEC ):VEC = copy().subtract(v0)
+  def +(v0:Vector):VEC = copy().add(v0)
+  def -(v0:Vector ):VEC = copy().subtract(v0)
 
   // implemented
   inline def round():VEC = {
@@ -108,7 +108,7 @@ trait Vector[V] extends DenseVectorData {
   }
 
 
-  inline def dot(v0:VEC): Double = {
+  inline def dot(v0:Vector): Double = {
     euclid.dot(v0)
   }
 
@@ -122,12 +122,12 @@ trait Vector[V] extends DenseVectorData {
     recognize(this)
   }
 
-  inline def add(v0:VEC):VEC = {
+  inline def add(v0:Vector):VEC = {
     euclid.add(v0)
     recognize(this)
   }
 
-  inline def subtract(v0:VEC):VEC = {
+  inline def subtract(v0:Vector):VEC = {
     euclid.subtract(v0)
       recognize(this)
   }
@@ -144,8 +144,8 @@ trait Vector[V] extends DenseVectorData {
     else throw VectorNormalizationException(this)
   }
 
-  inline def +=(v0:VEC):VEC = add(v0)
-  inline def -=(v0:VEC):VEC = subtract(v0)
+  inline def +=(v0:Vector):VEC = add(v0)
+  inline def -=(v0:Vector):VEC = subtract(v0)
   inline def *= (scalar: Double):VEC = scale(scalar)
   inline def /= (divisor: Double):VEC = divide(divisor)
 

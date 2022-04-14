@@ -12,7 +12,7 @@ import Vector.*
 
 object StreamingVectorStats extends Demonstrable {
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
-    val svs = new StreamingVectorStats[Vector4](4)
+    val svs = new StreamingVectorStats(4)
     for (i <- 0 until 10000) svs(defaultRandom.nextVector4(1000))
     sb.append(svs).append("\n")
   }
@@ -24,7 +24,7 @@ object StreamingVectorStats extends Demonstrable {
  * Not thread safe!
  * @param dimension
  */
-class StreamingVectorStats[V <: Vector[V]](val dimension: Int) {
+class StreamingVectorStats(val dimension: Int) {
   var s0: Double = 0.0
   val s1: VectorValues = VectorValues.fill(dimension)(0.0)
   val s2: VectorValues = VectorValues.fill(dimension)(0.0)
@@ -42,7 +42,7 @@ class StreamingVectorStats[V <: Vector[V]](val dimension: Int) {
     }
   }
 
-  def apply(c: V, weight: Double = 1.0): StreamingVectorStats[V] = synchronized {
+  def apply(c: Vector, weight: Double = 1.0): StreamingVectorStats = synchronized {
     s0 = s0 + weight
     for (i <- 0 until dimension) {
       val cv = c.component(i)
@@ -55,17 +55,17 @@ class StreamingVectorStats[V <: Vector[V]](val dimension: Int) {
     this
   }
 
-  def average(): V = Vector.tabulate(dimension)(i => s1(i)/s0).asInstanceOf[V]
+  def average(): Vector = Vector.tabulate(dimension)(i => s1(i)/s0)
 
   private def componentVariance(s1d: Double, s2d: Double): Double = (s0 * s2d - s1d * s1d)/(s0 * (s0 - 1))
 
-  def variance: V = Vector.tabulate(dimension)(i => componentVariance(s1(i), s2(i))).asInstanceOf[V]
+  def variance: Vector = Vector.tabulate(dimension)(i => componentVariance(s1(i), s2(i)))
 
-  def standardDeviation: V = Vector.tabulate(dimension)(i => Math.sqrt(componentVariance(s1(i), s2(i)))).asInstanceOf[V]
+  def standardDeviation: Vector = Vector.tabulate(dimension)(i => Math.sqrt(componentVariance(s1(i), s2(i))))
 
-  def bounds(): VectorBounds[V] = VectorBounds(
-    Vector(minValues).asInstanceOf[V],
-    Vector(maxValues).asInstanceOf[V]
+  def bounds(): VectorBounds = VectorBounds(
+    Vector(minValues),
+    Vector(maxValues)
   )
 
   override def toString: String = s"StreamingVectorStats(\n\t$s0\n\t${new VectorN(s1)}\n\t${new VectorN(s2)}\n\tAverage: ${average()}\n\tVariance: $variance\n\tStandard Deviation: $standardDeviation)"

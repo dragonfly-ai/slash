@@ -24,32 +24,32 @@ object Kernel extends Demonstrable {
   override def name: String = "Kernel"
 }
 
-trait Kernel[V <: VectorData with Vector[V]] {
+trait Kernel {
   val radius: Double
   lazy val radiusSquared:Double = radius * radius
 
   def weight(magnitudeSquared: Double): Double
-  def weight(v: V): Double
-  def weight(v1: V, v2: V): Double = weight(v1 - v2)
+  def weight(v: Vector): Double
+  def weight(v1: Vector, v2: Vector): Double = weight(v1 - v2)
 //  def scaledWeight(v1: VectorN, v2: VectorN): Double = weight(v1, v2) * v1.getFrequency * v2.getFrequency
 
-  def distance(v: V): Double = v.norm
-  def distance(v1: V, v2: V): Double = (v1 - v2).norm
+  def distance(v: Vector): Double = v.norm
+  def distance(v1: Vector, v2: Vector): Double = (v1 - v2).norm
 
-  lazy val discretize: DiscreteKernel[V] = DiscreteKernel[V](this)
+  lazy val discretize: DiscreteKernel = DiscreteKernel(this)
 }
 
 object GaussianKernel {
-  def apply[V <: VectorData with Vector[V]](radius: Double): GaussianKernel[V] = {
+  def apply(radius: Double): GaussianKernel = {
     val sigma: Double = radius / 3.0
     val denominator: Double = 2.0 * (sigma * sigma)
-    GaussianKernel[V](radius, sigma, denominator, 1.0 / Math.sqrt(π * denominator))
+    GaussianKernel(radius, sigma, denominator, 1.0 / Math.sqrt(π * denominator))
   }
 }
 
 
-case class GaussianKernel[V <: VectorData with Vector[V]](radius: Double, sigma: Double, denominator: Double, c: Double) extends Kernel[V] {
-  def weight(v: V): Double = weight(v.normSquared)
+case class GaussianKernel(radius: Double, sigma: Double, denominator: Double, c: Double) extends Kernel {
+  def weight(v: Vector): Double = weight(v.normSquared)
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0
@@ -58,15 +58,15 @@ case class GaussianKernel[V <: VectorData with Vector[V]](radius: Double, sigma:
 }
 
 
-case class EpanechnikovKernel[V <: VectorData with Vector[V]](radius: Double) extends Kernel[V] {
-  def weight(v: V): Double = weight(v.normSquared)
+case class EpanechnikovKernel(radius: Double) extends Kernel {
+  def weight(v: Vector): Double = weight(v.normSquared)
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0
     else 0.75 - 0.75 * (magnitudeSquared / radiusSquared)
   }
 
-  //  def naiveWeight(v: VectorN): Double = naiveWeight(v.magnitudeSquared)
+  //  def naiveWeight(v: VectorectorN): Double = naiveWeight(v.magnitudeSquared)
   //
   //  def naiveWeight(magnitudeSquared: Double): Double = {
   //    val l = Math.sqrt(magnitudeSquared) / radius
@@ -76,8 +76,8 @@ case class EpanechnikovKernel[V <: VectorData with Vector[V]](radius: Double) ex
 }
 
 
-case class UniformKernel[V <: VectorData with Vector[V]](radius: Double) extends Kernel[V] {
-  def weight(v: V): Double = weight(v.normSquared)
+case class UniformKernel(radius: Double) extends Kernel {
+  def weight(v: Vector): Double = weight(v.normSquared)
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0
@@ -87,16 +87,16 @@ case class UniformKernel[V <: VectorData with Vector[V]](radius: Double) extends
 
 
 object DiscreteKernel {
-  def apply[V <: VectorData with Vector[V]](k: Kernel[V]): DiscreteKernel[V] = {
+  def apply(k: Kernel): DiscreteKernel = {
     val maxMagSquared: Int = Math.ceil(k.radiusSquared).toInt
     val weights = new Array[Double](maxMagSquared + 1)
     for (d <- 0 to maxMagSquared) weights(d) = k.weight(d)
-    DiscreteKernel[V](k.radius, weights)
+    DiscreteKernel(k.radius, weights)
   }
 }
 
 
-case class DiscreteKernel[V <: VectorData with Vector[V]](radius: Double, weights: Array[Double]) extends Kernel[V] {
+case class DiscreteKernel(radius: Double, weights: Array[Double]) extends Kernel {
 
   lazy val totalWeights:Double = {
     var total = 0.0
@@ -105,7 +105,7 @@ case class DiscreteKernel[V <: VectorData with Vector[V]](radius: Double, weight
     total
   }
 
-  override def weight(v: V): Double = weight(v.normSquared)
+  override def weight(v: Vector): Double = weight(v.normSquared)
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0

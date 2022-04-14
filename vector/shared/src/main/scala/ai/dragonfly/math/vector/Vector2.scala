@@ -34,7 +34,7 @@ object Vector2 extends VectorCompanion[Vector2] with Demonstrable {
 
 }
 
-case class Vector2 private (values:VectorValues) extends Vector[Vector2] {
+case class Vector2 private (values:VectorValues) extends Vector {
 
   inline def x:Double = values(0)
   inline def y:Double = values(1)
@@ -54,7 +54,7 @@ case class Vector2 private (values:VectorValues) extends Vector[Vector2] {
     this
   }
 
-  override def copy(): Vector2 = Vector2(x, y)
+  override def copy(): VEC = Vector2(x, y).asInstanceOf[VEC]
 
   override def toString: String = s"《²↗〉${x}ᵢ ${y}ⱼ〉" // ₂⃗ ²↗ ↗²
 

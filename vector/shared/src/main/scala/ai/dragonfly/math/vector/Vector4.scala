@@ -72,14 +72,14 @@ object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
   override def name: String = "Vector4"
 }
 
-case class Vector4 private (override val values: VectorValues) extends Vector[Vector4] {
+case class Vector4 private (override val values: VectorValues) extends Vector {
 
   inline def x:Double = values(0)
   inline def y:Double = values(1)
   inline def z:Double = values(2)
   inline def w:Double = values(3)
 
-  override inline def copy(): Vector4 = Vector4(x, y, z, w)
+  override inline def copy(): VEC = Vector4(x, y, z, w).asInstanceOf[VEC]
 
   override def toString: String = s"《⁴↗〉${x}ᵢ ${y}ⱼ ${z}ₖ ${w}ₗ〉"
 
