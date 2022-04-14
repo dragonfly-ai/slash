@@ -84,7 +84,7 @@ object ConsoleImage extends Demonstrable {
     val dT:Double = (Math.random() - 0.5) * Math.PI / 100.0
     var pV:Vector2 = v.copy()
     val end = squareInPlace(ci.width) + squareInPlace(ci.height)
-    while (v.magnitudeSquared() < end){
+    while (v.euclideanNormSquared < end){
       pV = p + v
       v.rotate(dT).scale(s)
       Line.trace2D(

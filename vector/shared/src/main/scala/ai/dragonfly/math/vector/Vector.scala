@@ -4,6 +4,7 @@ import ai.dragonfly.math.squareInPlace
 
 import scala.scalajs.js
 import ai.dragonfly.math.vector.*
+import ai.dragonfly.math.visualization.Euclidean
 
 import scala.quoted.Type
 import scala.util.Random
@@ -74,7 +75,7 @@ trait VectorCompanion[V <: Vector with VectorOps[V]] {
   def midpoint(v0: V, v1: V):V = blend(0.5, v0, v1)
 }
 
-trait VectorOps[V <: Vector] extends Vector {
+trait VectorOps[V <: Vector] extends Vector with Euclidean[V with VectorOps[V]] {
 
   type VEC = V with VectorOps[V]
 
@@ -85,7 +86,6 @@ trait VectorOps[V <: Vector] extends Vector {
   def divide(divisor: Double):VEC
 
   def dot(v0:VEC): Double
-  def distanceSquaredTo(v:VEC): Double
 
   def add(v0:VEC):VEC
 
@@ -94,11 +94,11 @@ trait VectorOps[V <: Vector] extends Vector {
   def recognize(v: Vector):VEC
 
   // implemented
-
-  def distanceTo(v:VEC): Double = Math.sqrt(distanceSquaredTo(v))
+  def magnitudeSquared:Double = euclideanNormSquared
+  def magnitude:Double = euclideanNorm
 
   def normalize():VEC = {
-    val m2:Double = this.magnitudeSquared()
+    val m2:Double = this.euclideanNorm
     if (m2 > 0.0) divide(Math.sqrt(m2))
     else throw VectorNormalizationException(this)
   }
@@ -127,9 +127,6 @@ trait Vector {
 
   def component(i: Int): Double
 
-  def magnitudeSquared(): Double
-
-  def magnitude(): Double = Math.sqrt( magnitudeSquared() )
 
   /**
    * For exotic vector formatting, provide lambdas for generating prefix, delimiter, and suffix.

@@ -68,9 +68,9 @@ class VectorN(override val values:VectorValues) extends VectorOps[VectorN] {
     case aioobe:ArrayIndexOutOfBoundsException => throw ExtraDimensionalAccessException(this, i)
   }
 
-  override def magnitudeSquared(): Double = { var mag2 = 0.0; for (v:Double <- values) mag2 = mag2 + (v*v); mag2 }
+  override def euclideanNormSquared: Double = { var mag2 = 0.0; for (v:Double <- values) mag2 = mag2 + squareInPlace(v); mag2 }
 
-  def distanceSquaredTo(v: VectorN): Double = {
+  override def euclideanDistanceSquaredTo(v: VectorN): Double = {
     if (values.length != v.values.length) throw MismatchedVectorDimensionsException(this, v)
     else {
       var distance = 0.0

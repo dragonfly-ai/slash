@@ -57,9 +57,9 @@ object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
     for (i <- 0 until 10) {
       val vT:Vector4 = Vector4.random(10.0)
       sb.append("\nval vT = Vector4.random() = ").append(vT)
-        .append("\n\t∥").append(vT).append("∥ = ").append(vT.magnitude())
+        .append("\n\t∥").append(vT).append("∥ = ").append(vT.euclideanNorm)
         .append("\n\tvT.normalize = ").append(vT.normalize()).append(" /* in place operation */")
-        .append("\n\t∥").append(vT).append("∥ = ").append(vT.magnitude())
+        .append("\n\t∥").append(vT).append("∥ = ").append(vT.euclideanNorm)
         .append("\n\t").append(vT).append(" * 2.0 = ").append(vT * 2).append(" /* Copy operation */")
         .append("\n\tvT remains unnaffected: ").append(vT)
     }
@@ -87,9 +87,9 @@ case class Vector4(var x: Double, var y: Double, var z: Double, var w: Double) e
     }
   }
 
-  override inline def magnitudeSquared(): Double = squareInPlace(x) + squareInPlace(y) + squareInPlace(z) + squareInPlace(w)
+  override inline def euclideanNormSquared: Double = squareInPlace(x) + squareInPlace(y) + squareInPlace(z) + squareInPlace(w)
 
-  inline def distanceSquaredTo(v: Vector4): Double = {
+  inline def euclideanDistanceSquaredTo(v: Vector4): Double = {
     squareInPlace(x - v.x) + squareInPlace(y - v.y) + squareInPlace(z - v.z) + squareInPlace(w - v.w)
   }
 

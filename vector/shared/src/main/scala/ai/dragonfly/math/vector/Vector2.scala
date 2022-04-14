@@ -46,9 +46,9 @@ case class Vector2(var x: Double, var y: Double) extends VectorOps[Vector2] {
     else throw ExtraDimensionalAccessException(this, i)
   }
 
-  override inline def magnitudeSquared(): Double = squareInPlace(x) + squareInPlace(y)
+  override inline def euclideanNormSquared: Double = squareInPlace(x) + squareInPlace(y)
 
-  override inline def distanceSquaredTo(v: Vector2): Double = {
+  override inline def euclideanDistanceSquaredTo(v: Vector2): Double = {
     squareInPlace(x - v.x) + squareInPlace(y - v.y)
   }
 

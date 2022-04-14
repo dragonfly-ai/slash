@@ -68,9 +68,9 @@ case class Vector3(var x: Double, var y: Double, var z: Double) extends VectorOp
     }
   }
 
-  override inline def magnitudeSquared(): Double = squareInPlace(x) + squareInPlace(y) + squareInPlace(z)
+  override inline def euclideanNormSquared: Double = squareInPlace(x) + squareInPlace(y) + squareInPlace(z)
 
-  inline def distanceSquaredTo(v: Vector3): Double = {
+  inline def euclideanDistanceSquaredTo(v: Vector3): Double = {
     squareInPlace(x - v.x) + squareInPlace(y - v.y) + squareInPlace(z - v.z)
   }
 

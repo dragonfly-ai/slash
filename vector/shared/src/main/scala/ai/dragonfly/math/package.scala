@@ -15,6 +15,16 @@ package object math {
   inline def squareInPlace(d:Double): Double = d*d
   inline def squareInPlace(bd:BigDecimal): BigDecimal = bd*bd
 
+  inline def cubeInPlace(b:Byte): Byte = (b*b*b).toByte
+  inline def cubeInPlace(s:Short): Short = (s*s*s).toShort
+  inline def cubeInPlace(i:Int): Int = i*i*i
+  inline def cubeInPlace(l:Long): Long = l*l*l
+  inline def cubeInPlace(bi:BigInt): BigInt = bi*bi*bi
+  inline def cubeInPlace(f:Float): Float = f*f*f
+  inline def cubeInPlace(d:Double): Double = d*d*d
+  inline def cubeInPlace(bd:BigDecimal): BigDecimal = bd*bd*bd
+
+
   def Γ(x:Double):Double = Math.exp(logGamma(x))
   def gamma(x:Double):Double = Γ(x)
   def logGamma(x:Double):Double = Gamma.logGamma(x)

@@ -34,8 +34,8 @@ trait Kernel {
   def weight(v1: Vector, v2: Vector): Double = weight(v1 - v2)
 //  def scaledWeight(v1: VectorN, v2: VectorN): Double = weight(v1, v2) * v1.getFrequency * v2.getFrequency
 
-  def distance(v: Vector): Double = v.magnitude()
-  def distance(v1: Vector, v2: Vector): Double = (v1 - v2).magnitude()
+  def distance(v: Vector): Double = v.euclideanNorm
+  def distance(v1: Vector, v2: Vector): Double = (v1 - v2).euclideanNorm
 
   lazy val discretize: DiscreteKernel = DiscreteKernel(this)
 }
@@ -50,7 +50,7 @@ object GaussianKernel {
 
 
 case class GaussianKernel(radius: Double, sigma: Double, denominator: Double, c: Double) extends Kernel {
-  def weight(v: Vector): Double = weight(v.magnitudeSquared())
+  def weight(v: Vector): Double = weight(v.euclideanNormSquared)
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0
@@ -60,7 +60,7 @@ case class GaussianKernel(radius: Double, sigma: Double, denominator: Double, c:
 
 
 case class EpanechnikovKernel(radius: Double) extends Kernel {
-  def weight(v: Vector): Double = weight(v.magnitudeSquared())
+  def weight(v: Vector): Double = weight(v.euclideanNormSquared)
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0
@@ -78,7 +78,7 @@ case class EpanechnikovKernel(radius: Double) extends Kernel {
 
 
 case class UniformKernel(radius: Double) extends Kernel {
-  def weight(v: Vector): Double = weight(v.magnitudeSquared())
+  def weight(v: Vector): Double = weight(v.euclideanNormSquared)
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0
@@ -106,7 +106,7 @@ case class DiscreteKernel(radius: Double, weights: Array[Double]) extends Kernel
     total
   }
 
-  override def weight(v: Vector): Double = weight(v.magnitudeSquared())
+  override def weight(v: Vector): Double = weight(v.euclideanNormSquared)
 
   def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > radiusSquared) 0.0
