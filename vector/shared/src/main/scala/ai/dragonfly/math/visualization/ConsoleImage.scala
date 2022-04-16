@@ -78,7 +78,7 @@ object ConsoleImage extends Demonstrable {
   )
 
   def randomSpiral(ci:ConsoleImage, color:Int):ConsoleImage = {
-    val p:Vector2 = defaultRandom.next[Vector2](Vector2(ci.width, ci.height))
+    val p:Vector2 = defaultRandom.next(Vector2(ci.width, ci.height))
     val v:Vector2 = Vector2(1.0, 0.0)
     val s = 1.002 + (Math.random() * 0.0002)
     val dT:Double = (Math.random() - 0.5) * Math.PI / 100.0

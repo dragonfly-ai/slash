@@ -28,7 +28,7 @@ object Random {
     def nextVector3(maxNorm:Double = 1.0):Vector3 = r.nextVector(3, maxNorm).asInstanceOf[Vector3]
     def nextVector4(maxNorm:Double = 1.0):Vector4 = r.nextVector(4, maxNorm).asInstanceOf[Vector4]
     def nextVectorN(dimension:Int, maxNorm:Double = 1.0):VectorN = r.nextVector(dimension, maxNorm).asInstanceOf[VectorN]
-    def next[V <: Vector](norm:V):V = norm.recognize( Vector( VectorValues.tabulate(norm.dimension)((i:Int) => norm.values(i) * r.nextDouble() ) ) )
-    def between[V <: Vector](min:V, MAX:V):V = r.next[V]((MAX - min).add(min))
+    def next[V <: Vector](norm:V):V = Vector( VectorValues.tabulate(norm.dimension)((i:Int) => norm.values(i) * r.nextDouble() ) ).asInstanceOf[V]
+    def between[V <: Vector](min:V, MAX:V):V = Vector( VectorValues.tabulate(min.dimension)((i:Int) => r.between(min.values(i), MAX.values(i)) ) ).asInstanceOf[V]
 
 }

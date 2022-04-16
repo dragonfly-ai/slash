@@ -32,18 +32,18 @@ object Vector {
     }
   }
 
-  def midpoint[V <: Vector](v0: V, v1: V):V = ((v0 + v1) * 0.5)
+  def midpoint(v0: Vector, v1: Vector):Vector = ((v0 + v1) * 0.5)
 
-  def mean[V <: Vector](`[v₁v₂⋯vₙ]`:V*):V = {
-    val μ:V = `[v₁v₂⋯vₙ]`.head.copy()
+  def mean(`[v₁v₂⋯vₙ]`:Vector*):Vector = {
+    val μ:Vector = `[v₁v₂⋯vₙ]`.head.copy()
     for (v <- `[v₁v₂⋯vₙ]`.tail) {
       μ += v
     }
     μ /= `[v₁v₂⋯vₙ]`.size
   }
 
-  def mean[V <: VectorData with Vector](`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):V = {
-    val μ:V = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).asInstanceOf[V].copy()
+  def mean(`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):Vector = {
+    val μ:Vector = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).copy()
     for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
       μ += μ.recognize(`[v₀v₁⋯v₍ₙ₋₁₎]`(i))
     }
@@ -65,7 +65,7 @@ trait VectorCompanion[V <: Vector] {
 
   def blend(alpha: Double, v0: V, v1: V):V = ((v0 * alpha) + (v1 * (1.0 - alpha))).asInstanceOf[V]
 
-  def mean(`[v₁v₂⋯vₙ]`:V*):V = Vector.mean[V](`[v₁v₂⋯vₙ]`:_*)
+  def mean(`[v₁v₂⋯vₙ]`:V*):V = Vector.mean(`[v₁v₂⋯vₙ]`:_*).asInstanceOf[V]
 
   def mean(`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):V = Vector.mean(`[v₀v₁⋯v₍ₙ₋₁₎]`).asInstanceOf[V]
 
@@ -74,17 +74,16 @@ trait VectorCompanion[V <: Vector] {
 
 trait Vector extends DenseVectorData {
 
-  type VEC = this.type with Vector
+  type VEC <: Vector
 
   // abstract
   def copy():VEC
 
   // copy operators
-  def *(scalar:Double):VEC = copy().scale(scalar)
-  def /(divisor:Double):VEC = copy().divide(divisor)
-
-  def +(v0:Vector):VEC = copy().add(v0)
-  def -(v0:Vector ):VEC = copy().subtract(v0)
+  def *(scalar:Double):VEC = copy().scale(scalar).asInstanceOf[VEC]
+  def /(divisor:Double):VEC = copy().divide(divisor).asInstanceOf[VEC]
+  def +(v0:Vector):VEC = copy().add(v0).asInstanceOf[VEC]
+  def -(v0:Vector):VEC = copy().subtract(v0).asInstanceOf[VEC]
 
   // implemented
   inline def round():VEC = {
@@ -129,7 +128,7 @@ trait Vector extends DenseVectorData {
 
   inline def subtract(v0:Vector):VEC = {
     euclid.subtract(v0)
-      recognize(this)
+    recognize(this)
   }
 
   inline def recognize(v: Any):VEC = v.asInstanceOf[VEC]
