@@ -95,11 +95,6 @@ trait Euclidean {
 
 }
 
-
-case class MismatchedDimensionsException(e0:Euclidean, e1:Euclidean) extends Exception(
-  s"Operation undefined on Euclidean objects with different dimensions:\n\tdim($e0) = ${e0.dimension}\n\tdim($e1) = ${e1.dimension}"
-)
-
 case class ExtraDimensionalAccessException(e:Euclidean, ci: Int) extends Exception(
   s"Index: $ci exceeds dimensionality of Euclidean object${e.dimension}: $e"
 )
