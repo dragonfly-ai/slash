@@ -6,14 +6,11 @@ import ai.dragonfly.math.squareInPlace
 
 object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
 
-  given dimension: Int = 4
+  inline given dimension: Int = 4
 
-  inline override def validDimension(dimension: Int): Boolean = dimension == 4
+  override inline def validDimension(dimension: Int): Boolean = dimension == 4
 
-  def apply(values:VectorValues): Vector4 = {
-    if (values.length == 4) new Vector4(values)
-    else throw UnsupportedVectorDimension(values.length)
-  }
+  override def apply(values:VectorValues): Vector4 = new Vector4(dimensionCheck(values, dimension))
 
   def apply(x: Double, y: Double, z: Double, w: Double):Vector4 = new Vector4(VectorValues(x, y, z, w))
 

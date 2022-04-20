@@ -14,9 +14,12 @@ object VectorN extends VectorCompanion[VectorN] with Demonstrable {
 
   def apply(values:Double*):VectorN = new VectorN(VectorValues(values:_*))
 
-  override def apply(values:VectorValues): VectorN = new VectorN(values)
+  override def apply(values:VectorValues): VectorN = {
+    if ( validDimension(values.length) ) new VectorN(values)
+    else throw UnsupportedVectorDimension(values.length, 5)
+  }
 
-  override def validDimension(dimension: Int): Boolean = dimension > 4
+  override inline def validDimension(dimension: Int): Boolean = dimension > 4
 
   def fill(dimension:Int, d:Double):VectorN = {
     given dim:Int = dimension
@@ -58,14 +61,14 @@ object VectorN extends VectorCompanion[VectorN] with Demonstrable {
 
 }
 
-class VectorN(override val values:VectorValues) extends Vector {
+class VectorN private (override val values:VectorValues) extends Vector {
 
   type VEC = VectorN
 
-  override inline def copy():VEC = {
+  override def copy():VEC = {
     val cp:VectorValues = new VectorValues(values.length)
     for (i <- values.indices) cp(i) = values(i)
-    new VectorN(cp)
+    VectorN(cp)
   }
 
   import unicode.*

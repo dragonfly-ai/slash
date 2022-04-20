@@ -1,5 +1,7 @@
 package ai.dragonfly.math
 
+import ai.dragonfly.math.vector.dimensionCheck
+
 trait Euclidean {
   val self:Euclidean = this
 
@@ -7,7 +9,7 @@ trait Euclidean {
 
   inline def inDimensionOrThrowException(i:Int):Unit = if (i < 0 || dimension < i) throw ExtraDimensionalAccessException(self, i)
 
-  inline def sameDimensionOrThrowException(that:Euclidean):Unit = if (self.dimension != that.dimension) throw MismatchedDimensionsException(self, that)
+  inline def sameDimensionOrThrowException(that:Euclidean):Unit = dimensionCheck(self.dimension, that.dimension)
 
   // read
   def component(i: Int): Double

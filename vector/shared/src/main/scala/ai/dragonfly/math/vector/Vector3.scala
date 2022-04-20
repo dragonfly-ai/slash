@@ -9,19 +9,13 @@ import ai.dragonfly.math.squareInPlace
 
 object Vector3 extends VectorCompanion[Vector3] with Demonstrable {
 
-  given dimension: Int = 3
+  inline given dimension: Int = 3
 
-  override def validDimension(dimension: Int): Boolean = dimension == 3
+  override inline def validDimension(dimension: Int): Boolean = dimension == 3
 
-  override def apply(values:VectorValues): Vector3 = {
-    if (values.length == 3) new Vector3(values)
-    else throw UnsupportedVectorDimension(values.length)
-  }
+  override def apply(values:VectorValues): Vector3 = new Vector3(dimensionCheck(values, dimension))
 
   def apply(x: Double, y: Double, z: Double):Vector3 = apply(VectorValues(x, y, z))
-
-  def fill(value:Double): Vector3 = Vector3(value, value, value)
-  def fill(f: Int => Double):Vector3 = Vector3(f(0), f(1), f(2))
 
   def random(maxNorm:Double = 1.0): Vector3 = Vector3(maxNorm * Math.random(), maxNorm * Math.random(), maxNorm * Math.random())
 

@@ -14,10 +14,7 @@ object Vector2 extends VectorCompanion[Vector2] with Demonstrable {
 
   override inline def validDimension(dimension: Int): Boolean = dimension == this.dimension
 
-  override def apply(values:VectorValues): Vector2 = {
-    if (values.length == 2) new Vector2(values)
-    else throw UnsupportedVectorDimension(values.length)
-  }
+  override def apply(values:VectorValues): Vector2 = new Vector2(dimensionCheck(values, dimension))
 
   def apply(x:Double, y:Double): Vector2 = Vector2(VectorValues(x, y))
 

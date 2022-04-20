@@ -68,5 +68,5 @@ class StreamingVectorStats(val dimension: Int) {
     Vector(maxValues)
   )
 
-  override def toString: String = s"StreamingVectorStats(\n\t$s0\n\t${new VectorN(s1)}\n\t${new VectorN(s2)}\n\tAverage: ${average()}\n\tVariance: $variance\n\tStandard Deviation: $standardDeviation)"
+  override def toString: String = s"StreamingVectorStats(\n\t$s0\n\t${Vector(s1)}\n\t${Vector(s2)}\n\tAverage: ${average()}\n\tVariance: $variance\n\tStandard Deviation: $standardDeviation)"
 }
