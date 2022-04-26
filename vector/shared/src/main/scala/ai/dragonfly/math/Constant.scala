@@ -4,6 +4,7 @@ object Constant {
 
   // Literal
   val π: Double = Math.PI // Pi
+  val `√(2π)`:Double = Math.sqrt(2.0*π)
   val e: Double = Math.E  // Euler's Number
   val `𝜑`: Double = 1.46557123187676802665 // Golden
 

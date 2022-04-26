@@ -2,7 +2,7 @@ package ai.dragonfly.math.stats.probability.distributions
 
 import ai.dragonfly.math.stats.probability.distributions.ProbabilityDistribution
 import ai.dragonfly.math.*
-import Constant.π
+import Constant.`√(2π)`
 import stats.*
 import example.*
 import interval.*
@@ -21,12 +21,11 @@ case class Gaussian(override val μ:Double, override val `σ²`:Double) extends 
   lazy val σ: Double = Math.sqrt(`σ²`)
 
   // precomputed constants
-  private lazy val `1 / (σ * √(2π))`: Double = 1.0 / (σ * Math.sqrt(2.0 * π))
+  private lazy val `-1/(2σ²)`: Double = -1.0 / (2.0 * `σ²`)
+  private lazy val `1/σ√(2π)`: Double = 1.0 / (σ * `√(2π)`)
 
-  override def p(x: Double): Double = {
-    val `-(((x-μ)/σ)²)/2`: Double = -squareInPlace((x - μ) / σ) / 2.0
-    `1 / (σ * √(2π))` * Math.exp(`-(((x-μ)/σ)²)/2`)
-  }
+  override def p(x: Double): Double = p2(squareInPlace(x - μ))
+  def p2(magSquared: Double): Double = `1/σ√(2π)` * Math.exp(`-1/(2σ²)` * magSquared)
 
   override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = μ + (r.nextGaussian() * σ)
 

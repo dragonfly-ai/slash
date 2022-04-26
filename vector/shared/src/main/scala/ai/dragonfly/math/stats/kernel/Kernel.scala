@@ -5,28 +5,65 @@ package ai.dragonfly.math.stats.kernel
  */
 
 import ai.dragonfly.math.*
-import Constant.π
+import Constant.{`√(2π)`, π}
+import ai.dragonfly.math.stats.DenseHistogramOfContinuousDistribution
 import example.*
+import ai.dragonfly.math.stats.probability.distributions.Gaussian
 import ai.dragonfly.math.vector.*
 
+import scala.collection.mutable
+
 object Kernel extends Demonstrable {
-  override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
-    val r = 32
-    val dk = DiscreteKernel(GaussianKernel(r))
+  override def demo(using sb:mutable.StringBuilder = new mutable.StringBuilder()):mutable.StringBuilder = {
+    val exclusionRadius:Double = 12.0
 
-    sb.append(dk.totalWeights)
+    var t: Double = 0.0
+    val step:Double = 0.1
+    val totalSteps:Double = exclusionRadius / step
 
-    var count = 0
-    for (dy <- -r to r; dx <- -r to r) count = count + 1
-    sb.append(count).append("\n")
+    val gk:GaussianKernel = GaussianKernel(exclusionRadius, new Gaussian(0.0, 16.0))
+    val ek:EpanechnikovKernel = EpanechnikovKernel(exclusionRadius)
+    val uk:UniformKernel = UniformKernel(exclusionRadius)
+    val dk:DiscreteKernel = DiscreteKernel(
+      exclusionRadius,
+      Array.tabulate[Double](squareInPlace(totalSteps).toInt)((i:Int) => {
+        val t2:Double = squareInPlace(i * step)
+        0.5 * (gk.weight(t2) + ek.weight(t2))
+      })
+    )
+
+
+    val gkh = new DenseHistogramOfContinuousDistribution(10, 0.0, 12.0)
+    val ekh = new DenseHistogramOfContinuousDistribution(10, 0.0, 12.0)
+    val ukh = new DenseHistogramOfContinuousDistribution(10, 0.0, 12.0)
+    val dkh = new DenseHistogramOfContinuousDistribution(10, 0.0, 12.0)
+
+    while (t < exclusionRadius) {
+
+      val t2: Double = squareInPlace(t)
+
+      gkh( t, gk.weight(t2) )
+      ekh( t, ek.weight(t2) )
+      ukh( t, uk.weight(t2) )
+      dkh( t, dk.weight(t2) )
+
+      t = t + 0.1
+    }
+
+    sb.append("Gaussian Kernel ").append(gkh.toString)
+    sb.append("Epanechnikov Kernel ").append(ekh.toString)
+    sb.append("Uniform Kernel ").append(ukh.toString)
+    sb.append("Discrete Kernel ").append(dkh.toString)
+
+    sb
   }
 
   override def name: String = "Kernel"
 }
 
 trait Kernel {
-  val radius: Double
-  lazy val radiusSquared:Double = radius * radius
+  val exclusionRadius: Double
+  lazy val exclusionRadiusSquared:Double = exclusionRadius * exclusionRadius
 
   def weight(magnitudeSquared: Double): Double
   def weight(v: Vector): Double
@@ -39,31 +76,24 @@ trait Kernel {
   lazy val discretize: DiscreteKernel = DiscreteKernel(this)
 }
 
-object GaussianKernel {
-  def apply(radius: Double): GaussianKernel = {
-    val sigma: Double = radius / 3.0
-    val denominator: Double = 2.0 * (sigma * sigma)
-    GaussianKernel(radius, sigma, denominator, 1.0 / Math.sqrt(π * denominator))
+
+case class GaussianKernel(exclusionRadius: Double, gaussian:Gaussian) extends Kernel {
+
+  def weight(v: Vector): Double = weight(v.normSquared)
+
+  def weight(magnitudeSquared: Double): Double = {
+    if (magnitudeSquared > exclusionRadiusSquared) 0.0
+    else gaussian.p2(magnitudeSquared)
   }
 }
 
 
-case class GaussianKernel(radius: Double, sigma: Double, denominator: Double, c: Double) extends Kernel {
+case class EpanechnikovKernel(exclusionRadius: Double) extends Kernel {
   def weight(v: Vector): Double = weight(v.normSquared)
 
   def weight(magnitudeSquared: Double): Double = {
-    if (magnitudeSquared > radiusSquared) 0.0
-    else c * Math.pow(Math.E, -(magnitudeSquared / denominator))
-  }
-}
-
-
-case class EpanechnikovKernel(radius: Double) extends Kernel {
-  def weight(v: Vector): Double = weight(v.normSquared)
-
-  def weight(magnitudeSquared: Double): Double = {
-    if (magnitudeSquared > radiusSquared) 0.0
-    else 0.75 - 0.75 * (magnitudeSquared / radiusSquared)
+    if (magnitudeSquared > exclusionRadiusSquared) 0.0
+    else 0.75 - 0.75 * (magnitudeSquared / exclusionRadiusSquared)
   }
 
   //  def naiveWeight(v: VectorectorN): Double = naiveWeight(v.magnitudeSquared)
@@ -76,39 +106,39 @@ case class EpanechnikovKernel(radius: Double) extends Kernel {
 }
 
 
-case class UniformKernel(radius: Double) extends Kernel {
+case class UniformKernel(exclusionRadius: Double) extends Kernel {
   def weight(v: Vector): Double = weight(v.normSquared)
 
   def weight(magnitudeSquared: Double): Double = {
-    if (magnitudeSquared > radiusSquared) 0.0
-    else 1.0 / (π * radiusSquared)
+    if (magnitudeSquared > exclusionRadiusSquared) 0.0
+    else 1.0 / (π * exclusionRadiusSquared)
   }
 }
 
 
 object DiscreteKernel {
   def apply(k: Kernel): DiscreteKernel = {
-    val maxMagSquared: Int = Math.ceil(k.radiusSquared).toInt
+    val maxMagSquared: Int = Math.ceil(k.exclusionRadiusSquared).toInt
     val weights = new Array[Double](maxMagSquared + 1)
     for (d <- 0 to maxMagSquared) weights(d) = k.weight(d)
-    DiscreteKernel(k.radius, weights)
+    DiscreteKernel(k.exclusionRadius, weights)
   }
 }
 
 
-case class DiscreteKernel(radius: Double, weights: Array[Double]) extends Kernel {
+case class DiscreteKernel(exclusionRadius: Double, weights: Array[Double]) extends Kernel {
 
   lazy val totalWeights:Double = {
     var total = 0.0
-    val r = radius.toInt
-    for (dy <- -r to r; dx <- -r to r) total = total + weight(dx*dx + dy*dy)
+    val r = exclusionRadius.toInt
+    for (dy <- -r to r; dx <- -r to r) total += weight(squareInPlace(dx) + squareInPlace(dy))
     total
   }
 
   override def weight(v: Vector): Double = weight(v.normSquared)
 
   def weight(magnitudeSquared: Double): Double = {
-    if (magnitudeSquared > radiusSquared) 0.0
+    if (magnitudeSquared > exclusionRadiusSquared) 0.0
     else weights(magnitudeSquared.toInt)
   }
 
