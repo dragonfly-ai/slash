@@ -1,6 +1,6 @@
 package ai.dragonfly.math
 
-import ai.dragonfly.math.vector.dimensionCheck
+import ai.dragonfly.math.vector.{VectorN, dimensionCheck}
 
 trait Euclidean {
   val self:Euclidean = this
@@ -90,6 +90,12 @@ trait Euclidean {
         self.component(i, self.component(i) - that.component(i))
       }
     }
+
+    def equals(that: Euclidean): Boolean = if (dimension == that.dimension) {
+        var i:Int = 0
+        while ( i < dimension && component(i) == that.component(i) ) i += 1
+        i == dimension
+    } else false
 
   }
 

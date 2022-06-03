@@ -24,6 +24,8 @@ object Vector2 extends VectorCompanion[Vector2] with Demonstrable {
       i.rotateDegrees(deg)
       sb.append(s"${Vector2(1, 0)}.rotateDegrees($deg) -> $i\n")
     }
+    sb.append(s"Vector2(0.115, 0.937).euclid.equals(Vector2(0.115, 0.937)) => true : ${Vector2(0.115, 0.937).euclid.equals(Vector2(0.115, 0.937))}\n")
+    sb.append(s"Vector2(0.115, 0.937) == Vector2(0.115, 0.937) => false : ${ Vector2(0.115, 0.937) == Vector2(0.115, 0.937) }\n")
     sb
   }
 

@@ -66,7 +66,6 @@ case class Vector3 private (override val values:VectorValues) extends Vector {
 
   override inline def copy(): VEC = Vector3(x, y, z)
 
-
   override def toString: String = s"《³↗〉${x}ᵢ ${y}ⱼ ${z}ₖ〉"
 
 }

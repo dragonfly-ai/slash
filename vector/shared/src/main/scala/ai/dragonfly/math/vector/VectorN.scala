@@ -71,6 +71,7 @@ class VectorN private (override val values:VectorValues) extends Vector {
     VectorN(cp)
   }
 
+
   import unicode.*
 
   def indexedExhaustiveToString(sb:StringBuilder = new StringBuilder(), numberFormatter:Double => String = d => d.toString):StringBuilder = {
@@ -108,5 +109,7 @@ class VectorN private (override val values:VectorValues) extends Vector {
     sb.append("〉")
     sb.toString
   }
+
+
 
 }
