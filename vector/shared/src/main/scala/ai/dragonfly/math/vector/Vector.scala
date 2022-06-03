@@ -148,6 +148,22 @@ trait Vector extends DenseVectorData {
   inline def *= (scalar: Double):VEC = scale(scalar)
   inline def /= (divisor: Double):VEC = divide(divisor)
 
+
+  /**
+   * returns values.hashCode() (the hash code of the underlying VectorValues.)
+  */
+  override def hashCode(): Int = values.hashCode()
+
+  /**
+   * checks for reference equality in underlying values:VectorValues
+   * for value comparisons use v1.euclid.equals(v2)
+   * @param obj an object to compare to this vector.
+   * @return reference equality in underlying values:VectorValues
+   */
+  override def equals(obj: Any): Boolean = obj match {
+    case that: Vector => values.equals(that.values)
+    case _ => false
+  }
 }
 
 trait DenseVectorData extends VectorData {
@@ -163,6 +179,7 @@ trait DenseVectorData extends VectorData {
     values(i) = d
     d
   }
+
 }
 
 trait SparseVectorData extends VectorData {
