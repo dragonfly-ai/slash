@@ -54,6 +54,8 @@ object Demo {
   }
 
   def main(args: Array[String]): Unit = {
+//    val a:ARRAY[Double] = ARRAY.tabulate[Double](10)((i:Int) => Math.random() * i)
+//    for (i <- a.indices ) println(a(i))
     println(s"$RESET$GREEN$consolidateDemoOutput$RESET")
   }
 

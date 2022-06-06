@@ -5,6 +5,7 @@ import ai.dragonfly.math.example.Demonstrable
 import ai.dragonfly.math.*
 import Random.*
 import ai.dragonfly.math.vector.Vector.*
+import bridge.array.*
 
 /**
  * Created by clifton on 1/9/17.
@@ -12,9 +13,9 @@ import ai.dragonfly.math.vector.Vector.*
 
 object VectorN extends VectorCompanion[VectorN] with Demonstrable {
 
-  def apply(values:Double*):VectorN = new VectorN(VectorValues(values:_*))
+  def apply(values:Double*):VectorN = new VectorN(ARRAY[Double](values:_*))
 
-  override def apply(values:VectorValues): VectorN = {
+  override def apply(values:ARRAY[Double]): VectorN = {
     if ( validDimension(values.length) ) new VectorN(values)
     else throw UnsupportedVectorDimension(values.length, 5)
   }
@@ -30,7 +31,7 @@ object VectorN extends VectorCompanion[VectorN] with Demonstrable {
     super.tabulate(f)
   }
 
-  //def random(dimension:Int, maxNorm:Double = 1.0): VectorN = new VectorN(VectorValues.tabulate(dimension)((i:Int) => maxNorm * Math.random()))
+  //def random(dimension:Int, maxNorm:Double = 1.0): VectorN = new VectorN(ARRAY[Double].tabulate(dimension)((i:Int) => maxNorm * Math.random()))
 
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     import Console.{GREEN, RED, RESET, YELLOW, UNDERLINED, RED_B}
@@ -61,15 +62,11 @@ object VectorN extends VectorCompanion[VectorN] with Demonstrable {
 
 }
 
-class VectorN private (override val values:VectorValues) extends Vector {
+class VectorN private (override val values:ARRAY[Double]) extends Vector {
 
   type VEC = VectorN
 
-  override def copy():VEC = {
-    val cp:VectorValues = new VectorValues(values.length)
-    for (i <- values.indices) cp(i) = values(i)
-    VectorN(cp)
-  }
+  override def copy():VEC = VectorN( ARRAY.tabulate[Double](values.length)( (i:Int) => values(i) ) )
 
 
   import unicode.*

@@ -3,7 +3,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 import ai.dragonfly.math.Random.*
 import ai.dragonfly.math.example.Demonstrable
 import ai.dragonfly.math.vector._
-import Vector.*
+import bridge.array.*
 
 /**
  * Created by clifton on 1/10/17.
@@ -26,11 +26,11 @@ object StreamingVectorStats extends Demonstrable {
  */
 class StreamingVectorStats(val dimension: Int) {
   var s0: Double = 0.0
-  val s1: VectorValues = VectorValues.fill(dimension)(0.0)
-  val s2: VectorValues = VectorValues.fill(dimension)(0.0)
+  val s1: ARRAY[Double] = ARRAY.fill[Double](dimension)(0.0)
+  val s2: ARRAY[Double] = ARRAY.fill[Double](dimension)(0.0)
 
-  val minValues: VectorValues = VectorValues.fill(dimension)(Double.MaxValue)
-  val maxValues: VectorValues = VectorValues.fill(dimension)(Double.MinValue)
+  val minValues: ARRAY[Double] = ARRAY.fill[Double](dimension)(Double.MaxValue)
+  val maxValues: ARRAY[Double] = ARRAY.fill[Double](dimension)(Double.MinValue)
 
   def reset():Unit = synchronized {
     s0 = 0.0

@@ -1,8 +1,11 @@
 package ai.dragonfly.math.vector
 
+import ai.dragonfly.math.*
 import ai.dragonfly.math.example.Demonstrable
+
 import scala.language.postfixOps
 import ai.dragonfly.math.squareInPlace
+import bridge.array.*
 
 object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
 
@@ -10,9 +13,9 @@ object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
 
   override inline def validDimension(dimension: Int): Boolean = dimension == 4
 
-  override def apply(values:VectorValues): Vector4 = new Vector4(dimensionCheck(values, dimension))
+  override def apply(values:ARRAY[Double]): Vector4 = new Vector4(dimensionCheck(values, dimension))
 
-  def apply(x: Double, y: Double, z: Double, w: Double):Vector4 = new Vector4(VectorValues(x, y, z, w))
+  def apply(x: Double, y: Double, z: Double, w: Double):Vector4 = new Vector4(ARRAY[Double](x, y, z, w))
 
 
   def random(maxNorm:Double = 1.0): Vector4 = Vector4(maxNorm * Math.random(), maxNorm * Math.random(), maxNorm * Math.random(), maxNorm * Math.random())
@@ -69,7 +72,7 @@ object Vector4 extends VectorCompanion[Vector4] with Demonstrable {
   override def name: String = "Vector4"
 }
 
-case class Vector4 private (override val values: VectorValues) extends Vector {
+case class Vector4 private (override val values: ARRAY[Double]) extends Vector {
 
   type VEC = Vector4
 

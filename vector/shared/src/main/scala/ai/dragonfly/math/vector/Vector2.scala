@@ -2,7 +2,7 @@ package ai.dragonfly.math.vector
 
 import ai.dragonfly.math.example.Demonstrable
 import ai.dragonfly.math.*
-
+import bridge.array.*
 
 /**
  * Created by clifton on 1/10/17.
@@ -14,9 +14,9 @@ object Vector2 extends VectorCompanion[Vector2] with Demonstrable {
 
   override inline def validDimension(dimension: Int): Boolean = dimension == this.dimension
 
-  override def apply(values:VectorValues): Vector2 = new Vector2(dimensionCheck(values, dimension))
+  override def apply(values:ARRAY[Double]): Vector2 = new Vector2(dimensionCheck(values, dimension))
 
-  def apply(x:Double, y:Double): Vector2 = Vector2(VectorValues(x, y))
+  def apply(x:Double, y:Double): Vector2 = Vector2(ARRAY[Double](x, y))
 
   override def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
     for (deg <- Array[Double](10, 25, 33.333333, 45, 60, 75, 90)) {
@@ -33,7 +33,7 @@ object Vector2 extends VectorCompanion[Vector2] with Demonstrable {
 
 }
 
-case class Vector2 private (values:VectorValues) extends Vector {
+case class Vector2 private (values:ARRAY[Double]) extends Vector {
 
   type VEC = Vector2
 

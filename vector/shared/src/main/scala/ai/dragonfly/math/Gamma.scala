@@ -2,7 +2,7 @@ package ai.dragonfly.math
 
 import ai.dragonfly.math
 import ai.dragonfly.math.example.Demonstrable
-import ai.dragonfly.math.vector.VectorValues
+import bridge.array.*
 
 object Gamma extends Demonstrable {
 
@@ -21,7 +21,7 @@ object Gamma extends Demonstrable {
 
   // ported from https://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/src-html/org/apache/commons/math3/special/Gamma.html
 
-  private val lanczos_coefficients: VectorValues = VectorValues(
+  private val lanczos_coefficients: ARRAY[Double] = ARRAY[Double](
     0.99999999999999709182,
     57.156235665862923517,
     -59.597960355475491248,

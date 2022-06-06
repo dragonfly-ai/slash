@@ -1,20 +1,15 @@
 package ai.dragonfly.math
 
 import scala.quoted.Type
+import bridge.array.*
 
 package object vector {
-
-  type VectorIndices = native.VectorIndices
-  type VectorValues = native.VectorValues
-  type VECTORS = native.VECTORS
-  type VectorValuesObject = native.VectorValuesObject
-  val VectorValues:VectorValuesObject = native.VectorValues
 
   inline def dimensionCheck(supplied:Int, required: Int): Unit = {
     if (supplied != required) throw UnsupportedVectorDimension(supplied, required)
   }
 
-  inline def dimensionCheck(values:VectorValues, requiredDimension: Int): VectorValues = {
+  inline def dimensionCheck(values:ARRAY[Double], requiredDimension: Int): ARRAY[Double] = {
     dimensionCheck(values.length, requiredDimension)
     values
   }

@@ -1,18 +1,18 @@
 package ai.dragonfly.math.vector
 
 import ai.dragonfly.math.*
+import bridge.array.*
 
 import scala.scalajs.js
-
 import scala.util.Random
 
 object Vector {
 
-  def fill(dimension:Int)(d: Double): Vector = apply(VectorValues.fill(dimension)(d))
+  def fill(dimension:Int)(d: Double): Vector = apply(ARRAY.fill[Double](dimension)(d))
 
-  def tabulate(dimension:Int)(f: Int => Double): Vector = apply(VectorValues.tabulate(dimension)(f))
+  def tabulate(dimension:Int)(f: Int => Double): Vector = apply(ARRAY.tabulate[Double](dimension)(f))
 
-  def apply(values: VectorValues): Vector = {
+  def apply(values: ARRAY[Double]): Vector = {
     values.length match {
       case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
       case 2 => Vector2(values)
@@ -28,7 +28,7 @@ object Vector {
       case 2 => Vector2(d(0), d(1))
       case 3 => Vector3(d(0), d(1), d(2))
       case 4 => Vector4(d(0), d(1), d(2), d(3))
-      case _ => VectorN(VectorValues(d:_*))
+      case _ => VectorN(ARRAY[Double](d:_*))
     }
   }
 
@@ -42,12 +42,12 @@ object Vector {
     μ /= `[v₁v₂⋯vₙ]`.size
   }
 
-  def mean(`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):Vector = {
+  def mean[V <: Vector](`[v₀v₁⋯v₍ₙ₋₁₎]`: ARRAY[V]):V = {
     val μ:Vector = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).copy()
     for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
       μ += μ.recognize(`[v₀v₁⋯v₍ₙ₋₁₎]`(i))
     }
-    μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length
+    (μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length).asInstanceOf[V]
   }
 
 }
@@ -57,17 +57,17 @@ trait VectorCompanion[V <: Vector] {
 
   def validDimension(dimension:Int):Boolean
 
-  def apply(values: VectorValues): V
+  def apply(values: ARRAY[Double]): V
 
-  protected def fill(value: Double)(using dimension:Int):V = apply(VectorValues.fill(dimension)(value))
+  protected def fill(value: Double)(using dimension:Int):V = apply(ARRAY.fill[Double](dimension)(value))
 
-  protected def tabulate(f: Int => Double)(using dimension:Int):V = apply(VectorValues.tabulate(dimension)(f))
+  protected def tabulate(f: Int => Double)(using dimension:Int):V = apply(ARRAY.tabulate[Double](dimension)(f))
 
   def blend(alpha: Double, v0: V, v1: V):V = ((v0 * alpha) + (v1 * (1.0 - alpha))).asInstanceOf[V]
 
   def mean(`[v₁v₂⋯vₙ]`:V*):V = Vector.mean(`[v₁v₂⋯vₙ]`:_*).asInstanceOf[V]
 
-  def mean(`[v₀v₁⋯v₍ₙ₋₁₎]`: VECTORS):V = Vector.mean(`[v₀v₁⋯v₍ₙ₋₁₎]`).asInstanceOf[V]
+  def mean(`[v₀v₁⋯v₍ₙ₋₁₎]`: ARRAY[V]):V = Vector.mean(`[v₀v₁⋯v₍ₙ₋₁₎]`).asInstanceOf[V]
 
   def midpoint(v0: V, v1: V):V = blend(0.5, v0, v1)
 }
@@ -150,15 +150,15 @@ trait Vector extends DenseVectorData {
 
 
   /**
-   * returns values.hashCode() (the hash code of the underlying VectorValues.)
+   * returns values.hashCode() (the hash code of the underlying ARRAY[Double].)
   */
   override def hashCode(): Int = values.hashCode()
 
   /**
-   * checks for reference equality in underlying values:VectorValues
+   * checks for reference equality in underlying values:ARRAY[Double]
    * for value comparisons use v1.euclid.equals(v2)
    * @param obj an object to compare to this vector.
-   * @return reference equality in underlying values:VectorValues
+   * @return reference equality in underlying values:ARRAY[Double]
    */
   override def equals(obj: Any): Boolean = obj match {
     case that: Vector => values.equals(that.values)
@@ -183,7 +183,7 @@ trait DenseVectorData extends VectorData {
 }
 
 trait SparseVectorData extends VectorData {
-  val indices: VectorIndices
+  val indices: ARRAY[Int]
 
   // binary search
   private def localIndex(target: Int): Int = {
@@ -213,7 +213,7 @@ trait SparseVectorData extends VectorData {
 
 trait VectorData extends Euclidean {
 
-  val values: VectorValues
+  val values: ARRAY[Double]
 
   /**
    * For exotic vector formatting, provide lambdas for generating prefix, delimiter, and suffix.

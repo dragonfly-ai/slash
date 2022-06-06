@@ -2,6 +2,7 @@ package ai.dragonfly.math.vector
 
 import ai.dragonfly.math.example.Demonstrable
 import ai.dragonfly.math.squareInPlace
+import bridge.array.*
 
 /**
  * Created by clifton on 1/10/17.
@@ -13,9 +14,9 @@ object Vector3 extends VectorCompanion[Vector3] with Demonstrable {
 
   override inline def validDimension(dimension: Int): Boolean = dimension == 3
 
-  override def apply(values:VectorValues): Vector3 = new Vector3(dimensionCheck(values, dimension))
+  override def apply(values:ARRAY[Double]): Vector3 = new Vector3(dimensionCheck(values, dimension))
 
-  def apply(x: Double, y: Double, z: Double):Vector3 = apply(VectorValues(x, y, z))
+  def apply(x: Double, y: Double, z: Double):Vector3 = apply(ARRAY[Double](x, y, z))
 
   def random(maxNorm:Double = 1.0): Vector3 = Vector3(maxNorm * Math.random(), maxNorm * Math.random(), maxNorm * Math.random())
 
@@ -48,7 +49,7 @@ object Vector3 extends VectorCompanion[Vector3] with Demonstrable {
 }
 
 
-case class Vector3 private (override val values:VectorValues) extends Vector {
+case class Vector3 private (override val values:ARRAY[Double]) extends Vector {
 
   type VEC = Vector3
 

@@ -3,10 +3,11 @@ ThisBuild / publishTo := Some( Resolver.file( "file",  new File("/var/www/maven"
 
 lazy val vector = crossProject(JSPlatform, JVMPlatform).settings(
   name := "vector",
-  version := "0.524",
+  version := "0.525",
   organization := "ai.dragonfly.code",
   resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/",
   scalacOptions ++= Seq("-feature","-deprecation"),
+  libraryDependencies += "ai.dragonfly.code" %%% "arraybridge" % "0.02",
   Compile / mainClass := Some("ai.dragonfly.math.example.Demo")
 ).jvmSettings(
   libraryDependencies ++= Seq(
