@@ -80,10 +80,10 @@ trait Vector extends DenseVectorData {
   def copy():VEC
 
   // copy operators
-  def *(scalar:Double):VEC = copy().scale(scalar).asInstanceOf[VEC]
-  def /(divisor:Double):VEC = copy().divide(divisor).asInstanceOf[VEC]
-  def +(v0:Vector):VEC = copy().add(v0).asInstanceOf[VEC]
-  def -(v0:Vector):VEC = copy().subtract(v0).asInstanceOf[VEC]
+  def *(scalar:Double):VEC = recognize(copy().scale(scalar))
+  def /(divisor:Double):VEC = recognize(copy().divide(divisor))
+  def +(v0:Vector):VEC = recognize(copy().add(v0))
+  def -(v0:Vector):VEC = recognize(copy().subtract(v0))
 
   // implemented
   inline def round():VEC = {
@@ -109,6 +109,14 @@ trait Vector extends DenseVectorData {
 
   inline def dot(v0:Vector): Double = {
     euclid.dot(v0)
+  }
+
+  inline def distanceSquaredTo(v: Vector): Double = {
+    euclid.distanceSquaredTo(v)
+  }
+
+  inline def distanceTo(v: Vector): Double = {
+    euclid.distanceSquaredTo(v)
   }
 
   inline def scale(scalar: Double):VEC = {
