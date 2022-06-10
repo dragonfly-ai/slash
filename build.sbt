@@ -3,7 +3,7 @@ ThisBuild / publishTo := Some( Resolver.file( "file",  new File("/var/www/maven"
 
 lazy val vector = crossProject(JSPlatform, JVMPlatform).settings(
   name := "vector",
-  version := "0.525",
+  version := "0.526",
   organization := "ai.dragonfly.code",
   resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/",
   scalacOptions ++= Seq("-feature","-deprecation"),

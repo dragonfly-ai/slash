@@ -35,10 +35,12 @@ To use this library with SBT:
 
 <pre>
 resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/"
-libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.524"
+libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.526"
 </pre><br />
 
 Projects that rely on this Library:
+
+https://github.com/dragonfly-ai/bitfrost
 
 https://github.com/dragonfly-ai/matrix
 
