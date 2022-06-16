@@ -7,7 +7,7 @@ trait Euclidean {
 
   def dimension: Int
 
-  inline def inDimensionOrThrowException(i:Int):Unit = if (i < 0 || dimension < i) throw ExtraDimensionalAccessException(self, i)
+  inline def inDimensionOrThrowException(i:Int):Unit = if (i < 0 || dimension <= i) throw ExtraDimensionalAccessException(self, i)
 
   inline def sameDimensionOrThrowException(that:Euclidean):Unit = dimensionCheck(self.dimension, that.dimension)
 
