@@ -5,48 +5,9 @@ import ai.dragonfly.math.*
 import ai.dragonfly.math.interval.*
 import Interval.*
 import ai.dragonfly.math.stats.BoundedMean
-import example.*
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
-
-object Binomial {
-
-  val fixedBinomialDemo = OnlineProbDistDemo[Long, distributions.Binomial, FixedBinomial]("Streaming FixedBinomial", distributions.Binomial(42L, 0.69), FixedBinomial(42L), 1000)
-
-
-  val openBinomialDemo = new Demonstrable {
-    override def name: String = "Streaming Binomial"
-
-    def si:Double = 1 + ((Math.random() - 0.5) / 8.0)
-
-    override def demo(implicit sb: StringBuilder): StringBuilder = {
-      val sampleSize = 1000
-      val idealDist = distributions.Binomial(69, 0.42)
-      val streamingDist = Binomial()
-      sb.append(s"Estimate $name:\n\tSampling: $idealDist")
-      val blockSize:Int = sampleSize / 5
-      val end = sampleSize + 1
-      for (i <- 1 until end) {
-        val ki = idealDist.random() * si
-        val ni = idealDist.n * si
-        streamingDist.observe(ki.toLong, ni.toLong)
-        if (i % blockSize == 0) {
-          sb.append(s"\n\t\testimation after $i samples: ${streamingDist.estimate}")
-        }
-      }
-      sb.append(s"\n\tEstimate: ${streamingDist.estimate}\n\tIdeal Distribution: $idealDist\n")
-      sb.append(s"\nTest $idealDist.p($idealDist.random())")
-
-      for (i <- 0 until 5) {
-        val x = idealDist.random()
-        sb.append(s"\n\tp($x) = ${idealDist.p(x)}")
-      }
-      sb.append("\n")
-    }
-
-  }
-}
 
 
 case class FixedBinomial(n: Long) extends OnlineUnivariateProbabilityDistributionEstimator[Long, distributions.Binomial]  {

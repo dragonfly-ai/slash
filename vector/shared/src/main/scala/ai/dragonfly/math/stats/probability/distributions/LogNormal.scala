@@ -3,17 +3,14 @@ package ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import stats.*
 import interval.*
-import example.*
 import Constant.π
 
 // https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters
 
 object LogNormal {
 
-  val ln15_5:LogNormal = LogNormal(15.0, 5.0)
-  val demo = ProbabilityDistributionDemonstration("LogNormal", ln15_5, DenseHistogramOfContinuousDistribution(21, 1, ln15_5.μ + (6.0*ln15_5.σ)))
-
   def fromGaussianParameters(Gμ:Double, `Gσ²`: Double): LogNormal = fromGaussian( Gaussian(Gμ, `Gσ²`) )
+
   def fromGaussian(g: Gaussian): LogNormal = LogNormal(
     Math.exp( g.μ + (g.`σ²` / 2) ),
     (Math.exp(g.`σ²`) - 1) * Math.exp((2 * g.μ) + (g.`σ²`))

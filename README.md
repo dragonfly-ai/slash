@@ -33,10 +33,11 @@ Histogram: {
 
 To use this library with SBT:
 
-<pre>
+```scala
 resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/"
 libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.527"
-</pre><br />
+```
+<br />
 
 Projects that rely on this Library:
 

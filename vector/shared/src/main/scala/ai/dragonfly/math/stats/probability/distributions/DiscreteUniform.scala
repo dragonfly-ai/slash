@@ -4,16 +4,10 @@ import ai.dragonfly.math.*
 import stats.*
 import ai.dragonfly.math.interval.*
 import Interval.*
-import ai.dragonfly.math.example.ProbabilityDistributionDemonstration
 
 import scala.language.postfixOps
 
 object DiscreteUniform {
-  val demo = ProbabilityDistributionDemonstration(
-    "Discrete Uniform",
-    DiscreteUniform(5, 15),
-    DenseHistogramOfDiscreteDistribution(7, 5, 15)
-  )
   def apply(b1:Long, b2:Long): DiscreteUniform = {
     DiscreteUniform(`[]`[Long](Math.min(b1, b2), Math.max(b1, b2)))
   }

@@ -1,7 +1,7 @@
 package ai.dragonfly.math
 
 import scala.quoted.Type
-import bridge.array.*
+import narr.*
 
 package object vector {
 
@@ -9,7 +9,7 @@ package object vector {
     if (supplied != required) throw UnsupportedVectorDimension(supplied, required)
   }
 
-  inline def dimensionCheck(values:ARRAY[Double], requiredDimension: Int): ARRAY[Double] = {
+  inline def dimensionCheck(values:NArray[Double], requiredDimension: Int): NArray[Double] = {
     dimensionCheck(values.length, requiredDimension)
     values
   }

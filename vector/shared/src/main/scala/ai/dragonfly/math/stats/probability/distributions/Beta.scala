@@ -4,11 +4,8 @@ import ai.dragonfly.math.*
 import stats.*
 import interval.*
 import Interval.*
-import example.*
 
 object Beta {
-  val demo2param = ProbabilityDistributionDemonstration("Beta", Beta(0.5, 5.0), DenseHistogramOfContinuousDistribution(9, 0, 1))
-  val demo4param = ProbabilityDistributionDemonstration("Beta", Beta(2.0, 1.0, 33, 42), DenseHistogramOfContinuousDistribution(15, 33, 42))
 
   def fromPERT(pert:PERT):Beta = {
     fromMeanVarianceMinMax(pert.μ, pert.`σ²`, pert.interval.min, pert.interval.MAX)

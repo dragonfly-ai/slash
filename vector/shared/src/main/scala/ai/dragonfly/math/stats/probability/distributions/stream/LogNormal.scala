@@ -3,7 +3,6 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 import ai.dragonfly.math.interval.*
 import Interval.*
 import ai.dragonfly.math.stats.probability.distributions
-import ai.dragonfly.math.example.*
 import ai.dragonfly.math.stats.PointStatistics
 
 
@@ -25,9 +24,4 @@ class LogNormal extends OnlineUnivariateProbabilityDistributionEstimator[Double,
       sps.ℕ
     )
   }
-}
-
-
-object LogNormal {
-  val demo = OnlineProbDistDemo[Double, distributions.LogNormal, LogNormal]("Streaming LogNormal", distributions.LogNormal(69, 21), LogNormal(), 1000)
 }

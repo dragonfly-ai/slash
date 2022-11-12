@@ -21,8 +21,10 @@ trait Euclidean {
 
     inline def normSquared: Double = {
       var mag2 = 0.0
-      for (i <- 0 until dimension) {
+      var i = 0
+      while(i < dimension) {
         mag2 = mag2 + squareInPlace(component(i))
+        i = i + 1
       }
       mag2
     }
@@ -33,8 +35,10 @@ trait Euclidean {
       sameDimensionOrThrowException(that)
 
       var distance = 0.0
-      for (i <- 0 until dimension) {
+      var i = 0
+      while(i < dimension) {
         distance = distance + squareInPlace(self.component(i) - that.component(i))
+        i = i + 1
       }
       distance
     }
@@ -44,50 +48,64 @@ trait Euclidean {
     inline def dot(that: Euclidean): Double = {
       sameDimensionOrThrowException(that)
       var product = 0.0
-      for (i <- 0 until dimension) {
+      var i = 0
+      while(i < dimension) {
         product = product + self.component(i) * that.component(i)
+        i = i + 1
       }
       product
     }
 
 
     inline def scale(scalar: Double): Unit = {
-      for (i <- 0 until dimension) {
+      var i = 0
+      while(i < dimension) {
         self.component(i, self.component(i) * scalar)
+        i = i + 1
       }
     }
 
     inline def divide(divisor: Double): Unit = {
-      for (i <- 0 until dimension) {
+      var i = 0
+      while(i < dimension) {
         self.component(i, self.component(i) / divisor)
+        i = i + 1
       }
     }
 
     inline def round(): Unit = {
-      for (i <- 0 until dimension) {
+      var i = 0
+      while(i < dimension) {
         self.component(i, Math.round(self.component(i)).toDouble)
+        i = i + 1
       }
     }
 
     inline def discretize(): Unit = round()
 
     inline def discretize(r: Double): Unit = {
-      for (i <- 0 until dimension) {
+      var i = 0
+      while(i < dimension) {
         self.component(i, r * Math.round(self.component(i) / r).toDouble)
+        i = i + 1
       }
     }
 
     inline def add(that: Euclidean): Unit = {
       sameDimensionOrThrowException(that)
-      for (i <- 0 until dimension) {
+      var i = 0
+      while(i < dimension) {
         self.component(i, self.component(i) + that.component(i))
+        i = i + 1
       }
     }
 
     inline def subtract(that: Euclidean): Unit = {
       sameDimensionOrThrowException(that)
-      for (i <- 0 until dimension) {
+      var i = 0
+      while(i < dimension) {
         self.component(i, self.component(i) - that.component(i))
+        i = i + 1
       }
     }
 

@@ -1,7 +1,6 @@
 package ai.dragonfly.math
 
 import ai.dragonfly.math.*
-import example.*
 
 import scala.language.postfixOps
 
@@ -212,21 +211,4 @@ object Factorial {
   extension (x: BigInt)
     def ! : BigInt = apply(x)
 
-
-  object demo extends Demonstrable {
-    def demo(implicit sb:StringBuilder = new StringBuilder()):StringBuilder = {
-      for (x:Int <- Seq(1, 2, 3, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)) {
-        sb.append(s"\t${x}! = ${x!}\n")
-      }
-      sb
-    }
-    def name:String = "Factorial"
-  }
-}
-
-
-object TestFactorial extends App {
-  println(
-    Factorial.demo.demo(new StringBuilder()).toString
-  )
 }

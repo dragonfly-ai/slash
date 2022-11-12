@@ -1,7 +1,6 @@
 package ai.dragonfly.math.stats
 
 import ai.dragonfly.math.stats.probability.distributions.{ProbabilityDistribution, Sampleable}
-import ai.dragonfly.math.example.Demonstrable
 
 import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag

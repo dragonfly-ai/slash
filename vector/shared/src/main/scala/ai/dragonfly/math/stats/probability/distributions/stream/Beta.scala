@@ -2,11 +2,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.*
 import probability.distributions
-import ai.dragonfly.math.example.*
 
-object Beta {
-  val demo = OnlineProbDistDemo[Double, distributions.Beta, Beta]("Streaming Beta", distributions.Beta(3.0, 0.75, 42.0, 69.0), Beta(), 1000000)
-}
 
 class Beta extends OnlineUnivariateProbabilityDistributionEstimator[Double, distributions.Beta]  {
 

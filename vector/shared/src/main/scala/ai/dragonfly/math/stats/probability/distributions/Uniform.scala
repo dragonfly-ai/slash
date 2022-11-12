@@ -5,17 +5,18 @@ import ai.dragonfly.math.*
 import stats.*
 import ai.dragonfly.math.interval.*
 import Interval.*
-import ai.dragonfly.math.example.ProbabilityDistributionDemonstration
 
 
 import scala.language.postfixOps
 
 object Uniform {
-  val demo = ProbabilityDistributionDemonstration("Uniform", Uniform(5.0, 11.0), DenseHistogramOfContinuousDistribution(7, 5, 11))
+
   def apply(b1:Double, b2:Double): Uniform = {
     Uniform(`[]`[Double](Math.min(b1, b2), Math.max(b1, b2)))
   }
+
   lazy val domain:Domain[Double] = Domain.ℝ_Double
+
 }
 
 case class Uniform(interval:Interval[Double]) extends ParametricProbabilityDistribution[Double] {
