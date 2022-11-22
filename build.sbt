@@ -35,7 +35,7 @@ lazy val demo = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     Compile / mainClass := Some("Demo"),
     libraryDependencies ++= Seq(
 //      "com.lihaoyi" %%% "scalatags" % "0.11.1",
-      "ai.dragonfly.code" %%% "democrossy" % "0.0105"
+      "ai.dragonfly.code" %%% "democrossy" % "0.02"
     ),
     Compile / mainClass := Some("Demo")
   ).jsSettings(
