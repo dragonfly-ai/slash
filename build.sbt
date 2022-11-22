@@ -23,7 +23,6 @@ lazy val verification = project.dependsOn(vector.projects(JVMPlatform)).settings
   )
 )
 
-
 lazy val demo = crossProject(JSPlatform, JVMPlatform).dependsOn(vector).settings(
   name := "demo",
   Compile / mainClass := Some("Demo"),

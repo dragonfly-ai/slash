@@ -31,11 +31,23 @@ Histogram: {
 }
 ```
 
+
+# JavaScript Optimization
+
+Because vector relies on <a href="https://github.com/dragonfly-ai/narr">NArr</a>, JavaScript environments store vector data as:
+```scala
+var vectorArray:NArray[Double]
+```
+which is equivalent to:
+```scala
+var matrixArray:Float64Array
+```
+
 To use this library with SBT:
 
 ```scala
 resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/"
-libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.527"
+libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.53"
 ```
 <br />
 
