@@ -1,6 +1,6 @@
 # vector
 
-A Vector Math and Statistics library that brings machine learning, image processing, scientific/information visualization, and game development alternatives to Scala 3 and Scala.js.
+A Vector Math and Statistics library that brings machine learning, image processing, scientific/information visualization, and game development alternatives to Scala 3.  This library currently supports JVM, Native and Scala.js platforms.
 
 Features:
 - Vector trait and its inheritors: Vector2, Vector3, Vector4, and VectorN
@@ -47,18 +47,18 @@ To use this library with SBT:
 
 ```scala
 resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/"
-libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.53"
+libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.5321"
 ```
 <br />
 
 Projects that rely on this Library:
 
-https://github.com/dragonfly-ai/bitfrost
-
 https://github.com/dragonfly-ai/matrix
 
-https://github.com/dragonfly-ai/color
+https://github.com/dragonfly-ai/bitfrost
 
 https://github.com/dragonfly-ai/spatial
+
+https://github.com/dragonfly-ai/graphics
 
 https://github.com/dragonfly-ai/img

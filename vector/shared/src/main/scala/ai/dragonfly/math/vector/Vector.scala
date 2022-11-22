@@ -3,7 +3,6 @@ package ai.dragonfly.math.vector
 import ai.dragonfly.math.*
 import narr.*
 
-import scala.scalajs.js
 import scala.util.Random
 
 object Vector {
