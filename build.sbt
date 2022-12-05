@@ -8,7 +8,7 @@ lazy val vector = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .settings(
     name := "vector",
-    version := "0.5321",
+    version := "0.5401",
     libraryDependencies += "ai.dragonfly.code" %%% "narr" % "0.0321",
   ).jvmSettings(
     libraryDependencies ++= Seq(

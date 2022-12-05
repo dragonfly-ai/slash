@@ -14,8 +14,9 @@ case class ProbDistDemo[DOMAIN](
 ) extends Demonstration {
   override def demo(): Unit = {
     println(s"\nDemonstrating $name:\n\tgenerating $sampleSize random variables from $dist\n")
-    for (i <- 0 until sampleSize) {
+    var i:Int = 0; while (i < sampleSize) {
       histogram(dist.random())
+      i += 1
     }
     println(s"\n$histogram\n")
   }
@@ -32,18 +33,24 @@ case class OnlineProbDistDemo[DOMAIN, PPD <: ParametricProbabilityDistribution[D
   override def demo():Unit = {
     println(s"Estimate $name:\n\tSampling: $idealDist")
     val blockSize:Int = sampleSize / 5
+
+    var i:Int = 1
     val end = sampleSize + 1
-    for (i <- 1 until end) {
+
+    while (i < end) {
       streamingDist.observe(idealDist.random())
       if (i % blockSize == 0) {
         println(s"\n\t\testimation after $i samples: ${streamingDist.estimate}")
       }
+      i += 1
     }
     println(s"\n\tEstimate: ${streamingDist.estimate}\n\tIdeal Distribution: $idealDist\n")
     println(s"\nTest $idealDist.p($idealDist.random())")
-    for (i <- 0 until 5) {
+    i = 0
+    while (i < 5) {
       val x = idealDist.random()
       println(s"\n\tp($x) = ${idealDist.p(x)}")
+      i += 1
     }
     println("\n")
   }

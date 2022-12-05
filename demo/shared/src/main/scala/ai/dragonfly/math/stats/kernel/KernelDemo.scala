@@ -21,10 +21,10 @@ object KernelDemo extends Demonstration {
     val step:Double = 0.1
     val totalSteps:Double = exclusionRadius / step
 
-    val gk:GaussianKernel = GaussianKernel(exclusionRadius, new Gaussian(0.0, 16.0))
-    val ek:EpanechnikovKernel = EpanechnikovKernel(exclusionRadius)
-    val uk:UniformKernel = UniformKernel(exclusionRadius)
-    val dk:DiscreteKernel = DiscreteKernel(
+    val gk:GaussianKernel[VectorN] = GaussianKernel[VectorN](exclusionRadius, new Gaussian(0.0, 16.0))
+    val ek:EpanechnikovKernel[VectorN] = EpanechnikovKernel[VectorN](exclusionRadius)
+    val uk:UniformKernel[VectorN] = UniformKernel[VectorN](exclusionRadius)
+    val dk:DiscreteKernel[VectorN] = DiscreteKernel[VectorN](
       exclusionRadius,
       Array.tabulate[Double](squareInPlace(totalSteps).toInt)((i:Int) => {
         val t2:Double = squareInPlace(i * step)

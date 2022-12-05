@@ -27,8 +27,9 @@ object Gamma {
 
   private inline def lanczos(x: Double):Double = {
     var sum = lanczos_coefficients(0)
-    for (i <- 1 until lanczos_coefficients.length) {
+    var i:Int = 1; while (i < lanczos_coefficients.length) {
       sum = sum + ( lanczos_coefficients(i) / (x+i))
+      i += 1
     }
     sum
   }
@@ -48,8 +49,9 @@ object Gamma {
     } else if (x <= 8.0) {
       val n: Int = Math.floor(x - 1.5).toInt
       var prod = 1.0
-      for (i <- 1 to n) {
+      var i:Int = 1; while (i < n) {
         prod = prod * (x - i)
+        i += 1
       }
       logGamma1p(x - (n + 1)) + Math.log(prod)
     } else {

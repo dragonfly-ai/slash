@@ -66,12 +66,21 @@ class VectorN private (override val values:NArray[Double]) extends Vector {
     val sb = new StringBuilder("《ⁿ↗")
     if (dimension > 10) {
       sb.append(s" ✂〉${values(0)}")
-      for (i <- 1 until 4) sb.append(s", ${values(i)}")
+      var i:Int = 1; while (i < 4) {
+        sb.append(s", ${values(i)}")
+        i += 1
+      }
       sb.append(", ⋯")
-      for (i <- dimension - 4 until dimension) sb.append(s", ${values(i)}")
+      i = dimension - 4; while (i < dimension) {
+        sb.append(s", ${values(i)}")
+        i += 1
+      }
     } else {
       sb.append(s"〉${values(0)}")
-      for (i <- 1 until dimension) sb.append(s", ${values(i)}")
+      var i:Int = 1; while (i < dimension) {
+        sb.append(s", ${values(i)}")
+        i += 1
+      }
     }
     sb.append("〉")
     sb.toString

@@ -12,7 +12,7 @@ import narr.*
 
 object StreamingVectorStatsDemo extends Demonstration {
   override def demo():Unit = {
-    val svs = new StreamingVectorStats(4)
+    val svs:StreamingVectorStats[Vector4] = new StreamingVectorStats[Vector4](4)
     for (i <- 0 until 10000) svs(defaultRandom.nextVector4(1000))
     println(svs)
   }

@@ -51,8 +51,13 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOM
     val capBlocks: Array[String] = Array[String](" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█" )  //
 
     var maxBinMass:Double = Double.MinValue
-    for (bIndex <- index(min) to index(MAX)) {
+
+    var bIndex = index(min)
+    val end = index(MAX)
+
+    while (bIndex <= index(MAX)) {
       maxBinMass = Math.max(maxBinMass, binMass((bIndex)) / mass)
+      bIndex += 1
     }
 
     val scale:Double = 100.0 / maxBinMass
@@ -60,7 +65,10 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOM
     val sb = new mutable.StringBuilder("Histogram:\n")
 
     var cumulative = 0.0
-    for (bIndex <- index(min) to index(MAX)) {
+
+    bIndex = index(min)
+
+    while (bIndex <= end) {
 
       var bnms: Double = binMass(bIndex)
       cumulative = cumulative + bnms
@@ -108,6 +116,7 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOM
         }
         sb.append("\n")
       }
+      bIndex += 1
     }
     sb.toString()
   }
@@ -219,12 +228,17 @@ object UnivariateGenerativeModel {
     var cumulative: immutable.TreeMap[Double, Int] = immutable.TreeMap[Double, Int]()
 
     var total:Double = 0.0
-    for (bINdex <- hist.index(hist.min) to hist.index(hist.MAX)) {
+
+    var end = hist.index(hist.MAX)
+    var bINdex: Int = hist.index(hist.min)
+
+    while (bINdex <= end) {
       val binMass:Double = hist.binMass(bINdex)
       if (binMass > 0.0) {
         total = total + binMass
         cumulative = cumulative + (total -> bINdex)
       }
+      bINdex += 1
     }
 
     new UnivariateGenerativeModel(hist, cumulative)

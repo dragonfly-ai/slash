@@ -31,7 +31,7 @@ class StreamingVectorStats[V <: ai.dragonfly.math.vector.Vector](val dimension: 
     }
   }
 
-  def apply(c: Vector, weight: Double = 1.0): StreamingVectorStats[V] = synchronized {
+  def apply(c: V, weight: Double = 1.0): StreamingVectorStats[V] = synchronized {
     s0 = s0 + weight
     for (i <- 0 until dimension) {
       val cv = c.component(i)

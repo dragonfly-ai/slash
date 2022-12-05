@@ -173,10 +173,13 @@ object Factorial {
     else partialFactorial(x)
   }
 
+  val one:BigInt = BigInt(1)
+
   private def partialFactorial(x: BigInt): BigInt = {
     var out:BigInt = table(table.length - 1)
-    for (xi <- BigInt(table.length) to x) {
+    var xi:BigInt = BigInt(table.length); while (xi < x) {
       out = out * xi
+      xi = xi + one
     }
     out
   }
