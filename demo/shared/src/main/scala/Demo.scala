@@ -1,10 +1,10 @@
-import ai.dragonfly.democrossy.{Demonstration, DivConsole, XApp}
+import ai.dragonfly.democrossy.{Demonstration, NativeConsole, XApp}
 
 /**
  * Created by clifton on 1/9/17.
  */
 
-object Demo extends XApp(DivConsole(style = "padding: 8px; overflow: scroll;")) {
+object Demo extends XApp(NativeConsole(style = "padding: 8px; overflow: scroll;")) {
 
   val allDemos: Array[Demonstration] = Array[Demonstration](
     ai.dragonfly.math.stats.geometry.TetrahedronDemo,

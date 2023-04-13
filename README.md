@@ -12,9 +12,8 @@ Features:
 - Bijection[A, B]: an abstraction for bijective implicit conversions.
 - BigRandom: scala.util.Random extension methods to Generate random BigInt and BigDecimal values.
 
-Unicode Plot:
+Unicode Histogram Plot:
 
-![Unicode plot of a Linear Regression Model and its Sample Data.](https://github.com/dragonfly-ai/vector/blob/master/RegressionPlot.png "Linear Plot with Scatter Plot")
 
 ```
 Histogram: { 
@@ -46,8 +45,7 @@ var matrixArray:Float64Array
 To use this library with SBT:
 
 ```scala
-resolvers += "dragonfly.ai" at "https://code.dragonfly.ai/"
-libraryDependencies += "ai.dragonfly.code" %%% "vector" % "0.5321"
+libraryDependencies += "ai.dragonfly" %%% "vector" % "<LATEST_VERSION>"
 ```
 <br />
 

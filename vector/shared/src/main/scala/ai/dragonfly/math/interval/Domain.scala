@@ -36,7 +36,7 @@ object Domain {
     override inline def apply(x: Any): Boolean = false
 
   // Byte
-  given Overflows[Byte, _] with
+  given Overflows[Byte, Short | Int | Float | Double | Long | BigDecimal | BigInt] with
     override inline def apply(x: Byte): Boolean = false
 
   // Short

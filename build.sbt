@@ -1,15 +1,21 @@
-ThisBuild / scalaVersion := "3.2.1"
-ThisBuild / publishTo := Some( Resolver.file( "file",  new File("/var/www/maven" ) ) )
-ThisBuild / resolvers += "ai.dragonfly.code" at "https://code.dragonfly.ai/"
-ThisBuild / organization := "ai.dragonfly.code"
-ThisBuild / scalacOptions ++= Seq("-feature", "-deprecation")
+val appVersion:String = "0.6"
+val globalScalaVersion = "3.2.1"
+
+ThisBuild / organization := "ai.dragonfly"
+ThisBuild / organizationName := "dragonfly.ai"
+ThisBuild / startYear := Some(2023)
+ThisBuild / licenses := Seq(License.Apache2)
+ThisBuild / developers := List( tlGitHubDev("dragonfly-ai", "dragonfly.ai") )
+ThisBuild / scalaVersion := globalScalaVersion
+
+ThisBuild / tlBaseVersion := appVersion
+ThisBuild / tlCiReleaseBranches := Seq()
+ThisBuild / tlSonatypeUseLegacyHost := false
 
 lazy val vector = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .settings(
-    name := "vector",
-    version := "0.5401",
-    libraryDependencies += "ai.dragonfly.code" %%% "narr" % "0.0321",
+    libraryDependencies += "ai.dragonfly" %%% "narr" % "0.101",
   ).jvmSettings(
     libraryDependencies ++= Seq(
       "org.scala-js" %% "scalajs-stubs" % "1.1.0"
@@ -17,10 +23,10 @@ lazy val vector = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   ).jsSettings()
 
 lazy val verification = project
-  .dependsOn(vector.projects(JVMPlatform))
+  .dependsOn( vector.projects( JVMPlatform ) )
+  .enablePlugins(NoPublishPlugin)
   .settings(
     name := "verification",
-    version := "0.01",
     Compile / mainClass := Some("ai.dragonfly.math.Verify"),
     libraryDependencies ++= Seq(
       "org.apache.commons" % "commons-math3" % "3.6.1"
@@ -29,16 +35,38 @@ lazy val verification = project
 
 lazy val demo = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
+  .enablePlugins(NoPublishPlugin)
   .dependsOn(vector)
   .settings(
     name := "demo",
     Compile / mainClass := Some("Demo"),
     libraryDependencies ++= Seq(
 //      "com.lihaoyi" %%% "scalatags" % "0.11.1",
-      "ai.dragonfly.code" %%% "democrossy" % "0.02"
+      "ai.dragonfly" %%% "democrossy" % "0.101"
     ),
     Compile / mainClass := Some("Demo")
-  ).jsSettings(
-    Compile / fastOptJS / artifactPath := file("./demo/public_html/js/main.js"),
+  )
+  .jsSettings(
+    Compile / fastOptJS / artifactPath := file("./docs/js/main.js"),
+    Compile / fullOptJS / artifactPath := file("./docs/js/main.js"),
     scalaJSUseMainModuleInitializer := true
-  ).jvmSettings()
+  )
+  .jvmSettings()
+
+lazy val root = tlCrossRootProject.aggregate(vector).settings(name := "vector")
+
+lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin).settings(
+  mdocVariables := Map(
+    "VERSION" -> appVersion,
+    "SCALA_VERSION" -> globalScalaVersion
+  ),
+  laikaConfig ~= { _.withRawContent }
+)
+
+lazy val unidocs = project
+  .in(file("unidocs"))
+  .enablePlugins(TypelevelUnidocPlugin) // also enables the ScalaUnidocPlugin
+  .settings(
+    name := "vector-docs",
+    ScalaUnidoc / unidoc / unidocProjectFilter := inProjects(vector.jvm, vector.js, vector.native)
+  )
