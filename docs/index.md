@@ -4,7 +4,8 @@
 
 <div id="console"></div>
 
+<script type="application/javascript" src="js/main.js"></script>
+
 <a href="https://github.com/dragonfly-ai/vector">Back to vector GitHub Project</a><br />
 <a href="https://github.com/dragonfly-ai/">Other Projects by dragonfly.ai</a><br />
 
-<script type="application/javascript" src="js/main.js"></script>
