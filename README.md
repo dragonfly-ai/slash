@@ -8,12 +8,11 @@ Features:
 - Parametric and Estimated (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
 - Geometry: Sample points uniformly from the volumes defined by 3D tetrahedrons.
-- Visualization: Text based visualization, inspired by [https://github.com/JuliaPlots/UnicodePlots.jl].  Currently supports line charts, scatter plots, and histograms.
+- Console friendly Text Based Histogram Visualization: Text based visualization, inspired by [https://github.com/JuliaPlots/UnicodePlots.jl].
 - Bijection[A, B]: an abstraction for bijective implicit conversions.
 - BigRandom: scala.util.Random extension methods to Generate random BigInt and BigDecimal values.
 
 Unicode Histogram Plot:
-
 
 ```
 Histogram: { 
