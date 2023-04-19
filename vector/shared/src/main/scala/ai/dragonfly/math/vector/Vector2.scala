@@ -23,42 +23,43 @@ import narr.*
  * Created by clifton on 1/10/17.
  */
 
-object Vector2 extends VectorCompanion[Vector2] {
+object Vector2 {
 
-  inline given dimension: Int = 2
+  import Vector.*
 
-  override inline def validDimension(dimension: Int): Boolean = dimension == this.dimension
-
-  override def apply(values:NArray[Double]): Vector2 = new Vector2(dimensionCheck(values, dimension))
-
-  def apply(x:Double, y:Double): Vector2 = Vector2(NArray[Double](x, y))
-
-}
-
-case class Vector2 private (values:NArray[Double]) extends Vector {
-
-  type VEC = Vector2
-
-  inline def x:Double = values(0)
-  inline def y:Double = values(1)
-
-  inline def pseudoCross(v: Vector2): Double = x * v.y + y * v.x
-
-  inline def rotateDegrees(degrees: Double): Vector2 = rotate(degreesToRadians(degrees))
-
-  inline def rotate(radians: Double): Vector2 = {
-    val cos = Math.cos( radians )
-    val sin = Math.sin( radians )
-
-    val x1 = x*cos - y*sin
-    values(1) = x*sin + y*cos
-    values(0) = x1
-
-    this
+  def rotateAllDegrees(vectors:NArray[Vector[2]], degrees: Double): NArray[Vector[2]] = {
+    rotateAll(vectors, degreesToRadians(degrees))
   }
 
-  override def copy(): VEC = Vector2(x, y)
+  def rotateAll(vectors:NArray[Vector[2]], radians: Double): NArray[Vector[2]] = {
+    val cos:Double = Math.cos(radians)
+    val sin:Double = Math.sin(radians)
+    var v2 = 0
+    while (v2 < vectors.length) {
+      vectors(v2).rotate(cos, sin)
+      v2 = v2 + 1
+    }
+    vectors
+  }
 
-  override def toString: String = s"《²↗〉${x}ᵢ ${y}ⱼ〉" // ₂⃗ ²↗ ↗²
+  extension (thisVector: Vector[2]) {
+//    inline def apply(index: Int): Double = thisVector(index)
+//
+//    inline def update(index: Int, value: Double): Unit = thisVector(index) = value
+    inline def x: Double = thisVector(0)
+    inline def y: Double = thisVector(1)
+
+    inline def rotate(cosTheta:Double, sinTheata:Double):Vector[2] = {
+      val x1 = thisVector.x * cosTheta - thisVector.y * sinTheata
+      thisVector(1) = thisVector.x * sinTheata + thisVector.y * cosTheta
+      thisVector(0) = x1
+      thisVector
+    }
+    inline def rotate(radians: Double): Vector[2] = rotate( Math.cos(radians), Math.sin(radians) )
+    inline def rotateDegrees(degrees: Double): Vector[2] = rotate(degreesToRadians(degrees))
+
+    inline def pseudoCross(v: Vector[2]): Double = x * v.y + y * v.x
+    def show: String = s"《²↗〉${x}ᵢ ${y}ⱼ〉" // ₂⃗ ²↗ ↗²
+  }
 
 }

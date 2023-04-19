@@ -17,7 +17,8 @@
 package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.Random.*
-import ai.dragonfly.math.vector._
+import ai.dragonfly.math.vector.*
+import Vector.*
 import narr.*
 
 /**
@@ -29,7 +30,9 @@ import narr.*
  * Not thread safe!
  * @param dimension vector dimension
  */
-class StreamingVectorStats[V <: ai.dragonfly.math.vector.Vector](val dimension: Int) {
+class StreamingVectorStats[N <: Int](using ValueOf[N]) {
+  val dimension: N = valueOf[N]
+
   var s0: Double = 0.0
   val s1: NArray[Double] = NArray.fill[Double](dimension)(0.0)
   val s2: NArray[Double] = NArray.fill[Double](dimension)(0.0)
@@ -47,10 +50,10 @@ class StreamingVectorStats[V <: ai.dragonfly.math.vector.Vector](val dimension: 
     }
   }
 
-  def apply(c: V, weight: Double = 1.0): StreamingVectorStats[V] = synchronized {
+  def apply(c: Vector[N], weight: Double = 1.0): StreamingVectorStats[N] = synchronized {
     s0 = s0 + weight
     for (i <- 0 until dimension) {
-      val cv = c.component(i)
+      val cv = c(i)
       val wci = cv * weight
       s1(i) = s1(i) + wci
       s2(i) = s2(i) + wci * wci
@@ -60,18 +63,18 @@ class StreamingVectorStats[V <: ai.dragonfly.math.vector.Vector](val dimension: 
     this
   }
 
-  def average(): V = Vector.tabulate(dimension)(i => s1(i)/s0).asInstanceOf[V]
+  inline def average(): Vector[N] = Vector.tabulate[N](i => s1(i)/s0)
 
   private def componentVariance(s1d: Double, s2d: Double): Double = (s0 * s2d - s1d * s1d)/(s0 * (s0 - 1))
 
-  def variance: V = Vector.tabulate(dimension)(i => componentVariance(s1(i), s2(i))).asInstanceOf[V]
+  inline def variance: Vector[N] = Vector.tabulate[N](i => componentVariance(s1(i), s2(i)))
 
-  def standardDeviation: V = Vector.tabulate(dimension)(i => Math.sqrt(componentVariance(s1(i), s2(i)))).asInstanceOf[V]
+  inline def standardDeviation: Vector[N] = Vector.tabulate[N](i => Math.sqrt(componentVariance(s1(i), s2(i))))
 
-  def bounds(): VectorBounds[V] = VectorBounds[V](
-    Vector(minValues).asInstanceOf[V],
-    Vector(maxValues).asInstanceOf[V]
+  inline def bounds(): VectorBounds[N] = VectorBounds[N](
+    Vector[N](minValues),
+    Vector[N](maxValues)
   )
 
-  override def toString: String = s"StreamingVectorStats(\n\t$s0\n\t${Vector(s1)}\n\t${Vector(s2)}\n\tAverage: ${average()}\n\tVariance: $variance\n\tStandard Deviation: $standardDeviation)"
+  override def toString: String = s"StreamingVectorStats(\n\t$s0\n\t${Vector[N](s1).render()}\n\t${Vector[N](s2).render()}\n\tAverage: ${average().render()}\n\tVariance: ${variance.render()}\n\tStandard Deviation: ${standardDeviation.render()})"
 }

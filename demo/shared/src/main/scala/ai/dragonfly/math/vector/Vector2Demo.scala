@@ -4,6 +4,8 @@ import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.*
 import narr.*
 
+import Vector.*
+import Vector2.*
 /**
  * Created by clifton on 1/10/17.
  */
@@ -11,19 +13,18 @@ import narr.*
 object Vector2Demo extends Demonstration {
 
   override def demo():Unit = {
-    val degrees:Array[Double] = Array[Double](10, 25, 33.333333, 45, 60, 75, 90)
+    val degrees:NArray[Double] = NArray[Double](10, 25, 33.333333, 45, 60, 75, 90)
     var di:Int = 0
     while (di < degrees.length) {
-      val i = Vector2(1, 0)
+      val i = Vector[2](1, 0)
       val theta = degrees(di)
       i.rotateDegrees(theta)
-      println(s"${Vector2(1, 0)}.rotateDegrees($theta) -> $i\n")
+      println(s"${Vector[2](1, 0).show}.rotateDegrees($theta) -> ${i.show}\n")
       di = di + 1
     }
-    println(s"Vector2(0.115, 0.937).euclid.equals(Vector2(0.115, 0.937)) => true : ${Vector2(0.115, 0.937).euclid.equals(Vector2(0.115, 0.937))}\n")
-    println(s"Vector2(0.115, 0.937) == Vector2(0.115, 0.937) => false : ${ Vector2(0.115, 0.937) == Vector2(0.115, 0.937) }\n")
+
   }
 
-  override def name: String = "Vector2"
+  override def name: String = "Vector[2]"
 
 }

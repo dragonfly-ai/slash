@@ -5,6 +5,8 @@ import ai.dragonfly.math.interval.*
 import Interval.*
 import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.vector.*
+import Vector.*
+import Vector3.*
 
 object TetrahedronDemo extends Demonstration {
 
@@ -14,10 +16,10 @@ object TetrahedronDemo extends Demonstration {
     val q = 10.0 * Math.cos((Math.PI * 2.0)/3.0)
 
     val t = Tetrahedron(
-      Vector3( q, q, q),
-      Vector3(-q, q, q),
-      Vector3( 0,-q, q),
-      Vector3( 0, 0,-q)
+      Vector[3]( q, q, q),
+      Vector[3](-q, q, q),
+      Vector[3]( 0,-q, q),
+      Vector[3]( 0, 0,-q)
     )
 
     val sampleCount:Int = 100

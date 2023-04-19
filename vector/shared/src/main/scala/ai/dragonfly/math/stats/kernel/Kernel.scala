@@ -16,35 +16,32 @@
 
 package ai.dragonfly.math.stats.kernel
 
-/**
- * Created by clifton on 5/16/15.
- */
-
 import ai.dragonfly.math.*
 import Constant.{`√(2π)`, π}
 import ai.dragonfly.math.stats.DenseHistogramOfContinuousDistribution
 import ai.dragonfly.math.stats.probability.distributions.Gaussian
 import ai.dragonfly.math.vector.*
-
+import Vector.*
+import narr.*
 import scala.collection.mutable
 
-trait Kernel[V <: ai.dragonfly.math.vector.Vector] {
+trait Kernel[N <: Int] {
   val exclusionRadius: Double
   lazy val exclusionRadiusSquared:Double = exclusionRadius * exclusionRadius
 
   def weight(magnitudeSquared: Double): Double
-  def weight(v: V): Double
-  def weight(v1: V, v2: V): Double = weight((v1 - v2).asInstanceOf[V])
-  def distance(v: V): Double = v.norm
-  def distance(v1: V, v2: V): Double = (v1 - v2).norm
+  def weight(v: Vector[N]): Double
+  def weight(v1: Vector[N], v2: Vector[N]): Double = weight(v1 - v2)
+  def distance(v: Vector[N]): Double = v.norm
+  def distance(v1: Vector[N], v2: Vector[N]): Double = (v1 - v2).norm
 
-  lazy val discretize: DiscreteKernel[V] = DiscreteKernel[V](this)
+  lazy val discretize: DiscreteKernel[N] = DiscreteKernel[N](this)
 }
 
 
-case class GaussianKernel[V <: ai.dragonfly.math.vector.Vector](exclusionRadius: Double, gaussian:Gaussian) extends Kernel[V] {
+case class GaussianKernel[N <: Int](exclusionRadius: Double, gaussian:Gaussian) extends Kernel[N] {
 
-  override def weight(v: V): Double = weight(v.normSquared)
+  override def weight(v: Vector[N]): Double = weight(v.normSquared)
 
   override def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > exclusionRadiusSquared) 0.0
@@ -53,8 +50,8 @@ case class GaussianKernel[V <: ai.dragonfly.math.vector.Vector](exclusionRadius:
 }
 
 
-case class EpanechnikovKernel[V <: ai.dragonfly.math.vector.Vector](exclusionRadius: Double) extends Kernel[V] {
-  override def weight(v: V): Double = weight(v.normSquared)
+case class EpanechnikovKernel[N <: Int](exclusionRadius: Double) extends Kernel[N] {
+  override def weight(v: Vector[N]): Double = weight(v.normSquared)
 
   override def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > exclusionRadiusSquared) 0.0
@@ -64,8 +61,8 @@ case class EpanechnikovKernel[V <: ai.dragonfly.math.vector.Vector](exclusionRad
 }
 
 
-case class UniformKernel[V <: ai.dragonfly.math.vector.Vector](exclusionRadius: Double) extends Kernel[V] {
-  override def weight(v: V): Double = weight(v.normSquared)
+case class UniformKernel[N <: Int](exclusionRadius: Double) extends Kernel[N] {
+  override def weight(v: Vector[N]): Double = weight(v.normSquared)
 
   override def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > exclusionRadiusSquared) 0.0
@@ -75,16 +72,16 @@ case class UniformKernel[V <: ai.dragonfly.math.vector.Vector](exclusionRadius: 
 
 
 object DiscreteKernel {
-  def apply[V <: ai.dragonfly.math.vector.Vector](k: Kernel[V]): DiscreteKernel[V] = {
+  def apply[N <: Int](k: Kernel[N]): DiscreteKernel[N] = {
     val maxMagSquared: Int = Math.ceil(k.exclusionRadiusSquared).toInt
-    val weights = new Array[Double](maxMagSquared + 1)
+    val weights = new NArray[Double](maxMagSquared + 1)
     for (d <- 0 to maxMagSquared) weights(d) = k.weight(d)
     DiscreteKernel(k.exclusionRadius, weights)
   }
 }
 
 
-case class DiscreteKernel[V <: ai.dragonfly.math.vector.Vector](exclusionRadius: Double, weights: Array[Double]) extends Kernel[V] {
+case class DiscreteKernel[N <: Int](exclusionRadius: Double, weights: NArray[Double]) extends Kernel[N] {
 
   lazy val totalWeights:Double = {
     var total = 0.0
@@ -93,7 +90,7 @@ case class DiscreteKernel[V <: ai.dragonfly.math.vector.Vector](exclusionRadius:
     total
   }
 
-  override def weight(v: V): Double = weight(v.normSquared)
+  override def weight(v: Vector[N]): Double = weight(v.normSquared)
 
   override def weight(magnitudeSquared: Double): Double = {
     if (magnitudeSquared > exclusionRadiusSquared) 0.0

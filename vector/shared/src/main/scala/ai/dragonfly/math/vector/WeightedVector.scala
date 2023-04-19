@@ -15,13 +15,15 @@
  */
 
 package ai.dragonfly.math.vector
+import Vector.*
 
-
-case class WeightedVector[V <: ai.dragonfly.math.vector.Vector](unweighted: V, private var w: Double = 0.0) {
+case class WeightedVector[N <: Int](unweighted: Vector[N], private var w: Double = 0.0) {
   def weight:Double = w
-  def addWeight(w1: Double): WeightedVector[V] = {
+  def addWeight(w1: Double): WeightedVector[N] = {
     w = w + w1
     this
   }
-  def weighted: V = (unweighted * weight).asInstanceOf[V]
+  def weighted: Vector[N] = unweighted * weight
+
+  override def toString: String = s"WeightedVector($weight, ${unweighted.render()})"
 }

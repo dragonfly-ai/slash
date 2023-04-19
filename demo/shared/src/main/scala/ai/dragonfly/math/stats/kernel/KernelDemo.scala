@@ -10,6 +10,7 @@ import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.stats.DenseHistogramOfContinuousDistribution
 import ai.dragonfly.math.stats.probability.distributions.Gaussian
 import ai.dragonfly.math.vector.*
+import narr.*
 
 import scala.collection.mutable
 
@@ -21,12 +22,14 @@ object KernelDemo extends Demonstration {
     val step:Double = 0.1
     val totalSteps:Double = exclusionRadius / step
 
-    val gk:GaussianKernel[VectorN] = GaussianKernel[VectorN](exclusionRadius, new Gaussian(0.0, 16.0))
-    val ek:EpanechnikovKernel[VectorN] = EpanechnikovKernel[VectorN](exclusionRadius)
-    val uk:UniformKernel[VectorN] = UniformKernel[VectorN](exclusionRadius)
-    val dk:DiscreteKernel[VectorN] = DiscreteKernel[VectorN](
+    type N = 1
+
+    val gk:GaussianKernel[N] = GaussianKernel[N](exclusionRadius, new Gaussian(0.0, 16.0))
+    val ek:EpanechnikovKernel[N] = EpanechnikovKernel[N](exclusionRadius)
+    val uk:UniformKernel[N] = UniformKernel[N](exclusionRadius)
+    val dk:DiscreteKernel[N] = DiscreteKernel[N](
       exclusionRadius,
-      Array.tabulate[Double](squareInPlace(totalSteps).toInt)((i:Int) => {
+      NArray.tabulate[Double](squareInPlace(totalSteps).toInt)((i:Int) => {
         val t2:Double = squareInPlace(i * step)
         0.5 * (gk.weight(t2) + ek.weight(t2))
       })
