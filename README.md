@@ -1,13 +1,16 @@
 # vector
 
-A Scala 3 Vector Math and Statistics library designed to simultaneously provide convenient syntax while maximize performance while cross compiling to JVM, Native and Scala.js platforms.  <a href="https://dragonfly-ai.github.io/vector/">Try the demo</a>.
+A Scala 3 Vector Math and Statistics library designed to simultaneously provide convenient syntax, maximize performance, and cross compile to JVM, Native and Scala.js platforms.  <a href="https://dragonfly-ai.github.io/vector/">Try the demo</a>.
 
 <h3>How to use it:</h3>
 Installation with SBT:
+
 ```scala
 libraryDependencies += "ai.dragonfly" %%% "vector" % "<LATEST_VERSION>"
 ```
+
 <h3>Vector Math Syntax:</h3>
+
 ```scala
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vector.*
@@ -85,10 +88,12 @@ These plots label the bins with standardised math notation for open and closed i
 # JavaScript Optimization
 
 Because vector relies on <a href="https://github.com/dragonfly-ai/narr">NArr</a>, JavaScript environments store vector data as:
+
 ```scala
 var vectorArray:NArray[Double]
 ```
 which is equivalent to:
+
 ```scala
 var matrixArray:Float64Array
 ```
