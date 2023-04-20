@@ -102,7 +102,7 @@ package object vector {
 
       inline def magnitudeSquared: Double = normSquared
 
-      inline def distanceSquaredTo(v0: Vector[N]): Double = {
+      inline def euclideanDistanceSquaredTo(v0: Vector[N]): Double = {
         var distance = 0.0
         var i = 0
         while (i < dimension) {
@@ -112,7 +112,7 @@ package object vector {
         distance
       }
 
-      inline def distanceTo(v0: Vector[N]): Double = Math.sqrt(distanceSquaredTo(v0))
+      inline def euclideanDistanceTo(v0: Vector[N]): Double = Math.sqrt(euclideanDistanceSquaredTo(v0))
 
       def +(v0: Vector[N]): Vector[N] = copy.add(v0)
 

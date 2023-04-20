@@ -57,8 +57,18 @@ object Vector2 {
     }
     inline def rotate(radians: Double): Vector[2] = rotate( Math.cos(radians), Math.sin(radians) )
     inline def rotateDegrees(degrees: Double): Vector[2] = rotate(degreesToRadians(degrees))
-
     inline def pseudoCross(v: Vector[2]): Double = x * v.y + y * v.x
+
+    /**
+     * Compute the signed angle between two vectors.
+     * @param v the second vector to compare this vector to.
+     * @return the signed angle in radians
+     */
+    inline def angleFrom(v: Vector[2]): Double = {
+      //Math.acos( (thisVector dot v) / (thisVector.norm * v.norm) )  // unsigned method
+      Math.atan2(thisVector.pseudoCross(v), thisVector dot v)
+    }
+
     def show: String = s"《²↗〉${x}ᵢ ${y}ⱼ〉" // ₂⃗ ²↗ ↗²
   }
 

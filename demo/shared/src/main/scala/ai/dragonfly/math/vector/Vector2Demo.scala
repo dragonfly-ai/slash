@@ -1,8 +1,12 @@
 package ai.dragonfly.math.vector
 
+import Console.*
+
+import narr.*
+
 import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.*
-import narr.*
+import Constant.π
 
 import Vector.*
 import Vector2.*
@@ -13,13 +17,17 @@ import Vector2.*
 object Vector2Demo extends Demonstration {
 
   override def demo():Unit = {
-    val degrees:NArray[Double] = NArray[Double](10, 25, 33.333333, 45, 60, 75, 90)
+
+    val radians:NArray[Double] = NArray[Double](π/8, π/7, π/6, π/5, π/4, π/3, π/2, π)
+
     var di:Int = 0
-    while (di < degrees.length) {
-      val i = Vector[2](1, 0)
-      val theta = degrees(di)
-      i.rotateDegrees(theta)
-      println(s"${Vector[2](1, 0).show}.rotateDegrees($theta) -> ${i.show}\n")
+    while (di < radians.length) {
+      val vr = Vector[2](1, 0)
+      val v = vr.copy
+      val theta = radians(di)
+      vr.rotate(theta)
+      println(s"${v.show}.rotate($GREEN$theta$RESET) -> ${vr.show}")
+      println(s"${v.show}.angleFrom(${vr.show}) -> $GREEN${v.angleFrom(vr)}$RESET\n")
       di = di + 1
     }
 
