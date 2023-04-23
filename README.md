@@ -9,6 +9,19 @@ Installation with SBT:
 libraryDependencies += "ai.dragonfly" %%% "vector" % "<LATEST_VERSION>"
 ```
 
+Features:
+- High performance, low memory footprint Vector type `Vector[N <: Int]` which consists of nothing more than `Float64Array` in JavaScript environments and `Array[Double]` on JVM and Native platforms.  Extension methods, Opaque Types, and Dependent Types combine to provide convenient syntax for developers without introducing any runtime overhead.
+- Customisable Vector data to text converters.
+- Parametric and Estimated (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
+- Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
+- Geometry: Sample points uniformly from volumes defined by 3D tetrahedrons.  Bresenham Line Drawing Algorithm that invokes a lambda for each discrete point on a line. 
+- Kernels: Gaussian, Epanechnikov, Uniform, and Discrete.
+- Flexible Histogram data structures with Console friendly Text Based Visualizations inspired by <a href="https://github.com/JuliaPlots/UnicodePlots.jl">Julia Plots</a>.
+- Bijection[A, B]: an abstraction for bijective implicit conversions.
+- BigRandom: scala.util.Random extension methods to generate random BigInt and BigDecimal values.
+- Interval and Domain types and objects with support for random sampling. 
+- Unicode text formatting utility for writing integers in superscript or subscript positions. 
+
 <h3>Vector Math Syntax:</h3>
 
 ```scala
@@ -44,8 +57,6 @@ println( (v1 ⨯ v2 ).show ) // or with a unicode ⨯ operator
 import ai.dragonfly.math.Random.*
 val r:Random = defaultRandom
 
-import narr.*  // included library for native arrays.
-
 // higher dimensional vectors
 val v42a:Vector[42] = r.nextVector[42]()
 val v42b:Vector[42] = r.nextVector[42]()
@@ -55,17 +66,6 @@ println( (v42a - v42b).render() )
 println( (v42a + v42b).csv() ) // output vector sum as comma separated values
 println( (v42a + v42b).tsv() ) // output vector sum tab separated values
 ```
-
-Features:
-- High performance, low memory footprint Vector type `Vector[N <: Int]` which consists of nothing more than `Float64Array` in JavaScript environments and `Array[Double]` on JVM and Native platforms.  Extension methods, Opaque Types, and Dependent Types combine to provide convenient syntax for developers without introducing any runtime overhead.
-- Customisable Vector data to text converters.
-- Parametric and Estimated (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
-- Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
-- Geometry: Sample points uniformly from volumes defined by 3D tetrahedrons.
-- Kernels: Gaussian, Epanechnikov, Uniform, and Discrete.
-- Flexible Histogram data structures with Console friendly Text Based Visualizations inspired by <a href="https://github.com/JuliaPlots/UnicodePlots.jl">Julia Plots</a>.
-- Bijection[A, B]: an abstraction for bijective implicit conversions.
-- BigRandom: scala.util.Random extension methods to generate random BigInt and BigDecimal values.
 
 Unicode Histogram Plot:
 
