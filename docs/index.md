@@ -112,7 +112,9 @@ Tempts users into relying on `.equals` and `.hashcode`.  However, in practice, f
 v2.equals( v2.rotate(Math.PI / 4.0).rotate(-Math.PI / 4.0) ) 
 ```
 </li>
-<li>Not portable.  Array[Double] has long served as the common currency between machine learning, statistics, matrix, and other math libraries on all of Scala's target platforms.  Case classes, by contrast, require conversions to make use of 3rd party libraries.</li>
+<li>
+
+Not portable.  `Array[Double]` has long served as the common currency between machine learning, statistics, matrix, and other math libraries on all of Scala's target platforms.  Case classes, by contrast, require conversions to make use of 3rd party libraries.</li>
 <li>
 
 Bloated default serializations.  Whether JSON, or binary, automatic serializations of case classes create more bloated formats than `Array[Double]`.  For example, we might prefer JSON in the format:<br />
