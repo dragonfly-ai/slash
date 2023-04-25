@@ -5,15 +5,13 @@ A Scala 3 Vector Math and Statistics library designed to simultaneously provide 
 <h3>Vector Library Design 101 (what this library is not):</h3>
 
 &nbsp;&nbsp;&nbsp;To understand how this library avoids tradeoffs that have plagued other vector math libraries since the advent of computers, please contrast the following three illustrations; each represents a competing family of vector type design priorities:
-<table>
-<tr>
-<td style="text-align: center; width: 25%;">Case Classes (<a href="https://scastie.scala-lang.org/ClaUW7DmQOCtT2rlAhFEtg">Scastie</a>)</td>
-<td style="text-align: center; width: 25%;">Wrappers and Traits (<a href="https://scastie.scala-lang.org/oH0TYuYERCa8w21NeKjwrw">Scastie</a>)</td>
-<td style="text-align: center; width: 25%;">Arrays (<a href="https://scastie.scala-lang.org/VVTNglXrSrW8uDrd9iYmyg">Scastie</a>)</td>
-</tr>
 
-<tr style="vertical-align: top;">
-<td style="width: 25%;">Strictly Immutable Version:
+<h3>1. Case Classes (<a href="https://scastie.scala-lang.org/ClaUW7DmQOCtT2rlAhFEtg">Scastie</a>)</h3>
+
+&nbsp;&nbsp;&nbsp;Vector types very commonly appear in the form of case classes like the examples below.  The Scala.js game engine: <a href="https://github.com/PurpleKingdomGames/indigo/blob/main/indigo/indigo/src/main/scala/indigo/shared/datatypes/Vector2.scala#L5">Indigo</a> has taken this approach very far, and the <a href="https://github.com/dragonfly-ai/vector/commit/6ea051e89f0272a099662d7a9d565a9bea77be23#diff-2b17728622fdb5f2e6eb99607354b2652b818bbe28bd39117f68f3bac034c9f0R10">earliest versions of this library</a> also adopted it.  Although more legible and intuitive than the alternatives, this approach lags farthest behind in performance: "That's a lot of memory overhead for what's essentially an ordered sequence of `Double` values.", flexibility: "How can case classes represent vectors of high dimension or dimensions determined at run time?", ease of maintenance: "Who wants to maintain separate implementations of `def + (v: Vector): Vector` for every possible vector dimension?", and portability: "Scala case classes don't readily serialize efficiently to JSON or Binary compared to other types, and appear less accessible to native Java, C, and JavaScript developers."<br />
+&nbsp;&nbsp;&nbsp;Case class implementations tend to appear in three major flavors: Immutable, Mutable, and Hybrid:
+
+Strictly Immutable Version:
 
 ```scala
 case class Vector2(x:Double, y:Double) {
@@ -28,6 +26,7 @@ case class Vector3(x:Double, y:Double, z:Double) {
   )
 }
 ```
+
 Strictly Mutable Version:
 
 ```scala
@@ -46,7 +45,7 @@ case class Vector3(var x:Double, var y:Double, var z:Double) {
 }
 ```
 
-Combined Version to Offer Immutable or Mutable Behavior:
+Hybrid Version to Offer Immutable or Mutable Behavior:
 
 ```scala
 case class Vector2(var x:Double, var y:Double) {
@@ -69,8 +68,64 @@ case class Vector3(var x:Double, var y:Double, var z:Double) {
   }
 }
 ```
-</td>
-<td style="width: 25%;">
+
+Advantages:
+<ul>
+<li>Intuitive syntax.
+
+```scala
+val v = Vector2(0.5, 0.25) + Vector2(0.5, 0.25)
+```
+</li>
+<li>Type Safe.
+
+```scala
+// compiler error:
+val v3 = Vector2(0.5, 0.25) + Vector3(0.5, 0.25, 0.125)
+```
+</li>
+<li>Potentially Strictly Immutable.</li>
+<li>
+
+Human Readable `toString` => `Vector2(1.0,0.5)`.
+</li>
+<li>
+
+Supports Overloaded Operators: `+, -, *, /, etc.`
+</li>
+<li>No runtime errors.</li>
+<li>Dimensionality built into the type; no runtime dimension checking.</li>
+<li>No loop overhead for + method.</li>
+</ul>
+Disadvantages:
+<ul>
+<li>No clear way to implement vectors of higher or runtime determined dimension.</li>
+<li>Separate implementations for every vector dimensionality.</li>
+<li>Memory intensive.</li>
+<li>Slow.</li>
+<li>
+
+Not generic:  Suppose we need a `VectorBounds` class which can tell whether a vector lies within a rectangular volume or not.  Because `Vector2` and `Vector3` are entirely distinct types, we need separate implementations of `VectorBounds` for every possible dimensionality.
+</li>
+<li>
+
+Tempts users into relying on `.equals` and `.hashcode`.  However, in practice, floating point errors make `Vector` vector data error prone when used as `Map` keys or in equality testing.  For example:
+```scala
+// Returns true only sometimes:
+v2.equals( v2.rotate(Math.PI / 4.0).rotate(-Math.PI / 4.0) ) 
+```
+</li>
+<li>Not portable.  Array[Double] has long served as the common currency between machine learning, statistics, matrix, and other math libraries on all of Scala's target platforms.  Case classes, by contrast, require conversions to make use of 3rd party libraries.</li>
+<li>
+
+Bloated default serializations.  Whether JSON, or binary, automatic serializations of case classes create more bloated formats than `Array[Double]`.  For example, we might prefer JSON in the format:<br />
+`[1.0, 2.0, 3.0]` instead of `{ "x" : 1.0, "y" : 2.0, "z" : 3.0 }`.
+</li>
+</ul>
+
+<h3>2.  Wrappers and Traits (<a href="https://scastie.scala-lang.org/oH0TYuYERCa8w21NeKjwrw">Scastie</a>)</h3>
+
+&nbsp;&nbsp;&nbsp;To increase flexibility and reduce maintenance costs, <a href="https://github.com/dragonfly-ai/vector/blob/c9e370545d96a8e341b63e1c4ee39be846b0f970/vector/shared/src/main/scala/ai/dragonfly/math/vector/Vector3.scala#L25">Versions of this library as recent as 2023</a> reflected this approach.  With inheritance, type tricks, and wrappers, this kind of design can consolidate most vector operations e.g. `+`, `-`, `magnitude`, and `scale` across all vector dimension types into a shared trait.  Unfortunately, the design gets complicated, introduces potential runtime errors, and doesn't improve performance much.<br />
 
 ```scala
 def dimCheck(sup:Int, req: Int): Unit = {
@@ -142,109 +197,6 @@ class Vector3 private (values:Array[Double]) extends Vector {
   override def toString:String = s"Vector3($x, $y, $z)"
 }
 ```
-</td>
-<td style="width: 25%;">
-
-```scala
-type Vector = Array[Double]
-
-object Vector {
-  def plus(v1:Vector, v2:Vector):Vector = {
-    if (v1.length != v2.length) {
-      throw Exception("Mismatched Vector Dimensions!")
-    } else {
-      val out: Vector = new Array[Double](v1.length)
-      var i:Int = 0
-      while (i < v1.length) {
-        out(i) = v1(i) + v2(i)
-        i += 1
-      }
-      out
-    }
-  }
-}
-```
-</td>
-</tr>
-
-<tr>
-<td style="vertical-align: top; width: 25%;">
-
-Summary:<br />
-&nbsp;&nbsp;&nbsp;Vectors very commonly appear in the form of case classes like these.  The Scala.js game engine: <a href="https://github.com/PurpleKingdomGames/indigo/blob/main/indigo/indigo/src/main/scala/indigo/shared/datatypes/Vector2.scala#L5">Indigo</a> has taken this approach very far, and the <a href="https://github.com/dragonfly-ai/vector/commit/6ea051e89f0272a099662d7a9d565a9bea77be23#diff-2b17728622fdb5f2e6eb99607354b2652b818bbe28bd39117f68f3bac034c9f0R10">earliest versions of this library</a> also adopted it.  Although more legible and intuitive than the alternatives, this approach lags farthest behind in performance: "That's a lot of memory overhead for what's essentially an ordered sequence of `Double` values.", flexibility: "How can case classes represent vectors of high dimension or dimensions determined at run time?", ease of maintenance: "Who wants to maintain separate implementations of `def + (v: Vector): Vector` for every possible vector dimension?", and portability: "Scala case classes don't readily serialize efficiently to JSON or Binary compared to other types, and appear less accessible to native Java, C, and JavaScript developers."<br />
-</td>
-<td style="vertical-align: top; width: 25%;">
-
-Summary:<br />
-&nbsp;&nbsp;&nbsp;To increase flexibility and reduce maintenance costs without addressing performance concerns, <a href="https://github.com/dragonfly-ai/vector/blob/c9e370545d96a8e341b63e1c4ee39be846b0f970/vector/shared/src/main/scala/ai/dragonfly/math/vector/Vector3.scala#L25">Versions of this library as recent as 2023</a> reflected this approach.  With inheritance, type tricks, and wrappers, this kind of design can generalize operations like: `magnitude`, `def plus(v:Vector):Vector`, and `def scale(s:Double):Vector` across all vector dimensions to consolidate most of the methods from each vector type into a single shared trait.  Unfortunately, the design gets complicated, introduces potential runtime errors, and doesn't improve performance.<br />
-</td>
-
-<td style="vertical-align: top; width: 25%;">
-
-Summary:<br />
-&nbsp;&nbsp;&nbsp;This approach puts performance first, absolutely minimizes memory footprint and maintenance costs, and unless it abandons runtime dimension checking, also maximizes speed.  Unfortunately, emphasizing performance to this extent invites innumerable runtime errors, and subjects users to unpleasant syntax. 
-</td>
-</tr>
-
-
-<tr style="vertical-align: top;">
-<td style="width: 25%;">
-Advantages:
-<ul>
-<li>Intuitive syntax.
-
-```scala
-val v = Vector2(0.5, 0.25) + Vector2(0.5, 0.25)
-```
-</li>
-<li>Type Safe.
-
-```scala
-// compiler error:
-val v3 = Vector2(0.5, 0.25) + Vector3(0.5, 0.25, 0.125)
-```
-</li>
-<li>Potentially Strictly Immutable.</li>
-<li>
-
-Human Readable `toString` => `Vector2(1.0,0.5)`.
-</li>
-<li>
-
-Supports Overloaded Operators: `+, -, *, /, etc.`
-</li>
-<li>No runtime errors.</li>
-<li>Dimensionality built into the type; no runtime dimension checking.</li>
-<li>No loop overhead for + method.</li>
-</ul>
-Disadvantages:
-<ul>
-<li>No clear way to implement vectors of higher or runtime determined dimension.</li>
-<li>Separate implementations for every vector dimensionality.</li>
-<li>Memory intensive.</li>
-<li>Slow.</li>
-<li>
-
-Not generic:  Suppose we need a `VectorBounds` class which can tell whether a vector lies within a rectangular volume or not.  Because `Vector2` and `Vector3` are entirely distinct types, we need separate implementations of `VectorBounds` for every possible dimensionality.
-</li>
-<li>
-
-Tempts users into relying on `.equals` and `.hashcode`.  However, in practice, floating point errors make `Vector` vector data error prone when used as `Map` keys or in equality testing.  For example:
-```scala
-// Returns true only sometimes:
-v2.equals( v2.rotate(Math.PI / 4.0).rotate(-Math.PI / 4.0) ) 
-```
-</li>
-<li>Not portable.  Array[Double] has long served as the common currency between machine learning, statistics, matrix, and other math libraries on all of Scala's target platforms.  Case classes, by contrast, require conversions to make use of 3rd party libraries.</li>
-<li>
-
-Bloated default serializations.  Whether JSON, or binary, automatic serializations of case classes create more bloated formats than `Array[Double]`.  For example, we might prefer JSON in the format:<br />
-`[1.0, 2.0, 3.0]` instead of `{ "x" : 1.0, "y" : 2.0, "z" : 3.0 }`.
-</li>
-</ul>
-</td>
-
-<td style="width: 25%;">
 
 Advantages:
 <ul>
@@ -314,9 +266,30 @@ Slightly less bloated default serializations.  For example, we might prefer JSON
 `[1.0, 2.0, 3.0]` instead of `{ "values" : [1.0, 2.0, 3.0] }`.
 </li>
 </ul>
-</td>
 
-<td style="width: 25%;">
+
+<h3>3.  Arrays (<a href="https://scastie.scala-lang.org/VVTNglXrSrW8uDrd9iYmyg">Scastie</a>)</h3>
+&nbsp;&nbsp;&nbsp;This approach puts performance first, minimizes memory footprint and maintenance costs, and unless it abandons runtime dimension checking, also maximizes speed.  Unfortunately, emphasizing performance in this way leads to runtime errors and unpleasant syntax.
+```scala
+type Vector = Array[Double]
+
+object Vector {
+  def plus(v1:Vector, v2:Vector):Vector = {
+    if (v1.length != v2.length) {
+      throw Exception("Mismatched Vector Dimensions!")
+    } else {
+      val out: Vector = new Array[Double](v1.length)
+      var i:Int = 0
+      while (i < v1.length) {
+        out(i) = v1(i) + v2(i)
+        i += 1
+      }
+      out
+    }
+  }
+}
+```
+
 Advantages:
 <ul>
 <li>Fast.</li>
@@ -342,13 +315,10 @@ val v3:Vector = Vector.plus(v1, v2)
 </li>
 <li>Small performance penalty from requiring dimensionality checks on every operation involving two vectors.</li>
 </ul>
-</td>
-</tr>
-</table>
 
-<h3>How This Vector Library Surpasses the Strengths of All Three:</h3>
+<h3>How This Vector Library Builds on the Strengths of All Three:</h3>
 
-&nbsp;&nbsp;&nbsp;What if we could have a Vector type with less overhead and more speed than the Arrays method, more flexibility than the Traits and Wrappers method, and more robust compile time error detection than the Case Class method?  What if we could also maximize portability to native compilation targets for seamless interop with native language families: JavaScript, Java, and C/C++, all in a way that serialization libraries inherently treat in the most concise possible way?  This library makes good use of Scala 3 features to meet all of these goals.  Please consider <a href="https://github.com/dragonfly-ai/vector/blob/cb962a3b9d154eea37ffec877b25fa256e374ba7/vector/shared/src/main/scala/ai/dragonfly/math/vector/package.scala#L27">the design</a>:
+&nbsp;&nbsp;&nbsp;What if we could have a Vector type with more robust compile time error detection than the Case Class method, more flexibility than the Traits and Wrappers method, and  less overhead and more speed than the Arrays method?  What if we could also maximize portability to native compilation targets for seamless interop with native language families: JavaScript, Java, and C/C++, all in a way that serialization libraries inherently treat in the most concise possible way?  This library makes good use of Scala 3 features to meet all of these goals.  Please consider <a href="https://github.com/dragonfly-ai/vector/blob/cb962a3b9d154eea37ffec877b25fa256e374ba7/vector/shared/src/main/scala/ai/dragonfly/math/vector/package.scala#L27">the design</a>:
 
 ```scala
 import narr.*
@@ -361,7 +331,7 @@ package object vector {
   opaque type Vector[N <: Int] = NArray[Double] // NArray is a type alias for the best available native Array type.
 
   object Vector {
-    // convenience methods for Vector[2], Vector[3], and Vector[4]
+    // convenient factory methods for Vector[2], Vector[3], and Vector[4]
     inline def apply(x: Double, y: Double): Vector[2] = NArray[Double](x, y)
     inline def apply(x: Double, y: Double, z: Double): Vector[3] = NArray[Double](x, y, z)
     inline def apply(x: Double, y: Double, z: Double, w: Double): Vector[4] = NArray[Double](x, y, z, w)    
@@ -415,7 +385,7 @@ case class VectorBounds[N <: Int](min: Vector[N], MAX: Vector[N]) {
 }
 ```
 
-<h3>More Examples of this Sweet Vector Math Syntax:</h3>
+<h3>More Examples of Vector Math Syntax:</h3>
 
 ```scala
 import ai.dragonfly.math.vector.*

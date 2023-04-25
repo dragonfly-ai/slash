@@ -33,14 +33,8 @@ package object vector {
     }
 
     inline def random[N <: Int](maxNorm:Double = 1.0): Vector[N] = {
-      val dimension:Int = valueOf[N]
-      val randomVector: Vector[N] = new NArray[Double](dimension)
-      var i = 0
-      while (i < dimension) {
-        randomVector(i) = maxNorm * Math.random()
-        i = i + 1
-      }
-      randomVector
+      import ai.dragonfly.math.Random.*
+      defaultRandom.nextVector[N](maxNorm)
     }
 
     inline def apply(x: Double, y: Double): Vector[2] = NArray[Double](x, y)
