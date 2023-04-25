@@ -18,30 +18,95 @@ package ai.dragonfly.math
 
 package object unicode {
 
-  private val superscriptDigits: Array[String] = Array[String]("⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹")
-  private val subscriptDigits: Array[String] = Array[String]("₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉", "₊")
+// JavaScript Scientific Notation:
+//  -1.7976931348623157e+308
+//  5e-324
+//  1.7976931348623157e+308
 
-  private def digitMapper(i: Int, digitMap: Array[String]): String = {
+// JVM Scientific Notation:
+//  -1.7976931348623157E308
+//  4.9E-324
+//  1.7976931348623157E308
 
-    var in: Int = i / 10
-    var out: String = digitMap(i % 10)
+// Native Scientific Notation:
+//  -1.7976931348623157E308
+//  4.9E-324
+//  1.7976931348623157E308
 
-    while (in > 0) {
-      out = digitMap(in % 10) + out
-      in = in / 10
+  def exalt(c:Char):Char = c match {
+    case '0' => '⁰'
+    case '1' => '¹'
+    case '2' => '²'
+    case '3' => '³'
+    case '4' => '⁴'
+    case '5' => '⁵'
+    case '6' => '⁶'
+    case '7' => '⁷'
+    case '8' => '⁸'
+    case '9' => '⁹'
+    case '.' => 'ᐧ'
+    case '-' => '⁻'
+    case 'e' => 'ᵉ'
+    case 'E' => 'ᵉ'
+    case '+' => '⁺'
+  }
+
+  def abase(c: Char): Char = c match {
+    case '0' => '₀'
+    case '1' => '₁'
+    case '2' => '₂'
+    case '3' => '₃'
+    case '4' => '₄'
+    case '5' => '₅'
+    case '6' => '₆'
+    case '7' => '₇'
+    case '8' => '₈'
+    case '9' => '₉'
+    case '.' => '.'
+    case '-' => '₋'
+    case 'e' => 'ₑ'
+    case 'E' => 'ₑ'
+    case '+' => '₊'
+  }
+
+  private def exalt(numericString: String): String = {
+    val charBuffer: Array[Char] = new Array[Char](numericString.length)
+    var i: Int = 0
+    while (i < numericString.length) {
+      charBuffer(i) = exalt(numericString.charAt(i))
+      i += 1
     }
-    out
+    new String(charBuffer)
   }
 
-  def exalt(i: Int): String = {
-    if (i < 0) "⁻" + digitMapper(i * -1, superscriptDigits)
-    else digitMapper(i, superscriptDigits)
+  private def abase(numericString: String):String = {
+    val charBuffer:Array[Char] = new Array[Char](numericString.length)
+    var i:Int = 0
+    while (i < numericString.length) {
+      charBuffer(i) = abase(numericString.charAt(i))
+      i += 1
+    }
+    new String(charBuffer)
   }
 
-  def abase(i: Int): String = {
-    if (i < 0) "⁻" + digitMapper(i * -1, subscriptDigits)
-    else digitMapper(i, subscriptDigits)
-  }
+  def exalt(b: Byte): String = exalt(b.toString)
+  def abase(b: Byte): String = abase(b.toString)
+
+  def exalt(s: Short): String = exalt(s.toString)
+  def abase(s: Short): String = abase(s.toString)
+
+  def exalt(i: Int): String = exalt(i.toString)
+  def abase(i: Int): String = abase(i.toString)
+
+  def exalt(l: Long): String = exalt(l.toString)
+  def abase(l: Long): String = abase(l.toString)
+
+  def exalt(d:Double):String = exalt(d.toString)
+  def abase(d:Double):String = abase(d.toString)
+
+  def exalt(f: Float): String = exalt(f.toString)
+  def abase(f: Float): String = abase(f.toString)
+
 }
 
 /*

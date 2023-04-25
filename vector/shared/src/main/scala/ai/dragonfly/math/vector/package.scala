@@ -114,7 +114,7 @@ package object vector {
 
       inline def euclideanDistanceTo(v0: Vector[N]): Double = Math.sqrt(euclideanDistanceSquaredTo(v0))
 
-      def +(v0: Vector[N]): Vector[N] = copy.add(v0)
+      inline def +(v0: Vector[N]): Vector[N] = copy.add(v0)
 
       inline def += (v0: Vector[N]): Vector[N] = add(v0)
 
@@ -128,7 +128,7 @@ package object vector {
       }
 
 
-      def -(v0: Vector[N]): Vector[N] = copy.subtract(v0)
+      inline def -(v0: Vector[N]): Vector[N] = copy.subtract(v0)
       inline def -= (v0: Vector[N]): Vector[N] = subtract(v0)
 
       def subtract(v0: Vector[N]): Vector[N] = {
@@ -150,7 +150,7 @@ package object vector {
         product
       }
 
-      def *(scalar: Double): Vector[N] = copy.scale(scalar)
+      inline def *(scalar: Double): Vector[N] = copy.scale(scalar)
 
       inline def *= (scalar: Double): Vector[N] = scale(scalar)
       inline def scale(scalar: Double): Vector[N] = {
@@ -161,7 +161,7 @@ package object vector {
         }
         thisVector
       }
-      def /(divisor: Double): Vector[N] = copy.divide(divisor)
+      inline def /(divisor: Double): Vector[N] = copy.divide(divisor)
       inline def /= (divisor: Double): Vector[N] = divide(divisor)
 
       inline def divide(divisor: Double): Vector[N] = scale(1.0 / divisor)

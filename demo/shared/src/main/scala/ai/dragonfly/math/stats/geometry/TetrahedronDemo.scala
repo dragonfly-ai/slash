@@ -10,7 +10,7 @@ import Vector3.*
 
 object TetrahedronDemo extends Demonstration {
 
-  val `1/6`:Double = 1.0 / 6.0
+//  val `1/6`:Double = 1.0 / 6.0
 
   override def demo():Unit = {
     val q = 10.0 * Math.cos((Math.PI * 2.0)/3.0)
@@ -22,15 +22,12 @@ object TetrahedronDemo extends Demonstration {
       Vector[3]( 0, 0,-q)
     )
 
-    val sampleCount:Int = 100
+    val sampleCount:Int = 5
 
-    println("# dragonfly.ai tetrahedronSamples.obj\n")
-    println("o tetrahedronSamples\n")
-    val samples = (0 until sampleCount).map {
-      i =>
-      val s = t.random()
-      println(s"v ${s.x} ${s.y} ${s.z}\n")
-      s
+    println("sampling from the interior of the tetrahedron:")
+    var i:Int = 0; while ( i < sampleCount) {
+      println(t.random().show)
+      i += 1
     }
 
 //
