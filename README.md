@@ -270,6 +270,7 @@ Slightly less bloated default serializations.  For example, we might prefer JSON
 
 <h3>3.  Arrays (<a href="https://scastie.scala-lang.org/VVTNglXrSrW8uDrd9iYmyg">Scastie</a>)</h3>
 &nbsp;&nbsp;&nbsp;This approach puts performance first, minimizes memory footprint and maintenance costs, and unless it abandons runtime dimension checking, also maximizes speed.  Unfortunately, emphasizing performance in this way leads to runtime errors and unpleasant syntax.
+
 ```scala
 type Vector = Array[Double]
 
@@ -443,8 +444,6 @@ libraryDependencies += "ai.dragonfly" %%% "vector" % "<LATEST_VERSION>"
 ```
 
 Other Features:
-- High performance, low memory footprint Vector type `Vector[N <: Int]` which consists of nothing more than `Float64Array` in JavaScript environments and `Array[Double]` on JVM and Native platforms.  Extension methods, Opaque Types, and Dependent Types combine to provide convenient syntax for developers without introducing any runtime overhead.
-- Customisable Vector data to text converters.
 - Parametric and Estimated (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
 - Geometry: Sample points uniformly from volumes defined by 3D tetrahedrons.  Bresenham Line Drawing Algorithm that invokes a lambda for each discrete point on a line.
