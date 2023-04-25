@@ -24,7 +24,7 @@ import scala.compiletime.ops.int.*
 
 package object vector {
 
-  opaque type Vector[N <: Int] = NArray[Double] // putting the length in the type parameter looks so cool, but maybe just a bad idea.
+  opaque type Vector[N <: Int] = NArray[Double]
 
   object Vector {
     inline def apply[N <: Int](a: NArray[Double]): Vector[N] = { // sneaky way to cast an NArray[Double] to a Vector[N]
