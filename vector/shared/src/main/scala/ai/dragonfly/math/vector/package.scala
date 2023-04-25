@@ -285,8 +285,14 @@ case class UnsupportedVectorDimension(givenDimension:Int, requiredDimension:Int 
 )
 
 
-case class VectorNormalizationException[N <: Int](v:Vector[N]) extends Exception(s"Can't normalize ${v.show}")
+case class VectorNormalizationException[N <: Int](v:Vector[N]) extends Exception({
+  import vector.*
+  import Vector.*
+  s"Can't normalize ${v.render()}"
+})
 
-case class ExtraDimensionalAccessException[N <: Int](v:Vector[N], ci: Int) extends Exception(
-  s"Index: $ci exceeds dimensionality of Euclidean object${v.dimension}: ${v.show}"
-)
+case class ExtraDimensionalAccessException[N <: Int](v:Vector[N], ci: Int) extends Exception({
+  import vector.*
+  import Vector.*
+  s"Index: $ci exceeds dimensionality of Euclidean object${v.dimension}: ${v.render()}"
+})
