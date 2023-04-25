@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="Laika 0.18.1 + Helium Theme" />
     <link rel="icon" href="img/favicon.png" type="image/x-icon" />
-    <title>Vector</title>
+    <title></title>
     
     <meta name="author" content="dragonfly.ai"/>
     
@@ -27,15 +27,323 @@
 </head>
 <body>
 <div>
-    <div class="content" style="width:55%; padding: 16px;">
-        <h1 id="vector" class="title">Vector</h1>
-        
-        <h2 id="about-this-demo" class="section">About this Demo:<a class="anchor-link right" href="#about-this-demo"><i class="icofont-laika">&#xef71;</i></a></h2>
-        <p>&nbsp;&nbsp;&nbsp;The Console Output below exercises various features of the vector library:<br/></p>
-        <div id="console"></div>
-        <p><script type="application/javascript" src="js/main.js"></script></p>
-        <p><a href="https://github.com/dragonfly-ai/vector">Back to vector GitHub Project</a><br/>
-        <a href="https://github.com/dragonfly-ai/">Other Projects by dragonfly.ai</a><br/></p>
+    <div class="content" style="padding: 16px;">
+        <h3>Vector Library Design 101 (what this library is not):</h3>
+        <p>&nbsp;&nbsp;&nbsp;To understand how this library avoids tradeoffs that have plagued other vector math libraries since the advent of computers, please contrast the following three illustrations; each represents a competing family of vector type design priorities:</p>
+        <h3>1. Case Classes (<a href="https://scastie.scala-lang.org/ClaUW7DmQOCtT2rlAhFEtg">Scastie</a>)</h3>
+        <p>&nbsp;&nbsp;&nbsp;Vector types very commonly appear in the form of case classes like the examples below.  The Scala.js game engine: <a href="https://github.com/PurpleKingdomGames/indigo/blob/main/indigo/indigo/src/main/scala/indigo/shared/datatypes/Vector2.scala#L5">Indigo</a> has taken this approach very far, and the <a href="https://github.com/dragonfly-ai/vector/commit/6ea051e89f0272a099662d7a9d565a9bea77be23#diff-2b17728622fdb5f2e6eb99607354b2652b818bbe28bd39117f68f3bac034c9f0R10">earliest versions of this library</a> also adopted it.  Although more legible and intuitive than the alternatives, this approach lags farthest behind in performance: &quot;That&#39;s a lot of memory overhead for what&#39;s essentially an ordered sequence of <code>Double</code> values.&quot;, flexibility: &quot;How can case classes represent vectors of high dimension or dimensions determined at run time?&quot;, ease of maintenance: &quot;Who wants to maintain separate implementations of <code>def + (v: Vector): Vector</code> for every possible vector dimension?&quot;, and portability: &quot;Scala case classes don&#39;t readily serialize efficiently to JSON or Binary compared to other types, and appear less accessible to native Java, C, and JavaScript developers.&quot;<br/>
+        &nbsp;&nbsp;&nbsp;Case class implementations tend to appear in three major flavors: Immutable, Mutable, and Hybrid:</p>
+        <p>Strictly Immutable Version:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">Vector2</span><span>(</span><span class="identifier">x</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="identifier">y</span><span>:</span><span class="type-name">Double</span><span>) {
+  </span><span class="keyword">def</span><span> + (</span><span class="identifier">that</span><span>:</span><span class="type-name">Vector2</span><span>):</span><span class="type-name">Vector2</span><span> = </span><span class="type-name">Vector2</span><span>(
+    </span><span class="identifier">x</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">x</span><span>, </span><span class="identifier">y</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">y</span><span>
+  )
+}
+
+</span><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">Vector3</span><span>(</span><span class="identifier">x</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="identifier">y</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="identifier">z</span><span>:</span><span class="type-name">Double</span><span>) {
+  </span><span class="keyword">def</span><span> + (</span><span class="identifier">that</span><span>:</span><span class="type-name">Vector3</span><span>):</span><span class="type-name">Vector3</span><span> = </span><span class="type-name">Vector3</span><span>(
+    </span><span class="identifier">x</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">x</span><span>, </span><span class="identifier">y</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">y</span><span>, </span><span class="identifier">z</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">z</span><span>
+  )
+}</span></code></pre>
+        <p>Strictly Mutable Version:</p>
+        <pre><code class="nohighlight"><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">Vector2</span><span>(</span><span class="keyword">var</span><span> </span><span class="identifier">x</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="keyword">var</span><span> </span><span class="identifier">y</span><span>:</span><span class="type-name">Double</span><span>) {
+  </span><span class="keyword">def</span><span> += (</span><span class="identifier">that</span><span>:</span><span class="type-name">Vector2</span><span>):</span><span class="type-name">Vector2</span><span> = {
+    </span><span class="identifier">x</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">x</span><span>; </span><span class="identifier">y</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">y</span><span>
+    </span><span class="keyword">this</span><span>
+  }
+}
+
+</span><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">Vector3</span><span>(</span><span class="keyword">var</span><span> </span><span class="identifier">x</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="keyword">var</span><span> </span><span class="identifier">y</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="keyword">var</span><span> </span><span class="identifier">z</span><span>:</span><span class="type-name">Double</span><span>) {
+  </span><span class="keyword">def</span><span> += (</span><span class="identifier">that</span><span>:</span><span class="type-name">Vector3</span><span>):</span><span class="type-name">Vector3</span><span> = {
+    </span><span class="identifier">x</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">x</span><span>; </span><span class="identifier">y</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">y</span><span>; </span><span class="identifier">z</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">z</span><span>
+    </span><span class="keyword">this</span><span>
+  }
+}</span></code></pre>
+        <p>Hybrid Version to Offer Immutable or Mutable Behavior:</p>
+        <pre><code class="nohighlight"><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">Vector2</span><span>(</span><span class="keyword">var</span><span> </span><span class="identifier">x</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="keyword">var</span><span> </span><span class="identifier">y</span><span>:</span><span class="type-name">Double</span><span>) {
+  </span><span class="keyword">def</span><span> + (</span><span class="identifier">that</span><span>:</span><span class="type-name">Vector2</span><span>):</span><span class="type-name">Vector2</span><span> = </span><span class="type-name">Vector2</span><span>(
+    </span><span class="identifier">x</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">x</span><span>, </span><span class="identifier">y</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">y</span><span>
+  )
+  </span><span class="keyword">def</span><span> += (</span><span class="identifier">that</span><span>:</span><span class="type-name">Vector2</span><span>):</span><span class="type-name">Vector2</span><span> = {
+    </span><span class="identifier">x</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">x</span><span>; </span><span class="identifier">y</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">y</span><span>
+    </span><span class="keyword">this</span><span>
+  }
+}
+
+</span><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">Vector3</span><span>(</span><span class="keyword">var</span><span> </span><span class="identifier">x</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="keyword">var</span><span> </span><span class="identifier">y</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="keyword">var</span><span> </span><span class="identifier">z</span><span>:</span><span class="type-name">Double</span><span>) {
+  </span><span class="keyword">def</span><span> + (</span><span class="identifier">that</span><span>:</span><span class="type-name">Vector3</span><span>):</span><span class="type-name">Vector3</span><span> = </span><span class="type-name">Vector3</span><span>(
+    </span><span class="identifier">x</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">x</span><span>, </span><span class="identifier">y</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">y</span><span>, </span><span class="identifier">z</span><span> + </span><span class="identifier">that</span><span>.</span><span class="identifier">z</span><span>
+  )
+  </span><span class="keyword">def</span><span> += (</span><span class="identifier">that</span><span>:</span><span class="type-name">Vector3</span><span>):</span><span class="type-name">Vector3</span><span> = {
+    </span><span class="identifier">x</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">x</span><span>; </span><span class="identifier">y</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">y</span><span>; </span><span class="identifier">z</span><span> += </span><span class="identifier">that</span><span>.</span><span class="identifier">z</span><span>
+    </span><span class="keyword">this</span><span>
+  }
+}</span></code></pre>
+        <p>Advantages:
+        <ul>
+        <li>Intuitive syntax.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">v</span><span> = </span><span class="type-name">Vector2</span><span>(</span><span class="number-literal">0.5</span><span>, </span><span class="number-literal">0.25</span><span>) + </span><span class="type-name">Vector2</span><span>(</span><span class="number-literal">0.5</span><span>, </span><span class="number-literal">0.25</span><span>)</span></code></pre>
+        <p></li>
+        <li>Type Safe.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// compiler error:
+</span><span class="keyword">val</span><span> </span><span class="identifier">v3</span><span> = </span><span class="type-name">Vector2</span><span>(</span><span class="number-literal">0.5</span><span>, </span><span class="number-literal">0.25</span><span>) + </span><span class="type-name">Vector3</span><span>(</span><span class="number-literal">0.5</span><span>, </span><span class="number-literal">0.25</span><span>, </span><span class="number-literal">0.125</span><span>)</span></code></pre>
+        <p></li>
+        <li>Potentially Strictly Immutable.</li>
+        <li></p>
+        <p>Human Readable <code>toString</code> =&gt; <code>Vector2(1.0,0.5)</code>.
+        </li>
+        <li></p>
+        <p>Supports Overloaded Operators: <code>+, -, *, /, etc.</code>
+        </li>
+        <li>No runtime errors.</li>
+        <li>Dimensionality built into the type; no runtime dimension checking.</li>
+        <li>No loop overhead for + method.</li>
+        </ul>
+        Disadvantages:
+        <ul>
+        <li>No clear way to implement vectors of higher or runtime determined dimension.</li>
+        <li>Separate implementations for every vector dimensionality.</li>
+        <li>Memory intensive.</li>
+        <li>Slow.</li>
+        <li></p>
+        <p>Not generic:  Suppose we need a <code>VectorBounds</code> class which can tell whether a vector lies within a rectangular volume or not.  Because <code>Vector2</code> and <code>Vector3</code> are entirely distinct types, we need separate implementations of <code>VectorBounds</code> for every possible dimensionality.
+        </li>
+        <li></p>
+        <p>Tempts users into relying on <code>.equals</code> and <code>.hashcode</code>.  However, in practice, floating point errors make <code>Vector</code> vector data error prone when used as <code>Map</code> keys or in equality testing.  For example:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// Returns true only sometimes:
+</span><span class="identifier">v2</span><span>.</span><span class="identifier">equals</span><span>( </span><span class="identifier">v2</span><span>.</span><span class="identifier">rotate</span><span>(</span><span class="type-name">Math</span><span>.</span><span class="type-name">PI</span><span> / </span><span class="number-literal">4.0</span><span>).</span><span class="identifier">rotate</span><span>(-</span><span class="type-name">Math</span><span>.</span><span class="type-name">PI</span><span> / </span><span class="number-literal">4.0</span><span>) ) </span></code></pre>
+        <p></li>
+        <li></p>
+        <p>Not portable.  <code>Array[Double]</code> has long served as the common currency between machine learning, statistics, matrix, and other math libraries on all of Scala&#39;s target platforms.  Case classes, by contrast, require conversions to make use of 3rd party libraries.</li>
+        <li></p>
+        <p>Bloated default serializations.  Whether JSON, or binary, automatic serializations of case classes create more bloated formats than <code>Array[Double]</code>.  For example, we might prefer JSON in the format:<br/>
+        <code>[1.0, 2.0, 3.0]</code> instead of <code>{ &quot;x&quot; : 1.0, &quot;y&quot; : 2.0, &quot;z&quot; : 3.0 }</code>.
+        </li>
+        </ul></p>
+        <h3>2.  Wrappers and Traits (<a href="https://scastie.scala-lang.org/oH0TYuYERCa8w21NeKjwrw">Scastie</a>)</h3>
+        <p>&nbsp;&nbsp;&nbsp;To increase flexibility and reduce maintenance costs, <a href="https://github.com/dragonfly-ai/vector/blob/c9e370545d96a8e341b63e1c4ee39be846b0f970/vector/shared/src/main/scala/ai/dragonfly/math/vector/Vector3.scala#L25">Versions of this library as recent as 2023</a> reflected this approach.  With inheritance, type tricks, and wrappers, this kind of design can consolidate most vector operations e.g. <code>+</code>, <code>-</code>, <code>magnitude</code>, and <code>scale</code> across all vector dimension types into a shared trait.  Unfortunately, the design gets complicated, introduces potential runtime errors, and doesn&#39;t improve performance much.<br/></p>
+        <pre><code class="nohighlight"><span class="keyword">def</span><span> </span><span class="declaration-name">dimCheck</span><span>(</span><span class="identifier">sup</span><span>:</span><span class="type-name">Int</span><span>, </span><span class="identifier">req</span><span>: </span><span class="type-name">Int</span><span>): </span><span class="type-name">Unit</span><span> = {
+  </span><span class="keyword">if</span><span>(</span><span class="identifier">sup</span><span>!=</span><span class="identifier">req</span><span>) </span><span class="keyword">throw</span><span> </span><span class="type-name">Exception</span><span>(</span><span class="string-literal">&quot;Mismatched Dimensions!&quot;</span><span>)
+}
+
+</span><span class="keyword">trait</span><span> </span><span class="type-name">Vector</span><span> {
+  </span><span class="keyword">type</span><span> </span><span class="type-name">VEC</span><span> &lt;: </span><span class="type-name">Vector</span><span>
+  </span><span class="keyword">val</span><span> </span><span class="identifier">dimension</span><span>:</span><span class="type-name">Int</span><span>
+
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">i</span><span>:</span><span class="type-name">Int</span><span>):</span><span class="type-name">Double</span><span>
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">update</span><span>(</span><span class="identifier">i</span><span>:</span><span class="type-name">Int</span><span>, </span><span class="identifier">d</span><span>:</span><span class="type-name">Double</span><span>): </span><span class="type-name">Unit</span><span>
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">zeros</span><span>:</span><span class="type-name">VEC</span><span>
+  </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> +(</span><span class="identifier">that</span><span>:</span><span class="type-name">VEC</span><span>):</span><span class="type-name">VEC</span><span> = {
+    </span><span class="identifier">dimCheck</span><span>(</span><span class="identifier">dimension</span><span>, </span><span class="identifier">that</span><span>.</span><span class="identifier">dimension</span><span>)
+    </span><span class="keyword">val</span><span> </span><span class="identifier">out</span><span> = </span><span class="identifier">zeros</span><span>
+    </span><span class="keyword">var</span><span> </span><span class="identifier">i</span><span> = </span><span class="number-literal">0</span><span>; </span><span class="keyword">while</span><span>(</span><span class="identifier">i</span><span> &lt; </span><span class="identifier">dimension</span><span>) {
+      </span><span class="identifier">out</span><span>(</span><span class="identifier">i</span><span>) = </span><span class="keyword">this</span><span>(</span><span class="identifier">i</span><span>) + </span><span class="identifier">that</span><span>(</span><span class="identifier">i</span><span>)
+      </span><span class="identifier">i</span><span> = </span><span class="identifier">i</span><span> + </span><span class="number-literal">1</span><span>
+    }
+    </span><span class="identifier">out</span><span>
+  }
+}
+
+</span><span class="keyword">object</span><span> </span><span class="type-name">Vector2</span><span> {
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">values</span><span>:</span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>]): </span><span class="type-name">Vector2</span><span> = {
+    </span><span class="identifier">dimCheck</span><span>(</span><span class="number-literal">2</span><span>, </span><span class="identifier">values</span><span>.</span><span class="identifier">length</span><span>); </span><span class="keyword">new</span><span> </span><span class="type-name">Vector2</span><span>(</span><span class="identifier">values</span><span>)
+  }
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">x</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="identifier">y</span><span>:</span><span class="type-name">Double</span><span>): </span><span class="type-name">Vector2</span><span> = {
+    </span><span class="keyword">new</span><span> </span><span class="type-name">Vector2</span><span>(</span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>](</span><span class="identifier">x</span><span>, </span><span class="identifier">y</span><span>))
+  }
+}
+
+</span><span class="keyword">class</span><span> </span><span class="type-name">Vector2</span><span> </span><span class="keyword">private</span><span> (</span><span class="identifier">values</span><span>:</span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>]) </span><span class="keyword">extends</span><span> </span><span class="type-name">Vector</span><span> {
+  </span><span class="keyword">type</span><span> </span><span class="type-name">VEC</span><span> = </span><span class="type-name">Vector2</span><span>
+  </span><span class="keyword">override</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">dimension</span><span>:</span><span class="type-name">Int</span><span> = </span><span class="number-literal">2</span><span>
+  </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">x</span><span>:</span><span class="type-name">Double</span><span> = </span><span class="identifier">values</span><span>(</span><span class="number-literal">0</span><span>)
+  </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">y</span><span>:</span><span class="type-name">Double</span><span> = </span><span class="identifier">values</span><span>(</span><span class="number-literal">1</span><span>)
+  </span><span class="identifier">inline</span><span> </span><span class="keyword">override</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">index</span><span>: </span><span class="type-name">Int</span><span>): </span><span class="type-name">Double</span><span> = </span><span class="identifier">values</span><span>(</span><span class="identifier">index</span><span>)
+  </span><span class="identifier">inline</span><span> </span><span class="keyword">override</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">update</span><span>(</span><span class="identifier">index</span><span>: </span><span class="type-name">Int</span><span>, </span><span class="identifier">value</span><span>: </span><span class="type-name">Double</span><span>): </span><span class="type-name">Unit</span><span> = {
+    </span><span class="identifier">values</span><span>(</span><span class="identifier">index</span><span>) = </span><span class="identifier">value</span><span>
+  }
+  </span><span class="keyword">override</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">zeros</span><span>:</span><span class="type-name">Vector2</span><span> = </span><span class="type-name">Vector2</span><span>(</span><span class="number-literal">0.0</span><span>, </span><span class="number-literal">0.0</span><span>)
+  </span><span class="keyword">override</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">toString</span><span>:</span><span class="type-name">String</span><span> = </span><span class="string-literal">s&quot;Vector2(</span><span class="substitution">$x</span><span class="string-literal">, </span><span class="substitution">$y</span><span class="string-literal">)&quot;</span><span>
+}
+
+</span><span class="keyword">object</span><span> </span><span class="type-name">Vector3</span><span> {
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">values</span><span>:</span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>]): </span><span class="type-name">Vector3</span><span> = {
+    </span><span class="identifier">dimCheck</span><span>(</span><span class="number-literal">3</span><span>, </span><span class="identifier">values</span><span>.</span><span class="identifier">length</span><span>); </span><span class="keyword">new</span><span> </span><span class="type-name">Vector3</span><span>(</span><span class="identifier">values</span><span>)
+  }
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">x</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="identifier">y</span><span>:</span><span class="type-name">Double</span><span>, </span><span class="identifier">z</span><span>:</span><span class="type-name">Double</span><span>): </span><span class="type-name">Vector3</span><span> = {
+    </span><span class="keyword">new</span><span> </span><span class="type-name">Vector3</span><span>(</span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>](</span><span class="identifier">x</span><span>, </span><span class="identifier">y</span><span>, </span><span class="identifier">z</span><span>))
+  }
+}
+
+</span><span class="keyword">class</span><span> </span><span class="type-name">Vector3</span><span> </span><span class="keyword">private</span><span> (</span><span class="identifier">values</span><span>:</span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>]) </span><span class="keyword">extends</span><span> </span><span class="type-name">Vector</span><span> {
+  </span><span class="keyword">type</span><span> </span><span class="type-name">VEC</span><span> = </span><span class="type-name">Vector3</span><span>
+  </span><span class="keyword">override</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">dimension</span><span>:</span><span class="type-name">Int</span><span> = </span><span class="number-literal">3</span><span>
+  </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">x</span><span>:</span><span class="type-name">Double</span><span> = </span><span class="identifier">values</span><span>(</span><span class="number-literal">0</span><span>)
+  </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">y</span><span>:</span><span class="type-name">Double</span><span> = </span><span class="identifier">values</span><span>(</span><span class="number-literal">1</span><span>)
+  </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">z</span><span>:</span><span class="type-name">Double</span><span> = </span><span class="identifier">values</span><span>(</span><span class="number-literal">1</span><span>)
+
+  </span><span class="identifier">inline</span><span> </span><span class="keyword">override</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">index</span><span>: </span><span class="type-name">Int</span><span>): </span><span class="type-name">Double</span><span> = </span><span class="identifier">values</span><span>(</span><span class="identifier">index</span><span>)
+  </span><span class="identifier">inline</span><span> </span><span class="keyword">override</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">update</span><span>(</span><span class="identifier">index</span><span>: </span><span class="type-name">Int</span><span>, </span><span class="identifier">value</span><span>: </span><span class="type-name">Double</span><span>): </span><span class="type-name">Unit</span><span> = {
+    </span><span class="identifier">values</span><span>(</span><span class="identifier">index</span><span>) = </span><span class="identifier">value</span><span>
+  }
+
+  </span><span class="keyword">override</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">zeros</span><span>:</span><span class="type-name">Vector3</span><span> = </span><span class="type-name">Vector3</span><span>(</span><span class="number-literal">0.0</span><span>, </span><span class="number-literal">0.0</span><span>, </span><span class="number-literal">0.0</span><span>)
+  </span><span class="keyword">override</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">toString</span><span>:</span><span class="type-name">String</span><span> = </span><span class="string-literal">s&quot;Vector3(</span><span class="substitution">$x</span><span class="string-literal">, </span><span class="substitution">$y</span><span class="string-literal">, </span><span class="substitution">$z</span><span class="string-literal">)&quot;</span><span>
+}</span></code></pre>
+        <p>Advantages:
+        <ul>
+        <li>Intuitive syntax.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">v</span><span> = </span><span class="type-name">Vector2</span><span>(</span><span class="number-literal">0.5</span><span>, </span><span class="number-literal">0.25</span><span>) + </span><span class="type-name">Vector2</span><span>(</span><span class="number-literal">0.5</span><span>, </span><span class="number-literal">0.25</span><span>)</span></code></pre>
+        <p></li>
+        <li>Type Safe.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// compiler error:
+</span><span class="keyword">val</span><span> </span><span class="identifier">v3</span><span> = </span><span class="type-name">Vector2</span><span>(</span><span class="number-literal">0.5</span><span>, </span><span class="number-literal">0.25</span><span>) + </span><span class="type-name">Vector3</span><span>(</span><span class="number-literal">0.5</span><span>, </span><span class="number-literal">0.25</span><span>, </span><span class="number-literal">0.125</span><span>)</span></code></pre>
+        <p></li>
+        <li>Potentially Strictly Immutable.</li>
+        <li></p>
+        <p>Allows overrides for <code>toString</code>.
+        </li>
+        <li></p>
+        <p>Supports Overloaded Operators: <code>+, -, *, /, etc.</code>
+        </li>
+        <li>No runtime errors from operations involving multiple vectors of the same, explicitly defined, low dimensional type.</li>
+        <li>Generic.  Supports syntax like:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">VectorBounds</span><span>[</span><span class="type-name">V</span><span> &lt;: </span><span class="type-name">Vector</span><span>](</span><span class="identifier">min</span><span>:</span><span class="type-name">V</span><span>, </span><span class="type-name">MAX</span><span>:</span><span class="type-name">V</span><span>) {
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">contains</span><span>(</span><span class="identifier">v</span><span>: </span><span class="type-name">V</span><span>): </span><span class="type-name">Boolean</span><span> = {
+    </span><span class="keyword">var</span><span> </span><span class="identifier">o</span><span>: </span><span class="type-name">Boolean</span><span> = </span><span class="boolean-literal">true</span><span>
+    </span><span class="keyword">var</span><span> </span><span class="identifier">i</span><span>: </span><span class="type-name">Int</span><span> = </span><span class="number-literal">0</span><span>; </span><span class="keyword">while</span><span> (</span><span class="identifier">o</span><span> &amp;&amp; </span><span class="identifier">i</span><span> &lt; </span><span class="identifier">min</span><span>.</span><span class="identifier">dimension</span><span>) {
+      </span><span class="identifier">o</span><span> = </span><span class="identifier">min</span><span>.</span><span class="identifier">component</span><span>(</span><span class="identifier">i</span><span>) &lt;= </span><span class="identifier">v</span><span>.</span><span class="identifier">component</span><span>(</span><span class="identifier">i</span><span>) &amp;&amp; </span><span class="identifier">v</span><span>.</span><span class="identifier">component</span><span>(</span><span class="identifier">i</span><span>) &lt;= </span><span class="type-name">MAX</span><span>.</span><span class="identifier">component</span><span>(</span><span class="identifier">i</span><span>)
+      </span><span class="identifier">i</span><span> += </span><span class="number-literal">1</span><span>
+    }
+    </span><span class="identifier">o</span><span>
+  }
+}</span></code></pre>
+        <p></li>
+        <li>Shares common methods between vector implementations instead of forcing unique implementations for every possible dimensionality.</li>
+        <li>Only one implementation for every possible vector dimension.</li>
+        <li>Accommodates higher dimensional vectors, but without compile time dimensionality-linked type safety:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">class</span><span> </span><span class="type-name">VectorN</span><span> </span><span class="keyword">private</span><span> (</span><span class="keyword">override</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">values</span><span>:</span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>]) </span><span class="keyword">extends</span><span> </span><span class="type-name">Vector</span><span> { }</span></code></pre>
+        <p></li>
+        </ul>
+        Disadvantages:
+        <ul>
+        <li>Complicated!</li>
+        <li>Separate implementations for every vector dimensionality.</li>
+        <li>Slow: relies on traits and wrappers for convenient syntax at the expense of runtime performance.</li>
+        <li>Memory intensive: suffers from too many runtime dimension checks, wrapper instantiations, and trait abstraction overhead.</li>
+        <li></li>
+        <li></p>
+        <p>Allows overrides for <code>hashCode</code> and <code>equals</code> which tempts developers into making bad business logic decisions.
+        </li>
+        <li>Runtime dimensionality checks on every operation involving two vectors.</li>
+        <li>Exposes some runtime errors when creating Vector types from arrays of incorrect length.</li>
+        <li></p>
+        <p>Slightly less bloated default serializations.  For example, we might prefer JSON in the format:<br/>
+        <code>[1.0, 2.0, 3.0]</code> instead of <code>{ &quot;values&quot; : [1.0, 2.0, 3.0] }</code>.
+        </li>
+        </ul></p>
+        <h3>3.  Arrays (<a href="https://scastie.scala-lang.org/VVTNglXrSrW8uDrd9iYmyg">Scastie</a>)</h3>
+        <p>&nbsp;&nbsp;&nbsp;This approach puts performance first, minimizes memory footprint and maintenance costs, and unless it abandons runtime dimension checking, also maximizes speed.  Unfortunately, emphasizing performance in this way leads to runtime errors and unpleasant syntax.</p>
+        <pre><code class="nohighlight"><span class="keyword">type</span><span> </span><span class="type-name">Vector</span><span> = </span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>]
+
+</span><span class="keyword">object</span><span> </span><span class="type-name">Vector</span><span> {
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">plus</span><span>(</span><span class="identifier">v1</span><span>:</span><span class="type-name">Vector</span><span>, </span><span class="identifier">v2</span><span>:</span><span class="type-name">Vector</span><span>):</span><span class="type-name">Vector</span><span> = {
+    </span><span class="keyword">if</span><span> (</span><span class="identifier">v1</span><span>.</span><span class="identifier">length</span><span> != </span><span class="identifier">v2</span><span>.</span><span class="identifier">length</span><span>) {
+      </span><span class="keyword">throw</span><span> </span><span class="type-name">Exception</span><span>(</span><span class="string-literal">&quot;Mismatched Vector Dimensions!&quot;</span><span>)
+    } </span><span class="keyword">else</span><span> {
+      </span><span class="keyword">val</span><span> </span><span class="identifier">out</span><span>: </span><span class="type-name">Vector</span><span> = </span><span class="keyword">new</span><span> </span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>](</span><span class="identifier">v1</span><span>.</span><span class="identifier">length</span><span>)
+      </span><span class="keyword">var</span><span> </span><span class="identifier">i</span><span>:</span><span class="type-name">Int</span><span> = </span><span class="number-literal">0</span><span>
+      </span><span class="keyword">while</span><span> (</span><span class="identifier">i</span><span> &lt; </span><span class="identifier">v1</span><span>.</span><span class="identifier">length</span><span>) {
+        </span><span class="identifier">out</span><span>(</span><span class="identifier">i</span><span>) = </span><span class="identifier">v1</span><span>(</span><span class="identifier">i</span><span>) + </span><span class="identifier">v2</span><span>(</span><span class="identifier">i</span><span>)
+        </span><span class="identifier">i</span><span> += </span><span class="number-literal">1</span><span>
+      }
+      </span><span class="identifier">out</span><span>
+    }
+  }
+}</span></code></pre>
+        <p>Advantages:
+        <ul>
+        <li>Fast.</li>
+        <li>Minimal memory footprint.</li>
+        <li>Simplest code base to maintain.</li>
+        <li></p>
+        <p>Optimally concise default serialization formats with JSON defaulting to:
+        <code>[1.0, 2.0, 3.0]</code>
+        </li>
+        </ul>
+        Disadvantages:
+        <ul>
+        <li>No vector dimensionality errors detected at compile time; they only appear as runtime errors.</li>
+        <li>Terrible Syntax:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">v1</span><span>:</span><span class="type-name">Vector</span><span> = </span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>](</span><span class="number-literal">1.0</span><span>, </span><span class="number-literal">2.0</span><span>)
+</span><span class="keyword">val</span><span> </span><span class="identifier">v2</span><span>:</span><span class="type-name">Vector</span><span> = </span><span class="type-name">Array</span><span>[</span><span class="type-name">Double</span><span>](</span><span class="number-literal">3.0</span><span>, </span><span class="number-literal">4.0</span><span>, </span><span class="number-literal">5.0</span><span>)
+</span><span class="comment">// runtime exception instead of compiler error
+</span><span class="keyword">val</span><span> </span><span class="identifier">v3</span><span>:</span><span class="type-name">Vector</span><span> = </span><span class="type-name">Vector</span><span>.</span><span class="identifier">plus</span><span>(</span><span class="identifier">v1</span><span>, </span><span class="identifier">v2</span><span>)</span></code></pre>
+        <p></li>
+        <li>Small performance penalty from requiring dimensionality checks on every operation involving two vectors.</li>
+        </ul></p>
+        <h3>How This Vector Library Builds on the Strengths of All Three:</h3>
+        <p>&nbsp;&nbsp;&nbsp;What if we could have a Vector type with more robust compile time error detection than the Case Class method, more flexibility than the Traits and Wrappers method, and  less overhead and more speed than the Arrays method?  What if we could also maximize portability to native compilation targets for seamless interop with native language families: JavaScript, Java, and C/C++, all in a way that serialization libraries inherently treat in the most concise possible way?  This library makes good use of Scala 3 features to meet all of these goals.  Please consider <a href="https://github.com/dragonfly-ai/vector/blob/cb962a3b9d154eea37ffec877b25fa256e374ba7/vector/shared/src/main/scala/ai/dragonfly/math/vector/package.scala#L27">the design</a>:</p>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">narr</span><span>.*
+</span><span class="keyword">import</span><span> </span><span class="identifier">scala</span><span>.</span><span class="identifier">compiletime</span><span>.</span><span class="identifier">ops</span><span>.</span><span class="identifier">int</span><span>.*
+
+</span><span class="keyword">package</span><span> </span><span class="keyword">object</span><span> </span><span class="identifier">vector</span><span> {
+
+  </span><span class="comment">// What if the dimension occupied the type parameter?
+</span><span>  </span><span class="comment">// Now we can have the syntax of case class vectors on types that reduce to pure natively typed arrays at runtime!
+</span><span>  </span><span class="keyword">opaque</span><span> </span><span class="keyword">type</span><span> </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span> &lt;: </span><span class="type-name">Int</span><span>] = </span><span class="type-name">NArray</span><span>[</span><span class="type-name">Double</span><span>] </span><span class="comment">// NArray is a type alias for the best available native Array type.
+</span><span>
+  </span><span class="keyword">object</span><span> </span><span class="type-name">Vector</span><span> {
+    </span><span class="comment">// convenient factory methods for Vector[2], Vector[3], and Vector[4]
+</span><span>    </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">x</span><span>: </span><span class="type-name">Double</span><span>, </span><span class="identifier">y</span><span>: </span><span class="type-name">Double</span><span>): </span><span class="type-name">Vector</span><span>[</span><span class="number-literal">2</span><span>] = </span><span class="type-name">NArray</span><span>[</span><span class="type-name">Double</span><span>](</span><span class="identifier">x</span><span>, </span><span class="identifier">y</span><span>)
+    </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">x</span><span>: </span><span class="type-name">Double</span><span>, </span><span class="identifier">y</span><span>: </span><span class="type-name">Double</span><span>, </span><span class="identifier">z</span><span>: </span><span class="type-name">Double</span><span>): </span><span class="type-name">Vector</span><span>[</span><span class="number-literal">3</span><span>] = </span><span class="type-name">NArray</span><span>[</span><span class="type-name">Double</span><span>](</span><span class="identifier">x</span><span>, </span><span class="identifier">y</span><span>, </span><span class="identifier">z</span><span>)
+    </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">x</span><span>: </span><span class="type-name">Double</span><span>, </span><span class="identifier">y</span><span>: </span><span class="type-name">Double</span><span>, </span><span class="identifier">z</span><span>: </span><span class="type-name">Double</span><span>, </span><span class="identifier">w</span><span>: </span><span class="type-name">Double</span><span>): </span><span class="type-name">Vector</span><span>[</span><span class="number-literal">4</span><span>] = </span><span class="type-name">NArray</span><span>[</span><span class="type-name">Double</span><span>](</span><span class="identifier">x</span><span>, </span><span class="identifier">y</span><span>, </span><span class="identifier">z</span><span>, </span><span class="identifier">w</span><span>)    
+    
+    </span><span class="comment">// painless conversion from NArray[Double] to Vector[N]
+</span><span>    </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>[</span><span class="type-name">N</span><span> &lt;: </span><span class="type-name">Int</span><span>](</span><span class="identifier">a</span><span>: </span><span class="type-name">NArray</span><span>[</span><span class="type-name">Double</span><span>]): </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>] = { </span><span class="comment">// sneaky way to cast an NArray[Double] to a Vector[N]
+</span><span>      </span><span class="identifier">dimensionCheck</span><span>(</span><span class="identifier">a</span><span>, </span><span class="identifier">valueOf</span><span>[</span><span class="type-name">N</span><span>])
+      </span><span class="identifier">a</span><span>
+    }
+
+    </span><span class="comment">// We get convenient object oriented syntax through the use of extension methods:
+</span><span>    </span><span class="keyword">extension</span><span>[</span><span class="type-name">N</span><span> &lt;: </span><span class="type-name">Int</span><span>] (</span><span class="identifier">thisVector</span><span>: </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>]) {
+      </span><span class="comment">// inline everywhere, for speed!
+</span><span>      </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">dimension</span><span>: </span><span class="type-name">Int</span><span> = </span><span class="identifier">thisVector</span><span>.</span><span class="identifier">length</span><span>
+      </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">index</span><span>: </span><span class="type-name">Int</span><span>): </span><span class="type-name">Double</span><span> = </span><span class="identifier">thisVector</span><span>(</span><span class="identifier">index</span><span>)
+      </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> </span><span class="declaration-name">update</span><span>(</span><span class="identifier">index</span><span>: </span><span class="type-name">Int</span><span>, </span><span class="identifier">value</span><span>: </span><span class="type-name">Double</span><span>): </span><span class="type-name">Unit</span><span> = </span><span class="identifier">thisVector</span><span>(</span><span class="identifier">index</span><span>) = </span><span class="identifier">value</span><span>
+
+      </span><span class="comment">// immutable support:
+</span><span>      </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> +(</span><span class="identifier">v0</span><span>: </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>]): </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>] = </span><span class="identifier">copy</span><span>.</span><span class="identifier">add</span><span>(</span><span class="identifier">v0</span><span>)
+
+      </span><span class="comment">// mutable support for those who need speed more than safety:
+</span><span>      </span><span class="keyword">inline</span><span> </span><span class="keyword">def</span><span> += (</span><span class="identifier">v0</span><span>: </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>]): </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>] = </span><span class="identifier">add</span><span>(</span><span class="identifier">v0</span><span>)
+
+      </span><span class="comment">// one add method for all vectors of all possible dimensions
+</span><span>      </span><span class="keyword">def</span><span> </span><span class="declaration-name">add</span><span>(</span><span class="identifier">v0</span><span>: </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>]): </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>] = {
+        </span><span class="keyword">var</span><span> </span><span class="identifier">i</span><span> = </span><span class="number-literal">0</span><span>
+        </span><span class="keyword">while</span><span> (</span><span class="identifier">i</span><span> &lt; </span><span class="identifier">dimension</span><span>) {
+          </span><span class="identifier">thisVector</span><span>(</span><span class="identifier">i</span><span>) = </span><span class="identifier">thisVector</span><span>(</span><span class="identifier">i</span><span>) + </span><span class="identifier">v0</span><span>(</span><span class="identifier">i</span><span>)
+          </span><span class="identifier">i</span><span> = </span><span class="identifier">i</span><span> + </span><span class="number-literal">1</span><span>
+        }
+        </span><span class="identifier">thisVector</span><span>
+      }
+    }
+}</span></code></pre>
+        <p>Please consider also, the flexibility to enable types that use Vectors of varying sizes:</p>
+        <pre><code class="nohighlight"><span class="keyword">package</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.</span><span class="identifier">vector</span><span>
+</span><span class="keyword">import</span><span> </span><span class="type-name">Vector</span><span>.*
+
+</span><span class="comment">// instead of putting the Vector type in the type parameter, just place the vector dimensionality.
+</span><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">VectorBounds</span><span>[</span><span class="type-name">N</span><span> &lt;: </span><span class="type-name">Int</span><span>](</span><span class="identifier">min</span><span>: </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>], </span><span class="type-name">MAX</span><span>: </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>]) {
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">contains</span><span>(</span><span class="identifier">v</span><span>: </span><span class="type-name">Vector</span><span>[</span><span class="type-name">N</span><span>]):</span><span class="type-name">Boolean</span><span> = {
+    </span><span class="keyword">var</span><span> </span><span class="identifier">o</span><span>:</span><span class="type-name">Boolean</span><span> = </span><span class="boolean-literal">true</span><span>
+    </span><span class="keyword">var</span><span> </span><span class="identifier">i</span><span>:</span><span class="type-name">Int</span><span> = </span><span class="number-literal">0</span><span>; </span><span class="keyword">while</span><span>(</span><span class="identifier">o</span><span> &amp;&amp; </span><span class="identifier">i</span><span> &lt; </span><span class="identifier">min</span><span>.</span><span class="identifier">dimension</span><span>) {
+      </span><span class="identifier">o</span><span> = </span><span class="identifier">min</span><span>(</span><span class="identifier">i</span><span>) &lt;= </span><span class="identifier">v</span><span>(</span><span class="identifier">i</span><span>) &amp;&amp; </span><span class="identifier">v</span><span>(</span><span class="identifier">i</span><span>) &lt;= </span><span class="type-name">MAX</span><span>(</span><span class="identifier">i</span><span>)
+      </span><span class="identifier">i</span><span> += </span><span class="number-literal">1</span><span>
+    }
+    </span><span class="identifier">o</span><span>
+  }
+}</span></code></pre>
     </div>
 </div>
 </body>
