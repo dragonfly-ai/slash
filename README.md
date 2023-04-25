@@ -13,8 +13,8 @@ A Scala 3 Vector Math and Statistics library designed to:
 </ol>
 
 Features:
-- High performance <a href="#vectormath">Vector data types</a> with convenient vector math syntax.
-- <a href="#parametric">Parametric</a> and <a href="#estimated">Estimated</a> (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
+- High performance Vector data types with convenient vector math syntax.
+- Parametric and Estimated (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
 - Geometry: Sample points uniformly from volumes defined by 3D tetrahedrons.  Bresenham Line Drawing Algorithm that invokes a lambda for each discrete point on a line.
 - Kernels: Gaussian, Epanechnikov, Uniform, and Discrete.
@@ -43,6 +43,8 @@ println((v2 + v3).show) // compiler error!
 ```
 
 &nbsp;&nbsp;&nbsp;Why `NArray[Double]` and not `Array[Double]`?  Because vector relies on <a href="https://github.com/dragonfly-ai/narr">NArr</a>, JavaScript environments store vector data as: `Float64Array` while JVM and Native environments rely on: `Array[Double]`.  This ensures that whichever compilation target you choose, Vector will always reduce to the native array type with the highest available performance.
+
+&nbsp;&nbsp;&nbsp;For a more detailed explanation of the design decisions that have shaped this library, see the <a href="https://dragonfly-ai.github.io/vector/">design notes.</a>
 
 <h3 id="vectormath">More Vector Math Syntax:</h3>
 
@@ -89,7 +91,7 @@ println( (v42a + v42b).csv() ) // output vector sum as comma separated values
 println( (v42a + v42b).tsv() ) // output vector sum tab separated values
 ```
 
-<h3 id="parametric">Parametric Probability Distributions</h3>
+<h3>Parametric Probability Distributions</h3>
 
 ```scala
 import ai.dragonfly.math.stats.probability.distributions.*
@@ -101,7 +103,7 @@ g.random() // randomly sample a value from this gaussian model
 ```
 
 
-<h3 id="estimated">Estimated, also called Online or Streaming, Probability Distributions</h3>
+<h3>Estimated, also called Online or Streaming, Probability Distributions</h3>
 
 ```scala
 import ai.dragonfly.math.stats.probability.distributions.*
