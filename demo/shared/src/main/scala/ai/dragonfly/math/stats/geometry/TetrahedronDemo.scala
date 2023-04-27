@@ -7,6 +7,7 @@ import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.vector.*
 import Vector.*
 import Vector3.*
+import ai.dragonfly.math.geometry.Tetrahedron
 
 object TetrahedronDemo extends Demonstration {
 

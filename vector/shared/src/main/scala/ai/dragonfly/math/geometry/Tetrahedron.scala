@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package ai.dragonfly.math.stats.geometry
+package ai.dragonfly.math.geometry
 
-import ai.dragonfly.math.stats.probability.distributions.Sampleable
 import ai.dragonfly.math.interval.*
-import Interval.*
+import ai.dragonfly.math.interval.Interval.*
+import ai.dragonfly.math.stats.probability.distributions.Sampleable
 import ai.dragonfly.math.vector.*
-import Vector.*
-
+import ai.dragonfly.math.vector.Vector.*
 import narr.*
 
 object Tetrahedron {
 
   val `1/6`:Double = 1.0 / 6.0
-
   def apply(v1: Vector[3], v2: Vector[3], v3: Vector[3], v4: Vector[3]):Tetrahedron = Tetrahedron(NArray[Vector[3]](v1, v2, v3, v4))
 
 }

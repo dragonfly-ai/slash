@@ -24,18 +24,27 @@ object Poisson {
   val domain:Domain[Long] = Domain.ℕ_Long
 }
 
+/**
+ * 🐟
+ * @param λ
+ */
 case class Poisson(λ:Double) extends ParametricProbabilityDistribution[Long] {
-
   def lambda:Double = λ
   override val μ:Double = λ
   override val `σ²`:Double = λ
   lazy val σ:Double = Math.sqrt(λ)
 
-  def p(x:Long):Double = Math.exp( x.toDouble * Math.log(λ) - λ - Math.log(Γ(x.toDouble+1.0)) )
+  lazy private val `ln(λ)`:Double = ln(λ)
+  lazy private val L:Double = Math.pow(Math.E, -λ)
+
+  // https://en.wikipedia.org/wiki/Poisson_distribution#Computational_methods
+  def p(k:Long):Double = {
+    val x: Double = k.toDouble
+    Math.exp(x * `ln(λ)` - λ - lnGamma(x + 1))
+  }
 
   // Knuth's method:
   override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Long = {
-    val L = BigDecimal(Math.pow(Math.E, -λ))
     var k = 0L
     var p = 1.0
     while (p > L) {
@@ -48,9 +57,8 @@ case class Poisson(λ:Double) extends ParametricProbabilityDistribution[Long] {
   override def toString: String = s"Poisson(λ = μ = σ² = $λ, √λ = $σ)"
 }
 
-case class EstimatedPousson(override val interval:Interval[Long], override val idealized: Poisson, override val ℕ:Long) extends EstimatedProbabilityDistribution[Long, Poisson]{
+case class EstimatedPoisson(override val interval:Interval[Long], override val idealized: Poisson, override val ℕ:Long) extends EstimatedProbabilityDistribution[Long, Poisson]{
   def λ:Double = idealized.λ
   def sampleLambda:Double = idealized.λ
-
   override def toString: String = s"PoissonEstimate(min = ${interval.min}, MAX = ${interval.MAX}, λ = μ = σ² = $λ, √λ = $σ, ℕ = $ℕ)"
 }

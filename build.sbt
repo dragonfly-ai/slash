@@ -12,6 +12,13 @@ ThisBuild / tlBaseVersion := appVersion
 ThisBuild / tlCiReleaseBranches := Seq()
 ThisBuild / tlSonatypeUseLegacyHost := false
 
+ThisBuild / nativeConfig ~= {
+  _.withLTO(scala.scalanative.build.LTO.thin)
+    .withMode(scala.scalanative.build.Mode.releaseFast)
+    .withGC(scala.scalanative.build.GC.commix)
+}
+
+
 lazy val vector = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .settings(
@@ -21,6 +28,7 @@ lazy val vector = crossProject(JSPlatform, JVMPlatform, NativePlatform)
       "org.scala-js" %% "scalajs-stubs" % "1.1.0"
     )
   ).jsSettings()
+  .nativeSettings()
 
 lazy val verification = project
   .dependsOn( vector.projects( JVMPlatform ) )
@@ -52,6 +60,7 @@ lazy val demo = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     scalaJSUseMainModuleInitializer := true
   )
   .jvmSettings()
+  .nativeSettings()
 
 lazy val root = tlCrossRootProject.aggregate(vector).settings(name := "vector")
 

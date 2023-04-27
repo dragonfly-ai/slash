@@ -55,13 +55,13 @@ object Gamma {
 
 
   // ported from apache commons math
-  def logGamma(x:Double):Double = {
+  def lnGamma(x:Double):Double = {
     if (x == Double.NaN || (x <= 0.0)) {
       throw InvalidArgumentToGammaFunction(x, s"logGamma( x = $x ) is only defined on x > 0. ")
     } else if (x < 0.5) {
-      logGamma1p(x) - Math.log(x)
+      lnGamma1p(x) - Math.log(x)
     } else if (x <= 2.5) {
-      logGamma1p((x - 0.5) - 0.5)
+      lnGamma1p((x - 0.5) - 0.5)
     } else if (x <= 8.0) {
       val n: Int = Math.floor(x - 1.5).toInt
       var prod = 1.0
@@ -69,7 +69,7 @@ object Gamma {
         prod = prod * (x - i)
         i += 1
       }
-      logGamma1p(x - (n + 1)) + Math.log(prod)
+      lnGamma1p(x - (n + 1)) + Math.log(prod)
     } else {
       val sum = lanczos(x)
       val tmp = x + c1
@@ -78,7 +78,7 @@ object Gamma {
   }
 
 
-  private def logGamma1p(x:Double):Double = {
+  private def lnGamma1p(x:Double):Double = {
     if (x < -0.5 || x > 1.5) throw new InvalidArgumentToGammaFunction(x, s"logGamma1p( x = $x ) defined on -0.5 > x > 1.5")
     -Math.log1p(invGamma1pm1(x))
   }

@@ -24,6 +24,11 @@ object Constant {
   val e: Double = Math.E  // Euler's Number
   val `𝜑`: Double = 1.46557123187676802665 // Golden
 
+  /**
+   * The largest possible Long value such that Double can contiguously represent every Long value in the range: [0L, xL]
+   */
+  val MaxContiguousLong:Long = 9007199254740992L
+
   // Computed
   lazy val log2:Double = Math.log10(2.0) // base 10 logarithm of 2
   lazy val ln2:Double = Math.log(2.0)    // natural logarithm of 2
