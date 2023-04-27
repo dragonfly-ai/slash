@@ -3,19 +3,19 @@ package ai.dragonfly.math.vector
 import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.squareInPlace
 import narr.*
-import Vector.*
-import Vector3.*
+import Vec.*
+import Vec3.*
 
 /**
  * Created by clifton on 1/10/17.
  */
 
-object Vector3Demo extends Demonstration {
+object Vec3Demo extends Demonstration {
 
   override def demo():Unit = {
-    val i = Vector[3](1, 0, 0)
-    val j = Vector[3](0, 1, 0)
-    val k = Vector[3](0, 0, 1)
+    val i = Vec[3](1, 0, 0)
+    val j = Vec[3](0, 1, 0)
+    val k = Vec[3](0, 0, 1)
 
     println(s"i3 X j3 -> ${(i ⨯ j).show}\n")
     println(s"j3 X i3 -> ${(j ⨯ i).show}\n")
@@ -36,5 +36,5 @@ object Vector3Demo extends Demonstration {
     println(s"k3 dot j3 -> ${k dot j}\n")
   }
 
-  override def name: String = "Vector[3]"
+  override def name: String = "Vec[3]"
 }

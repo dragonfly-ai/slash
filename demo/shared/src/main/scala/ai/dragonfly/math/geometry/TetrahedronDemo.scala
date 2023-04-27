@@ -1,12 +1,12 @@
-package ai.dragonfly.math.stats.geometry
+package ai.dragonfly.math.geometry
 
 import ai.dragonfly.math.stats.probability.distributions.Sampleable
 import ai.dragonfly.math.interval.*
 import Interval.*
 import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.vector.*
-import Vector.*
-import Vector3.*
+import Vec.*
+import Vec3.*
 import ai.dragonfly.math.geometry.Tetrahedron
 
 object TetrahedronDemo extends Demonstration {
@@ -17,10 +17,10 @@ object TetrahedronDemo extends Demonstration {
     val q = 10.0 * Math.cos((Math.PI * 2.0)/3.0)
 
     val t = Tetrahedron(
-      Vector[3]( q, q, q),
-      Vector[3](-q, q, q),
-      Vector[3]( 0,-q, q),
-      Vector[3]( 0, 0,-q)
+      Vec[3]( q, q, q),
+      Vec[3](-q, q, q),
+      Vec[3]( 0,-q, q),
+      Vec[3]( 0, 0,-q)
     )
 
     val sampleCount:Int = 5

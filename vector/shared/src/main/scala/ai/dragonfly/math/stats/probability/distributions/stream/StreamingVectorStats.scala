@@ -18,7 +18,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.Random.*
 import ai.dragonfly.math.vector.*
-import Vector.*
+import Vec.*
 import narr.*
 
 /**
@@ -50,7 +50,7 @@ class StreamingVectorStats[N <: Int](using ValueOf[N]) {
     }
   }
 
-  def apply(c: Vector[N], weight: Double = 1.0): StreamingVectorStats[N] = synchronized {
+  def apply(c: Vec[N], weight: Double = 1.0): StreamingVectorStats[N] = synchronized {
     s0 = s0 + weight
     for (i <- 0 until dimension) {
       val cv = c(i)
@@ -63,18 +63,18 @@ class StreamingVectorStats[N <: Int](using ValueOf[N]) {
     this
   }
 
-  inline def average(): Vector[N] = Vector.tabulate[N](i => s1(i)/s0)
+  inline def average(): Vec[N] = Vec.tabulate[N](i => s1(i)/s0)
 
   private def componentVariance(s1d: Double, s2d: Double): Double = (s0 * s2d - s1d * s1d)/(s0 * (s0 - 1))
 
-  inline def variance: Vector[N] = Vector.tabulate[N](i => componentVariance(s1(i), s2(i)))
+  inline def variance: Vec[N] = Vec.tabulate[N](i => componentVariance(s1(i), s2(i)))
 
-  inline def standardDeviation: Vector[N] = Vector.tabulate[N](i => Math.sqrt(componentVariance(s1(i), s2(i))))
+  inline def standardDeviation: Vec[N] = Vec.tabulate[N](i => Math.sqrt(componentVariance(s1(i), s2(i))))
 
-  inline def bounds(): VectorBounds[N] = VectorBounds[N](
-    Vector[N](minValues),
-    Vector[N](maxValues)
+  inline def bounds(): VecBounds[N] = VecBounds[N](
+    Vec[N](minValues),
+    Vec[N](maxValues)
   )
 
-  override def toString: String = s"StreamingVectorStats(\n\t$s0\n\t${Vector[N](s1).render()}\n\t${Vector[N](s2).render()}\n\tAverage: ${average().render()}\n\tVariance: ${variance.render()}\n\tStandard Deviation: ${standardDeviation.render()})"
+  override def toString: String = s"StreamingVectorStats(\n\t$s0\n\t${Vec[N](s1).render()}\n\t${Vec[N](s2).render()}\n\tAverage: ${average().render()}\n\tVariance: ${variance.render()}\n\tStandard Deviation: ${standardDeviation.render()})"
 }

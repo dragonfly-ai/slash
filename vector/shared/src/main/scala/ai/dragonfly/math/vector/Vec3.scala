@@ -16,21 +16,30 @@
 
 package ai.dragonfly.math.vector
 
-import ai.dragonfly.math.*
-
-import scala.language.postfixOps
 import ai.dragonfly.math.squareInPlace
 import narr.*
 
-object Vector4 {
+/**
+ * Created by clifton on 1/10/17.
+ */
 
-  import Vector.*
+object Vec3 {
 
-  extension (thisVector: Vector[4]) {
+  import Vec.*
+
+  extension (thisVector: Vec[3]) {
     inline def x: Double = thisVector(0)
     inline def y: Double = thisVector(1)
     inline def z: Double = thisVector(2)
-    inline def w: Double = thisVector(3)
-    def show: String = s"《⁴↗〉${x}ᵢ ${y}ⱼ ${z}ₖ ${w}ₗ〉"
+
+    inline def ⨯(thatVector: Vec[3]): Vec[3] = cross(thatVector)
+
+    inline def cross(thatVector: Vec[3]): Vec[3] = Vec[3](
+      y * thatVector.z - z * thatVector.y, // u2*v3 - u3*v2,
+      z * thatVector.x - x * thatVector.z, // u3*v1 - u1*v3,
+      x * thatVector.y - y * thatVector.x // u1*v2 - u2*v1
+    )
+
+    def show: String = s"《³↗〉${x}ᵢ ${y}ⱼ ${z}ₖ〉"
   }
 }

@@ -31,10 +31,10 @@ Features:
 &nbsp;&nbsp;&nbsp;Instead of case classes, traits, or wrappers, this library represents all runtime vector data as native arrays of double precision floating point values.  However, it also uses Scala 3 features like opaque types, dependent types, and extension methods to decorate the array primitives with convenient syntax, e.g. overloaded operators like `+ - * / += -= *= /=`, and also, by expressing vector dimensionality as a type parameter, can prevent runtime errors resulting from trying to perform vector operations on vectors of mismatched dimensions at compile time.  For example:   
 
 ```scala
-opaque type Vector[N <: Int] = NArray[Double]
+opaque type Vec[N <: Int] = NArray[Double]
 
-val v2:Vector[2] = Vector[2](1.0, 2.0)
-val v3:Vector[3] = Vector[3](1.0, 2.0, 3.0)
+val v2:Vec[2] = Vec[2](1.0, 2.0)
+val v3:Vec[3] = Vec[3](1.0, 2.0, 3.0)
 
 println((v2 + v3).show) // compiler error!
 
@@ -54,15 +54,15 @@ import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vector.*
 
 // create a 3 dimensional vector
-val v1:Vector[3] = Vector[3](1.0, 0.5, 0.0)
+val v1:Vec[3] = Vec[3](1.0, 0.5, 0.0)
 
 // print it to the console with expressive unicode text
 println(v1.show)  // -> 《³↗〉1.0ᵢ 0.0ⱼ 0.0ₖ〉
 
 // perform various vector math operations
-val v2:Vector[3] = Vector[3](0.75, 1.0, 0.5)
+val v2:Vec[3] = Vec[3](0.75, 1.0, 0.5)
 
-val v3:Vector[3] = v1 + v2
+val v3:Vec[3] = v1 + v2
 
 println( v3.norm )
 
@@ -83,8 +83,8 @@ import ai.dragonfly.math.Random.*
 val r:Random = defaultRandom
 
 // higher dimensional vectors
-val v42a:Vector[42] = r.nextVector[42]()
-val v42b:Vector[42] = r.nextVector[42]()
+val v42a:Vec[42] = r.nextVec[42]()
+val v42b:Vec[42] = r.nextVec[42]()
 
 println( v42a dot v42b )
 println( (v42a - v42b).render() ) // fully customisable render method.

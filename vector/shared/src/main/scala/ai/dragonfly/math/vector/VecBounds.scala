@@ -16,9 +16,9 @@
 
 package ai.dragonfly.math.vector
 
-import Vector.*
-case class VectorBounds[N <: Int](min: Vector[N], MAX: Vector[N]) {
-  def contains(v: Vector[N]):Boolean = {
+import Vec.*
+case class VecBounds[N <: Int](min: Vec[N], MAX: Vec[N]) {
+  def contains(v: Vec[N]):Boolean = {
     var o:Boolean = true
     var i:Int = 0; while(o && i < min.dimension) {
       o = min(i) <= v(i) && v(i) <= MAX(i)

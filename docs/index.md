@@ -328,35 +328,35 @@ package object vector {
 
   // What if the dimension occupied the type parameter?
   // Now we can have the syntax of case class vectors on types that reduce to pure natively typed arrays at runtime!
-  opaque type Vector[N <: Int] = NArray[Double] // NArray is a type alias for the best available native Array type.
+  opaque type Vec[N <: Int] = NArray[Double] // NArray is a type alias for the best available native Array type.
 
   object Vector {
-    // convenient factory methods for Vector[2], Vector[3], and Vector[4]
-    inline def apply(x: Double, y: Double): Vector[2] = NArray[Double](x, y)
-    inline def apply(x: Double, y: Double, z: Double): Vector[3] = NArray[Double](x, y, z)
-    inline def apply(x: Double, y: Double, z: Double, w: Double): Vector[4] = NArray[Double](x, y, z, w)    
+    // convenient factory methods for Vec[2], Vec[3], and Vec[4]
+    inline def apply(x: Double, y: Double): Vec[2] = NArray[Double](x, y)
+    inline def apply(x: Double, y: Double, z: Double): Vec[3] = NArray[Double](x, y, z)
+    inline def apply(x: Double, y: Double, z: Double, w: Double): Vec[4] = NArray[Double](x, y, z, w)    
     
-    // painless conversion from NArray[Double] to Vector[N]
-    inline def apply[N <: Int](a: NArray[Double]): Vector[N] = { // sneaky way to cast an NArray[Double] to a Vector[N]
+    // painless conversion from NArray[Double] to Vec[N]
+    inline def apply[N <: Int](a: NArray[Double]): Vec[N] = { // sneaky way to cast an NArray[Double] to a Vec[N]
       dimensionCheck(a, valueOf[N])
       a
     }
 
     // We get convenient object oriented syntax through the use of extension methods:
-    extension[N <: Int] (thisVector: Vector[N]) {
+    extension[N <: Int] (thisVector: Vec[N]) {
       // inline everywhere, for speed!
       inline def dimension: Int = thisVector.length
       inline def apply(index: Int): Double = thisVector(index)
       inline def update(index: Int, value: Double): Unit = thisVector(index) = value
 
       // immutable support:
-      inline def +(v0: Vector[N]): Vector[N] = copy.add(v0)
+      inline def +(v0: Vec[N]): Vec[N] = copy.add(v0)
 
       // mutable support for those who need speed more than safety:
-      inline def += (v0: Vector[N]): Vector[N] = add(v0)
+      inline def += (v0: Vec[N]): Vec[N] = add(v0)
 
       // one add method for all vectors of all possible dimensions
-      def add(v0: Vector[N]): Vector[N] = {
+      def add(v0: Vec[N]): Vec[N] = {
         var i = 0
         while (i < dimension) {
           thisVector(i) = thisVector(i) + v0(i)
@@ -373,8 +373,8 @@ package ai.dragonfly.math.vector
 import Vector.*
 
 // instead of putting the Vector type in the type parameter, just place the vector dimensionality.
-case class VectorBounds[N <: Int](min: Vector[N], MAX: Vector[N]) {
-  def contains(v: Vector[N]):Boolean = {
+case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N]) {
+  def contains(v: Vec[N]):Boolean = {
     var o:Boolean = true
     var i:Int = 0; while(o && i < min.dimension) {
       o = min(i) <= v(i) && v(i) <= MAX(i)

@@ -20,25 +20,25 @@ import ai.dragonfly.math.interval.*
 import ai.dragonfly.math.interval.Interval.*
 import ai.dragonfly.math.stats.probability.distributions.Sampleable
 import ai.dragonfly.math.vector.*
-import ai.dragonfly.math.vector.Vector.*
+import ai.dragonfly.math.vector.Vec.*
 import narr.*
 
 object Tetrahedron {
 
   val `1/6`:Double = 1.0 / 6.0
-  def apply(v1: Vector[3], v2: Vector[3], v3: Vector[3], v4: Vector[3]):Tetrahedron = Tetrahedron(NArray[Vector[3]](v1, v2, v3, v4))
+  def apply(v1: Vec[3], v2: Vec[3], v3: Vec[3], v4: Vec[3]):Tetrahedron = Tetrahedron(NArray[Vec[3]](v1, v2, v3, v4))
 
 }
 
-case class Tetrahedron(vertices:NArray[Vector[3]]) extends Sampleable[Vector[3]] {
+case class Tetrahedron(vertices:NArray[Vec[3]]) extends Sampleable[Vec[3]] {
 
   import Tetrahedron.*
-  import Vector3.*
+  import Vec3.*
 
-  inline def v1:Vector[3] = vertices(0)
-  inline def v2:Vector[3] = vertices(1)
-  inline def v3:Vector[3] = vertices(2)
-  inline def v4:Vector[3] = vertices(3)
+  inline def v1:Vec[3] = vertices(0)
+  inline def v2:Vec[3] = vertices(1)
+  inline def v3:Vec[3] = vertices(2)
+  inline def v4:Vec[3] = vertices(3)
 
   private def `v1-v4` = v1 - v4
   private def `v2-v4` = v2 - v4
@@ -49,7 +49,7 @@ case class Tetrahedron(vertices:NArray[Vector[3]]) extends Sampleable[Vector[3]]
 
   def volume:Double = `1/6` * Math.abs(`v1-v4` dot (`v2-v4` ⨯ `v3-v4`))
 
-  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Vector[3] = {
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Vec[3] = {
 
     var w1 = r.nextDouble()
     var w2 = r.nextDouble()

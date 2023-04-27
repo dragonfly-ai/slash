@@ -1,4 +1,5 @@
 import ai.dragonfly.democrossy.{Demonstration, NativeConsole, XApp}
+import ai.dragonfly.math.geometry.TetrahedronDemo
 
 /**
  * Created by clifton on 1/9/17.
@@ -9,12 +10,12 @@ object Demo extends XApp(NativeConsole(style = "padding: 8px; overflow: scroll;"
   val allDemos: Array[Demonstration] = Array[Demonstration](
 //    ai.dragonfly.math.vector.SparseVectorDemo,
     ai.dragonfly.math.unicode.UnicodeDemo,
-    ai.dragonfly.math.vector.Vector2Demo,
-    ai.dragonfly.math.vector.Vector3Demo,
-    ai.dragonfly.math.vector.Vector4Demo,
-    ai.dragonfly.math.vector.VectorNDemo,
-    ai.dragonfly.math.vector.WeightedVectorDemo,
-    ai.dragonfly.math.stats.geometry.TetrahedronDemo,
+    ai.dragonfly.math.vector.Vec2Demo,
+    ai.dragonfly.math.vector.Vec3Demo,
+    ai.dragonfly.math.vector.Vec4Demo,
+    ai.dragonfly.math.vector.VecNDemo,
+    ai.dragonfly.math.vector.WeightedVecDemo,
+    ai.dragonfly.math.geometry.TetrahedronDemo,
     ai.dragonfly.math.stats.kernel.KernelDemo,
     ai.dragonfly.math.GammaDemo,
     ai.dragonfly.math.FactorialDemo,

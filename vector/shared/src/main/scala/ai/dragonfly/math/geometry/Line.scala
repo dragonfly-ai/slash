@@ -17,11 +17,11 @@
 package ai.dragonfly.math.geometry
 
 import ai.dragonfly.math.vector.*
-import Vector2.*
+import Vec2.*
 
 object Line {
 
-  def trace2D(v0: Vector[2], v1: Vector[2], f: (Int, Int) => Unit): Unit = trace2D(
+  def trace2D(v0: Vec[2], v1: Vec[2], f: (Int, Int) => Unit): Unit = trace2D(
     v0.x.toInt, v0.y.toInt,
     v1.x.toInt, v1.y.toInt,
     f

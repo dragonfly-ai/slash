@@ -17,8 +17,8 @@
 package ai.dragonfly.math
 
 import ai.dragonfly.math.Constant.log2
-import ai.dragonfly.math.vector.{Vector, *}
-import Vector.*
+import ai.dragonfly.math.vector.{Vec, *}
+import Vec.*
 import narr.*
 
 import java.math.MathContext
@@ -41,10 +41,10 @@ object Random {
     def nextBigDecimal(precision: Int): BigDecimal = { val bd = BigDecimal( r.nextBigInt(precision) ); BigDecimal(bd.bigDecimal.movePointLeft(bd.precision)) }
     def nextBigDecimal(norm: BigDecimal, scale: Int): BigDecimal = norm * r.nextBigDecimal(scale)(new MathContext((norm.precision - norm.scale) + scale))
     def between(min: BigDecimal, MAX: BigDecimal): BigDecimal = min + r.nextBigDecimal(MAX - min, Math.max(min.precision, MAX.precision))
-    inline def nextVector[N <: Int](maxNorm:Double = 1.0): Vector[N] = Vector.apply[N]( NArray.tabulate[Double](valueOf[N])( (i:Int) => maxNorm * r.nextDouble() ) )
-    inline def next[N <: Int](norm:Vector[N]):Vector[N] = Vector[N]( NArray.tabulate[Double](norm.dimension)((i:Int) => norm(i) * r.nextDouble() ) )
-    inline def between[N <: Int](min:Vector[N], MAX:Vector[N]):Vector[N] = {
-      Vector[N](NArray.tabulate[Double](min.dimension)((i: Int) => r.between(min(i), MAX(i))))
+    inline def nextVec[N <: Int](maxNorm:Double = 1.0): Vec[N] = Vec.apply[N]( NArray.tabulate[Double](valueOf[N])((i:Int) => maxNorm * r.nextDouble() ) )
+    inline def next[N <: Int](norm:Vec[N]):Vec[N] = Vec[N]( NArray.tabulate[Double](norm.dimension)((i:Int) => norm(i) * r.nextDouble() ) )
+    inline def between[N <: Int](min:Vec[N], MAX:Vec[N]):Vec[N] = {
+      Vec[N](NArray.tabulate[Double](min.dimension)((i: Int) => r.between(min(i), MAX(i))))
     }
 
 }

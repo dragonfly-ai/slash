@@ -16,7 +16,7 @@
 
 package ai.dragonfly.math
 
-import ai.dragonfly.math.vector.Vector
+import ai.dragonfly.math.vector.Vec
 import unicode.*
 import narr.*
 
@@ -24,33 +24,33 @@ import scala.compiletime.ops.int.*
 
 package object vector {
 
-  opaque type Vector[N <: Int] = NArray[Double]
+  opaque type Vec[N <: Int] = NArray[Double]
 
-  object Vector {
-    inline def apply[N <: Int](a: NArray[Double]): Vector[N] = { // sneaky way to cast an NArray[Double] to a Vector[N]
+  object Vec {
+    inline def apply[N <: Int](a: NArray[Double]): Vec[N] = { // sneaky way to cast an NArray[Double] to a Vec[N]
       dimensionCheck(a, valueOf[N])
       a
     }
 
-    inline def random[N <: Int](maxNorm:Double = 1.0): Vector[N] = {
+    inline def random[N <: Int](maxNorm:Double = 1.0): Vec[N] = {
       import ai.dragonfly.math.Random.*
-      defaultRandom.nextVector[N](maxNorm)
+      defaultRandom.nextVec[N](maxNorm)
     }
 
-    inline def apply(x: Double, y: Double): Vector[2] = NArray[Double](x, y)
+    inline def apply(x: Double, y: Double): Vec[2] = NArray[Double](x, y)
 
-    inline def apply(x: Double, y: Double, z: Double): Vector[3] = NArray[Double](x, y, z)
+    inline def apply(x: Double, y: Double, z: Double): Vec[3] = NArray[Double](x, y, z)
 
-    inline def apply(x: Double, y: Double, z: Double, w: Double): Vector[4] = NArray[Double](x, y, z, w)
+    inline def apply(x: Double, y: Double, z: Double, w: Double): Vec[4] = NArray[Double](x, y, z, w)
 
     /**
      * Varargs factory for high dimensional Vector literals.
      * Note: This is not an efficient way to create a vector.
      * @param d vector value literals
      * @tparam N intended vector dimension
-     * @return a Vector[N] consisting of the specified Double valued literals.
+     * @return a Vec[N] consisting of the specified Double valued literals.
      */
-    inline def apply[N <: Int](d: Double*): Vector[N] = {
+    inline def apply[N <: Int](d: Double*): Vec[N] = {
       val dimension:Int = valueOf[N]
       dimensionCheck(d.size, dimension)
       d.size match {
@@ -62,7 +62,7 @@ package object vector {
       }
     }
 
-    extension[N <: Int] (thisVector: Vector[N]) {
+    extension[N <: Int] (thisVector: Vec[N]) {
 
       inline def apply(index: Int): Double = thisVector(index)
 
@@ -70,8 +70,8 @@ package object vector {
 
       inline def dimension: Int = thisVector.length
 
-      def copy:Vector[N] = {
-        val copyOfThisVector:Vector[N] = new NArray[Double](dimension)
+      def copy:Vec[N] = {
+        val copyOfThisVector:Vec[N] = new NArray[Double](dimension)
         var i = 0
         while (i < dimension) {
           copyOfThisVector(i) = thisVector(i)
@@ -96,7 +96,7 @@ package object vector {
 
       inline def magnitudeSquared: Double = normSquared
 
-      inline def euclideanDistanceSquaredTo(v0: Vector[N]): Double = {
+      inline def euclideanDistanceSquaredTo(v0: Vec[N]): Double = {
         var distance = 0.0
         var i = 0
         while (i < dimension) {
@@ -106,13 +106,13 @@ package object vector {
         distance
       }
 
-      inline def euclideanDistanceTo(v0: Vector[N]): Double = Math.sqrt(euclideanDistanceSquaredTo(v0))
+      inline def euclideanDistanceTo(v0: Vec[N]): Double = Math.sqrt(euclideanDistanceSquaredTo(v0))
 
-      inline def +(v0: Vector[N]): Vector[N] = copy.add(v0)
+      inline def +(v0: Vec[N]): Vec[N] = copy.add(v0)
 
-      inline def += (v0: Vector[N]): Vector[N] = add(v0)
+      inline def += (v0: Vec[N]): Vec[N] = add(v0)
 
-      def add(v0: Vector[N]): Vector[N] = {
+      def add(v0: Vec[N]): Vec[N] = {
         var i = 0
         while (i < dimension) {
           thisVector(i) = thisVector(i) + v0(i)
@@ -122,10 +122,10 @@ package object vector {
       }
 
 
-      inline def -(v0: Vector[N]): Vector[N] = copy.subtract(v0)
-      inline def -= (v0: Vector[N]): Vector[N] = subtract(v0)
+      inline def -(v0: Vec[N]): Vec[N] = copy.subtract(v0)
+      inline def -= (v0: Vec[N]): Vec[N] = subtract(v0)
 
-      def subtract(v0: Vector[N]): Vector[N] = {
+      def subtract(v0: Vec[N]): Vec[N] = {
         var i = 0
         while (i < dimension) {
           thisVector(i) = thisVector(i) - v0(i)
@@ -134,7 +134,7 @@ package object vector {
         thisVector
       }
 
-      def dot(v0: Vector[N]): Double = {
+      def dot(v0: Vec[N]): Double = {
         var product = 0.0
         var i = 0
         while (i < dimension) {
@@ -144,10 +144,10 @@ package object vector {
         product
       }
 
-      inline def *(scalar: Double): Vector[N] = copy.scale(scalar)
+      inline def *(scalar: Double): Vec[N] = copy.scale(scalar)
 
-      inline def *= (scalar: Double): Vector[N] = scale(scalar)
-      inline def scale(scalar: Double): Vector[N] = {
+      inline def *= (scalar: Double): Vec[N] = scale(scalar)
+      inline def scale(scalar: Double): Vec[N] = {
         var i = 0
         while (i < dimension) {
           thisVector(i) = thisVector(i) * scalar
@@ -155,10 +155,10 @@ package object vector {
         }
         thisVector
       }
-      inline def /(divisor: Double): Vector[N] = copy.divide(divisor)
-      inline def /= (divisor: Double): Vector[N] = divide(divisor)
+      inline def /(divisor: Double): Vec[N] = copy.divide(divisor)
+      inline def /= (divisor: Double): Vec[N] = divide(divisor)
 
-      inline def divide(divisor: Double): Vector[N] = scale(1.0 / divisor)
+      inline def divide(divisor: Double): Vec[N] = scale(1.0 / divisor)
 
       inline def round(): Unit = {
         var i = 0
@@ -178,7 +178,7 @@ package object vector {
         }
       }
 
-      inline def normalize(): Vector[N] = {
+      inline def normalize(): Vec[N] = {
         val n: Double = norm
         if (n > 0.0) divide(n)
         else throw VectorNormalizationException(thisVector)
@@ -203,66 +203,66 @@ package object vector {
     }
 
 
-    inline def fill[N <: Int](d: Double): Vector[N] = apply(NArray.fill[Double](valueOf[N])(d))
+    inline def fill[N <: Int](d: Double): Vec[N] = apply(NArray.fill[Double](valueOf[N])(d))
 
-    inline def tabulate[N <: Int](f: Int => Double): Vector[N] = apply(NArray.tabulate[Double](valueOf[N])(f))
+    inline def tabulate[N <: Int](f: Int => Double): Vec[N] = apply(NArray.tabulate[Double](valueOf[N])(f))
 
-    def midpoint[N <: Int](v0: Vector[N], v1: Vector[N]): Vector[N] = (v0 + v1) * 0.5
+    def midpoint[N <: Int](v0: Vec[N], v1: Vec[N]): Vec[N] = (v0 + v1) * 0.5
 
-    def blend[N <: Int](alpha: Double, v0: Vector[N], v1: Vector[N]):Vector[N] = (v0 * alpha) + (v1 * (1.0 - alpha))
+    def blend[N <: Int](alpha: Double, v0: Vec[N], v1: Vec[N]):Vec[N] = (v0 * alpha) + (v1 * (1.0 - alpha))
 
-    def mean[N <: Int](`[v₁v₂⋯vₙ]`: Vector[N]*): Vector[N] = {
-      val μ: Vector[N] = `[v₁v₂⋯vₙ]`.head.copy
+    def mean[N <: Int](`[v₁v₂⋯vₙ]`: Vec[N]*): Vec[N] = {
+      val μ: Vec[N] = `[v₁v₂⋯vₙ]`.head.copy
       for (v <- `[v₁v₂⋯vₙ]`.tail) {
         μ += v
       }
       μ /= `[v₁v₂⋯vₙ]`.size
     }
 
-    def mean[N <: Int](`[v₀v₁⋯v₍ₙ₋₁₎]`: NArray[Vector[N]]): Vector[N] = {
-      val μ: Vector[N] = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).copy
+    def mean[N <: Int](`[v₀v₁⋯v₍ₙ₋₁₎]`: NArray[Vec[N]]): Vec[N] = {
+      val μ: Vec[N] = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).copy
       for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
         μ += `[v₀v₁⋯v₍ₙ₋₁₎]`(i)
       }
-      μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length //.asInstanceOf[Vector[N]]
+      μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length //.asInstanceOf[Vec[N]]
     }
   }
 
   trait Format {
-    def prefix[N <: Int](v:Vector[N]): String
+    def prefix[N <: Int](v:Vec[N]): String
     def delimiter(index:Int): String
-    def suffix[N <: Int](v:Vector[N]): String
+    def suffix[N <: Int](v:Vec[N]): String
     def numberFormatter(value: Double): String = value.toString
   }
 
   object Format {
 
     object Default extends Format {
-      import Vector.*
-      override def prefix[N <: Int](v: Vector[N]): String = s"《${exalt(v.dimension)}↗〉"
+      import Vec.*
+      override def prefix[N <: Int](v: Vec[N]): String = s"《${exalt(v.dimension)}↗〉"
       override def delimiter(i: Int): String = ", "
-      override def suffix[N <: Int](v: Vector[N]): String = "〉"
+      override def suffix[N <: Int](v: Vec[N]): String = "〉"
     }
 
     object Indexed extends Format {
-      import Vector.*
-      override def prefix[N <: Int](v: Vector[N]): String = s"《${exalt(v.dimension)}↗〉"
+      import Vec.*
+      override def prefix[N <: Int](v: Vec[N]): String = s"《${exalt(v.dimension)}↗〉"
       override def delimiter(i: Int): String = s"${abase(i)} "
-      override def suffix[N <: Int](v: Vector[N]): String = "〉"
+      override def suffix[N <: Int](v: Vec[N]): String = "〉"
     }
 
     object CSV extends Format {
-      override def prefix[N <: Int](v: Vector[N]): String = ""
+      override def prefix[N <: Int](v: Vec[N]): String = ""
       override def delimiter(i: Int): String = ","
-      override def suffix[N <: Int](v: Vector[N]): String = ""
+      override def suffix[N <: Int](v: Vec[N]): String = ""
     }
 
     object TSV extends Format {
-      override def prefix[N <: Int](v: Vector[N]): String = ""
+      override def prefix[N <: Int](v: Vec[N]): String = ""
 
       override def delimiter(i: Int): String = "\t"
 
-      override def suffix[N <: Int](v: Vector[N]): String = ""
+      override def suffix[N <: Int](v: Vec[N]): String = ""
     }
   }
 
@@ -285,14 +285,14 @@ case class UnsupportedVectorDimension(givenDimension:Int, requiredDimension:Int 
 )
 
 
-case class VectorNormalizationException[N <: Int](v:Vector[N]) extends Exception({
+case class VectorNormalizationException[N <: Int](v:Vec[N]) extends Exception({
   import vector.*
-  import Vector.*
+  import Vec.*
   s"Can't normalize ${v.render()}"
 })
 
-case class ExtraDimensionalAccessException[N <: Int](v:Vector[N], ci: Int) extends Exception({
+case class ExtraDimensionalAccessException[N <: Int](v:Vec[N], ci: Int) extends Exception({
   import vector.*
-  import Vector.*
+  import Vec.*
   s"Index: $ci exceeds dimensionality of Euclidean object${v.dimension}: ${v.render()}"
 })

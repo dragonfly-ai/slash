@@ -8,13 +8,13 @@ import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.*
 import Constant.π
 
-import Vector.*
-import Vector2.*
+import Vec.*
+import Vec2.*
 /**
  * Created by clifton on 1/10/17.
  */
 
-object Vector2Demo extends Demonstration {
+object Vec2Demo extends Demonstration {
 
   override def demo():Unit = {
 
@@ -22,7 +22,7 @@ object Vector2Demo extends Demonstration {
 
     var di:Int = 0
     while (di < radians.length) {
-      val vr = Vector[2](1, 0)
+      val vr = Vec[2](1, 0)
       val v = vr.copy
       val theta = radians(di)
       vr.rotate(theta)
@@ -33,6 +33,6 @@ object Vector2Demo extends Demonstration {
 
   }
 
-  override def name: String = "Vector[2]"
+  override def name: String = "Vec[2]"
 
 }
