@@ -16,6 +16,7 @@ object Demo extends XApp(NativeConsole(style = "padding: 8px; overflow: scroll;"
     ai.dragonfly.math.vector.VecNDemo,
     ai.dragonfly.math.vector.WeightedVecDemo,
     ai.dragonfly.math.geometry.TetrahedronDemo,
+    ai.dragonfly.math.spatial.OctreeDemo,
     ai.dragonfly.math.stats.kernel.KernelDemo,
     ai.dragonfly.math.GammaDemo,
     ai.dragonfly.math.FactorialDemo,

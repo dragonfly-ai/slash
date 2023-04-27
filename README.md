@@ -1,6 +1,6 @@
 # vector
 
-A Scala 3 Vector Math and Statistics library designed to:
+A Scala 3 vector math and statistics library designed to:
 
 <ol>
 <li>Cross compile to JVM, Native and JavaScript platforms</li>
@@ -14,6 +14,7 @@ A Scala 3 Vector Math and Statistics library designed to:
 
 Features:
 - High performance Vector data types with convenient vector math syntax.
+- Octree for nearest neighbor search and radial querying.
 - Parametric and Estimated (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Sampleable trait for declaring generative models.
 - Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
