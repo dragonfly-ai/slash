@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package ai.dragonfly.math.spatial
 
 import narr.*
