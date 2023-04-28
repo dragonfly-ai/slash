@@ -55,7 +55,6 @@ lazy val demo = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     Compile / mainClass := Some("Demo")
   )
   .jsSettings(
-    Compile / fastOptJS / artifactPath := file("./docs/js/main.js"),
     Compile / fullOptJS / artifactPath := file("./docs/js/main.js"),
     scalaJSUseMainModuleInitializer := true
   )
