@@ -183,22 +183,37 @@ class PROctreeMapMetaNode[T](override val width: Double, override val center:Vec
     insertedNode
   }
 
+
   override def nearestNeighbor(queryPoint: Vec[3]): Option[Vec[3]] = {
     val x = if (queryPoint.x - center.x < 0.0) 0 else 1
     val y = if (queryPoint.y - center.y < 0.0) 0 else 1
     val z = if (queryPoint.z - center.z < 0.0) 0 else 1
 
     var node = nodes(x)(y)(z)
-    if (node.size > 0) {
-      node.nearestNeighbor(queryPoint)
-    } else {
-      for (xi <- 0 to 1; yi <- 0 to 1; zi <- 0 to 1) {
-        node = nodes(xi)(yi)(zi)
-        if (node.size > 0) return node.nearestNeighbor(queryPoint)
-      }
-      None
-    }
 
+    if (node.size > 0) node.nearestNeighbor(queryPoint) else {
+
+      var nn:Option[Vec[3]] = None
+      var nd: Double = Double.MaxValue
+
+      for (xi <- 0 to 1; yi <- 0 to 1; zi <- 0 to 1) {
+        if (xi != x || yi != y || zi != z) {
+          node = nodes(xi)(yi)(zi)
+          if (node.size > 0) {
+            node.nearestNeighbor(queryPoint) match {
+              case Some(candidate: Vec[3]) =>
+                val cd: Double = queryPoint.euclideanDistanceSquaredTo(candidate)
+                if (cd < nd) {
+                  nd = cd
+                  nn = Some(candidate)
+                }
+              case _ =>
+            }
+          }
+        }
+      }
+      nn
+    }
   }
 
   override def radialQuery(p: Vec[3], radiusSquared: Double): List[Vec[3]] = {
