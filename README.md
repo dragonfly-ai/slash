@@ -14,11 +14,11 @@ A Scala 3 vector math and statistics library designed to:
 
 Features:
 - High performance Vector data types with convenient vector math syntax.
-- Octree for nearest neighbor search and radial querying.
-- Parametric and Estimated (Online/Streaming) Probability Distributions: Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
-- Sampleable trait for declaring generative models.
+- Probability Distributions, Parametric and Estimated (Online/Streaming): Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
+- Sampleable trait for making types into generative models.
 - Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
-- Geometry: Sample points uniformly from volumes defined by 3D tetrahedrons.  Bresenham Line Drawing Algorithm that invokes a lambda for each discrete point on a line.
+- Geometry: Sample points uniformly from volumes defined by 3D tetrahedrons.
+- Bresenham Line Drawing Algorithm that invokes a lambda for each discrete point on a line.
 - Kernels: Gaussian, Epanechnikov, Uniform, and Discrete.
 - Flexible Histogram data structures with Console friendly Text Based Visualizations inspired by <a href="https://github.com/JuliaPlots/UnicodePlots.jl">Julia Plots</a>.
 - Bijection[A, B]: an abstraction for bijective implicit conversions.
