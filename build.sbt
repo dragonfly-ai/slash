@@ -22,12 +22,13 @@ ThisBuild / nativeConfig ~= {
 lazy val vector = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .settings(
-    libraryDependencies += "ai.dragonfly" %%% "narr" % "0.101",
-  ).jvmSettings(
-    libraryDependencies ++= Seq(
-      "org.scala-js" %% "scalajs-stubs" % "1.1.0"
-    )
-  ).jsSettings()
+    description := "High performance, low footprint, cross platform, vector and statistics library!",
+    libraryDependencies += "ai.dragonfly" %%% "narr" % "0.101"
+  )
+  .jvmSettings(
+    libraryDependencies ++= Seq( "org.scala-js" %% "scalajs-stubs" % "1.1.0" )
+  )
+  .jsSettings()
   .nativeSettings()
 
 lazy val verification = project
@@ -49,7 +50,6 @@ lazy val demo = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     name := "demo",
     Compile / mainClass := Some("Demo"),
     libraryDependencies ++= Seq(
-//      "com.lihaoyi" %%% "scalatags" % "0.11.1",
       "ai.dragonfly" %%% "democrossy" % "0.101"
     ),
     Compile / mainClass := Some("Demo")
