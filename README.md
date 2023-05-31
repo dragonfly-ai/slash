@@ -26,7 +26,6 @@ Features:
 - Interval and Domain types and objects with support for random sampling.
 - Unicode text formatting utility for writing numeric value types in superscript or subscript positions.
 
-
 <a href="https://dragonfly-ai.github.io/vector/demo">Try the demo</a>.
 
 &nbsp;&nbsp;&nbsp;Instead of case classes, traits, or wrappers, this library represents all runtime vector data as native arrays of double precision floating point values.  However, it also uses Scala 3 features like opaque types, dependent types, and extension methods to decorate the array primitives with convenient syntax, e.g. overloaded operators like `+ - * / += -= *= /=`, and also, by expressing vector dimensionality as a type parameter, can prevent runtime errors resulting from trying to perform vector operations on vectors of mismatched dimensions at compile time.  For example:   
