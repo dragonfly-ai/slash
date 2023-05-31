@@ -16,10 +16,13 @@
 
 package ai.dragonfly.math
 
+import ai.dragonfly.math.Random.nextVec
 import ai.dragonfly.math.vector.Vec
 import unicode.*
 import narr.*
 
+import scala.compiletime.ops.any.==
+import scala.compiletime.ops.boolean.&&
 import scala.compiletime.ops.int.*
 
 package object vector {
@@ -27,17 +30,18 @@ package object vector {
   opaque type Vec[N <: Int] = NArray[Double]
 
   object Vec {
-    inline def apply[N <: Int](a: NArray[Double]): Vec[N] = { // sneaky way to cast an NArray[Double] to a Vec[N]
+    inline def apply[N <: Int](a: NArray[Double]): Vec[N] = { // cast a NArray[Double] as Vec[N]
       dimensionCheck(a, valueOf[N])
       a
     }
 
-    inline def zeros[N <: Int](using ValueOf[N]): Vec[N] = new NArray[Double](valueOf[N])
+    inline def zeros[N <: Int](using ValueOf[N]): Vec[N] = fill[N](0.0)
 
-    inline def random[N <: Int](maxNorm:Double = 1.0): Vec[N] = {
-      import ai.dragonfly.math.Random.*
-      defaultRandom.nextVec[N](maxNorm)
-    }
+    inline def random[N <: Int](
+      MAX:Double = 1.0,
+      min:Double = 0.0,
+      r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom
+    ): Vec[N] = r.nextVec[N](min, MAX)
 
     inline def apply(x: Double, y: Double): Vec[2] = NArray[Double](x, y)
 
@@ -62,6 +66,62 @@ package object vector {
         case 4 => apply(d(0), d(1), d(2), d(3))
         case _ => apply[dimension.type](NArray[Double](d: _*))
       }
+    }
+
+    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 1 =:= true) {
+      inline def x: Double = thisVector(0)
+    }
+
+    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 2 =:= true) {
+      inline def y: Double = thisVector(1)
+    }
+
+    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 3 =:= true) {
+      inline def z: Double = thisVector(2)
+    }
+
+    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 4 =:= true) {
+      inline def w: Double = thisVector(3)
+    }
+
+    /**
+     * Vec[2] extension methods:
+     */
+    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N == 2 =:= true) {
+      inline def rotate(cosTheta: Double, sinTheata: Double): Vec[2] = {
+        val x1 = thisVector(0) * cosTheta - thisVector(1) * sinTheata
+        thisVector(1) = thisVector(0) * sinTheata + thisVector(1) * cosTheta
+        thisVector(0) = x1
+        thisVector
+      }
+      inline def rotate(radians: Double): Vec[2] = rotate(Math.cos(radians), Math.sin(radians))
+      inline def rotateDegrees(degrees: Double): Vec[2] = rotate(degreesToRadians(degrees))
+      inline def pseudoCross(thatVector: Vec[2]): Double = thisVector(0) * thatVector.y + thisVector(1) * thatVector.x
+
+      /**
+       * Compute the signed angle between two vectors.
+       *
+       * @param v the second vector to compare this vector to.
+       * @return the signed angle in radians
+       */
+      inline def angleFrom(v: Vec[2]): Double = {
+        //Math.acos( (thisVector dot v) / (thisVector.norm * v.norm) )  // unsigned method
+        Math.atan2(thisVector.pseudoCross(v), thisVector dot v)
+      }
+    }
+
+    /**
+     * Vec[3] extension methods:
+     */
+    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N == 3 =:= true) {
+      inline def ⨯(thatVector: Vec[3]): Vec[3] = cross(thatVector)
+
+      inline def cross(thatVector: Vec[3]): Vec[3] = Vec[3](
+        thisVector(1) * thatVector.z - thisVector(2) * thatVector.y, // u2*v3 - u3*v2,
+        thisVector(2) * thatVector.x - thisVector(0) * thatVector.z, // u3*v1 - u1*v3,
+        thisVector(0) * thatVector.y - thisVector(1) * thatVector.x // u1*v2 - u2*v1
+      )
+
     }
 
     extension[N <: Int] (thisVector: Vec[N]) {
@@ -188,6 +248,14 @@ package object vector {
         else throw VectorNormalizationException(thisVector)
       }
 
+      // ₂⃗ ²↗ ↗²
+      def show: String = thisVector.dimension match {
+        case 2 => s"《²↗〉${thisVector(0)}ᵢ ${thisVector(1)}ⱼ〉"
+        case 3 => s"《³↗〉${thisVector(0)}ᵢ ${thisVector(1)}ⱼ ${thisVector(2)}ₖ〉"
+        case 4 => s"《⁴↗〉${thisVector(0)}ᵢ ${thisVector(1)}ⱼ ${thisVector(2)}ₖ ${thisVector(3)}ₗ〉"
+        case _ => render().toString()
+      }
+
       def render(format:Format = Format.Default, sb: StringBuilder = new StringBuilder() ): StringBuilder = {
         import format.*
         sb.append(prefix(thisVector))
@@ -205,7 +273,6 @@ package object vector {
       def csv(sb: StringBuilder = new StringBuilder()): String = render(Format.CSV, sb).toString
       def tsv(sb: StringBuilder = new StringBuilder()): String = render(Format.TSV, sb).toString
     }
-
 
     inline def fill[N <: Int](d: Double): Vec[N] = apply(NArray.fill[Double](valueOf[N])(d))
 
@@ -281,7 +348,7 @@ package object vector {
 
 }
 
-case class UnsupportedVectorDimension(givenDimension:Int, requiredDimension:Int = -1) extends Exception(
+  case class UnsupportedVectorDimension(givenDimension:Int, requiredDimension:Int = -1) extends Exception(
   givenDimension match {
     case gd:Int if gd < 2 => s"Vector dimensions must exceed 1.  Cannot create a vector of dimension: $givenDimension"
     case _ => s"Expected Vector dimension: $requiredDimension, but observed: $givenDimension"

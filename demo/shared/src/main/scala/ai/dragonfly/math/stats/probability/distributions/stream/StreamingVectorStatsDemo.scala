@@ -4,7 +4,6 @@ import ai.dragonfly.math.Random.*
 import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.vector.*
 import Vec.*
-import Vec4.*
 import narr.*
 
 /**

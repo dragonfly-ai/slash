@@ -33,7 +33,6 @@ object Tetrahedron {
 case class Tetrahedron(vertices:NArray[Vec[3]]) extends Sampleable[Vec[3]] {
 
   import Tetrahedron.*
-  import Vec3.*
 
   inline def v1:Vec[3] = vertices(0)
   inline def v2:Vec[3] = vertices(1)

@@ -6,7 +6,6 @@ import ai.dragonfly.democrossy.Demonstration
 import scala.language.postfixOps
 import ai.dragonfly.math.squareInPlace
 import Vec.*
-import Vec4.*
 import narr.*
 
 object Vec4Demo extends Demonstration {

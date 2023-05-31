@@ -4,7 +4,6 @@ import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.squareInPlace
 import narr.*
 import Vec.*
-import Vec3.*
 
 /**
  * Created by clifton on 1/10/17.

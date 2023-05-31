@@ -19,6 +19,8 @@ package ai.dragonfly.math.vector
 import ai.dragonfly.math.*
 import narr.*
 
+import scala.compiletime.ops.int.*
+
 /**
  * Created by clifton on 1/10/17.
  */
@@ -34,42 +36,14 @@ object Vec2 {
   def rotateAll(vectors:NArray[Vec[2]], radians: Double): NArray[Vec[2]] = {
     val cos:Double = Math.cos(radians)
     val sin:Double = Math.sin(radians)
-    var v2 = 0
-    while (v2 < vectors.length) {
-      vectors(v2).rotate(cos, sin)
-      v2 = v2 + 1
+    var vi = 0
+    while (vi < vectors.length) {
+      val v2:Vec[2] = vectors(vi)
+      v2.rotate(cos, sin)
+      vi = vi + 1
     }
     vectors
   }
 
-  extension (thisVector: Vec[2]) {
-//    inline def apply(index: Int): Double = thisVector(index)
-//
-//    inline def update(index: Int, value: Double): Unit = thisVector(index) = value
-    inline def x: Double = thisVector(0)
-    inline def y: Double = thisVector(1)
-
-    inline def rotate(cosTheta:Double, sinTheata:Double):Vec[2] = {
-      val x1 = thisVector.x * cosTheta - thisVector.y * sinTheata
-      thisVector(1) = thisVector.x * sinTheata + thisVector.y * cosTheta
-      thisVector(0) = x1
-      thisVector
-    }
-    inline def rotate(radians: Double): Vec[2] = rotate( Math.cos(radians), Math.sin(radians) )
-    inline def rotateDegrees(degrees: Double): Vec[2] = rotate(degreesToRadians(degrees))
-    inline def pseudoCross(v: Vec[2]): Double = x * v.y + y * v.x
-
-    /**
-     * Compute the signed angle between two vectors.
-     * @param v the second vector to compare this vector to.
-     * @return the signed angle in radians
-     */
-    inline def angleFrom(v: Vec[2]): Double = {
-      //Math.acos( (thisVector dot v) / (thisVector.norm * v.norm) )  // unsigned method
-      Math.atan2(thisVector.pseudoCross(v), thisVector dot v)
-    }
-
-    def show: String = s"《²↗〉${x}ᵢ ${y}ⱼ〉" // ₂⃗ ²↗ ↗²
-  }
 
 }

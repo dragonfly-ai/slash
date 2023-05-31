@@ -42,9 +42,8 @@ object Random {
     def nextBigDecimal(norm: BigDecimal, scale: Int): BigDecimal = norm * r.nextBigDecimal(scale)(new MathContext((norm.precision - norm.scale) + scale))
     def between(min: BigDecimal, MAX: BigDecimal): BigDecimal = min + r.nextBigDecimal(MAX - min, Math.max(min.precision, MAX.precision))
     inline def nextVec[N <: Int](maxNorm:Double = 1.0): Vec[N] = Vec.apply[N]( NArray.tabulate[Double](valueOf[N])((i:Int) => maxNorm * r.nextDouble() ) )
-    inline def next[N <: Int](norm:Vec[N]):Vec[N] = Vec[N]( NArray.tabulate[Double](norm.dimension)((i:Int) => norm(i) * r.nextDouble() ) )
-    inline def between[N <: Int](min:Vec[N], MAX:Vec[N]):Vec[N] = {
-      Vec[N](NArray.tabulate[Double](min.dimension)((i: Int) => r.between(min(i), MAX(i))))
-    }
+    inline def nextVec[N <: Int](minNorm:Double, normMAX:Double): Vec[N] = Vec.apply[N]( NArray.tabulate[Double](valueOf[N])((i:Int) => r.between(minNorm, normMAX) ) )
+    inline def nextVec[N <: Int](componentNorm:Vec[N]):Vec[N] = Vec[N]( NArray.tabulate[Double](componentNorm.dimension)((i:Int) => componentNorm(i) * r.nextDouble() ) )
+    inline def between[N <: Int](min:Vec[N], MAX:Vec[N]):Vec[N] = Vec[N](NArray.tabulate[Double](min.dimension)((i: Int) => r.between(min(i), MAX(i))))
 
 }

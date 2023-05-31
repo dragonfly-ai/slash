@@ -6,7 +6,6 @@ import Interval.*
 import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.vector.*
 import Vec.*
-import Vec3.*
 import ai.dragonfly.math.geometry.Tetrahedron
 
 object TetrahedronDemo extends Demonstration {

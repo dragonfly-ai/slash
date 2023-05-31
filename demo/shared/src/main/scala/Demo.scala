@@ -9,6 +9,7 @@ object Demo extends XApp(NativeConsole(style = "padding: 8px; overflow: scroll;"
 
   val allDemos: Array[Demonstration] = Array[Demonstration](
     // ai.dragonfly.math.vector.SparseVectorDemo,
+    ai.dragonfly.math.vector.MixedVecDemo,
     ai.dragonfly.math.unicode.UnicodeDemo,
     ai.dragonfly.math.vector.Vec2Demo,
     ai.dragonfly.math.vector.Vec3Demo,
