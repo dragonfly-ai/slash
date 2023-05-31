@@ -35,6 +35,8 @@ object Vec4Demo extends Demonstration {
     println(s"k4 dot l4 -> ${k dot l}\n")
     println(s"l4 dot k4 -> ${l dot k}\n")
 
+    println(s"Unary Minus: -i = ${ (-i).show }\n")
+
     val v0:Vec[4] = Vec[4](0.5, 0.0, 1.0, 0.75)
     println("val v₀ = Vec[4](0.5, 0.0, 1.0, 0.75)")
     print("\n\tv₀:"); println(v0.show)

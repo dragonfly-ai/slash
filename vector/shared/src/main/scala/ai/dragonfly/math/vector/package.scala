@@ -32,6 +32,8 @@ package object vector {
       a
     }
 
+    inline def zeros[N <: Int](using ValueOf[N]): Vec[N] = new NArray[Double](valueOf[N])
+
     inline def random[N <: Int](maxNorm:Double = 1.0): Vec[N] = {
       import ai.dragonfly.math.Random.*
       defaultRandom.nextVec[N](maxNorm)
@@ -108,7 +110,7 @@ package object vector {
 
       inline def euclideanDistanceTo(v0: Vec[N]): Double = Math.sqrt(euclideanDistanceSquaredTo(v0))
 
-      inline def +(v0: Vec[N]): Vec[N] = copy.add(v0)
+      inline def + (v0: Vec[N]): Vec[N] = copy.add(v0)
 
       inline def += (v0: Vec[N]): Vec[N] = add(v0)
 
@@ -120,6 +122,8 @@ package object vector {
         }
         thisVector
       }
+
+      inline def unary_- : Vec[N] = thisVector * ( -1.0 )
 
 
       inline def -(v0: Vec[N]): Vec[N] = copy.subtract(v0)
