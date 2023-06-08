@@ -16,7 +16,7 @@ Features:
 - High performance Vector data types with convenient vector math syntax.
 - Probability Distributions, Parametric and Estimated (Online/Streaming): Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Sampleable trait for making types into generative models.
-- Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).
+- Math functions: Beta, Factorial, and Gamma functions: B(α, β), x! and Γ(x).  Convenience macros, methods, and case classes for computing logarithms of arbitrary base. 
 - Geometry: Sample points uniformly from volumes defined by 3D tetrahedrons.
 - Bresenham Line Drawing Algorithm that invokes a lambda for each discrete point on a line.
 - Kernels: Gaussian, Epanechnikov, Uniform, and Discrete.
@@ -124,10 +124,37 @@ pg.p(8.0)   // estimate the Probability Density Function at 8.0, in other words:
 pg.random() // randomly sample a value from the estimated gaussian model
 ```
 
-<h3>Add the SBT dependency:</h3>
+
+<h3>Compile time Logarithms</h3>
+
+&nbsp;&nbsp;&nbsp;To compute `logₓ(y)`, where `x` is any value of type: `Double`, we compute: `log₁₀(y) / log₁₀(x)`.  Which can introduce a lot of computational overhead, especially when done in loops which repeatedly compute the same value for `log₁₀(x)`.  To improve performance and legibility, this library provides a `log[BASE <: Double | Int]` macro that computes the `log₁₀(x)` denominator at compile time; it also clarifies the operation by allowing users to write the base of the log into the type parameter and the operand as a method parameter.  As such, instead of: `log(2 /*base*/, 42 /*operand*/)` we can write: `log[2](42)`.
 
 ```scala
-libraryDependencies += "ai.dragonfly" %%% "vector" % "<LATEST_VERSION>"
+import ai.dragonfly.math.*
+
+// Compile time optimized Logarithms of known base:
+log[2](42.0)  // Computes log₂(42) at compile time
+log[0.5](11.0)  // Computes log₀.₅(11) at compile time
+
+var i: Int = 1; while (i > 0) {
+  println( log[2](i) )  // computes half of this operation at compile time
+  i = i << 1
+}
+```
+
+<h3>Runtime Logarithms</h3>
+&nbsp;&nbsp;&nbsp;The runtime `Log` class can yield comparable performance in cases when the base of the logarithm can't be known at compile time, or can't be expressed as a constant.
+
+```scala
+import ai.dragonfly.math.*
+// Use the runtime Log class for:
+// a base determined by a value:
+import ai.dragonfly.math.Constant.π
+val logBasePi: Log = Log(π)
+logBasePi(13)
+// or any base unknown at compile time,
+val logBaseRandom:Log = Log(Math.random())
+logBaseRandom(42)
 ```
 
 Unicode Histogram Plot:
@@ -147,6 +174,12 @@ Histogram: {
 }
 ```
 These plots label the bins with standardised math notation for open and closed intervals, but also use the unicode glyphs for the phases of the moon to represent the cumulative distribution.
+
+<h3>Add the SBT dependency:</h3>
+
+```scala
+libraryDependencies += "ai.dragonfly" %%% "vector" % "<LATEST_VERSION>"
+```
 
 <h2>FAQ:</h2>
 <ul>

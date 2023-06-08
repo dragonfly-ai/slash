@@ -68,6 +68,30 @@ package object vector {
       }
     }
 
+    private inline def DBL(a:Any):Double = a.asInstanceOf[Double]
+
+    def fromTuple(t: (Double, Double)):Vec[2] = Vec[2](t._1, t._2)
+    def fromTuple(t: (Double, Double, Double)):Vec[3] = Vec[3](t._1, t._2, t._3)
+    def fromTuple(t: (Double, Double, Double, Double)):Vec[4] = Vec[4](t._1, t._2, t._3, t._4)
+    def fromTuple(t: (Double, Double, Double, Double, Double)):Vec[5] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double)):Vec[6] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double)):Vec[7] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double)):Vec[8] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[9] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[10] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[11] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[12] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[13] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[14] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[15] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[16] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[17] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[18] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[19] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[20] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[21] = Vec.tabulate(i => DBL(t(i)))
+    def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[22] = Vec.tabulate(i => DBL(t(i)))
+
     extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 1 =:= true) {
       inline def x: Double = thisVector(0)
     }

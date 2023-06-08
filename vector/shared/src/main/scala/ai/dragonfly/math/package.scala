@@ -48,6 +48,53 @@ package object math {
   def beta(α:Double, β:Double):Double = B(α, β)
 
   inline def ln(x:Double):Double = Math.log(x)
+
+  import scala.quoted.*
+
+  /**
+   * Compute a logarithm of the given base.
+   * Because Logₓ(y) = Math.log10(y) / Math.log10(x), this method computes the denominator at compile time.
+   * For example, to compute log base 2 of 64: {{{ log[2](64) }}}
+   * To compute log base π of 42: {{{ log[3.141592653589793](42) }}}
+   * @param y the input to the logarithm operator.
+   * @tparam BASE the base of the logarithm.
+   * @return logₓ(y) where x = base and y = d.
+   */
+  inline def log[BASE <: Double | Int](y:Double): Double = ${ logImpl[BASE]('{y}) }
+
+  private def logImpl[BASE: Type](x:Expr[Double])(using Quotes): Expr[Double] = {
+    import quotes.reflect.*
+    val base:Double = TypeRepr.of[BASE] match {
+      case ConstantType(c:Constant) =>
+        c.value match {
+          case i:Int => i.toDouble
+          case d:Double => d
+          case a => throw Exception(s"Expected log[Double|Int] but found log[$a].")
+        }
+      case TermRef(a, b) => println(s"found ${a} ${b}"); 0.0
+      case notaconstant =>
+        throw Exception(s"Expected log[Double|Int] but found log[${notaconstant}].")
+    }
+
+    '{ Math.log10(${x}) / ${ Expr(Math.log10(base)) } }
+  }
+
+  /**
+   * This class can yield drastic performance improvements in cases when the base of an oft-repeated logarithm operation
+   * can't be known at compile time, or can't be expressed as a constant.
+   * @param base the base of the logarithm operator.
+   */
+  case class Log(val base: Double) {
+    private val `log10(base)`: Double = Math.log10(base)
+
+    /**
+     * Computes logarithm with a base defined in the constructor of the class of the operand specified by the x parameter.
+     * @param x the operand to this logarithm operator.
+     * @return
+     */
+    inline def apply(x:Double): Double = Math.log10(x) / `log10(base)`
+  }
+
   inline def degreesToRadians(degrees: Double):Double = degrees * 0.017453292519943295
   inline def radiansToDegrees(radians: Double):Double = radians * 57.29577951308232
 }

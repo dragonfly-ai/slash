@@ -26,4 +26,7 @@ case class VecBounds[N <: Int](min: Vec[N], MAX: Vec[N]) {
     }
     o
   }
+
+  def center:Vec[N] = (min + MAX) / 2.0
+
 }

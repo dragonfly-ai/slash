@@ -33,6 +33,12 @@ object MixedVecDemo extends Demonstration {
     println(s"${v2.show}.w : Compiler Error!")
     println(s"${v3.show}.w : Compiler Error!")
     println(s"${v4.show}.w : ${v4.w}")
+
+    val t: (
+      Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double
+    ) = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+    println(s"${Vec.fromTuple(t).show}")
+
   }
 
   override def name: String = "MixedVecDemo"
