@@ -71,7 +71,7 @@ package object math {
           case d:Double => d
           case a => throw Exception(s"Expected log[Double|Int] but found log[$a].")
         }
-      case TermRef(a, b) => println(s"found ${a} ${b}"); 0.0
+      //case TermRef(a, b) => println(s"found ${a} ${b}"); 0.0
       case notaconstant =>
         throw Exception(s"Expected log[Double|Int] but found log[${notaconstant}].")
     }
