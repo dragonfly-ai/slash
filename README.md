@@ -1,5 +1,7 @@
 # vector
 
+[![javadoc](https://javadoc.io/badge2/ai.dragonfly/vector_3/javadoc.svg)](https://javadoc.io/doc/ai.dragonfly/vector_3)
+
 A Scala 3 vector math and statistics library designed to:
 
 <ol>
