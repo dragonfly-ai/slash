@@ -24,6 +24,7 @@ import narr.*
 import scala.compiletime.ops.any.==
 import scala.compiletime.ops.boolean.&&
 import scala.compiletime.ops.int.*
+import scala.collection.View
 
 package object vector {
 
@@ -164,6 +165,41 @@ package object vector {
           i = i + 1
         }
         copyOfThisVector
+      }
+
+      def elementRanks: Vec[N] = {
+        //val ranks = new NArray[Int](thisVector.dimension)
+        val (sorted, originalPosition) = thisVector.zipWithIndex.toVector.sortBy(_._1).unzip
+        val ranks = Array.tabulate(thisVector.dimension)(i => (i+1).toDouble)
+
+        //if (ranks.isEmpty) throw new Exception("Can't rank an empty vector!") This can't happen unless N is zero
+
+        var currentValue = sorted(0)
+        var i = 0
+        var currentSum = 0.0
+        var currentCount = 0
+        var resultList = List[Double]()
+
+        for (value <- sorted) {
+          println(value)
+          if (value == currentValue) {
+            currentSum += ranks(i)
+            currentCount += 1
+          } else {
+            resultList = resultList ++ List.fill(currentCount)(currentSum / currentCount)
+            currentValue = value
+            currentCount = 1
+            currentSum = ranks(i)
+          }
+          i = i + 1
+        }
+        resultList = resultList ++ List.fill(currentCount)(currentSum / currentCount)
+
+        val rankResult : Vec[N] = new NArray[Double](thisVector.dimension)
+        for( (idx, r) <- originalPosition.zip(resultList)) {
+          rankResult(idx) = r
+        }
+        rankResult
       }
 
       inline def normSquared: Double = {

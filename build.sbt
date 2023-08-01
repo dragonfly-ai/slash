@@ -19,7 +19,11 @@ ThisBuild / nativeConfig ~= {
 }
 
 
-lazy val vector = crossProject(JSPlatform, JVMPlatform, NativePlatform)
+lazy val vector = crossProject(
+    JSPlatform,
+    JVMPlatform,
+    NativePlatform
+  )
   .crossType(CrossType.Full)
   .settings(
     description := "High performance, low footprint, cross platform, vector and statistics library!",
@@ -42,7 +46,11 @@ lazy val verification = project
     )
   )
 
-lazy val demo = crossProject(JSPlatform, JVMPlatform, NativePlatform)
+lazy val demo = crossProject(
+  JSPlatform,
+  JVMPlatform,
+  NativePlatform
+)
   .crossType(CrossType.Full)
   .enablePlugins(NoPublishPlugin)
   .dependsOn(vector)
@@ -76,5 +84,25 @@ lazy val unidocs = project
   .enablePlugins(TypelevelUnidocPlugin) // also enables the ScalaUnidocPlugin
   .settings(
     name := "vector-docs",
-    ScalaUnidoc / unidoc / unidocProjectFilter := inProjects(vector.jvm, vector.js, vector.native)
+    ScalaUnidoc / unidoc / unidocProjectFilter :=
+      inProjects(
+        vector.jvm,
+        vector.js,
+        vector.native
+      )
   )
+
+lazy val tests = crossProject(
+    JVMPlatform,
+    JSPlatform,
+    //NativePlatform
+  )
+  .in(file("tests"))
+  .enablePlugins(NoPublishPlugin)
+  .dependsOn(vector)
+  .settings(
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M8" % Test
+  )
+  // .jvmSettings(name := "jvmTest")
+  // .jsSettings(name := "jsTest")
+  //.nativeSettings(name := "nativeTest") - no worky worky
