@@ -103,6 +103,6 @@ lazy val tests = crossProject(
   .settings(
     libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M8" % Test
   )
-  .jvmSettings(name := "jvmTest")
-  .jsSettings(name := "jsTest")
-  .nativeSettings(name := "nativeTest")
+  .jvmSettings(name := "tests-jvm")
+  .jsSettings(name := "tests-js")
+  .nativeSettings(name := "tests-native")
