@@ -195,6 +195,9 @@ package object vector {
         (σxy - (μx * μy)) / (σx * σy)
       }
 
+      // An alias - pearson is the most commonly requested type of correlation
+      def corr(thatVector: Vec[N]): Double = pearsonCorrelationCoefficient(thatVector)
+
       def elementRanks: Vec[N] = {
         val (sorted, originalPosition) = thisVector.zipWithIndex.toVector.sortBy(_._1).unzip
         val ranks : Vec[N] = NArray.tabulate[Double](thisVector.dimension)(i => (i+1).toDouble)
