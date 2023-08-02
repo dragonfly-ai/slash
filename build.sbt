@@ -101,8 +101,9 @@ lazy val tests = crossProject(
   .enablePlugins(NoPublishPlugin)
   .dependsOn(vector)
   .settings(
+    name := "vector-tests",
     libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M8" % Test
   )
-  .jvmSettings(name := "tests-jvm")
-  .jsSettings(name := "tests-js")
-  .nativeSettings(name := "tests-native")
+  // .jvmSettings(name := "tests-jvm")
+  // .jsSettings(name := "tests-js")
+  // .nativeSettings(name := "tests-native")
