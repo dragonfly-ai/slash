@@ -29,6 +29,31 @@ class VecTests extends munit.FunSuite:
       assertNotEquals(v, v2 )
    }
 
+   test("sample mean") {
+    val v = Vec.fromTuple(2.0,4.0,4.0,4.0,5.0,5.0,7.0,9.0)
+    assertEquals(v.mean, 5.0)
+   }
+
+   test("sample variance and std") {
+    // https://en.wikipedia.org/wiki/Standard_deviation#Basic_examples
+      val v = Vec.fromTuple(2.0,4.0,4.0,4.0,5.0,5.0,7.0,9.0)
+      assertEquals(v.variance, 4.0)
+      assertEquals(v.stdDev, 2.0)
+   }
+
+   test("sample covariance") {
+    // Sample version
+    // https://corporatefinanceinstitute.com/resources/data-science/covariance/
+
+    val vector1 = Vec.fromTuple(1692.0, 1978.0, 1884.0, 2151.0, 2519.0)
+    val vector2 = Vec.fromTuple(68.0, 102.0, 110.0, 112.0, 154.0)
+
+    val result = vector1.covariance(vector2)
+    println(result)
+    assertEqualsDouble(result, 9107.3, 0.001)
+
+   }
+
    test("element rank") {
       val v = Vec.fromTuple(1.0, 5.0, 3.0, 6.0, 1.0, 5.0)
       /*
@@ -39,5 +64,6 @@ class VecTests extends munit.FunSuite:
       val v2 = Vec.fromTuple(1.0, 5.0, 3.0, 6.0, 1.0, 5.0, 1.0)
       assertEquals(v2.elementRanks.csv(),  Array[Double](2, 5.5, 4.0, 7, 2, 5.5, 2).mkString(","))
    }
+
 
 end VecTests

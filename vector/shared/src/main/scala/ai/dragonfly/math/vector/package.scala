@@ -167,6 +167,34 @@ package object vector {
         copyOfThisVector
       }
 
+      def mean: Double = {
+        thisVector.sum / thisVector.size
+      }
+
+      def variance: Double = {
+        val μ = thisVector.mean
+        thisVector.map(i => math.pow(i - μ, 2)).sum / thisVector.size
+      }
+
+      def stdDev: Double = {
+        math.sqrt(thisVector.variance)
+      }
+
+      def covariance(thatVector : Vec[N] ) = {
+        val μThis = thisVector.mean
+        val μThat = thatVector.mean
+        thisVector.zip(thatVector).map{ case (thisV, thatV) => (thisV - μThis) * (thatV - μThat) }.sum / (thisVector.size -1)
+      }
+
+      def pearsonCorrelationCoefficient(thatVector: Vec[N]): Double = {
+        val μx = thisVector.mean
+        val μy = thatVector.mean
+        val σx = thisVector.stdDev
+        val σy = thatVector.stdDev
+        val σxy = thisVector.covariance(thatVector)
+        (σxy - (μx * μy)) / (σx * σy)
+      }
+
       def elementRanks: Vec[N] = {
         val (sorted, originalPosition) = thisVector.zipWithIndex.toVector.sortBy(_._1).unzip
         val ranks : Vec[N] = NArray.tabulate[Double](thisVector.dimension)(i => (i+1).toDouble)
