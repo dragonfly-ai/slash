@@ -69,7 +69,7 @@ lazy val demo = crossProject(
   .jvmSettings()
   .nativeSettings()
 
-lazy val root = tlCrossRootProject.aggregate(vector).settings(name := "vector")
+lazy val root = tlCrossRootProject.aggregate(vector, tests).settings(name := "vector")
 
 lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin).settings(
   mdocVariables := Map(
