@@ -168,11 +168,8 @@ package object vector {
       }
 
       def elementRanks: Vec[N] = {
-        //val ranks = new NArray[Int](thisVector.dimension)
         val (sorted, originalPosition) = thisVector.zipWithIndex.toVector.sortBy(_._1).unzip
-        val ranks = Array.tabulate(thisVector.dimension)(i => (i+1).toDouble)
-
-        //if (ranks.isEmpty) throw new Exception("Can't rank an empty vector!") This can't happen unless N is zero
+        val ranks : Vec[N] = NArray.tabulate[Double](thisVector.dimension)(i => (i+1).toDouble)
 
         var currentValue = sorted(0)
         var i = 0
@@ -181,7 +178,6 @@ package object vector {
         var resultList = List[Double]()
 
         for (value <- sorted) {
-          println(value)
           if (value == currentValue) {
             currentSum += ranks(i)
             currentCount += 1

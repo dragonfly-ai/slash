@@ -95,7 +95,7 @@ lazy val unidocs = project
 lazy val tests = crossProject(
     JVMPlatform,
     JSPlatform,
-    //NativePlatform
+    NativePlatform
   )
   .in(file("tests"))
   .enablePlugins(NoPublishPlugin)
@@ -103,6 +103,6 @@ lazy val tests = crossProject(
   .settings(
     libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M8" % Test
   )
-  // .jvmSettings(name := "jvmTest")
-  // .jsSettings(name := "jsTest")
-  //.nativeSettings(name := "nativeTest") - no worky worky
+  .jvmSettings(name := "jvmTest")
+  .jsSettings(name := "jsTest")
+  .nativeSettings(name := "nativeTest")
