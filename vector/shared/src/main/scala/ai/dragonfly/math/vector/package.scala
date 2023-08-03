@@ -187,12 +187,13 @@ package object vector {
       }
 
       def pearsonCorrelationCoefficient(thatVector: Vec[N]): Double = {
-        val μx = thisVector.mean
-        val μy = thatVector.mean
-        val σx = thisVector.stdDev
-        val σy = thatVector.stdDev
-        val σxy = thisVector.covariance(thatVector)
-        (σxy - (μx * μy)) / (σx * σy)
+        val n = thisVector.size
+        val sum_x = thisVector.sum
+        val sum_y = thatVector.sum
+        val sum_xy = thisVector.zip(thatVector).map{ case (thisV, thatV) => thisV * thatV }.sum
+        val sum_x2 = thisVector.map(Math.pow(_,2)).sum
+        val sum_y2 = thatVector.map(Math.pow(_,2)).sum
+        (n * sum_xy - (sum_x * sum_y)) / Math.pow( (sum_x2 * n - Math.pow(sum_x, 2)) * (sum_y2 * n - Math.pow(sum_y, 2)), 0.5)
       }
 
       def spearmansRankCorrelation(thatVector: Vec[N]): Double = {

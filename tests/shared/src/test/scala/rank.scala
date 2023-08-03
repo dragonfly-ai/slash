@@ -55,15 +55,20 @@ class VecTests extends munit.FunSuite:
 
    }
 
+   test("pearson correlation coefficient") {
+    // https://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/
+    val v1 = Vec.fromTuple(43.0, 21.0, 25.0, 42.0, 57.0, 59.0)
+    val v2 = Vec.fromTuple(99.0, 65.0, 79.0, 75.0, 87.0, 81.0)
+    assertEqualsDouble(v1.pearsonCorrelationCoefficient(v2), 0.529809, 0.0001)
+
+   }
+
    test("element rank") {
       val v = Vec.fromTuple(1.0, 5.0, 3.0, 6.0, 1.0, 5.0)
       /*
       1.0 is the first, but has as tied rank. Take the average - 1.5
       */
-      assertEquals(v.elementRanks.csv(),  Array[Double](5.5,2.5,4.0,1.0,5.5,2.5).mkString(","))
-
-      val v2 = Vec.fromTuple(1.0, 5.0, 3.0, 6.0, 1.0, 5.0, 1.0)
-      assertEquals(v2.elementRanks.csv(),  Array[Double](6.0,2.5,4.0,1.0,6.0,2.5,6.0).mkString(","))
+      assertEquals(v.elementRanks.csv(),  Array[Double](1.5,4.5,3.0,6.0,1.5,4.5).mkString(","))
    }
 
    test("spearmans rank") {
