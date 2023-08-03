@@ -17,7 +17,7 @@
 import ai.dragonfly.math.vector.Vec
 import narr.NArray
 
-class VecTests extends munit.FunSuite:
+class SimpleStatsTests extends munit.FunSuite:
 
    test("Some basic properties") {
 
@@ -36,10 +36,9 @@ class VecTests extends munit.FunSuite:
    }
 
    test("sample variance and std") {
-    // https://en.wikipedia.org/wiki/Standard_deviation#Basic_examples
       val v = Vec.fromTuple(2.0,4.0,4.0,4.0,5.0,5.0,7.0,9.0)
-      assertEquals(v.variance, 4.0)
-      assertEquals(v.stdDev, 2.0)
+      assertEqualsDouble(v.variance, 4.571429, 0.00001)
+      assertEqualsDouble(v.stdDev, 2.13809, 0.00001)
    }
 
    test("sample covariance") {

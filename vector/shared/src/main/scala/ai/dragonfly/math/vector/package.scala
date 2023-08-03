@@ -172,17 +172,19 @@ package object vector {
       }
       // It is assumed, that we consider a sample rather than a complete population
       def variance: Double = {
+        // https://www.cuemath.com/sample-variance-formula/
         val μ = thisVector.mean
         thisVector.map(i => math.pow(i - μ, 2)).sum / (thisVector.size - 1)
       }
-      
+
       // It is assumed, that we consider a sample rather than a complete population
       def stdDev: Double = {
+        // https://www.cuemath.com/data/standard-deviation/
         val mu = thisVector.mean
         val diffs_2 = thisVector.map( num => Math.pow(num - mu , 2))
         Math.pow( diffs_2.sum / (thisVector.size - 1 )  , 0.5)
       }
-      
+
       def covariance(thatVector : Vec[N] ) = {
         val μThis = thisVector.mean
         val μThat = thatVector.mean
