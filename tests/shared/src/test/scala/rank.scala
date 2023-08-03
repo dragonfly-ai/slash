@@ -15,6 +15,7 @@
  */
 
 import ai.dragonfly.math.vector.Vec
+import narr.NArray
 
 class VecTests extends munit.FunSuite:
 
@@ -59,11 +60,22 @@ class VecTests extends munit.FunSuite:
       /*
       1.0 is the first, but has as tied rank. Take the average - 1.5
       */
-      assertEquals(v.elementRanks.csv(),  Array[Double](1.5, 4.5, 3.0, 6, 1.5, 4.5).mkString(","))
+      assertEquals(v.elementRanks.csv(),  Array[Double](5.5,2.5,4.0,1.0,5.5,2.5).mkString(","))
 
       val v2 = Vec.fromTuple(1.0, 5.0, 3.0, 6.0, 1.0, 5.0, 1.0)
-      assertEquals(v2.elementRanks.csv(),  Array[Double](2, 5.5, 4.0, 7, 2, 5.5, 2).mkString(","))
+      assertEquals(v2.elementRanks.csv(),  Array[Double](6.0,2.5,4.0,1.0,6.0,2.5,6.0).mkString(","))
    }
 
+   test("spearmans rank") {
+    // https://statistics.laerd.com/statistical-guides/spearmans-rank-order-correlation-statistical-guide-2.php
+    val v1 = Vec.fromTuple(56.0, 75.0, 45.0, 71.0, 62.0, 64.0, 58.0, 80.0, 76.0, 61.0)
+    val v2 = Vec.fromTuple(66.0, 70.0, 40.0, 60.0, 65.0, 56.0, 59.0, 77.0, 67.0, 63.0)
+    assertEqualsDouble(v1.spearmansRankCorrelation(v2), 0.6727, 0.001 )
 
+    // https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+
+    val v3 = Vec[10](86.0, 97.0, 99.0, 100.0, 101.0, 103.0, 106.0, 110.0, 112.0, 113.0)
+    val v4 = Vec[10](2, 20.0, 28.0, 27.0, 50.0, 29.0, 7.0, 17.0, 6.0, 12.0)
+    assertEqualsDouble(-0.1757575, v3.spearmansRankCorrelation(v4), 0.000001);
+   }
 end VecTests

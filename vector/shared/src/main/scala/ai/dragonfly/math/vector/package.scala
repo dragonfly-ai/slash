@@ -195,6 +195,18 @@ package object vector {
         (σxy - (μx * μy)) / (σx * σy)
       }
 
+      def spearmansRankCorrelation(thatVector: Vec[N]): Double = {
+        val theseRanks = thisVector.elementRanks
+        val thoseRanks = thatVector.elementRanks
+        val diffs = theseRanks - thoseRanks
+        val diffs_2 = diffs.map(Math.pow(_,2))
+        val n = theseRanks.size
+        val s = diffs_2.sum
+        val numerator = 6 * diffs_2.sum
+        val denominator = n * (Math.pow(n, 2) - 1)
+        1 - ( numerator / denominator)
+      }
+
       // An alias - pearson is the most commonly requested type of correlation
       def corr(thatVector: Vec[N]): Double = pearsonCorrelationCoefficient(thatVector)
 
