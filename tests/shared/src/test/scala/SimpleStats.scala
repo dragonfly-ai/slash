@@ -82,4 +82,4 @@ class SimpleStatsTests extends munit.FunSuite:
     val v4 = Vec[10](2, 20.0, 28.0, 27.0, 50.0, 29.0, 7.0, 17.0, 6.0, 12.0)
     assertEqualsDouble(-0.1757575, v3.spearmansRankCorrelation(v4), 0.000001);
    }
-end VecTests
+end SimpleStatsTests
