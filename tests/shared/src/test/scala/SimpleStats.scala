@@ -32,7 +32,7 @@ class SimpleStatsTests extends munit.FunSuite:
 
    test("sample mean") {
     val v = Vec.fromTuple(2.0,4.0,4.0,4.0,5.0,5.0,7.0,9.0)
-    assertEquals(v.mean, 5.0)
+    assertEquals(v.mean , 5.0)
    }
 
    test("sample variance and std") {

@@ -29,7 +29,6 @@ import scala.collection.View
 package object vector {
 
   opaque type Vec[N <: Int] = NArray[Double]
-
   object Vec {
     inline def apply[N <: Int](a: NArray[Double]): Vec[N] = { // cast a NArray[Double] as Vec[N]
       dimensionCheck(a, valueOf[N])
@@ -37,6 +36,8 @@ package object vector {
     }
 
     inline def zeros[N <: Int](using ValueOf[N]): Vec[N] = fill[N](0.0)
+
+    inline def ones[N <: Int](using ValueOf[N]): Vec[N] = fill[N](1.0)
 
     inline def random[N <: Int](
       MAX:Double = 1.0,
@@ -167,21 +168,27 @@ package object vector {
         copyOfThisVector
       }
 
-      def mean: Double = {
+      inline def mean: Double = {
+        var sum = 0.0
+        var i = 1
+        while (i < dimension) {
+          sum = sum + thisVector(i)
+          i = i + 1
+        }
         thisVector.sum / thisVector.size
       }
-      // It is assumed, that we consider a sample rather than a complete population
-      def variance: Double = {
+      //It is assumed, that we consider a sample rather than a complete population
+      inline def variance: Double = {
         // https://www.cuemath.com/sample-variance-formula/
         val μ = thisVector.mean
-        thisVector.map(i => math.pow(i - μ, 2)).sum / (thisVector.size - 1)
+        thisVector.map(i => squareInPlace(i - μ)).sum / (thisVector.size - 1)
       }
 
       // It is assumed, that we consider a sample rather than a complete population
-      def stdDev: Double = {
+      inline def stdDev: Double = {
         // https://www.cuemath.com/data/standard-deviation/
         val mu = thisVector.mean
-        val diffs_2 = thisVector.map( num => Math.pow(num - mu , 2))
+        val diffs_2 = thisVector.map( num => squareInPlace(num - mu) )
         Math.pow( diffs_2.sum / (thisVector.size - 1 )  , 0.5)
       }
 
@@ -196,8 +203,8 @@ package object vector {
         val sum_x = thisVector.sum
         val sum_y = thatVector.sum
         val sum_xy = thisVector.zip(thatVector).map{ case (thisV, thatV) => thisV * thatV }.sum
-        val sum_x2 = thisVector.map(Math.pow(_,2)).sum
-        val sum_y2 = thatVector.map(Math.pow(_,2)).sum
+        val sum_x2 = thisVector.map(squareInPlace(_)).sum
+        val sum_y2 = thatVector.map(squareInPlace(_)).sum
         (n * sum_xy - (sum_x * sum_y)) / Math.pow( (sum_x2 * n - Math.pow(sum_x, 2)) * (sum_y2 * n - Math.pow(sum_y, 2)), 0.5)
       }
 
@@ -205,11 +212,11 @@ package object vector {
         val theseRanks = thisVector.elementRanks
         val thoseRanks = thatVector.elementRanks
         val diffs = theseRanks - thoseRanks
-        val diffs_2 = diffs.map(Math.pow(_,2))
+        val diffs_2 = diffs.map(squareInPlace(_))
         val n = theseRanks.size
         val s = diffs_2.sum
         val numerator = 6 * diffs_2.sum
-        val denominator = n * (Math.pow(n, 2) - 1)
+        val denominator = n * (squareInPlace(n) - 1)
         1 - ( numerator / denominator)
       }
 
