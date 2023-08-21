@@ -24,11 +24,11 @@ import narr.*
 import scala.compiletime.ops.any.==
 import scala.compiletime.ops.boolean.&&
 import scala.compiletime.ops.int.*
+import scala.collection.View
 
 package object vector {
 
   opaque type Vec[N <: Int] = NArray[Double]
-
   object Vec {
     inline def apply[N <: Int](a: NArray[Double]): Vec[N] = { // cast a NArray[Double] as Vec[N]
       dimensionCheck(a, valueOf[N])
@@ -36,6 +36,8 @@ package object vector {
     }
 
     inline def zeros[N <: Int](using ValueOf[N]): Vec[N] = fill[N](0.0)
+
+    inline def ones[N <: Int](using ValueOf[N]): Vec[N] = fill[N](1.0)
 
     inline def random[N <: Int](
       MAX:Double = 1.0,
@@ -164,6 +166,92 @@ package object vector {
           i = i + 1
         }
         copyOfThisVector
+      }
+
+      inline def mean: Double = {
+        var sum = 0.0
+        var i = 1
+        while (i < dimension) {
+          sum = sum + thisVector(i)
+          i = i + 1
+        }
+        thisVector.sum / thisVector.size
+      }
+      //It is assumed, that we consider a sample rather than a complete population
+      inline def variance: Double = {
+        // https://www.cuemath.com/sample-variance-formula/
+        val μ = thisVector.mean
+        thisVector.map(i => squareInPlace(i - μ)).sum / (thisVector.size - 1)
+      }
+
+      // It is assumed, that we consider a sample rather than a complete population
+      inline def stdDev: Double = {
+        // https://www.cuemath.com/data/standard-deviation/
+        val mu = thisVector.mean
+        val diffs_2 = thisVector.map( num => squareInPlace(num - mu) )
+        Math.pow( diffs_2.sum / (thisVector.size - 1 )  , 0.5)
+      }
+
+      def covariance(thatVector : Vec[N] ) = {
+        val μThis = thisVector.mean
+        val μThat = thatVector.mean
+        thisVector.zip(thatVector).map{ case (thisV, thatV) => (thisV - μThis) * (thatV - μThat) }.sum / (thisVector.size -1)
+      }
+
+      def pearsonCorrelationCoefficient(thatVector: Vec[N]): Double = {
+        val n = thisVector.size
+        val sum_x = thisVector.sum
+        val sum_y = thatVector.sum
+        val sum_xy = thisVector.zip(thatVector).map{ case (thisV, thatV) => thisV * thatV }.sum
+        val sum_x2 = thisVector.map(squareInPlace(_)).sum
+        val sum_y2 = thatVector.map(squareInPlace(_)).sum
+        (n * sum_xy - (sum_x * sum_y)) / Math.pow( (sum_x2 * n - Math.pow(sum_x, 2)) * (sum_y2 * n - Math.pow(sum_y, 2)), 0.5)
+      }
+
+      def spearmansRankCorrelation(thatVector: Vec[N]): Double = {
+        val theseRanks = thisVector.elementRanks
+        val thoseRanks = thatVector.elementRanks
+        val diffs = theseRanks - thoseRanks
+        val diffs_2 = diffs.map(squareInPlace(_))
+        val n = theseRanks.size
+        val s = diffs_2.sum
+        val numerator = 6 * diffs_2.sum
+        val denominator = n * (squareInPlace(n) - 1)
+        1 - ( numerator / denominator)
+      }
+
+      // An alias - pearson is the most commonly requested type of correlation
+      def corr(thatVector: Vec[N]): Double = pearsonCorrelationCoefficient(thatVector)
+
+      def elementRanks: Vec[N] = {
+        val (sorted, originalPosition) = thisVector.zipWithIndex.toVector.sortBy(_._1).unzip
+        val ranks : Vec[N] = NArray.tabulate[Double](thisVector.dimension)(i => (i+1).toDouble)
+
+        var currentValue = sorted(0)
+        var i = 0
+        var currentSum = 0.0
+        var currentCount = 0
+        var resultList = List[Double]()
+
+        for (value <- sorted) {
+          if (value == currentValue) {
+            currentSum += ranks(i)
+            currentCount += 1
+          } else {
+            resultList = resultList ++ List.fill(currentCount)(currentSum / currentCount)
+            currentValue = value
+            currentCount = 1
+            currentSum = ranks(i)
+          }
+          i = i + 1
+        }
+        resultList = resultList ++ List.fill(currentCount)(currentSum / currentCount)
+
+        val rankResult : Vec[N] = new NArray[Double](thisVector.dimension)
+        for( (idx, r) <- originalPosition.zip(resultList)) {
+          rankResult(idx) = r
+        }
+        rankResult
       }
 
       inline def normSquared: Double = {

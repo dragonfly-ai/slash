@@ -1,0 +1,11 @@
+.bloop
+.bsp
+.js
+.jvm
+.metals
+.native
+.vscode
+target
+project/build.sbt
+project/metals.sbt
+project/project
