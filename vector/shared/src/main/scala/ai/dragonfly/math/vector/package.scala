@@ -189,7 +189,7 @@ package object vector {
         // https://www.cuemath.com/data/standard-deviation/
         val mu = thisVector.mean
         val diffs_2 = thisVector.map( num => squareInPlace(num - mu) )
-        Math.pow( diffs_2.sum / (thisVector.size - 1 )  , 0.5)
+        Math.sqrt( diffs_2.sum / (thisVector.size - 1 ) )
       }
 
       def covariance(thatVector : Vec[N] ) = {
@@ -205,7 +205,7 @@ package object vector {
         val sum_xy = thisVector.zip(thatVector).map{ case (thisV, thatV) => thisV * thatV }.sum
         val sum_x2 = thisVector.map(squareInPlace(_)).sum
         val sum_y2 = thatVector.map(squareInPlace(_)).sum
-        (n * sum_xy - (sum_x * sum_y)) / Math.pow( (sum_x2 * n - Math.pow(sum_x, 2)) * (sum_y2 * n - Math.pow(sum_y, 2)), 0.5)
+        (n * sum_xy - (sum_x * sum_y)) / Math.sqrt( (sum_x2 * n - squareInPlace(sum_x)) * (sum_y2 * n - squareInPlace(sum_y)) )
       }
 
       def spearmansRankCorrelation(thatVector: Vec[N]): Double = {

@@ -22,7 +22,7 @@ object Constant {
   val π: Double = Math.PI // Pi
   val `√(2π)`:Double = Math.sqrt(2.0*π)
   val e: Double = Math.E  // Euler's Number
-  val `𝜑`: Double = 1.46557123187676802665 // Golden
+  val 𝜑: Double = 1.46557123187676802665 // Golden
 
   /**
    * The largest possible Long value such that Double can contiguously represent every Long value in the range: [0L, xL]

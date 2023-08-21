@@ -18,9 +18,7 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.*
 import probability.distributions
-import jdk.jfr.Frequency
 
-import scala.util.Random
 
 
 class Gaussian extends OnlineUnivariateProbabilityDistributionEstimator[Double, distributions.Gaussian]  {

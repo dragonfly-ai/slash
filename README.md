@@ -53,7 +53,7 @@ println((v2 + v3).show) // compiler error!
 
 ```scala
 import ai.dragonfly.math.vector.*
-import ai.dragonfly.math.vector.Vector.*
+import ai.dragonfly.math.vector.Vec.*
 
 // create a 3 dimensional vector
 val v1:Vec[3] = Vec[3](1.0, 0.5, 0.0)
