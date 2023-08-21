@@ -191,7 +191,7 @@ libraryDependencies += "ai.dragonfly" %%% "vector" % "<LATEST_VERSION>"
 
 In Scala.js, the runtime type of `Float` doesn't fully exist, while Scala.js, Scala JVM, and Scala Native all share the same implementation of `Double`.
 </li>
-<li>What if a vector's dimension depends on a variable?  Can this library support vectors with  defined at runtime?
+<li>What if a vector's dimension depends on a variable?  Can this library support vectors with dimensionality defined at runtime?
 
 Yes, but with some limitations.  Please consider the following examples:
 

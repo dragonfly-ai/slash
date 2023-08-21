@@ -9,3 +9,4 @@ target
 project/build.sbt
 project/metals.sbt
 project/project
+/.idea/
