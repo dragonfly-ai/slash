@@ -191,6 +191,47 @@ libraryDependencies += "ai.dragonfly" %%% "vector" % "<LATEST_VERSION>"
 
 In Scala.js, the runtime type of `Float` doesn't fully exist, while Scala.js, Scala JVM, and Scala Native all share the same implementation of `Double`.
 </li>
+<li>What if a vector's dimension depends on a variable?  Can this library support vectors with  defined at runtime?
+
+Yes, but with some limitations.  Please consider the following examples:
+
+```scala
+// Vectors with lengths defined at runtime.
+
+// method 1:
+val l0:Int = r.nextInt (100)
+type N0 = l0.type
+val rtv0: Vec[N0] = r.nextVec[N0]()
+println(rtv0.render())
+
+// method 2:
+val l1: Int = r.nextInt(100)
+val rtv1: Vec[l1.type] = r.nextVec[l1.type]()
+println(rtv1.render())
+
+// For better or worse, this throws a compiler error even though l1 == l2 is true:
+val l1: Int = r.nextInt(100)
+val l2: Int = 0 + l1
+val rtv1: Vec[l1.type] = r.nextVec[l1.type]()
+val rtv2: Vec[l2.type] = r.nextVec[l2.type]()
+println((rtv1 + rtv2).render())
+  
+//    [error] 57 |    println((rtv1 + rtv2).render())
+//    [error]    |                    ^^^^
+//    [error]    |             Found:    (rtv2 : ai.dragonfly.math.vector.Vec[(l2 : Int)])
+//    [error]    |             Required: ai.dragonfly.math.vector.Vec[(l1 : Int)]
+
+
+// However, you can do this:
+val l1: Int = r.nextInt(100)
+val l2: Int = 0 + l1
+val rtv1: Vec[l1.type] = r.nextVec[l1.type]()
+val rtv2: Vec[l2.type] = r.nextVec[l2.type]()
+println((rtv1 + rtv2.asInstanceOf[Vec[l1.type]]).render())
+```
+
+We recommend writing a representation of a vector space that contains a reference to a dimension type, then sharing that type across all of the vectors in that space.  Unfortunately, this means having to think about a concept that no other math library has had, but it can also head off all kinds of run time errors caused by mismatched dimension exceptions.
+</li>
 </ul>
 <br />
 

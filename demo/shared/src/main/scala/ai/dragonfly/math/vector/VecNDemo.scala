@@ -35,6 +35,35 @@ object VecNDemo extends Demonstration {
       35, 36, 37, 38, 39, 40, 41
     )
     println(v42c.render())
+
+
+    // Vectors with lengths defined at runtime.
+    // method 1:
+    val l0:Int = r.nextInt (100)
+    type N0 = l0.type
+    val rtv0: Vec[N0] = r.nextVec[N0]()
+    println(rtv0.render())
+
+    // method 2:
+    val l1: Int = r.nextInt(100)
+    val rtv1: Vec[l1.type] = r.nextVec[l1.type]()
+    println(rtv1.render())
+
+/*
+    // Unfortunately this doesn't work and throws a compiler error even though l1 == l2 is true:
+    val l1: Int = r.nextInt(100)
+    val l2: Int = 0 + l1
+    val rtv1: Vec[l1.type] = r.nextVec[l1.type]()
+    val rtv2: Vec[l2.type] = r.nextVec[l2.type]()
+    println((rtv1 + rtv2).render())
+
+    // [error] 57 |    println((rtv1 + rtv2).render())
+    // [error]    |                    ^^^^
+    // [error]    |             Found:    (rtv2 : ai.dragonfly.math.vector.Vec[(l2 : Int)])
+    // [error]    |             Required: ai.dragonfly.math.vector.Vec[(l1 : Int)]
+    // However you can do this:
+    println((rtv1 + rtv2.asInstanceOf[Vec[l1.type]]).render())
+*/
   }
 
   override def name: String = "Vec[N]"
