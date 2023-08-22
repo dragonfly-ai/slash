@@ -1,4 +1,4 @@
-val appVersion:String = "0.101"
+val appVersion:String = "0.1"
 val globalScalaVersion = "3.3.0"
 
 ThisBuild / organization := "ai.dragonfly"
