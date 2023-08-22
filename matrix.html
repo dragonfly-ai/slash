@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Laika 0.18.1 + Helium Theme" />
+    <link rel="icon" href="img/favicon.png" type="image/x-icon" />
+    <title></title>
+    
+    <meta name="author" content="dragonfly.ai"/>
+    
+    
+    <meta name="description" content="docs"/>
+    
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:500">
+    
+    <link rel="stylesheet" type="text/css" href="helium/icofont.min.css" />
+    <link rel="stylesheet" type="text/css" href="helium/laika-helium.css" />
+    <link rel="stylesheet" type="text/css" href="site/styles.css" />
+
+    
+    
+</head>
+<body>
+<div>
+    <div class="content" style="padding: 16px;">
+        <h3>How to Use this Matrix Math Library:</h3>
+        <p>&nbsp;&nbsp;&nbsp;This matrix library differs most significantly from others like <a href="https://math.nist.gov/javanumerics/jama/">JAMA</a> and <a href="https://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/org/apache/commons/math3/linear/">Apache Commons Math</a>, by providing compile time dimensionality checks.  Instead of encoding matrix row and column dimensions with method parameters or <code>Array[Double].length</code> values, this library relies on dependent types.  For example:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// create a 3 x 2 matrix of zeros.
+</span><span class="keyword">val</span><span> </span><span class="identifier">m</span><span>:</span><span class="type-name">Matrix</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>] = </span><span class="type-name">Matrix</span><span>.</span><span class="identifier">zeros</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>]</span></code></pre>
+        <p>&nbsp;&nbsp;&nbsp;By encoding the matrix&#39;s row and column dimensions into its type, the compiler can prevent a whole category of runtime errors that arise from mismatched matrix dimensions:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">m0</span><span>:</span><span class="type-name">Matrix</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>] = </span><span class="type-name">Matrix</span><span>.</span><span class="identifier">zeros</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>]
+</span><span class="keyword">val</span><span> </span><span class="identifier">m1</span><span>:</span><span class="type-name">Matrix</span><span>[</span><span class="number-literal">2</span><span>, </span><span class="number-literal">3</span><span>] = </span><span class="type-name">Matrix</span><span>.</span><span class="identifier">zeros</span><span>[</span><span class="number-literal">2</span><span>, </span><span class="number-literal">3</span><span>]
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">m2</span><span>:</span><span class="type-name">Matrix</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">3</span><span>] = </span><span class="identifier">m0</span><span> * </span><span class="identifier">m1</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">m</span><span> = </span><span class="identifier">m2</span><span> * </span><span class="identifier">m1</span><span> </span><span class="comment">// compiler error!</span></code></pre>
+        <p>&nbsp;&nbsp;&nbsp;Relatedly, many matrix operations like <code>determinant</code>, Cholesky decomposition, etc, only pertain to square matrices.  This library relies on type conditioned extension methods so that users simply cannot attempt to invoke these operations on rectangular matrices.  More specifically: </p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">extension</span><span> [</span><span class="type-name">MN</span><span> &lt;: </span><span class="type-name">Int</span><span>] (</span><span class="identifier">m</span><span>: </span><span class="type-name">Matrix</span><span>[</span><span class="type-name">MN</span><span>, </span><span class="type-name">MN</span><span>])(</span><span class="keyword">using</span><span> </span><span class="type-name">ValueOf</span><span>[</span><span class="type-name">MN</span><span>]) {
+  </span><span class="keyword">def</span><span> </span><span class="declaration-name">determinant</span><span>: </span><span class="type-name">Double</span><span> = </span><span class="type-name">LU</span><span>[</span><span class="type-name">MN</span><span>, </span><span class="type-name">MN</span><span>](</span><span class="identifier">m</span><span>).</span><span class="identifier">determinant</span><span>
+}</span></code></pre>
+        <p>&nbsp;&nbsp;&nbsp;Instead of including a <code>determinant</code> method directly in the <code>Matrix</code> class, this extension method makes a <code>determinant</code> method available only for square matrices.  Trying to invoke the <code>determinant</code> method on a rectangular metrix, for which M != N, will yield a compiler error.</p>
+    </div>
+</div>
+<a href="https://github.com/dragonfly-ai/vector">Back to the vector project on GitHub</a>.<br />
+<a href="https://github.com/dragonfly-ai/">Other projects by dragonfly.ai</a>.<br />
+</body>
+</html>
