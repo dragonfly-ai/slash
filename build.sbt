@@ -18,15 +18,14 @@ ThisBuild / nativeConfig ~= {
     .withGC(scala.scalanative.build.GC.commix)
 }
 
-
-lazy val vector = crossProject(
+lazy val slash = crossProject(
     JSPlatform,
     JVMPlatform,
     NativePlatform
   )
   .crossType(CrossType.Full)
   .settings(
-    description := "High performance, low footprint, cross platform, vector and statistics library!",
+    description := "High performance, low footprint, cross platform, Linear Algebra and Statistics Hacks!",
     libraryDependencies += "ai.dragonfly" %%% "narr" % "0.101"
   )
   .jvmSettings(
@@ -36,13 +35,14 @@ lazy val vector = crossProject(
   .nativeSettings()
 
 lazy val verification = project
-  .dependsOn( vector.projects( JVMPlatform ) )
+  .dependsOn( slash.projects( JVMPlatform ) )
   .enablePlugins(NoPublishPlugin)
   .settings(
     name := "verification",
     Compile / mainClass := Some("ai.dragonfly.math.Verify"),
     libraryDependencies ++= Seq(
-      "org.apache.commons" % "commons-math3" % "3.6.1"
+      "org.apache.commons" % "commons-math3" % "3.6.1",
+      "gov.nist.math" % "jama" % "1.0.3"
     )
   )
 
@@ -53,11 +53,12 @@ lazy val demo = crossProject(
 )
   .crossType(CrossType.Full)
   .enablePlugins(NoPublishPlugin)
-  .dependsOn(vector)
+  .dependsOn(slash)
   .settings(
     name := "demo",
     Compile / mainClass := Some("Demo"),
     libraryDependencies ++= Seq(
+      "ai.dragonfly" %%% "cliviz" % "0.102",
       "ai.dragonfly" %%% "democrossy" % "0.102"
     ),
     Compile / mainClass := Some("Demo")
@@ -69,7 +70,7 @@ lazy val demo = crossProject(
   .jvmSettings()
   .nativeSettings()
 
-lazy val root = tlCrossRootProject.aggregate(vector, tests).settings(name := "vector")
+lazy val root = tlCrossRootProject.aggregate(slash, tests).settings(name := "slash")
 
 lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin).settings(
   mdocVariables := Map(
@@ -83,12 +84,12 @@ lazy val unidocs = project
   .in(file("unidocs"))
   .enablePlugins(TypelevelUnidocPlugin) // also enables the ScalaUnidocPlugin
   .settings(
-    name := "vector-docs",
+    name := "slash-docs",
     ScalaUnidoc / unidoc / unidocProjectFilter :=
       inProjects(
-        vector.jvm,
-        vector.js,
-        vector.native
+        slash.jvm,
+        slash.js,
+        slash.native
       )
   )
 
@@ -99,9 +100,9 @@ lazy val tests = crossProject(
   )
   .in(file("tests"))
   .enablePlugins(NoPublishPlugin)
-  .dependsOn(vector)
+  .dependsOn(slash)
   .settings(
-    name := "vector-tests",
+    name := "slash-tests",
     libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M8" % Test
   )
   // .jvmSettings(name := "tests-jvm")

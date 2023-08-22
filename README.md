@@ -1,11 +1,12 @@
-# vector
+# S.L.A.S.H
+Scala Linear Algebra & Statistics Hacks
 
-[![javadoc](https://javadoc.io/badge2/ai.dragonfly/vector_3/javadoc.svg)](https://javadoc.io/doc/ai.dragonfly/vector_3)
+[![javadoc](https://javadoc.io/badge2/ai.dragonfly/slash_3/javadoc.svg)](https://javadoc.io/doc/ai.dragonfly/slash_3)
 
-A Scala 3 vector math and statistics library designed to:
+A Scala 3 Linear Algebra and Statistics library designed to:
 
 <ol>
-<li>Cross compile to JVM, Native and JavaScript platforms</li>
+<li>Cross compile to JVM, Native, and JavaScript platforms</li>
 <li>Maximize performance</li>
 <li>Minimize memory footprint</li>
 <li>Provide convenient syntax</li>
@@ -14,7 +15,13 @@ A Scala 3 vector math and statistics library designed to:
 <li>Serialize efficiently and compactly by default</li>
 </ol>
 
-Features:
+# SBT
+
+```scala
+libraryDependencies += "ai.dragonfly" %%% "slash" % "<LATEST_VERSION>"
+```
+
+# Features:
 - High performance Vector data types with convenient vector math syntax.
 - Probability Distributions, Parametric and Estimated (Online/Streaming): Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Sampleable trait for making types into generative models.
@@ -28,7 +35,7 @@ Features:
 - Interval and Domain types and objects with support for random sampling.
 - Unicode text formatting utility for writing numeric value types in superscript or subscript positions.
 
-<a href="https://dragonfly-ai.github.io/vector/demo">Try the demo</a>.
+<a href="https://dragonfly-ai.github.io/slash/demo">Try the demo</a>.
 
 &nbsp;&nbsp;&nbsp;Instead of case classes, traits, or wrappers, this library represents all runtime vector data as native arrays of double precision floating point values.  However, it also uses Scala 3 features like opaque types, dependent types, and extension methods to decorate the array primitives with convenient syntax, e.g. overloaded operators like `+ - * / += -= *= /=`, and also, by expressing vector dimensionality as a type parameter, can prevent runtime errors resulting from trying to perform vector operations on vectors of mismatched dimensions at compile time.  For example:   
 
@@ -45,7 +52,7 @@ println((v2 + v3).show) // compiler error!
 // This eliminates runtime exceptions related to mismatched vector dimensions.
 ```
 
-&nbsp;&nbsp;&nbsp;Why `NArray[Double]` and not `Array[Double]`?  Because vector relies on <a href="https://github.com/dragonfly-ai/narr">NArr</a>, JavaScript environments store vector data as: `Float64Array` while JVM and Native environments rely on: `Array[Double]`.  This ensures that whichever compilation target you choose, Vector will always reduce to the native array type with the highest available performance.
+&nbsp;&nbsp;&nbsp;Why `NArray[Double]` and not `Array[Double]`?  Because Vec relies on <a href="https://github.com/dragonfly-ai/narr">NArr</a>, JavaScript environments store vector data as: `Float64Array` while JVM and Native environments rely on: `Array[Double]`.  This ensures that whichever compilation target you choose, Vector will always reduce to the native array type with the highest available performance.
 
 &nbsp;&nbsp;&nbsp;For a more detailed explanation of the design decisions that have shaped this library, see the <a href="https://dragonfly-ai.github.io/vector/">design notes.</a>
 
@@ -93,6 +100,69 @@ println( (v42a - v42b).render() ) // fully customisable render method.
 println( (v42a + v42b).csv() ) // output vector sum as comma separated values
 println( (v42a + v42b).tsv() ) // output vector sum tab separated values
 ```
+
+<h3>Matrix math</h3>
+&nbsp;&nbsp;&nbsp;This matrix library differs most significantly from others like <a href="https://math.nist.gov/javanumerics/jama/">JAMA</a> and <a href="https://commons.apache.org/proper/commons-math/javadocs/api-3.6.1/org/apache/commons/math3/linear/">Apache Commons Math</a>, by providing compile time dimensionality checks.  Instead of encoding matrix row and column dimensions with method parameters or `Array[Double].length` values, this library relies on dependent types.  For example:
+
+```scala
+// create an 3 x 2 matrix of zeros.
+val m:Matrix[3, 2] = Matrix.zeros[3, 2]
+```
+
+&nbsp;&nbsp;&nbsp;By encoding the matrix's row and column dimensions into its type, the compiler can prevent a whole category of runtime errors that arise from mismatched matrix dimensions:
+
+```scala
+// create an 3 x 2 matrix of zeros.
+val m0:Matrix[3, 2] = Matrix.zeros[3, 2]
+val m1:Matrix[2, 3] = Matrix.zeros[2, 3]
+
+val m2:Matrix[3, 3] = m0 * m1
+val m = m2 * m1 // compiler error!
+```
+
+&nbsp;&nbsp;&nbsp;Relatedly, many matrix operations like `determinant`, Cholesky decomposition, etc, only pertain to square matrices.  This library relies on type conditioned extension methods so that users simply cannot attempt to invoke these operations on rectangular matrices.  More specifically:
+
+```scala
+extension [MN <: Int] (m: Matrix[MN, MN])(using ValueOf[MN]) {
+  def determinant: Double = LU[MN, MN](m).determinant
+}
+```
+
+&nbsp;&nbsp;&nbsp;Instead of including a `determinant` method directly in the `Matrix` class, this extension method makes a `determinant` method available only for square matrices.  Trying to invoke the `determinant` method on a rectangular metrix, for which M != N, will yield a compiler error.
+
+- Matrix math:
+    + multiplication for Matrix * Matrix, Matrix * Vector, and Scalar * Matrix
+    + element wise operations: add, subtract, multiply, and divide
+    + sub-matrix, column, row, and element operations: get, set
+    + determinant
+    + transpose
+    + inverse
+    + norm operations: one, two, infinity, and Frobenius
+    + decompositions: Cholesky, Eigen, LU, QR, and Singular Value
+- In memory data sets: unsupervised and supervised
+- Linear Regression based on both QR Decomposition and Singular Value Decomposition.
+- Principal Components Analysis
+
+# JavaScript Optimization
+
+&nbsp;&nbsp;&nbsp;Because matrix relies on <a href="https://github.com/dragonfly-ai/narr">NArr</a>, JavaScript environments store matrix data as:
+```scala
+var matrixArray:NArray[NArray[Double]]
+```
+&nbsp;&nbsp;&nbsp;which is equivalent to:
+```scala
+var matrixArray:js.Array[Float64Array]
+```
+&nbsp;&nbsp;&nbsp;In JVM and Native environments, matrix data occupies normal scala `Array[Double]`.
+
+# History
+&nbsp;&nbsp;&nbsp;Although it began as a 1:1 port of <a href="https://math.nist.gov/javanumerics/jama/">JAMA</a> for Scala 3 and Scala.js projects, it has expanded to include features that make matrix operations more comfortable in idiomatic Scala. Past versions of this library JAMA from the <a href="https://mvnrepository.com/artifact/gov.nist.math/jama/1.0.3">maven repository</a> on the JVM side, and provided facades for a JavaScript version of JAMA ported through <a href="http://www.jsweet.org">Jsweet</a> and included through the <a href="https://scalacenter.github.io/scalajs-bundler/">scalajs-bundler</a> sbt plugin.  As scalajs-bundler has slipped into an unmaintained status, this library evolved into a pure scala port of JAMA and has begun to take its own shape.
+
+# Exclusions
+&nbsp;&nbsp;&nbsp;This implementation of JAMA excludes test and I/O functionality as well as some constructors that comments in the original JAMA library describe as dangerous and unnecessary.
+
+# Verification
+&nbsp;&nbsp;&nbsp;See the verification subproject of this repository to evaluate the fidelity of this port from Java to Scala.  Given the original JaMa implementation of hypot, these two matrix libraries produce identical output, however, modern Java includes a more advanced implementation of the hypot function and using it produces tiny discrepancies between Jama and this scala implementation.
 
 <h3>Parametric Probability Distributions</h3>
 
