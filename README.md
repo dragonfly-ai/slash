@@ -34,6 +34,18 @@ libraryDependencies += "ai.dragonfly" %%% "slash" % "<LATEST_VERSION>"
 - BigRandom: scala.util.Random extension methods to generate random BigInt and BigDecimal values.
 - Interval and Domain types and objects with support for random sampling.
 - Unicode text formatting utility for writing numeric value types in superscript or subscript positions.
+- Matrix math:
+  + multiplication for Matrix * Matrix, Matrix * Vector, and Scalar * Matrix
+  + element wise operations: add, subtract, multiply, and divide
+  + sub-matrix, column, row, and element operations: get, set
+  + determinant
+  + transpose
+  + inverse
+  + norm operations: one, two, infinity, and Frobenius
+  + decompositions: Cholesky, Eigen, LU, QR, and Singular Value
+- In memory data sets: unsupervised and supervised
+- Linear Regression based on both QR Decomposition and Singular Value Decomposition.
+- Principal Components Analysis
 
 <a href="https://dragonfly-ai.github.io/slash/demo">Try the demo</a>.
 
@@ -130,20 +142,9 @@ extension [MN <: Int] (m: Matrix[MN, MN])(using ValueOf[MN]) {
 
 &nbsp;&nbsp;&nbsp;Instead of including a `determinant` method directly in the `Matrix` class, this extension method makes a `determinant` method available only for square matrices.  Trying to invoke the `determinant` method on a rectangular metrix, for which M != N, will yield a compiler error.
 
-- Matrix math:
-    + multiplication for Matrix * Matrix, Matrix * Vector, and Scalar * Matrix
-    + element wise operations: add, subtract, multiply, and divide
-    + sub-matrix, column, row, and element operations: get, set
-    + determinant
-    + transpose
-    + inverse
-    + norm operations: one, two, infinity, and Frobenius
-    + decompositions: Cholesky, Eigen, LU, QR, and Singular Value
-- In memory data sets: unsupervised and supervised
-- Linear Regression based on both QR Decomposition and Singular Value Decomposition.
-- Principal Components Analysis
 
-# JavaScript Optimization
+
+<h3>JavaScript Optimization</h3>
 
 &nbsp;&nbsp;&nbsp;Because matrix relies on <a href="https://github.com/dragonfly-ai/narr">NArr</a>, JavaScript environments store matrix data as:
 ```scala
@@ -155,13 +156,13 @@ var matrixArray:js.Array[Float64Array]
 ```
 &nbsp;&nbsp;&nbsp;In JVM and Native environments, matrix data occupies normal scala `Array[Double]`.
 
-# History
+<h3>History</h3>
 &nbsp;&nbsp;&nbsp;Although it began as a 1:1 port of <a href="https://math.nist.gov/javanumerics/jama/">JAMA</a> for Scala 3 and Scala.js projects, it has expanded to include features that make matrix operations more comfortable in idiomatic Scala. Past versions of this library JAMA from the <a href="https://mvnrepository.com/artifact/gov.nist.math/jama/1.0.3">maven repository</a> on the JVM side, and provided facades for a JavaScript version of JAMA ported through <a href="http://www.jsweet.org">Jsweet</a> and included through the <a href="https://scalacenter.github.io/scalajs-bundler/">scalajs-bundler</a> sbt plugin.  As scalajs-bundler has slipped into an unmaintained status, this library evolved into a pure scala port of JAMA and has begun to take its own shape.
 
-# Exclusions
+<h3>Exclusions</h3>
 &nbsp;&nbsp;&nbsp;This implementation of JAMA excludes test and I/O functionality as well as some constructors that comments in the original JAMA library describe as dangerous and unnecessary.
 
-# Verification
+<h3>Verification</h3>
 &nbsp;&nbsp;&nbsp;See the verification subproject of this repository to evaluate the fidelity of this port from Java to Scala.  Given the original JaMa implementation of hypot, these two matrix libraries produce identical output, however, modern Java includes a more advanced implementation of the hypot function and using it produces tiny discrepancies between Jama and this scala implementation.
 
 <h3>Parametric Probability Distributions</h3>
@@ -307,8 +308,6 @@ We recommend writing a representation of a vector space that contains a referenc
 
 Projects that rely on this Library:
 
-https://github.com/dragonfly-ai/matrix
-
 https://github.com/dragonfly-ai/bitfrost
 
 https://github.com/dragonfly-ai/spatial
@@ -317,13 +316,19 @@ https://github.com/dragonfly-ai/graphics
 
 https://github.com/dragonfly-ai/img
 
-Acknowledgements:
-This library has evolved over years, but owes a lot of its virtues to feedback from the Scala Discord community.  In no particular order:
+Acknowledgements: <br />
+&nbsp;&nbsp;&nbsp;This library has evolved over years, but owes a lot of its virtues to feedback from the Scala Discord community.  In no particular order:
 
-https://github.com/ekrich
+https://github.com/ekrich - Performance tips and encouragement.
 
-https://github.com/armanbilge
+https://github.com/armanbilge - Continuous Integration tools and support.
 
-https://github.com/s5bug
+https://github.com/s5bug - Design insights.
 
-https://github.com/BalmungSan
+https://github.com/BalmungSan - Design insights.
+
+https://github.com/Quafadas - Contributor!  Authored 1st and 2nd PRs.
+
+https://github.com/JD557 - Design insights and named this library.
+
+Thanks, scala fam!
