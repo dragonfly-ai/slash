@@ -331,4 +331,6 @@ https://github.com/Quafadas - Contributor!  Authored 1st and 2nd PRs.
 
 https://github.com/JD557 - Design insights and named this library.
 
+https://github.com/J-mie6 - Git advice.
+
 Thanks, scala fam!
