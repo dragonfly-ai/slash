@@ -3,7 +3,7 @@ Scala Linear Algebra & Statistics Hacks
 
 [![javadoc](https://javadoc.io/badge2/ai.dragonfly/slash_3/javadoc.svg)](https://javadoc.io/doc/ai.dragonfly/slash_3)
 
-A Scala 3 Linear Algebra and Statistics library designed to:
+<h3>Design goals:</h3>
 
 <ol>
 <li>Cross compile to JVM, Native, and JavaScript platforms</li>
@@ -15,13 +15,13 @@ A Scala 3 Linear Algebra and Statistics library designed to:
 <li>Serialize efficiently and compactly by default</li>
 </ol>
 
-# SBT
+<h3>sbt</h3>
 
 ```scala
 libraryDependencies += "ai.dragonfly" %%% "slash" % "<LATEST_VERSION>"
 ```
 
-# Features:
+<h3>Features:</h3>
 - High performance Vector data types with convenient vector math syntax.
 - Probability Distributions, Parametric and Estimated (Online/Streaming): Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Sampleable trait for making types into generative models.
@@ -140,7 +140,7 @@ extension [MN <: Int] (m: Matrix[MN, MN])(using ValueOf[MN]) {
 }
 ```
 
-&nbsp;&nbsp;&nbsp;Instead of including a `determinant` method directly in the `Matrix` class, this extension method makes a `determinant` method available only for square matrices.  Trying to invoke the `determinant` method on a rectangular metrix, for which M != N, will yield a compiler error.
+&nbsp;&nbsp;&nbsp;Instead of including a `determinant` method directly in the `Matrix` class, this extension method makes a `determinant` method available only for square matrices.  Trying to invoke the `determinant` method on a rectangular matrix, for which M != N, will yield a compiler error.
 
 
 
@@ -312,7 +312,7 @@ https://github.com/dragonfly-ai/bitfrost
 
 https://github.com/dragonfly-ai/spatial
 
-https://github.com/dragonfly-ai/graphics
+https://github.com/dragonfly-ai/mesh
 
 https://github.com/dragonfly-ai/img
 
