@@ -22,6 +22,7 @@ libraryDependencies += "ai.dragonfly" %%% "slash" % "<LATEST_VERSION>"
 ```
 
 <h3>Features:</h3>
+
 - High performance Vector data types with convenient vector math syntax.
 - Probability Distributions, Parametric and Estimated (Online/Streaming): Gaussian/Normal, Poisson, LogNormal, Binomial (parametric only), Beta, and PERT; each with support for sampling and probability density functions, PDFs.
 - Sampleable trait for making types into generative models.
