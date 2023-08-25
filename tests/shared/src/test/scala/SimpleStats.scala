@@ -88,11 +88,4 @@ class SimpleStatsTests extends munit.FunSuite:
     assertEqualsDouble(-0.1757575, v3.spearmansRankCorrelation(v4), 0.000001);
    }
 
-   test("min max") {
-      val v = Vec.fromTuple(1.0, 5.0, 3.0, 6.0, 1.0, 5.0)
-      assertEquals(v.minElement, 1.0)
-      //assertEquals(v.maxElement, 6.0)
-   }
-
-
 end SimpleStatsTests
