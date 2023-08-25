@@ -26,6 +26,8 @@ import scala.compiletime.ops.boolean.&&
 import scala.compiletime.ops.int.*
 import scala.collection.View
 
+import scala.collection.mutable.ListBuffer // for fast append in elementRanks
+
 package object vector {
 
   opaque type Vec[N <: Int] = NArray[Double]
@@ -168,14 +170,18 @@ package object vector {
         copyOfThisVector
       }
 
-      inline def mean: Double = {
+      inline def sum = {
         var sum = 0.0
-        var i = 1
-        while (i < dimension) {
+        var i = 0
+        while (i < thisVector.dimension) {
           sum = sum + thisVector(i)
           i = i + 1
         }
-        thisVector.sum / thisVector.size
+        sum
+      }
+
+      inline def mean: Double = {
+        thisVector.sum / thisVector.dimension
       }
       //It is assumed, that we consider a sample rather than a complete population
       inline def variance: Double = {
@@ -198,32 +204,37 @@ package object vector {
         thisVector.zip(thatVector).map{ case (thisV, thatV) => (thisV - μThis) * (thatV - μThat) }.sum / (thisVector.size -1)
       }
 
-      def pearsonCorrelationCoefficient(thatVector: Vec[N]): Double = {
+      inline def pearsonCorrelationCoefficient(thatVector: Vec[N]): Double = {
         val n = thisVector.size
-        val sum_x = thisVector.sum
-        val sum_y = thatVector.sum
-        val sum_xy = thisVector.zip(thatVector).map{ case (thisV, thatV) => thisV * thatV }.sum
-        val sum_x2 = thisVector.map(squareInPlace(_)).sum
-        val sum_y2 = thatVector.map(squareInPlace(_)).sum
+        var i = 0
+
+        var sum_x = 0.0
+        var sum_y = 0.0
+        var sum_xy = 0.0
+        var sum_x2 = 0.0
+        var sum_y2 = 0.0
+
+        while (i < n) {
+          sum_x = sum_x + thisVector(i)
+          sum_y = sum_y + thatVector(i)
+          sum_xy = sum_xy + thisVector(i) * thatVector(i)
+          sum_x2 = sum_x2 + squareInPlace(thisVector(i))
+          sum_y2 = sum_y2 + squareInPlace(thatVector(i))
+          i = i + 1
+        }
         (n * sum_xy - (sum_x * sum_y)) / Math.sqrt( (sum_x2 * n - squareInPlace(sum_x)) * (sum_y2 * n - squareInPlace(sum_y)) )
       }
 
-      def spearmansRankCorrelation(thatVector: Vec[N]): Double = {
+      inline def spearmansRankCorrelation(thatVector: Vec[N]) : Double =
         val theseRanks = thisVector.elementRanks
         val thoseRanks = thatVector.elementRanks
-        val diffs = theseRanks - thoseRanks
-        val diffs_2 = diffs.map(squareInPlace(_))
-        val n = theseRanks.size
-        val s = diffs_2.sum
-        val numerator = 6 * diffs_2.sum
-        val denominator = n * (squareInPlace(n) - 1)
-        1 - ( numerator / denominator)
-      }
+        theseRanks.pearsonCorrelationCoefficient(thoseRanks)
+
 
       // An alias - pearson is the most commonly requested type of correlation
-      def corr(thatVector: Vec[N]): Double = pearsonCorrelationCoefficient(thatVector)
+      inline def corr(thatVector: Vec[N]): Double = pearsonCorrelationCoefficient(thatVector)
 
-      def elementRanks: Vec[N] = {
+      inline def elementRanks: Vec[N] = {
         val (sorted, originalPosition) = thisVector.zipWithIndex.toVector.sortBy(_._1).unzip
         val ranks : Vec[N] = NArray.tabulate[Double](thisVector.dimension)(i => (i+1).toDouble)
 
@@ -231,21 +242,21 @@ package object vector {
         var i = 0
         var currentSum = 0.0
         var currentCount = 0
-        var resultList = List[Double]()
+        var resultList = ListBuffer[Double]()
 
         for (value <- sorted) {
           if (value == currentValue) {
             currentSum += ranks(i)
             currentCount += 1
           } else {
-            resultList = resultList ++ List.fill(currentCount)(currentSum / currentCount)
+            resultList.appendAll(ListBuffer.fill(currentCount)(currentSum / currentCount))
             currentValue = value
             currentCount = 1
             currentSum = ranks(i)
           }
           i = i + 1
         }
-        resultList = resultList ++ List.fill(currentCount)(currentSum / currentCount)
+        resultList.appendAll(List.fill(currentCount)(currentSum / currentCount))
 
         val rankResult : Vec[N] = new NArray[Double](thisVector.dimension)
         for( (idx, r) <- originalPosition.zip(resultList)) {
@@ -263,6 +274,12 @@ package object vector {
         }
         mag2
       }
+
+      inline def minElement = {
+        thisVector.asInstanceOf[NArray[Double]].min
+      }
+
+
 
       inline def norm: Double = Math.sqrt(normSquared)
 

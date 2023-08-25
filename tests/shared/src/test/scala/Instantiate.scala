@@ -26,6 +26,7 @@ class InstantiateTests extends munit.FunSuite:
     val v = Vec.fromTuple(1.0, 2.0, 3.0, 4.0, 5.0)
     val v2 = Vec[5](1.0, 2.0, 3.0, 4.0, 5.0)
     val v_fill = Vec.fill[5](1.0)
+    val v_tabulate = Vec.tabulate[5](i => i.toDouble)
 
     val v_zeros = Vec.zeros[5]
     val v_ones = Vec.ones[5]
@@ -36,8 +37,8 @@ class InstantiateTests extends munit.FunSuite:
 
     assertEquals(v2.dimension, v2.dimension )
     assertEquals(v2.dimension, v_fill.dimension )
+    assertEquals(v2.dimension, v_tabulate.dimension )
     assertEquals(v2.dimension, v_zeros.dimension )
-    assertEquals(v2.dimension, v_rand.dimension )
     assertEquals(v2.dimension, v_rand.dimension )
     assertEquals(v2.dimension, v_rand_max_min.dimension )
 
