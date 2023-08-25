@@ -275,12 +275,6 @@ package object vector {
         mag2
       }
 
-      inline def minElement = {
-        thisVector.asInstanceOf[NArray[Double]].min
-      }
-
-
-
       inline def norm: Double = Math.sqrt(normSquared)
 
       inline def magnitude: Double = norm
