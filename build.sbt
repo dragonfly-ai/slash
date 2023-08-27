@@ -110,6 +110,7 @@ lazy val docs = project
   }
 )
 .enablePlugins(TypelevelSitePlugin)
+.enablePlugins(NoPublishPlugin)
 
 lazy val unidocs = project
   .in(file("unidocs"))
