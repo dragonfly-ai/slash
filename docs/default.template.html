@@ -1,33 +1,28 @@
 <!DOCTYPE html>
 <html lang="${?laika.site.metadata.language}">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Laika 0.18.1 + Helium Theme" />
-    <link rel="icon" href="img/favicon.png" type="image/x-icon" />
-    <title>${cursor.currentDocument.title}</title>
-    @:for(laika.site.metadata.authors)
-    <meta name="author" content="${_}"/>
-    @:@
-    @:for(laika.site.metadata.description)
-    <meta name="description" content="${_}"/>
-    @:@
-    @:for(helium.webFonts)
-    <link rel="stylesheet" href="${_}">
-    @:@
-    @:linkCSS { paths = ${helium.site.includeCSS} }
 
-    @:heliumInitVersions
-    @:heliumInitPreview(container)
-</head>
-<body>
-<div>
-    <div class="content" style="padding: 16px;">
+  @:include(helium.site.templates.head)
+
+  <body>
+
+    @:include(helium.site.templates.topNav)
+
+    @:include(helium.site.templates.mainNav)
+
+    <div id="container">
+
+      @:include(helium.site.templates.pageNav)
+
+      <main class="content">
+
         ${cursor.currentDocument.content}
+
+        @:include(helium.site.templates.footer)
+
+      </main>
+
     </div>
-</div>
-<a href="https://github.com/dragonfly-ai/vector">Back to the vector project on GitHub</a>.<br />
-<a href="https://github.com/dragonfly-ai/">Other projects by dragonfly.ai</a>.<br />
-</body>
+
+  </body>
+
 </html>
