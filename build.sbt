@@ -21,6 +21,8 @@ ThisBuild / developers := List( tlGitHubDev("dragonfly-ai", "dragonfly.ai") )
 ThisBuild / scalaVersion := globalScalaVersion
 //ThisBuild / authors := List( "Someone" )
 
+ThisBuild / tlFatalWarnings := false
+
 ThisBuild / tlSitePublishBranch := Some("main")
 
 ThisBuild / tlBaseVersion := appVersion
