@@ -30,9 +30,14 @@ class SimpleStatsTests extends munit.FunSuite:
       assertNotEquals(v, v2 )
    }
 
+    test("sum") {
+      val v = Vec[5](1.0,2,3,4,5.0)
+      assertEquals(v.sum , 15.0)
+    }
+
    test("sample mean") {
-    val v = Vec.fromTuple(2.0,4.0,4.0,4.0,5.0,5.0,7.0,9.0)
-    assertEquals(v.mean , 5.0)
+    val v = Vec[5](1.0,2,3,4,5.0)
+    assertEquals(v.mean , 3.0)
    }
 
    test("sample variance and std") {
@@ -82,4 +87,5 @@ class SimpleStatsTests extends munit.FunSuite:
     val v4 = Vec[10](2, 20.0, 28.0, 27.0, 50.0, 29.0, 7.0, 17.0, 6.0, 12.0)
     assertEqualsDouble(-0.1757575, v3.spearmansRankCorrelation(v4), 0.000001);
    }
+
 end SimpleStatsTests
