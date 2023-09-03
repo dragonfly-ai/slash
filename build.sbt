@@ -35,6 +35,8 @@ ThisBuild / nativeConfig ~= {
     .withGC(scala.scalanative.build.GC.commix)
 }
 
+ThisBuild / mimaFailOnNoPrevious := false // TODO: remove this if the project hits the stage where bincomap is important.
+
 lazy val slash = crossProject(
     JSPlatform,
     JVMPlatform,

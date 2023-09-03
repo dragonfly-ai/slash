@@ -231,7 +231,7 @@ package object vector {
         var i = 0
         var currentSum = 0.0
         var currentCount = 0
-        var resultList = List[Double]()
+        val resultList = List[Double]()
 
         for (value <- sorted) {
           if (value == currentValue) {
