@@ -1,3 +1,15 @@
+import laika.ast
+import laika.ast.Path.Root
+import laika.helium.config.HeliumIcon
+import laika.helium.config.IconLink
+import java.time.Instant
+import laika.helium.Helium
+import laika.helium.config.Favicon
+import laika.helium.config.ImageLink
+import laika.ast.*
+import laika.markdown.github.GitHubFlavor
+import laika.parse.code.SyntaxHighlighting
+
 val appVersion:String = "0.1"
 val globalScalaVersion = "3.3.0"
 
@@ -7,6 +19,11 @@ ThisBuild / startYear := Some(2023)
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List( tlGitHubDev("dragonfly-ai", "dragonfly.ai") )
 ThisBuild / scalaVersion := globalScalaVersion
+//ThisBuild / authors := List( "Someone" )
+
+ThisBuild / tlFatalWarnings := false
+
+ThisBuild / tlSitePublishBranch := Some("main")
 
 ThisBuild / tlBaseVersion := appVersion
 ThisBuild / tlCiReleaseBranches := Seq()
@@ -17,6 +34,8 @@ ThisBuild / nativeConfig ~= {
     .withMode(scala.scalanative.build.Mode.releaseFast)
     .withGC(scala.scalanative.build.GC.commix)
 }
+
+ThisBuild / tlVersionIntroduced := Map("3" -> "1.0.0")
 
 lazy val slash = crossProject(
     JSPlatform,
@@ -72,13 +91,30 @@ lazy val demo = crossProject(
 
 lazy val root = tlCrossRootProject.aggregate(slash, tests).settings(name := "slash")
 
-lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin).settings(
-  mdocVariables := Map(
-    "VERSION" -> appVersion,
-    "SCALA_VERSION" -> globalScalaVersion
-  ),
-  laikaConfig ~= { _.withRawContent }
+lazy val docs = project
+.in(file("site"))
+.dependsOn(slash.jvm)
+.settings(
+  laikaExtensions := Seq(GitHubFlavor, SyntaxHighlighting),
+  //tlSiteHeliumExtensions :=  Seq(GitHubFlavor, SyntaxHighlighting),
+  tlSiteHelium := {
+    Helium.defaults.site.metadata(
+      title = Some("S"),
+      language = Some("en"),
+      description = Some("S"),
+      authors = Seq("one"),
+    )
+    .site
+    .topNavigationBar(
+      homeLink = IconLink.internal(laika.ast.Path(List("index.md")), HeliumIcon.home),
+      navLinks = Seq(IconLink.external("https://github.com/dragonfly-ai/slash", HeliumIcon.github))
+    )
+    .site
+    .autoLinkJS()
+  }
 )
+.enablePlugins(TypelevelSitePlugin)
+.enablePlugins(NoPublishPlugin)
 
 lazy val unidocs = project
   .in(file("unidocs"))
@@ -105,6 +141,3 @@ lazy val tests = crossProject(
     name := "slash-tests",
     libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M8" % Test
   )
-  // .jvmSettings(name := "tests-jvm")
-  // .jsSettings(name := "tests-js")
-  // .nativeSettings(name := "tests-native")

@@ -242,7 +242,8 @@ package object vector {
         var i = 0
         var currentSum = 0.0
         var currentCount = 0
-        var resultList = ListBuffer[Double]()
+        val resultList = ListBuffer[Double]()
+
 
         for (value <- sorted) {
           if (value == currentValue) {
