@@ -117,19 +117,19 @@
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">v_rand</span><span> = </span><span class="type-name">Vec</span><span>.</span><span class="identifier">random</span><span>[</span><span class="number-literal">5</span><span>]()
 </span><span class="comment">// v_rand: Vec[5] = Array(
-//   -0.9755717913633072,
-//   -0.0817450511434138,
-//   -0.6874266492049367,
-//   -0.09770174497238993,
-//   -0.21384861781000108
+//   -0.514201581898364,
+//   -0.8215665708234864,
+//   -0.2156971300713838,
+//   -0.31176030399691657,
+//   -0.7726793165196091
 // )
 </span><span class="keyword">val</span><span> </span><span class="identifier">v_rand_max_min</span><span> = </span><span class="type-name">Vec</span><span>.</span><span class="identifier">random</span><span>[</span><span class="number-literal">5</span><span>](</span><span class="number-literal">2.0</span><span>, </span><span class="number-literal">0.5</span><span>)
 </span><span class="comment">// v_rand_max_min: Vec[5] = Array(
-//   1.5195036712389998,
-//   1.0750210246670922,
-//   1.2703754974817585,
-//   0.6861747606971714,
-//   1.3971735215463594
+//   1.6310525291983438,
+//   1.7538446979936704,
+//   1.8253871771239885,
+//   0.8343465979207954,
+//   0.7181670167095728
 // )</span></code></pre>
         <p>And do some stuff</p>
         <pre><code class="nohighlight"><span class="identifier">v</span><span> + </span><span class="identifier">v_fill</span><span>
@@ -140,11 +140,11 @@
 </span><span>
 </span><span class="identifier">v_rand</span><span> -= </span><span class="identifier">v_ones</span><span>
 </span><span class="comment">// res2: Vec[5] = Array(
-//   -0.9755717913633072,
-//   -0.0817450511434138,
-//   -0.6874266492049367,
-//   -0.09770174497238993,
-//   -0.21384861781000108
+//   -0.514201581898364,
+//   -0.8215665708234864,
+//   -0.2156971300713838,
+//   -0.31176030399691657,
+//   -0.7726793165196091
 // )
 </span><span>
 </span><span class="comment">// native indexing is fast...
@@ -158,10 +158,10 @@
 </span><span class="comment">// res6: Double = 3.0
 </span><span>
 </span><span class="identifier">v</span><span>.</span><span class="identifier">corr</span><span>(</span><span class="identifier">v_rand</span><span>)
-</span><span class="comment">// res7: Double = 0.5956150120407054
+</span><span class="comment">// res7: Double = -0.0041943322143369694
 </span><span>
 </span><span class="identifier">v_rand</span><span>.</span><span class="identifier">elementRanks</span><span>
-</span><span class="comment">// res8: Vec[5] = Array(1.0, 5.0, 2.0, 4.0, 3.0)</span></code></pre>
+</span><span class="comment">// res8: Vec[5] = Array(3.0, 1.0, 5.0, 4.0, 2.0)</span></code></pre>
 
         
 <hr class="footer-rule"/>
