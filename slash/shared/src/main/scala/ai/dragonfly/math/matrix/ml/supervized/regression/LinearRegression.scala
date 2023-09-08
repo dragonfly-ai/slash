@@ -16,13 +16,12 @@
 
 package ai.dragonfly.math.matrix.ml.supervized.regression
 
-import ai.dragonfly.math.interval.Interval.*
 import ai.dragonfly.math.matrix.*
-import ai.dragonfly.math.matrix.ml.data.{StaticSupervisedData, SupervisedData}
+import ai.dragonfly.math.matrix.ml.data.SupervisedData
 import ai.dragonfly.math.matrix.ml.supervized
 import ai.dragonfly.math.matrix.ml.supervized.regression
-import ai.dragonfly.math.stats.LabeledVec
-import ai.dragonfly.math.stats.probability.distributions.{EstimatedGaussian, stream}
+
+import ai.dragonfly.math.stats.probability.distributions.{EstimatedGaussian}
 import ai.dragonfly.math.vector.*
 
 trait LinearRegression[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {

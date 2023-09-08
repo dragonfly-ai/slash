@@ -16,10 +16,7 @@
 
 package ai.dragonfly.math.interval
 
-import ai.dragonfly.math.Random.defaultRandom
 import ai.dragonfly.math.stats.probability.distributions.Sampleable
-
-import math.Numeric.Implicits.infixNumericOps
 
 object Interval {
   import ai.dragonfly.math.Random.*

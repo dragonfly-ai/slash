@@ -16,7 +16,6 @@
 
 package ai.dragonfly.math.matrix
 
-import ai.dragonfly.math.matrix.decomposition.{Cholesky, Eigen, LU, QR, SV}
 import ai.dragonfly.math.matrix.util.CannotExpressMatrixAsVector
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*

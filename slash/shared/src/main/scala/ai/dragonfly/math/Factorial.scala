@@ -16,8 +16,6 @@
 
 package ai.dragonfly.math
 
-import ai.dragonfly.math.*
-
 import scala.language.postfixOps
 
 object Factorial {

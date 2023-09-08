@@ -17,7 +17,6 @@
 package ai.dragonfly.math.geometry
 
 import ai.dragonfly.math.interval.*
-import ai.dragonfly.math.interval.Interval.*
 import ai.dragonfly.math.stats.probability.distributions.Sampleable
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*
