@@ -23,6 +23,8 @@ package object idx {
   opaque type Index[N <: Int] = NArray[Boolean]
 
   object Index {
+    def none(num: Int): Index[num.type] = NArray.fill(num)(false)
+    def trues(num: Int) : Index[num.type] = NArray.fill(num)(true)
     def none[N <: Int](using ValueOf[N]) : Index[N] = NArray.fill[Boolean](valueOf[N])(false)
     def all[N <: Int](using ValueOf[N]) : Index[N] = NArray.fill[Boolean](valueOf[N])(true)
 
@@ -32,6 +34,7 @@ package object idx {
   extension[N <: Int] (thisVector: Index[N]) {
       inline def apply(idx: Int): Boolean = thisVector(idx)
       inline def at(idx: Int): Boolean = thisVector(idx)
+      inline def update(idx: Int, value: Boolean): Unit = thisVector(idx) = value
       inline def changeAt(idx: Int, value: Boolean): Unit = thisVector(idx) = value
       inline def dimension: Int = thisVector.length
       inline def countTrue : Int =
@@ -41,6 +44,22 @@ package object idx {
         }
         sum
       end countTrue
+
+      inline def &&(thatIdx: Index[N]): Index[N] = {
+        val result:Index[N] = new NArray[Boolean](dimension)
+        for(i <- 0 until dimension) {
+          result(i) = thisVector(i) && thatIdx(i)
+        }
+        result
+      }
+
+      inline def ||(thatIdx: Index[N]): Index[N] = {
+        val result:Index[N] = new NArray[Boolean](dimension)
+        for(i <- 0 until dimension) {
+          result(i) = thisVector(i) || thatIdx(i)
+        }
+        result
+      }
 
       def copy:Index[N] = {
         val copyOfThisVector:Index[N] = new NArray[Boolean](dimension)

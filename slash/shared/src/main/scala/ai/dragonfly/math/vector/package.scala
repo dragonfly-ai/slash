@@ -22,6 +22,7 @@ import unicode.*
 import narr.*
 
 import scala.compiletime.ops.any.==
+  import scala.compiletime.ops.any.!=
 import scala.compiletime.ops.boolean.&&
 import scala.compiletime.ops.int.*
 import scala.collection.View
@@ -29,6 +30,8 @@ import scala.collection.View
 
 import scala.collection.mutable.ListBuffer // for fast append in elementRanks
 import ai.dragonfly.idx.*
+import ai.dragonfly.math.vector.Vec.dimension
+import scala.util.NotGiven
 //import ai.dragonfly.Index
 
 package object vector {
@@ -155,9 +158,9 @@ package object vector {
 
     }
 
-    extension[N <: Int, M <: Int] (thisVector: Vec[N])(using ValueOf[N]) {
-      inline def apply(index: Index[M])(using ValueOf[M]): Vec[M] =
-        assert(valueOf[M] == valueOf[N])
+    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N]) {
+      transparent inline def apply[M <: Int](index: Index[M])(using ValueOf[M]) =
+        dimensionCheck(valueOf[M], valueOf[N])
         val newLength = index.countTrue
         type D = newLength.type
         val newVec = Vec.zeros[D]
@@ -168,7 +171,7 @@ package object vector {
             j += 1
           }
         }
-        newVec
+        newVec.asInstanceOf[Vec[Int]]
     }
 
 
@@ -367,6 +370,7 @@ package object vector {
       inline def /(divisor: Double): Vec[N] = copy.divide(divisor)
       inline def /= (divisor: Double): Vec[N] = divide(divisor)
 
+
       inline def divide(divisor: Double): Vec[N] = scale(1.0 / divisor)
 
       inline def round(): Unit = {
@@ -443,6 +447,43 @@ package object vector {
       μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length //.asInstanceOf[Vec[N]]
     }
   }
+
+   object dynamic :
+    extension[N <: Int] (thisVector: Vec[N])
+
+      def `+!`[M <: Int](thatVector: Vec[M])(using NotGiven[M =:= N]): Vec[M] =
+        dimensionCheck(thisVector.dimension, thatVector.dimension)
+        import ai.dragonfly.math.vector.Vec.+
+        thisVector + thatVector.asInstanceOf[Vec[N]]
+
+      inline def <(num:Double): Index[N] =
+        logicalIdx((a,b) => a < b , num)
+
+      inline def <=(num:Double): Index[N] =
+        logicalIdx((a,b) => a <= b , num)
+
+      inline def >(num:Double): Index[N] =
+        logicalIdx((a,b) => a > b , num)
+
+      inline def >=(num:Double): Index[N] =
+        logicalIdx((a,b) => a >= b , num)
+
+
+      inline def logicalIdx(inline op: (Double, Double) => Boolean, inline num: Double  ): Index[N] = {
+        val n = thisVector.dimension
+        val idx = Index.none(n)
+        var i = 0
+        while (i < n) {
+          if (op(thisVector(i), num)) idx(i) = true
+          i = i + 1
+        }
+        idx.asInstanceOf[Index[N]]
+      }
+
+    end extension
+
+
+   end dynamic
 
   trait Format {
     def prefix[N <: Int](v:Vec[N]): String
