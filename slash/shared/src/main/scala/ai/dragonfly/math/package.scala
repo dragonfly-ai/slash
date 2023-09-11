@@ -79,6 +79,8 @@ package object math {
     '{ Math.log10(${x}) / ${ Expr(Math.log10(base)) } }
   }
 
+
+
   /**
    * This class can yield drastic performance improvements in cases when the base of an oft-repeated logarithm operation
    * can't be known at compile time, or can't be expressed as a constant.

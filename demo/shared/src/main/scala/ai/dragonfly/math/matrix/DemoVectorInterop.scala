@@ -15,7 +15,7 @@ object DemoVectorInterop extends Demonstration {
   def demo(): Unit = {
     val M0: Matrix[2, 3] = Matrix[2, 3](
       NArray[NArray[Double]](
-        NArray[Double](1.0, `𝜑`, `√2`),
+        NArray[Double](1.0, 1.5, `√2`),
         NArray[Double](2.0, π, e),
       )
     )
