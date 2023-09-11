@@ -474,7 +474,7 @@ package object vector {
         val idx = Index.none(n)
         var i = 0
         while (i < n) {
-          if (op(thisVector(i), num)) idx(i) = true
+          if (op(thisVector(i), num)) idx.changeAt(i, true)
           i = i + 1
         }
         idx.asInstanceOf[Index[N]]

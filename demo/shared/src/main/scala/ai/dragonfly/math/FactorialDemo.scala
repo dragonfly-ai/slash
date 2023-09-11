@@ -1,7 +1,6 @@
 package ai.dragonfly.math
 
 import ai.dragonfly.democrossy.Demonstration
-import ai.dragonfly.math.*
 import ai.dragonfly.math.Factorial.!
 import scala.language.postfixOps
 
