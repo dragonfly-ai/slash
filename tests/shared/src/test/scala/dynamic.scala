@@ -41,8 +41,6 @@ class DynamicTests extends munit.FunSuite:
     idx(0) = true
     idx(1) = true
     val anotherVec2 = vec3(idx)
-    println(anotherVec2.render())
-    println(anotherVec2.dimension)
 
     val sum = vec2 +! anotherVec2
     assertEquals(sum.dimension, 2)
