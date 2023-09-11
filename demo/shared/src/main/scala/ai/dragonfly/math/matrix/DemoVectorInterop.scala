@@ -12,7 +12,7 @@ object DemoVectorInterop extends Demonstration {
   def demo(): Unit = {
     val M0: Matrix[2, 3] = Matrix[2, 3](
       NArray[NArray[Double]](
-        NArray[Double](1.0, 1.46557123187676802665, `√2`),
+        NArray[Double](1.0, 1.5, `√2`),
         NArray[Double](2.0, π, e),
       )
     )

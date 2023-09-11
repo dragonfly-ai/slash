@@ -24,7 +24,10 @@ import narr.*
 import scala.compiletime.ops.any.==
 import scala.compiletime.ops.int.*
 
+
 import scala.collection.mutable.ListBuffer // for fast append in elementRanks
+import ai.dragonfly.idx.*
+//import ai.dragonfly.Index
 
 package object vector {
 
@@ -149,6 +152,24 @@ package object vector {
       )
 
     }
+
+    extension[N <: Int, M <: Int] (thisVector: Vec[N])(using ValueOf[N]) {
+      inline def apply(index: Index[M])(using ValueOf[M]): Vec[M] =
+        assert(valueOf[M] == valueOf[N])
+        val newLength = index.countTrue
+        type D = newLength.type
+        val newVec = Vec.zeros[D]
+        var j = 0
+        for(i <- 0 until valueOf[M]) {
+          if(index.at(i)) {
+            newVec(j) = thisVector(i)
+            j += 1
+          }
+        }
+        newVec
+    }
+
+
 
     extension[N <: Int] (thisVector: Vec[N]) {
 
