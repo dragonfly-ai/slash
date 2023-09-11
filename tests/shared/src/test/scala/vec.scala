@@ -17,19 +17,11 @@
 import ai.dragonfly.math.vector.Vec
 import ai.dragonfly.math.vector.Vec.*
 
-import ai.dragonfly.math.vector.dynamic.*
-
-import ai.dragonfly.idx.Index
-import ai.dragonfly.idx.*
-
-import narr.NArray
 
 class VecTests extends munit.FunSuite:
   test("Compile safety") {
     val vec2 = Vec.zeros[2]
-    val vec3 = Vec.zeros[3]
-
-    compileErrors("vec2 + vec3")
+    assert(compileErrors("Vec.zeros[2] + Vec.zeros[3]").contains("Required: ai.dragonfly.math.vector.Vec[(2 : Int)]"))
     assertEquals((vec2 + vec2).sum, 0.0)
   }
 

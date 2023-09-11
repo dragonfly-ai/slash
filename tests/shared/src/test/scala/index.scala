@@ -28,7 +28,7 @@ class IndexTests extends munit.FunSuite:
 
   lazy val v_fill = Vec.tabulate[5](i => i.toDouble )
 
-  println(v_fill.render())
+  //println(v_fill.render())
 
   test(" ways of making index ") {
     val v_idx: Index[5] = Index.none[5]
