@@ -41,8 +41,21 @@ class DynamicTests extends munit.FunSuite:
     idx(0) = true
     idx(1) = true
     val anotherVec2 = vec3(idx)
-
     val sum = vec2 +! anotherVec2
+
+    assert(
+      // notice the difference in the operator on the last line vs above
+      compileErrors("""
+    val vec2 = Vec.zeros[2]
+    val vec3 = Vec.zeros[3]
+    val idx = Index.none[3]
+    idx(0) = true
+    idx(1) = true
+    val anotherVec2 = vec3(idx)
+    val sum = vec2 + anotherVec2
+    """).contains("Required: ai.dragonfly.math.vector.Vec[(2 : Int)]") )
+
+
     assertEquals(sum.dimension, 2)
     assertEquals(sum.sum, 0.0)
 
