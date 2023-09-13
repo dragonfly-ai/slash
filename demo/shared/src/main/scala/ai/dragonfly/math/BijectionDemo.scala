@@ -3,8 +3,6 @@ package ai.dragonfly.math
 import ai.dragonfly.math
 import ai.dragonfly.democrossy.Demonstration
 
-import scala.reflect.ClassTag
-
 object BijectionDemo extends Demonstration {
 
   object H2O {

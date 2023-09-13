@@ -17,7 +17,6 @@
 package ai.dragonfly.math.matrix.ml.supervized.regression
 
 import ai.dragonfly.math.matrix.*
-import ai.dragonfly.math.matrix.util.*
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*
 

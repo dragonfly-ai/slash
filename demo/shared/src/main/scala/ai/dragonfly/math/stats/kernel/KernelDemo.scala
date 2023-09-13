@@ -5,14 +5,10 @@ package ai.dragonfly.math.stats.kernel
  */
 
 import ai.dragonfly.math.*
-import Constant.{`√(2π)`, π}
 import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.stats.DenseHistogramOfContinuousDistribution
 import ai.dragonfly.math.stats.probability.distributions.Gaussian
-import ai.dragonfly.math.vector.*
 import narr.*
-
-import scala.collection.mutable
 
 object KernelDemo extends Demonstration {
   override def demo():Unit = {

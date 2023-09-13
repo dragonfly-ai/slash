@@ -6,10 +6,8 @@ import ai.dragonfly.math.matrix.ml.data.StaticSupervisedData
 import ai.dragonfly.math.matrix.ml.supervized.regression.{LinearRegressionQR, LinearRegressionSVD, *}
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*
-import ai.dragonfly.math.vector.Vec2.*
 import ai.dragonfly.viz.cli.*
 import ai.dragonfly.math.interval.*
-import scala.compiletime.ops.int.*
 
 object DemoLinearRegression extends Demonstration {
 
@@ -60,7 +58,7 @@ object DemoLinearRegression extends Demonstration {
     val xSlopeSVD: Double = slrSVD(p + Vec[2](1.0, 0.0)) - yMean
     val ySlopeSVD: Double = slrSVD(p + Vec[2](0.0, 1.0)) - yMean
 
-    val c = yMean / slrSVD.a.magnitude
+    yMean / slrSVD.a.magnitude
     xPlot.line(Vec[2](p(0), yMean), xSlopeSVD, "SVD (p.x, f'(p))")
     yPlot.line(Vec[2](p(1), yMean), ySlopeSVD, "SVD (p.y, f'(p))")
 
@@ -73,7 +71,7 @@ object DemoLinearRegression extends Demonstration {
     val elrt: EmpiricalRegressionTest[100, 8] = EmpiricalRegressionTest[100, 8](empericalTrainingData, empericalTestData)
     val emProbLR: LinearRegressionProblem[100, 8] = LinearRegressionProblem[100, 8](empericalTrainingData)
 
-    val size: Double = empericalTrainingData.sampleSize
+    println(empericalTrainingData.sampleSize)
 
     println("\nTest LinearRegressionQR:\n")
     val elrQR = new LinearRegressionQR[100, 8].train(emProbLR)

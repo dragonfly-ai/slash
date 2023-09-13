@@ -16,8 +16,6 @@
 
 package ai.dragonfly
 
-import ai.dragonfly.math.Gamma
-import ai.dragonfly.math.vector.*
 
 package object math {
 

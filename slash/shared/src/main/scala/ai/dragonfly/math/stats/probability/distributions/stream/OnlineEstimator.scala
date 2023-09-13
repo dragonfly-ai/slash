@@ -24,7 +24,7 @@ import probability.distributions.*
 
 import scala.reflect.ClassTag
 
-trait OnlineEstimator[DOMAIN](using `#`: Numeric[DOMAIN] , tag: ClassTag[DOMAIN]) {
+trait OnlineEstimator[DOMAIN](using `#`: Numeric[DOMAIN]) {
 
   val domain:Domain[DOMAIN]
 

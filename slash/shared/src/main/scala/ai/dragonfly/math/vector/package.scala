@@ -22,9 +22,7 @@ import unicode.*
 import narr.*
 
 import scala.compiletime.ops.any.==
-import scala.compiletime.ops.boolean.&&
 import scala.compiletime.ops.int.*
-import scala.collection.View
 
 import scala.collection.mutable.ListBuffer // for fast append in elementRanks
 

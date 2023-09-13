@@ -4,7 +4,6 @@ import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.*
 import ai.dragonfly.math.Random.*
 import ai.dragonfly.math.vector.Vec.*
-import ai.dragonfly.math.vector.Vec2.*
 import narr.*
 
 import scala.language.postfixOps

@@ -1,7 +1,6 @@
 package ai.dragonfly.math.matrix
 
 import ai.dragonfly.democrossy.Demonstration
-import ai.dragonfly.math.matrix.Matrix
 import ai.dragonfly.math.matrix.decomposition.*
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*

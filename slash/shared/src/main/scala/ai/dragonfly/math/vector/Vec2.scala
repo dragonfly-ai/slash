@@ -19,8 +19,6 @@ package ai.dragonfly.math.vector
 import ai.dragonfly.math.*
 import narr.*
 
-import scala.compiletime.ops.int.*
-
 /**
  * Created by clifton on 1/10/17.
  */

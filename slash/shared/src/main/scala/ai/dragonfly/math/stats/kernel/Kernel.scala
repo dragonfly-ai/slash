@@ -17,13 +17,11 @@
 package ai.dragonfly.math.stats.kernel
 
 import ai.dragonfly.math.*
-import Constant.{`√(2π)`, π}
-import ai.dragonfly.math.stats.DenseHistogramOfContinuousDistribution
+import Constant.π
 import ai.dragonfly.math.stats.probability.distributions.Gaussian
 import ai.dragonfly.math.vector.*
 import Vec.*
 import narr.*
-import scala.collection.mutable
 
 trait Kernel[N <: Int] {
   val exclusionRadius: Double

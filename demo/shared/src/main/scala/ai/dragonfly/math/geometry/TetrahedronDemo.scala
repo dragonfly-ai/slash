@@ -1,12 +1,10 @@
 package ai.dragonfly.math.geometry
 
-import ai.dragonfly.math.stats.probability.distributions.Sampleable
-import ai.dragonfly.math.interval.*
-import Interval.*
+
 import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.vector.*
 import Vec.*
-import ai.dragonfly.math.geometry.Tetrahedron
+
 
 object TetrahedronDemo extends Demonstration {
 
