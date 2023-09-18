@@ -19,8 +19,6 @@ package ai.dragonfly.math.matrix.decomposition
 import ai.dragonfly.math.matrix.*
 import narr.*
 
-import scala.compiletime.ops.int.{-, >}
-
 object LU {
 
   def apply[M <: Int, N <: Int](A:Matrix[M, N])(using ValueOf[M], ValueOf[N]):LU[M, N] = {

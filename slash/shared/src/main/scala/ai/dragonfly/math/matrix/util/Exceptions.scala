@@ -18,8 +18,6 @@ package ai.dragonfly.math.matrix.util
 
 import ai.dragonfly.math.matrix.*
 
-import scala.util.control
-
 case class CannotExpressMatrixAsVector[M <: Int, N <: Int](m:Matrix[M, N]) extends Exception(
   s"To convert a Matrix to a Vector, one of its dimensions must be 1, but this matrix has dimensions: [${m.rows}x${m.columns}]"
 )

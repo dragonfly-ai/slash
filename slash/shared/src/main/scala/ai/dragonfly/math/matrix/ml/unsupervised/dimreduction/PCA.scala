@@ -17,17 +17,16 @@
 package ai.dragonfly.math.matrix.ml.unsupervised.dimreduction
 
 import ai.dragonfly.math.*
-import ai.dragonfly.math.geometry.Line
+
 import ai.dragonfly.math.matrix.util.*
 import ai.dragonfly.math.matrix.*
 import ai.dragonfly.math.matrix.decomposition.SV
 import ai.dragonfly.math.matrix.ml.data.*
-import ai.dragonfly.math.stats.probability.distributions.stream.StreamingVectorStats
+
 import ai.dragonfly.math.vector.*
 import Vec.*
 import narr.*
 
-import scala.collection.mutable.ListBuffer
 import scala.language.implicitConversions
 
 import scala.compiletime.ops.int.*

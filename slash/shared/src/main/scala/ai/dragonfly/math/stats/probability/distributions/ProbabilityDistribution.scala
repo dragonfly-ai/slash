@@ -16,14 +16,11 @@
 
 package ai.dragonfly.math.stats.probability.distributions
 
-import ai.dragonfly.math.interval.{Domain, Interval}
-import ai.dragonfly.math.stats.probability.distributions.Sampleable
 
 // ℕ population size symbol for future reference.
 
 trait ProbabilityDistribution[DOMAIN: Numeric] extends Sampleable[DOMAIN] {
   val `#` = implicitly[Numeric[DOMAIN]]
-  import `#`._
 
   /**
    * Probability Densidy Function: PDF

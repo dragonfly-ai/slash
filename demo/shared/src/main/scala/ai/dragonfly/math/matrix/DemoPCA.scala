@@ -8,15 +8,11 @@ import ai.dragonfly.math.matrix.ml.data.*
 import ai.dragonfly.math.matrix.ml.unsupervised.dimreduction.PCA
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*
-import ai.dragonfly.math.vector.Vec2.*
-import ai.dragonfly.math.interval
 import ai.dragonfly.viz.cli.CLImg
 
 import Console.*
 
 object DemoPCA extends Demonstration {
-
-  import interval.*
 
   def demo(): Unit = {
 

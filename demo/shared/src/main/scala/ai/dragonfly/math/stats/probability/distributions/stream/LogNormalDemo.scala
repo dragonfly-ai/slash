@@ -1,10 +1,7 @@
 package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.*
-import ai.dragonfly.math.interval.*
-import Interval.*
 import ai.dragonfly.math.stats.probability.distributions
-import ai.dragonfly.math.stats.PointStatistics
 
 
 object LogNormalDemo {

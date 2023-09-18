@@ -14,34 +14,22 @@
  * limitations under the License.
  */
 
-package ai.dragonfly.math.vector
+import ai.dragonfly.math.log
+import ai.dragonfly.math.Constant
 
-import ai.dragonfly.math.*
-import narr.*
-
-/**
- * Created by clifton on 1/10/17.
- */
-
-object Vec2 {
-
-  import Vec.*
-
-  def rotateAllDegrees(vectors:NArray[Vec[2]], degrees: Double): NArray[Vec[2]] = {
-    rotateAll(vectors, degreesToRadians(degrees))
-  }
-
-  def rotateAll(vectors:NArray[Vec[2]], radians: Double): NArray[Vec[2]] = {
-    val cos:Double = Math.cos(radians)
-    val sin:Double = Math.sin(radians)
-    var vi = 0
-    while (vi < vectors.length) {
-      val v2:Vec[2] = vectors(vi)
-      v2.rotate(cos, sin)
-      vi = vi + 1
+class LogTests extends munit.FunSuite:
+    test("logs") {
+      assertEqualsDouble(log[2](8), 3, 0.000000001)
+      assertEqualsDouble(log[2](65536), 16, 0.000000001)
     }
-    vectors
-  }
+
+    test("log e") {
+      assertEqualsDouble(log[2.7182818284590452](Constant.e), 1, 0.000000001)
+    }
+
+    test("negative") {
+      assert(log[10](-1).isNaN())
+    }
 
 
-}
+end LogTests

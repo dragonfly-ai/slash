@@ -1,7 +1,5 @@
 package verification
 
-import scala.Console.println
-
 case class ArrayComparison(rows:Int, columns:Int, discrepancies:Int, combinedError:Double) {
 
   def averageError:Double = if (discrepancies == 0) 0.0 else combinedError / discrepancies

@@ -1,8 +1,5 @@
 package verification
 
-import Jama.EigenvalueDecomposition
-import ai.dragonfly.math.matrix
-import narr.*
 import verification.decomposition.*
 
 import scala.Console.*

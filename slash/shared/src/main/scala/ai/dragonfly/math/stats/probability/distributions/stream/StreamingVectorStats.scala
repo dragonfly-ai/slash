@@ -16,7 +16,6 @@
 
 package ai.dragonfly.math.stats.probability.distributions.stream
 
-import ai.dragonfly.math.Random.*
 import ai.dragonfly.math.vector.*
 import Vec.*
 import narr.*

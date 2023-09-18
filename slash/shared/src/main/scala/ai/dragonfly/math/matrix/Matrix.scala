@@ -16,13 +16,11 @@
 
 package ai.dragonfly.math.matrix
 
-import ai.dragonfly.math.matrix.decomposition.{Cholesky, Eigen, LU, QR, SV}
 import ai.dragonfly.math.matrix.util.CannotExpressMatrixAsVector
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*
 import narr.*
 
-import scala.compiletime.ops.int.*
 import scala.math.hypot
 
 /**
@@ -587,7 +585,7 @@ class Matrix[M <: Int, N <: Int] private(val values: NArray[NArray[Double]])(usi
   }
 
   def * [V <: Int](thatMatrix: Matrix[N, V])(using ValueOf[V]): Matrix[M, V] = {
-    given v:Int = Math.min(valueOf[M], valueOf[V])
+    //given v:Int = Math.min(valueOf[M], valueOf[V])
     times(thatMatrix)
   }
 

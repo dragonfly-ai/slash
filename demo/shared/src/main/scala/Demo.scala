@@ -8,9 +8,9 @@ object Demo extends XApp(NativeConsole(style = "padding: 8px; overflow: scroll;"
 
   val allDemos: Array[Demonstration] = Array[Demonstration](
     // Math
-    ai.dragonfly.math.LogDemo,
-    ai.dragonfly.math.GammaDemo,
-    ai.dragonfly.math.FactorialDemo,
+    //ai.dragonfly.math.LogDemo,
+    //ai.dragonfly.math.GammaDemo,
+    //ai.dragonfly.math.FactorialDemo,
     // TODO: add Interval demo
     ai.dragonfly.math.unicode.UnicodeDemo,
     // Geometry:

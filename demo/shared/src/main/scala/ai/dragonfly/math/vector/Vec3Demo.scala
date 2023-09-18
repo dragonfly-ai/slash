@@ -1,7 +1,6 @@
 package ai.dragonfly.math.vector
 
 import ai.dragonfly.democrossy.Demonstration
-import ai.dragonfly.math.squareInPlace
 import narr.*
 import Vec.*
 

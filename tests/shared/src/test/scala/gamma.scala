@@ -14,34 +14,13 @@
  * limitations under the License.
  */
 
-package ai.dragonfly.math.vector
+import ai.dragonfly.math.gamma
+import ai.dragonfly.math.Factorial
 
-import ai.dragonfly.math.*
-import narr.*
-
-/**
- * Created by clifton on 1/10/17.
- */
-
-object Vec2 {
-
-  import Vec.*
-
-  def rotateAllDegrees(vectors:NArray[Vec[2]], degrees: Double): NArray[Vec[2]] = {
-    rotateAll(vectors, degreesToRadians(degrees))
-  }
-
-  def rotateAll(vectors:NArray[Vec[2]], radians: Double): NArray[Vec[2]] = {
-    val cos:Double = Math.cos(radians)
-    val sin:Double = Math.sin(radians)
-    var vi = 0
-    while (vi < vectors.length) {
-      val v2:Vec[2] = vectors(vi)
-      v2.rotate(cos, sin)
-      vi = vi + 1
-    }
-    vectors
-  }
-
-
-}
+class GammaTests extends munit.FunSuite:
+    test("gamma") {
+      for(i <- 1 to 15) {
+        assertEqualsDouble(gamma(i),  Factorial(i - 1).toDouble, 0.005  )
+      }
+   }
+end GammaTests

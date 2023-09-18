@@ -2,7 +2,6 @@ package verification.decomposition
 
 import Jama.SingularValueDecomposition
 import ai.dragonfly.math.matrix
-import narr.*
 import verification.Verification
 
 import scala.Console.*

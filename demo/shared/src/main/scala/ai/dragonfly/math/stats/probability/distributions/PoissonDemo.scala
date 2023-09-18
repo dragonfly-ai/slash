@@ -2,7 +2,6 @@ package ai.dragonfly.math.stats.probability.distributions
 
 import ai.dragonfly.math.*
 import stats.*
-import interval.*
 
 object PoissonDemo {
   val p15:Poisson = Poisson(15)

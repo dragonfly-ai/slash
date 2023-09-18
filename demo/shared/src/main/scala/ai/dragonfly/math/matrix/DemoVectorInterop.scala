@@ -1,9 +1,7 @@
 package ai.dragonfly.math.matrix
 
 import ai.dragonfly.democrossy.Demonstration
-import ai.dragonfly.math.matrix.Matrix
 import ai.dragonfly.math.matrix.util.*
-import ai.dragonfly.math.matrix.decomposition.*
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*
 import ai.dragonfly.math.vector.Vec2.*
@@ -15,7 +13,7 @@ object DemoVectorInterop extends Demonstration {
   def demo(): Unit = {
     val M0: Matrix[2, 3] = Matrix[2, 3](
       NArray[NArray[Double]](
-        NArray[Double](1.0, `𝜑`, `√2`),
+        NArray[Double](1.0, 1.46557123187676802665, `√2`),
         NArray[Double](2.0, π, e),
       )
     )
