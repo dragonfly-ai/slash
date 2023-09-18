@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="generator" content="Typelevel Laika + Helium Theme" />
-  <title>Gamma</title>
+  <title>Logarithms</title>
   
   <meta name="author" content="one"/>
   
@@ -72,8 +72,8 @@
     <li class="level2 nav-leaf"><a href="../basics/getting_started.html">Getting started</a></li>
     <li class="level1 nav-header">demo</li>
     <li class="level2 nav-leaf"><a href="factorial.html">Factorial</a></li>
-    <li class="level2 active nav-leaf"><a href="#">Gamma</a></li>
-    <li class="level2 nav-leaf"><a href="logs.html">Logarithms</a></li>
+    <li class="level2 nav-leaf"><a href="gamma.html">Gamma</a></li>
+    <li class="level2 active nav-leaf"><a href="#">Logarithms</a></li>
     <li class="level1 nav-header">design</li>
     <li class="level2 nav-leaf"><a href="../design/design.html">Design Choices</a></li>
     <li class="level1 nav-header">matrix</li>
@@ -86,7 +86,7 @@
 
       
 <nav id="page-nav">
-  <p class="header"><a href="#">Gamma</a></p>
+  <p class="header"><a href="#">Logarithms</a></p>
 
   <ul class="nav-list">
   </ul>
@@ -97,23 +97,58 @@
 
       <main class="content">
 
-        <h1 id="gamma" class="title">Gamma</h1>
-        <p>Try gamma function</p>
-        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>
+        <h1 id="logarithms" class="title">Logarithms</h1>
+        <p>Example</p>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.*
+</span><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.</span><span class="type-name">Constant</span><span>
 
-</span><span class="keyword">for</span><span> ( </span><span class="identifier">i</span><span> &lt;- </span><span class="number-literal">1</span><span> </span><span class="identifier">until</span><span> </span><span class="number-literal">10</span><span> ) {
-  </span><span class="keyword">val</span><span> </span><span class="identifier">i_1</span><span>:</span><span class="type-name">Int</span><span> = </span><span class="identifier">i</span><span> - </span><span class="number-literal">1</span><span>
-  </span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;</span><span class="escape-sequence">\t</span><span class="string-literal">Γ(</span><span class="substitution">$i</span><span class="string-literal">):</span><span class="substitution">$i_1</span><span class="string-literal">! =&gt; </span><span class="substitution">${math.gamma(i.toDouble)}</span><span class="string-literal"> : </span><span class="substitution">${math.Factorial(i_1)}</span><span class="string-literal">&quot;</span><span>)
+</span><span class="identifier">log</span><span>[</span><span class="number-literal">4</span><span>](</span><span class="number-literal">16</span><span>)
+</span><span class="comment">// res0: Double = 2.0
+</span><span>
+</span><span class="identifier">log</span><span>[</span><span class="number-literal">10</span><span>](-</span><span class="number-literal">1</span><span>)
+</span><span class="comment">// res1: Double = NaN
+</span><span>
+</span><span class="identifier">log</span><span>[</span><span class="number-literal">2.7182818284590452</span><span>](</span><span class="type-name">Constant</span><span>.</span><span class="identifier">e</span><span>)
+</span><span class="comment">// res2: Double = 1.0
+</span><span>
+</span><span class="identifier">println</span><span>( </span><span class="string-literal">s&quot;log[2.0](42.0) = </span><span class="substitution">${log[2.0](42.0)}</span><span class="string-literal">&quot;</span><span> )
+</span><span class="comment">// log[2.0](42.0) = 5.392317422778761
+</span><span class="keyword">var</span><span> </span><span class="identifier">i</span><span>: </span><span class="type-name">Int</span><span> = </span><span class="number-literal">1</span><span>; </span><span class="keyword">while</span><span> (</span><span class="identifier">i</span><span> &gt; </span><span class="number-literal">0</span><span>) {
+</span><span class="comment">// i: Int = 1; while (i &gt; 0) {
+</span><span>  </span><span class="identifier">println</span><span>( </span><span class="string-literal">s&quot;log[2](</span><span class="substitution">$i</span><span class="string-literal">) = </span><span class="substitution">${log[2](i)}</span><span class="string-literal">&quot;</span><span> )
+  </span><span class="identifier">i</span><span> = </span><span class="identifier">i</span><span> &lt;&lt; </span><span class="number-literal">1</span><span>
 }
-</span><span class="comment">// 	Γ(1):0! =&gt; 1.0 : 1
-// 	Γ(2):1! =&gt; 1.0 : 1
-// 	Γ(3):2! =&gt; 2.0 : 2
-// 	Γ(4):3! =&gt; 6.0 : 6
-// 	Γ(5):4! =&gt; 24.000000000000004 : 24
-// 	Γ(6):5! =&gt; 119.99999999999997 : 120
-// 	Γ(7):6! =&gt; 720.0000000000001 : 720
-// 	Γ(8):7! =&gt; 5040.000000000002 : 5040
-// 	Γ(9):8! =&gt; 40320.00000000002 : 40320</span></code></pre>
+</span><span class="comment">// log[2](1) = 0.0
+// log[2](2) = 1.0
+// log[2](4) = 2.0
+// log[2](8) = 3.0
+// log[2](16) = 4.0
+// log[2](32) = 5.0
+// log[2](64) = 6.0
+// log[2](128) = 7.0
+// log[2](256) = 8.0
+// log[2](512) = 9.0
+// log[2](1024) = 10.0
+// log[2](2048) = 11.0
+// log[2](4096) = 12.0
+// log[2](8192) = 13.0
+// log[2](16384) = 14.0
+// log[2](32768) = 15.0
+// log[2](65536) = 16.0
+// log[2](131072) = 17.0
+// log[2](262144) = 18.0
+// log[2](524288) = 19.0
+// log[2](1048576) = 20.0
+// log[2](2097152) = 21.0
+// log[2](4194304) = 22.0
+// log[2](8388608) = 23.0
+// log[2](16777216) = 24.0
+// log[2](33554432) = 25.0
+// log[2](67108864) = 26.0
+// log[2](134217728) = 27.0
+// log[2](268435456) = 28.0
+// log[2](536870912) = 29.0
+// log[2](1073741824) = 30.0</span></code></pre>
 
         
 <hr class="footer-rule"/>
