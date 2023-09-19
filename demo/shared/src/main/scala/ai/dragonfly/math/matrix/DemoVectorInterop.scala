@@ -4,7 +4,6 @@ import ai.dragonfly.democrossy.Demonstration
 import ai.dragonfly.math.matrix.util.*
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*
-import ai.dragonfly.math.vector.Vec2.*
 import narr.*
 
 import ai.dragonfly.math.Constant.*

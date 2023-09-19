@@ -17,7 +17,7 @@
 import ai.dragonfly.math.vector.Vec
 import narr.NArray
 
-class SimpleStatsTests extends munit.FunSuite:
+class SimpleStats extends munit.FunSuite:
 
    test("Some basic properties") {
 
@@ -85,7 +85,7 @@ class SimpleStatsTests extends munit.FunSuite:
 
     val v3 = Vec[10](86.0, 97.0, 99.0, 100.0, 101.0, 103.0, 106.0, 110.0, 112.0, 113.0)
     val v4 = Vec[10](2, 20.0, 28.0, 27.0, 50.0, 29.0, 7.0, 17.0, 6.0, 12.0)
-    assertEqualsDouble(-0.1757575, v3.spearmansRankCorrelation(v4), 0.000001);
+    assertEqualsDouble(-0.1757575, v3.spearmansRankCorrelation(v4), 0.000001)
    }
 
-end SimpleStatsTests
+end SimpleStats

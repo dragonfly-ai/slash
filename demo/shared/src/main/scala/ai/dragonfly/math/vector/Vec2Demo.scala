@@ -9,7 +9,6 @@ import ai.dragonfly.math.*
 import Constant.π
 
 import Vec.*
-import Vec2.*
 /**
  * Created by clifton on 1/10/17.
  */
