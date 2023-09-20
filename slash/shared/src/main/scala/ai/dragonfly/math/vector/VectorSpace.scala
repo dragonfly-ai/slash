@@ -41,6 +41,18 @@ class VectorSpace[N0 <: Int](using dt: ValueOf[N0]) {
 
   inline def apply(d: Double*): Vec[N] = Vec.apply[N](d: _*)
 
+  def fromTuple(t:Tuple):Vec[N] = {
+    dimensionCheck(t.productArity, dimension)
+    val itr:Iterator[Any] = t.productIterator
+    val v:NArray[Double] = new NArray[Double](dimension)
+    var i:Int = 0
+    while (itr.hasNext) {
+      v(i) = itr.next().asInstanceOf[Double]
+      i += 1
+    }
+    apply(v)
+  }
+
   inline def tabulate(f: (i: Int) => Double): Vec[N] = apply(NArray.tabulate[Double](dimension)(f))
 
   inline def fill(d: Double): Vec[N] = apply(NArray.fill[Double](dimension)(d))
