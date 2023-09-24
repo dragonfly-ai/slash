@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.gamma
-import ai.dragonfly.math.Factorial
+import ai.dragonfly.math.log
+import ai.dragonfly.math.Constant
 
-class GammaTests extends munit.FunSuite:
-    test("gamma") {
-      for(i <- 1 to 15) {
-        assertEqualsDouble(gamma(i),  Factorial(i - 1).toDouble, 0.005  )
-      }
-   }
-end GammaTests
+class Log extends munit.FunSuite:
+    test("logs") {
+      assertEqualsDouble(log[2](8), 3, 0.000000001)
+      assertEqualsDouble(log[2](65536), 16, 0.000000001)
+    }
+
+    test("log e") {
+      assertEqualsDouble(log[2.7182818284590452](Constant.e), 1, 0.000000001)
+    }
+
+    test("negative") {
+      assert(log[10](-1).isNaN())
+    }
+
+
+end Log

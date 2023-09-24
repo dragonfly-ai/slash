@@ -5,7 +5,7 @@ import ai.dragonfly.democrossy.Demonstration
 import narr.{NArray, *}
 import ai.dragonfly.math.geometry.Line
 import ai.dragonfly.math.matrix.ml.data.*
-import ai.dragonfly.math.matrix.ml.unsupervised.dimreduction.PCA
+import ai.dragonfly.math.matrix.ml.unsupervised.dimreduction.*
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.vector.Vec.*
 import ai.dragonfly.viz.cli.CLImg
@@ -102,12 +102,14 @@ object DemoPCA extends Demonstration {
 
     val sud: StaticUnsupervisedData[6, 18] = StaticUnsupervisedData[6, 18](vArr)
     val pca = PCA[6, 18](sud)
-    val reducer = pca.getReducer[2]
 
     println(s"Mean Shape with μ = ${pca.mean.render()}\n")
     println(plotVectorOfShape2D(pca.mean, Vec[2](25, 25))())
 
+    var totalVariance:Double = 0.0
+
     for (bp <- pca.basisPairs) {
+      totalVariance += bp.variance
       if (bp.variance > 0.001) {
         var i = 0
         val cImg2: CLImg = new CLImg(350, 50)
@@ -125,7 +127,8 @@ object DemoPCA extends Demonstration {
       }
     }
 
-    println(s"Dimensinoality reduction from ${reducer.domainDimension} to ${reducer.rangeDimension}:")
+    val reducer = pca.getReducer[2]
+    println(s"Dimensionality reduction from ${reducer.domainDimension} to ${reducer.rangeDimension}:")
     i = 0; while (i < vArr.length) {
       val v:Vec[18] = vArr(i)
       val cImg2: CLImg = new CLImg(100, 50)
@@ -139,6 +142,34 @@ object DemoPCA extends Demonstration {
       i += 1
     }
 
+    println(s"Dimensionality reduction from ${reducer.domainDimension} to minimum dimension with at least 98% accuracy:")
+    var cumulativeVariance:Double = 0
+    var minDimension:Int = 0
+    val itr:Iterator[BasisPair[18]] = pca.basisPairs.iterator
+    while (cumulativeVariance < 0.98 && itr.hasNext ) {
+      cumulativeVariance = cumulativeVariance + (itr.next().variance / totalVariance)
+      minDimension += 1
+    }
+
+    println(s"\tFound $minDimension dimensions can account for $cumulativeVariance % of the variance.")
+
+    val vs = VectorSpace(minDimension)
+    val runTimeDimensionReducer: DimensionalityReducerPCA[18, vs.N] = pca.getReducer[vs.N]
+
+    println(vs.ones.render())
+
+    i = 0;
+    while (i < vArr.length) {
+      val v: Vec[18] = vArr(i)
+      val cImg2: CLImg = new CLImg(100, 50)
+      plotVectorOfShape2D(v, Vec[2](25, 25))(cImg2)
+      val reducedV:Vec[vs.N] = runTimeDimensionReducer(v)
+      plotVectorOfShape2D(runTimeDimensionReducer.unapply(reducedV), Vec[2](75, 25))(cImg2)
+      println(s"${v.render()} -> ${reducedV.render()}")
+      println(cImg2)
+      println(s"$RESET")
+      i += 1
+    }
   }
 
 
@@ -153,6 +184,7 @@ object DemoPCA extends Demonstration {
         transform(sv(j), sv(j + 1)),
         (dX: Int, dY: Int) => {
           cimg.setPixel(dX, (cimg.height - 1) - dY, 2)
+          ()
         }
       )
     }

@@ -17,7 +17,7 @@
 import ai.dragonfly.math.vector.Vec
 import narr.NArray
 
-class InstantiateTests extends munit.FunSuite:
+class Instantiate extends munit.FunSuite:
 
    test(" ways of making vecs ") {
 
@@ -45,4 +45,4 @@ class InstantiateTests extends munit.FunSuite:
 
    }
 
-end InstantiateTests
+end Instantiate
