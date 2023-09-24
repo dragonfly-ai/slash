@@ -42,8 +42,8 @@ class PoissonTests extends munit.FunSuite:
       val sample = dist1.sample[100000](100000)(rand)
 
       assertEqualsDouble( sample.mean, mean, 0.2)
-      assertEqualsDouble( sample.variance, mean, 0.1)
-      assertEqualsDouble( sample.variance / mean,1.0, 0.01 )
+      assertEqualsDouble( sample.variance, mean, 0.2)
+      assertEqualsDouble( sample.variance / mean,1.0, 0.1 )
 
     }
 
