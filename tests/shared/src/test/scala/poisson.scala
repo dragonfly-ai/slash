@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import ai.dragonfly.math.stats.probability.distributions.Poisson
 
 class PoissonTests extends munit.FunSuite:

@@ -35,7 +35,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout current branch (full)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -104,7 +104,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -185,7 +185,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -205,7 +205,7 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: slash_3 docs_3 verification_3 slash-tests_sjs1_3 slash_3 slash_3 demo_3 slash-tests_3 demo_native0.4_3 slash-tests_native0.4_3 demo_sjs1_3
+          modules-ignore: slash_3 docs_3 verification_3 jsdocs_sjs1_3 slash-tests_sjs1_3 slash_3 slash_3 demo_3 slash-tests_3 demo_native0.4_3 slash-tests_native0.4_3 demo_sjs1_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   site:
@@ -217,7 +217,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
