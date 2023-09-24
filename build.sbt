@@ -97,7 +97,7 @@ lazy val jsdocs = project
     scalaJSUseMainModuleInitializer := true,
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.4.0",
     libraryDependencies += ("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0").cross(CrossVersion.for3Use2_13),
-    libraryDependencies += "io.github.quafadas" %%% "dedav_laminar" % "0.9-2b8610f-20230922T150429Z-SNAPSHOT",
+    libraryDependencies += "io.github.quafadas" %%% "dedav_laminar" % "0.9.0-RC7",
   )
   .dependsOn(slash.js)
   .enablePlugins(ScalaJSPlugin)
