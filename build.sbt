@@ -91,11 +91,25 @@ lazy val demo = crossProject(
 
 lazy val root = tlCrossRootProject.aggregate(slash, tests).settings(name := "slash")
 
+lazy val jsdocs = project
+  .in(file("jsdocs"))
+  .settings(
+    scalaJSUseMainModuleInitializer := true,
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.4.0",
+    libraryDependencies += ("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0").cross(CrossVersion.for3Use2_13),
+    libraryDependencies += "io.github.quafadas" %%% "dedav_laminar" % "0.9-2b8610f-20230922T150429Z-SNAPSHOT",
+  )
+  .dependsOn(slash.js)
+  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(NoPublishPlugin)
+
 lazy val docs = project
 .in(file("site"))
 .dependsOn(slash.jvm)
 .settings(
+  mdocJS := Some(jsdocs),
   laikaExtensions := Seq(GitHubFlavor, SyntaxHighlighting),
+  laikaConfig ~= { _.withRawContent },
   //tlSiteHeliumExtensions :=  Seq(GitHubFlavor, SyntaxHighlighting),
   tlSiteHelium := {
     Helium.defaults.site.metadata(
@@ -110,6 +124,17 @@ lazy val docs = project
       navLinks = Seq(IconLink.external("https://github.com/dragonfly-ai/slash", HeliumIcon.github))
     )
     .site
+    .externalJS(
+      url = "https://cdn.jsdelivr.net/npm/vega@5"
+    )
+    .site
+    .externalJS(
+      url = "https://cdn.jsdelivr.net/npm/vega-lite@5"
+    )
+    .site
+    .externalJS(
+      url = "https://cdn.jsdelivr.net/npm/vega-embed@6"
+    )
     .autoLinkJS()
   }
 )
