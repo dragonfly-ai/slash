@@ -16,7 +16,7 @@
 
 import ai.dragonfly.math.vector.Vec
 
-import ai.dragonfly.math.vector.dynamic.*
+//import ai.dragonfly.math.vector.dynamic.*
 
 import ai.dragonfly.idx.Index
 import ai.dragonfly.idx.*
@@ -25,14 +25,14 @@ import narr.NArray
 
 class DynamicTests extends munit.FunSuite:
 
-  test("Different vector lengths throw errors") {
-    val vec2 = Vec.zeros[2]
-    val vec3 = Vec.zeros[3]
+  // test("Different vector lengths throw errors") {
+  //   val vec2 = Vec.zeros[2]
+  //   val vec3 = Vec.zeros[3]
 
-    interceptMessage[ai.dragonfly.math.UnsupportedVectorDimension]("Expected Vector dimension: 3, but observed: 2"){
-      vec2 +! vec3
-    }
-  }
+  //   interceptMessage[ai.dragonfly.math.UnsupportedVectorDimension]("Expected Vector dimension: 3, but observed: 2"){
+  //     vec2 + vec3
+  //   }
+  // }
 
   test("same length vectors can be added") {
     val vec2 = Vec.zeros[2]
@@ -41,7 +41,7 @@ class DynamicTests extends munit.FunSuite:
     idx(0) = true
     idx(1) = true
     val anotherVec2 = vec3(idx)
-    val sum = vec2 +! anotherVec2
+    val sum = vec2 + anotherVec2
 
     assert(
       // notice the difference in the operator on the last line vs above

@@ -158,11 +158,11 @@ package object vector {
     }
 
     extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N]) {
-      transparent inline def apply[M <: Int](index: Index[M])(using ValueOf[M]) =
+      inline def apply[M <: Int](index: Index[M])(using ValueOf[M]) : Vec[Int] =
         dimensionCheck(valueOf[M], valueOf[N])
         val newLength = index.countTrue
-        type D = newLength.type
-        val newVec = Vec.zeros[D]
+        val vs = VectorSpace(newLength)
+        val newVec = NArray.ofSize[Double](newLength)
         var j = 0
         for(i <- 0 until valueOf[M]) {
           if(index.at(i)) {
@@ -170,7 +170,7 @@ package object vector {
             j += 1
           }
         }
-        newVec.asInstanceOf[Vec[Int]]
+        vs(newVec)
     }
 
 
@@ -447,13 +447,13 @@ package object vector {
     }
   }
 
-   object dynamic :
+   object logical :
     extension[N <: Int] (thisVector: Vec[N])
 
-      def `+!`[M <: Int](thatVector: Vec[M])(using NotGiven[M =:= N]): Vec[M] =
-        dimensionCheck(thisVector.dimension, thatVector.dimension)
-        import ai.dragonfly.math.vector.Vec.+
-        thisVector + thatVector.asInstanceOf[Vec[N]]
+  //     def `+!`[M <: Int](thatVector: Vec[M])(using NotGiven[M =:= N]): Vec[M] =
+  //       dimensionCheck(thisVector.dimension, thatVector.dimension)
+  //       import ai.dragonfly.math.vector.Vec.+
+  //       thisVector + thatVector.asInstanceOf[Vec[N]]
 
       inline def <(num:Double): Index[N] =
         logicalIdx((a,b) => a < b , num)
@@ -482,7 +482,7 @@ package object vector {
     end extension
 
 
-   end dynamic
+   end logical
 
   trait Format {
     def prefix[N <: Int](v:Vec[N]): String

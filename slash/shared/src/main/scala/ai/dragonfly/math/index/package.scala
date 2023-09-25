@@ -17,6 +17,7 @@
 package ai.dragonfly
 
 import narr.NArray
+import ai.dragonfly.math.vector.VectorSpace
 
 package object idx {
 
@@ -44,6 +45,8 @@ package object idx {
         }
         sum
       end countTrue
+
+      inline def vectorSpace: VectorSpace[?] = VectorSpace.apply(dimension)
 
       inline def &&(thatIdx: Index[N]): Index[N] = {
         val result:Index[N] = new NArray[Boolean](dimension)

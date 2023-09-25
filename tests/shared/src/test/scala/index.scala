@@ -17,7 +17,7 @@
 import ai.dragonfly.math.vector.Vec
 import ai.dragonfly.math.vector.Vec.*
 
-import ai.dragonfly.math.vector.dynamic.*
+import ai.dragonfly.math.vector.logical.*
 
 import ai.dragonfly.idx.Index
 import ai.dragonfly.idx.*
@@ -45,8 +45,6 @@ class IndexTests extends munit.FunSuite:
     assertEquals(indexed.dimension, 2)
     assertEquals(indexed(0), 1.0)
     assertEquals(indexed(1), 2.0)
-
-
   }
 
   test("<=") {
