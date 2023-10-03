@@ -16,7 +16,14 @@
 
 package ai.dragonfly.math.stats.probability.distributions
 
+import narr.*
 
-trait Sampleable[DOMAIN] {
+import scala.reflect.ClassTag
+
+
+trait Sampleable[DOMAIN:ClassTag] {
   def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): DOMAIN
+
+  inline def sample(n: Int, r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): NArray[DOMAIN] = NArray.tabulate(n)(_ => random(r))
+
 }

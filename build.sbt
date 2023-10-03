@@ -10,7 +10,7 @@ import laika.ast.*
 import laika.markdown.github.GitHubFlavor
 import laika.parse.code.SyntaxHighlighting
 
-val appVersion:String = "0.1"
+val appVersion:String = "0.101"
 val globalScalaVersion = "3.3.0"
 
 ThisBuild / organization := "ai.dragonfly"
@@ -45,7 +45,7 @@ lazy val slash = crossProject(
   .crossType(CrossType.Full)
   .settings(
     description := "High performance, low footprint, cross platform, Linear Algebra and Statistics Hacks!",
-    libraryDependencies += "ai.dragonfly" %%% "narr" % "0.101"
+    libraryDependencies += "ai.dragonfly" %%% "narr" % "0.103"
   )
   .jvmSettings(
     libraryDependencies ++= Seq( "org.scala-js" %% "scalajs-stubs" % "1.1.0" )
@@ -64,30 +64,6 @@ lazy val verification = project
       "gov.nist.math" % "jama" % "1.0.3"
     )
   )
-
-lazy val demo = crossProject(
-  JSPlatform,
-  JVMPlatform,
-  NativePlatform
-)
-  .crossType(CrossType.Full)
-  .enablePlugins(NoPublishPlugin)
-  .dependsOn(slash)
-  .settings(
-    name := "demo",
-    Compile / mainClass := Some("Demo"),
-    libraryDependencies ++= Seq(
-      "ai.dragonfly" %%% "cliviz" % "0.102",
-      "ai.dragonfly" %%% "democrossy" % "0.102"
-    ),
-    Compile / mainClass := Some("Demo")
-  )
-  .jsSettings(
-    Compile / fullOptJS / artifactPath := file("./docs/js/main.js"),
-    scalaJSUseMainModuleInitializer := true
-  )
-  .jvmSettings()
-  .nativeSettings()
 
 lazy val root = tlCrossRootProject.aggregate(slash, tests).settings(name := "slash")
 

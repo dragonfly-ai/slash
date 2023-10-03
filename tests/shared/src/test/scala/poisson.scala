@@ -15,6 +15,8 @@
  */
 
 import ai.dragonfly.math.stats.probability.distributions.Poisson
+import narr.*
+import ai.dragonfly.math.vector.*
 
 class PoissonTests extends munit.FunSuite:
     test("Po[1]") {
@@ -29,7 +31,7 @@ class PoissonTests extends munit.FunSuite:
 
     }
 
-    test("dispersion"){
+    test("dispersion") {
 
       val mean = 10.0
 
@@ -39,7 +41,8 @@ class PoissonTests extends munit.FunSuite:
       assertEqualsDouble(dist1.`σ²`, mean, 0.00001)
 
       val rand = ai.dragonfly.math.Random.defaultRandom
-      val sample = dist1.sample[100000](100000)(rand)
+      val poissonSample:NArray[Long] = dist1.sample(100000, rand)
+      val sample:Vec[100000] = Vec.tabulate[100000]( (i:Int) => poissonSample(i).toDouble )
 
       assertEqualsDouble( sample.mean, mean, 0.2)
       assertEqualsDouble( sample.variance, mean, 0.2)

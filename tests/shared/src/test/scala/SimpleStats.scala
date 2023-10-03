@@ -15,7 +15,7 @@
  */
 
 import ai.dragonfly.math.vector.Vec
-import narr.NArray
+import narr.*
 
 class SimpleStats extends munit.FunSuite:
 

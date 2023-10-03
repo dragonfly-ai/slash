@@ -48,8 +48,6 @@ libraryDependencies += "ai.dragonfly" %%% "slash" % "<LATEST_VERSION>"
 - Linear Regression based on both QR Decomposition and Singular Value Decomposition.
 - Principal Components Analysis
 
-<a href="https://dragonfly-ai.github.io/slash/demo">Try the demo</a>.
-
 &nbsp;&nbsp;&nbsp;Instead of case classes, traits, or wrappers, this library represents all runtime vector data as native arrays of double precision floating point values.  However, it also uses Scala 3 features like opaque types, dependent types, and extension methods to decorate the array primitives with convenient syntax, e.g. overloaded operators like `+ - * / += -= *= /=`, and also, by expressing vector dimensionality as a type parameter, can prevent runtime errors resulting from trying to perform vector operations on vectors of mismatched dimensions at compile time.  For example:   
 
 ```scala

@@ -240,7 +240,7 @@ class DenseHistogramOfContinuousDistribution(override val size: Int, override va
 //}
 
 object UnivariateGenerativeModel {
-  def apply[T](hist: UnivariateHistogram[T]): UnivariateGenerativeModel[T] = {
+  def apply[T:ClassTag](hist: UnivariateHistogram[T]): UnivariateGenerativeModel[T] = {
     var cumulative: immutable.TreeMap[Double, Int] = immutable.TreeMap[Double, Int]()
 
     var total:Double = 0.0
@@ -261,7 +261,7 @@ object UnivariateGenerativeModel {
   }
 }
 
-class UnivariateGenerativeModel[T](
+class UnivariateGenerativeModel[T:ClassTag](
   private val hist:UnivariateHistogram[T],
   private val cumulative: immutable.TreeMap[Double, Int]
 ) extends Sampleable[T] {

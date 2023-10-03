@@ -19,7 +19,6 @@ package ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import stats.*
 import interval.*
-import ai.dragonfly.math.vector.Vec
 
 object Poisson {
   val domain:Domain[Long] = Domain.ℕ_Long
@@ -53,14 +52,6 @@ case class Poisson(λ:Double) extends ParametricProbabilityDistribution[Long] {
       p = p * r.nextDouble()
     }
     k - 1
-  }
-
-  inline def sample[N<:Int](n: Int)(inline r:scala.util.Random): Vec[N] = {
-    val v = Vec.zeros[n.type]
-    for (i <- 0 until n) {
-      v(i) = random(r).toDouble
-    }
-    v.asInstanceOf[Vec[N]]
   }
 
 //Poissonλ = μ = σ² = $λ, σ = √λ = $σ, n = $s0)

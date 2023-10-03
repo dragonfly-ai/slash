@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import narr.*
 import ai.dragonfly.math.*
 import ai.dragonfly.math.vector.*
 import ai.dragonfly.math.Constant.π

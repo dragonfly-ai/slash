@@ -18,6 +18,8 @@ package ai.dragonfly.math.interval
 
 import ai.dragonfly.math.stats.probability.distributions.Sampleable
 
+import scala.reflect.ClassTag
+
 object Interval {
   import ai.dragonfly.math.Random.*
   private inline def between(i:Interval[Int], r:scala.util.Random) = r.between(i.min, i.MAX)
@@ -83,14 +85,14 @@ object Interval {
   val LEFT_CLOSED:Int = 0x1 << 1
   val CLOSED:Int = RIGHT_CLOSED | LEFT_CLOSED
 
-  def `[]`[DOMAIN](min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]):Interval[DOMAIN] = new Interval[DOMAIN](CLOSED, min, MAX)
-  def `(]`[DOMAIN](min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]):Interval[DOMAIN] = new Interval[DOMAIN](RIGHT_CLOSED, min, MAX)
-  def `[)`[DOMAIN](min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]):Interval[DOMAIN] = new Interval[DOMAIN](LEFT_CLOSED, min, MAX)
-  def `()`[DOMAIN](min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]):Interval[DOMAIN] = new Interval[DOMAIN](OPEN, min, MAX)
+  def `[]`[DOMAIN:ClassTag](min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]):Interval[DOMAIN] = new Interval[DOMAIN](CLOSED, min, MAX)
+  def `(]`[DOMAIN:ClassTag](min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]):Interval[DOMAIN] = new Interval[DOMAIN](RIGHT_CLOSED, min, MAX)
+  def `[)`[DOMAIN:ClassTag](min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]):Interval[DOMAIN] = new Interval[DOMAIN](LEFT_CLOSED, min, MAX)
+  def `()`[DOMAIN:ClassTag](min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]):Interval[DOMAIN] = new Interval[DOMAIN](OPEN, min, MAX)
 
 }
 
-case class Interval[DOMAIN](code:Int, min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]) extends Sampleable[DOMAIN] {
+case class Interval[DOMAIN:ClassTag](code:Int, min:DOMAIN, MAX:DOMAIN)(using `#`: Numeric[DOMAIN]) extends Sampleable[DOMAIN] {
   import `#`.*
 
   lazy val norm:DOMAIN = `#`.minus(MAX, min)
