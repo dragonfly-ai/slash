@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="generator" content="Typelevel Laika + Helium Theme" />
-  <title>Logarithms</title>
+  <title>Poisson Distribution</title>
   
   <meta name="author" content="one"/>
   
@@ -77,8 +77,8 @@
     <li class="level1 nav-header">demo</li>
     <li class="level2 nav-leaf"><a href="factorial.html">Factorial</a></li>
     <li class="level2 nav-leaf"><a href="gamma.html">Gamma</a></li>
-    <li class="level2 active nav-leaf"><a href="#">Logarithms</a></li>
-    <li class="level2 nav-leaf"><a href="poisson.html">Poisson Distribution</a></li>
+    <li class="level2 nav-leaf"><a href="logs.html">Logarithms</a></li>
+    <li class="level2 active nav-leaf"><a href="#">Poisson Distribution</a></li>
     <li class="level1 nav-header">design</li>
     <li class="level2 nav-leaf"><a href="../design/design.html">Design Choices</a></li>
     <li class="level1 nav-header">matrix</li>
@@ -91,9 +91,10 @@
 
       
 <nav id="page-nav">
-  <p class="header"><a href="#">Logarithms</a></p>
+  <p class="header"><a href="#">Poisson Distribution</a></p>
 
   <ul class="nav-list">
+    <li class="level1 nav-leaf"><a href="#funsies">Funsies</a></li>
   </ul>
 
   <p class="footer"></p>
@@ -102,58 +103,90 @@
 
       <main class="content">
 
-        <h1 id="logarithms" class="title">Logarithms</h1>
+        <h1 id="poisson-distribution" class="title">Poisson Distribution</h1>
         <p>Example</p>
-        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.*
-</span><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.</span><span class="type-name">Constant</span><span>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.</span><span class="identifier">stats</span><span>.</span><span class="identifier">probability</span><span>.</span><span class="identifier">distributions</span><span>.</span><span class="type-name">Poisson</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.</span><span class="identifier">vector</span><span>.*
 
-</span><span class="identifier">log</span><span>[</span><span class="number-literal">4</span><span>](</span><span class="number-literal">16</span><span>)
-</span><span class="comment">// res0: Double = 2.0
+</span><span class="keyword">val</span><span> </span><span class="identifier">dist1</span><span> = </span><span class="type-name">Poisson</span><span>(</span><span class="number-literal">1</span><span>)
+</span><span class="comment">// dist1: Poisson = Poisson(λ = 1.0)
+</span><span class="keyword">for</span><span> (</span><span class="identifier">i</span><span> &lt;- </span><span class="number-literal">0</span><span> </span><span class="identifier">to</span><span> </span><span class="number-literal">5</span><span>) {
+  </span><span class="identifier">println</span><span>( </span><span class="string-literal">s&quot;Poisson(1).pdf(</span><span class="substitution">$i</span><span class="string-literal">) = </span><span class="substitution">${dist1.p(i)}</span><span class="string-literal">&quot;</span><span> )
+}
+</span><span class="comment">// Poisson(1).pdf(0) = 0.36787944117144233
+// Poisson(1).pdf(1) = 0.36787944117144233
+// Poisson(1).pdf(2) = 0.18393972058572114
+// Poisson(1).pdf(3) = 0.06131324019524039
+// Poisson(1).pdf(4) = 0.015328310048810101
+// Poisson(1).pdf(5) = 0.00306566200976202
 </span><span>
-</span><span class="identifier">log</span><span>[</span><span class="number-literal">10</span><span>](-</span><span class="number-literal">1</span><span>)
-</span><span class="comment">// res1: Double = NaN
-</span><span>
-</span><span class="identifier">log</span><span>[</span><span class="number-literal">2.7182818284590452</span><span>](</span><span class="type-name">Constant</span><span>.</span><span class="identifier">e</span><span>)
+</span><span class="identifier">dist1</span><span>.μ
+</span><span class="comment">// res1: Double = 1.0
+</span><span class="identifier">dist1</span><span>.</span><span class="identifier">`σ²`</span><span>
 </span><span class="comment">// res2: Double = 1.0
 </span><span>
-</span><span class="identifier">println</span><span>( </span><span class="string-literal">s&quot;log[2.0](42.0) = </span><span class="substitution">${log[2.0](42.0)}</span><span class="string-literal">&quot;</span><span> )
-</span><span class="comment">// log[2.0](42.0) = 5.392317422778761
-</span><span class="keyword">var</span><span> </span><span class="identifier">i</span><span>: </span><span class="type-name">Int</span><span> = </span><span class="number-literal">1</span><span>; </span><span class="keyword">while</span><span> (</span><span class="identifier">i</span><span> &gt; </span><span class="number-literal">0</span><span>) {
-</span><span class="comment">// i: Int = 1; while (i &gt; 0) {
-</span><span>  </span><span class="identifier">println</span><span>( </span><span class="string-literal">s&quot;log[2](</span><span class="substitution">$i</span><span class="string-literal">) = </span><span class="substitution">${log[2](i)}</span><span class="string-literal">&quot;</span><span> )
-  </span><span class="identifier">i</span><span> = </span><span class="identifier">i</span><span> &lt;&lt; </span><span class="number-literal">1</span><span>
-}
-</span><span class="comment">// log[2](1) = 0.0
-// log[2](2) = 1.0
-// log[2](4) = 2.0
-// log[2](8) = 3.0
-// log[2](16) = 4.0
-// log[2](32) = 5.0
-// log[2](64) = 6.0
-// log[2](128) = 7.0
-// log[2](256) = 8.0
-// log[2](512) = 9.0
-// log[2](1024) = 10.0
-// log[2](2048) = 11.0
-// log[2](4096) = 12.0
-// log[2](8192) = 13.0
-// log[2](16384) = 14.0
-// log[2](32768) = 15.0
-// log[2](65536) = 16.0
-// log[2](131072) = 17.0
-// log[2](262144) = 18.0
-// log[2](524288) = 19.0
-// log[2](1048576) = 20.0
-// log[2](2097152) = 21.0
-// log[2](4194304) = 22.0
-// log[2](8388608) = 23.0
-// log[2](16777216) = 24.0
-// log[2](33554432) = 25.0
-// log[2](67108864) = 26.0
-// log[2](134217728) = 27.0
-// log[2](268435456) = 28.0
-// log[2](536870912) = 29.0
-// log[2](1073741824) = 30.0</span></code></pre>
+</span><span class="keyword">val</span><span> </span><span class="identifier">rand</span><span> = </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.</span><span class="type-name">Random</span><span>.</span><span class="identifier">defaultRandom</span><span>
+</span><span class="comment">// rand: Random = scala.util.Random@349365aa
+</span><span class="keyword">type</span><span> </span><span class="type-name">N</span><span> = </span><span class="number-literal">10000</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">v</span><span> : </span><span class="type-name">Vec</span><span>[</span><span class="type-name">N</span><span>] = </span><span class="identifier">dist1</span><span>.</span><span class="identifier">sample</span><span>[</span><span class="type-name">N</span><span>](</span><span class="number-literal">10000</span><span>)(</span><span class="identifier">rand</span><span>)
+</span><span class="comment">// v: Vec[N] = Array(
+//   0.0,
+//   1.0,
+//   0.0,
+//   2.0,
+//   3.0,
+//   0.0,
+//   1.0,
+//   1.0,
+//   1.0,
+//   1.0,
+//   0.0,
+//   3.0,
+//   2.0,
+//   2.0,
+//   1.0,
+//   1.0,
+//   1.0,
+//   1.0,
+//   1.0,
+//   0.0,
+//   1.0,
+//   0.0,
+//   0.0,
+//   2.0,
+//   1.0,
+//   0.0,
+//   0.0,
+//   0.0,
+//   0.0,
+//   1.0,
+//   0.0,
+//   0.0,
+//   1.0,
+//   0.0,
+//   1.0,
+//   2.0,
+//   0.0,
+//   0.0,
+//   1.0,
+//   1.0,
+//   1.0,
+//   1.0,
+//   0.0,
+//   0.0,
+//   0.0,
+//   0.0,
+//   2.0,
+//   2.0,
+// ...</span></code></pre>
+        
+        <h3 id="funsies" class="section"><a class="anchor-link left" href="#funsies"><i class="icofont-laika link">&#xef71;</i></a>Funsies</h3>
+        <p>Our poisson distribution cross compiles to scalaJS... it turns out to be pretty simple from here, to build up a tiny app to investigate the Poisson distribution.</p>
+        <p>As we&#39;re using native (read - pretty quick) JS arrays behind the scenes - we can rag the ui thread pretty hard (100k samples) before we start to see any lag in our plots and stats.</p>
+        <p>For funsies - we compare theoretical and empirical distributions. This little app lets you pick a λ and a number of samples. Hover over a bar to see it&#39;s theoretical and sampled probability.</p>
+        <div id="mdoc-html-run0" data-mdoc-js></div>
+        <p><script type="text/javascript" src="poisson.md.js" defer></script>
+        <script type="text/javascript" src="mdoc.js" defer></script></p>
 
         
 <hr class="footer-rule"/>

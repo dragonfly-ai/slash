@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+  
   <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta charset="utf-8">
@@ -22,7 +22,11 @@
   
   <link rel="stylesheet" type="text/css" href="../helium/icofont.min.css" />
     <link rel="stylesheet" type="text/css" href="../helium/laika-helium.css" />
+  
   <script src="../helium/laika-helium.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
   
   
   <script> /* for avoiding page load transitions */ </script>
@@ -53,7 +57,7 @@
   </div>  
 
 </header>
-
+    
     <nav id="sidebar">
 
   <div class="row">
@@ -74,6 +78,7 @@
     <li class="level2 nav-leaf"><a href="../demo/factorial.html">Factorial</a></li>
     <li class="level2 nav-leaf"><a href="../demo/gamma.html">Gamma</a></li>
     <li class="level2 nav-leaf"><a href="../demo/logs.html">Logarithms</a></li>
+    <li class="level2 nav-leaf"><a href="../demo/poisson.html">Poisson Distribution</a></li>
     <li class="level1 nav-header">design</li>
     <li class="level2 nav-leaf"><a href="../design/design.html">Design Choices</a></li>
     <li class="level1 nav-header">matrix</li>
@@ -119,19 +124,19 @@
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">v_rand</span><span> = </span><span class="type-name">Vec</span><span>.</span><span class="identifier">random</span><span>[</span><span class="number-literal">5</span><span>]()
 </span><span class="comment">// v_rand: Vec[5] = Array(
-//   -0.7543871698704119,
-//   -0.32295611201095287,
-//   -0.3727648262444021,
-//   -0.6876186681435446,
-//   -0.30954522151273545
+//   -0.9423797495032561,
+//   -0.47023995159666065,
+//   -0.5869859831995828,
+//   -0.4000945070321711,
+//   -0.8674668656262128
 // )
 </span><span class="keyword">val</span><span> </span><span class="identifier">v_rand_max_min</span><span> = </span><span class="type-name">Vec</span><span>.</span><span class="identifier">random</span><span>[</span><span class="number-literal">5</span><span>](</span><span class="number-literal">2.0</span><span>, </span><span class="number-literal">0.5</span><span>)
 </span><span class="comment">// v_rand_max_min: Vec[5] = Array(
-//   1.3665294959411973,
-//   0.7551559013430598,
-//   0.788280698454525,
-//   1.391127943762245,
-//   1.7165270289618704
+//   1.5945285138421683,
+//   1.1878091852883332,
+//   0.7465800327937857,
+//   1.2624603094188183,
+//   1.791688292508834
 // )</span></code></pre>
         <p>And do some stuff</p>
         <pre><code class="nohighlight"><span class="identifier">v</span><span> + </span><span class="identifier">v_fill</span><span>
@@ -142,11 +147,11 @@
 </span><span>
 </span><span class="identifier">v_rand</span><span> -= </span><span class="identifier">v_ones</span><span>
 </span><span class="comment">// res2: Vec[5] = Array(
-//   -0.7543871698704119,
-//   -0.32295611201095287,
-//   -0.3727648262444021,
-//   -0.6876186681435446,
-//   -0.30954522151273545
+//   -0.9423797495032561,
+//   -0.47023995159666065,
+//   -0.5869859831995828,
+//   -0.4000945070321711,
+//   -0.8674668656262128
 // )
 </span><span>
 </span><span class="comment">// native indexing is fast...
@@ -160,10 +165,10 @@
 </span><span class="comment">// res6: Double = 3.0
 </span><span>
 </span><span class="identifier">v</span><span>.</span><span class="identifier">corr</span><span>(</span><span class="identifier">v_rand</span><span>)
-</span><span class="comment">// res7: Double = 0.3879332608419212
+</span><span class="comment">// res7: Double = 0.14458778896704583
 </span><span>
 </span><span class="identifier">v_rand</span><span>.</span><span class="identifier">elementRanks</span><span>
-</span><span class="comment">// res8: Vec[5] = Array(1.0, 4.0, 3.0, 2.0, 5.0)</span></code></pre>
+</span><span class="comment">// res8: Vec[5] = Array(1.0, 4.0, 3.0, 5.0, 2.0)</span></code></pre>
 
         
 <hr class="footer-rule"/>
