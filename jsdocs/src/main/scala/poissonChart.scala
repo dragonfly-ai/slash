@@ -2,7 +2,7 @@ package livechart
 
 import scala.scalajs.js
 import com.raquo.laminar.api.L.*
-import viz.vega.plots.{Histogram, given}
+import viz.vega.plots.Histogram
 import ai.dragonfly.math.stats.probability.distributions.Poisson
 import narr.*
 
@@ -16,7 +16,6 @@ import ai.dragonfly.math.vector.Vec
 import com.raquo.airstream.core.Signal
 import narr.native.NArr
 import scala.scalajs.js.typedarray.Float64Array
-import scala.collection.mutable.ArrayBuffer
 import io.circe.Encoder
 import io.circe.Decoder
 import io.circe.parser.decode
@@ -32,7 +31,12 @@ def poissonChart(): Div = {
   val λ_ = Var[Double](5.0)
   val n_ = Var[Integer](1000)
   val poissonDist: Signal[Poisson] = λ_.signal.map(Poisson(_))
-  val sampled : Signal[Vec[Int]] = poissonDist.combineWith(n_.signal).map((dist: Poisson, n: Integer) => dist.sample(n)(rand))
+  val sampled : Signal[Vec[Int]] = poissonDist.combineWith(n_.signal).map(
+    (dist: Poisson, n: Integer) => {
+      val poissonSample:NArray[Long] = dist.sample(n, rand)
+      NArray.tabulate[Double](n)((i:Int) => poissonSample(i).toDouble).asInstanceOf[Vec[Int]]
+    }
+  )
 
   def bin0(in: js.UndefOr[js.Dynamic]): Option[HistogramBin] =
     if in == js.undefined then None
@@ -105,7 +109,7 @@ def poissonChart(): Div = {
         tpe := "number",
         controlled(
           value <-- n_.signal.map(_.toString),
-          onInput.mapToValue.map( i => Integer(i) ) --> n_.writer
+          onInput.mapToValue.map( i => Integer.valueOf(i) ) --> n_.writer
         )
       ),
     ),
