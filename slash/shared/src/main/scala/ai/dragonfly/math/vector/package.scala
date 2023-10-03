@@ -21,21 +21,23 @@ import ai.dragonfly.math.vector.Vec
 import unicode.*
 import narr.*
 
+import scala.language.implicitConversions
+
 import scala.compiletime.ops.any.==
 import scala.compiletime.ops.int.*
-
-import scala.collection.mutable.ListBuffer // for fast append in elementRanks
 
 package object vector {
 
   opaque type Vec[N <: Int] = NArray[Double]
   object Vec {
+
+    export narr.Extensions.given
     inline def apply[N <: Int](a: NArray[Double]): Vec[N] = { // cast a NArray[Double] as Vec[N]
       dimensionCheck(a, valueOf[N])
       a
     }
 
-    inline def zeros[N <: Int](using ValueOf[N]): Vec[N] = fill[N](0.0)
+    inline def zeros[N <: Int](using ValueOf[N]): Vec[N] = new DoubleArray(valueOf[N]).asInstanceOf[Vec[N]]
 
     inline def ones[N <: Int](using ValueOf[N]): Vec[N] = fill[N](1.0)
 
@@ -93,6 +95,8 @@ package object vector {
     def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[20] = Vec.tabulate(i => DBL(t(i)))
     def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[21] = Vec.tabulate(i => DBL(t(i)))
     def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[22] = Vec.tabulate(i => DBL(t(i)))
+
+    val rankVariableSort: Ordering[(Double, Int)] = Ordering.by(_._1)
 
     extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 1 =:= true) {
       inline def x: Double = thisVector(0)
@@ -168,7 +172,7 @@ package object vector {
         copyOfThisVector
       }
 
-      inline def sum = {
+      def sum = {
         var sum = 0.0
         var i = 0
         while (i < thisVector.dimension) {
@@ -178,31 +182,35 @@ package object vector {
         sum
       }
 
-      inline def mean: Double = {
-        thisVector.sum / thisVector.dimension
-      }
+      inline def mean: Double = thisVector.sum / thisVector.dimension
+
       //It is assumed, that we consider a sample rather than a complete population
-      inline def variance: Double = {
+      def variance: Double = {
         // https://www.cuemath.com/sample-variance-formula/
         val μ = thisVector.mean
         thisVector.map(i => squareInPlace(i - μ)).sum / (thisVector.size - 1)
       }
 
       // It is assumed, that we consider a sample rather than a complete population
-      inline def stdDev: Double = {
+      def stdDev: Double = {
         // https://www.cuemath.com/data/standard-deviation/
         val mu = thisVector.mean
         val diffs_2 = thisVector.map( num => squareInPlace(num - mu) )
         Math.sqrt( diffs_2.sum / (thisVector.size - 1 ) )
       }
 
-      def covariance(thatVector : Vec[N] ) = {
+      def covariance(thatVector : Vec[N] ):Double = {
         val μThis = thisVector.mean
         val μThat = thatVector.mean
-        thisVector.zip(thatVector).map{ case (thisV, thatV) => (thisV - μThis) * (thatV - μThat) }.sum / (thisVector.size -1)
+        var cv:Double = 0
+        var i:Int = 0; while (i < thisVector.dimension) {
+          cv += (thisVector(i) - μThis) * (thatVector(i) - μThat)
+          i += 1
+        }
+        cv / (thisVector.dimension -1)
       }
 
-      inline def pearsonCorrelationCoefficient(thatVector: Vec[N]): Double = {
+      def pearsonCorrelationCoefficient(thatVector: Vec[N]): Double = {
         val n = thisVector.size
         var i = 0
 
@@ -223,48 +231,42 @@ package object vector {
         (n * sum_xy - (sum_x * sum_y)) / Math.sqrt( (sum_x2 * n - squareInPlace(sum_x)) * (sum_y2 * n - squareInPlace(sum_y)) )
       }
 
-      inline def spearmansRankCorrelation(thatVector: Vec[N]) : Double =
+      def spearmansRankCorrelation(thatVector: Vec[N]) : Double = {
         val theseRanks = thisVector.elementRanks
         val thoseRanks = thatVector.elementRanks
         theseRanks.pearsonCorrelationCoefficient(thoseRanks)
+      }
 
 
       // An alias - pearson is the most commonly requested type of correlation
       inline def corr(thatVector: Vec[N]): Double = pearsonCorrelationCoefficient(thatVector)
 
-      inline def elementRanks: Vec[N] = {
-        val (sorted, originalPosition) = thisVector.zipWithIndex.toVector.sortBy(_._1).unzip
-        val ranks : Vec[N] = NArray.tabulate[Double](thisVector.dimension)(i => (i+1).toDouble)
+      def elementRanks: Vec[N] = {
+        val indexed:NArray[(Double, Int)] = thisVector.zipWithIndex
+        indexed.sort(rankVariableSort)
 
-        var currentValue = sorted(0)
-        var i = 0
-        var currentSum = 0.0
-        var currentCount = 0
-        val resultList = ListBuffer[Double]()
-
-
-        for (value <- sorted) {
-          if (value == currentValue) {
-            currentSum += ranks(i)
-            currentCount += 1
-          } else {
-            resultList.appendAll(ListBuffer.fill(currentCount)(currentSum / currentCount))
-            currentValue = value
-            currentCount = 1
-            currentSum = ranks(i)
+        val ranks : Vec[N] = new DoubleArray(thisVector.dimension) // faster than zeros.
+        ranks(indexed.last._2) = thisVector.dimension
+        var currentValue:Double = indexed(0)._1
+        var r0:Int = 0
+        var rank:Int = 1
+        while (rank < thisVector.dimension) {
+          val temp: Double = indexed(rank)._1
+          if (temp != currentValue) {
+            val avg: Double = (1.0 + (rank + r0)) / 2.0
+            var i:Int = r0; while (i < rank) {
+              ranks(indexed(i)._2) = avg
+              i += 1
+            }
+            r0 = rank
+            currentValue = temp
           }
-          i = i + 1
+          rank += 1
         }
-        resultList.appendAll(List.fill(currentCount)(currentSum / currentCount))
-
-        val rankResult : Vec[N] = new NArray[Double](thisVector.dimension)
-        for( (idx, r) <- originalPosition.zip(resultList)) {
-          rankResult(idx) = r
-        }
-        rankResult
+        ranks
       }
 
-      inline def normSquared: Double = {
+      def normSquared: Double = {
         var mag2 = 0.0
         var i = 0
         while (i < dimension) {
@@ -280,7 +282,7 @@ package object vector {
 
       inline def magnitudeSquared: Double = normSquared
 
-      inline def euclideanDistanceSquaredTo(v0: Vec[N]): Double = {
+      def euclideanDistanceSquaredTo(v0: Vec[N]): Double = {
         var distance = 0.0
         var i = 0
         while (i < dimension) {
@@ -333,7 +335,7 @@ package object vector {
       inline def *(scalar: Double): Vec[N] = copy.scale(scalar)
 
       inline def *= (scalar: Double): Vec[N] = scale(scalar)
-      inline def scale(scalar: Double): Vec[N] = {
+      def scale(scalar: Double): Vec[N] = {
         var i = 0
         while (i < dimension) {
           thisVector(i) = thisVector(i) * scalar
@@ -346,7 +348,7 @@ package object vector {
 
       inline def divide(divisor: Double): Vec[N] = scale(1.0 / divisor)
 
-      inline def round(): Unit = {
+      def round(): Unit = {
         var i = 0
         while (i < dimension) {
           thisVector(i) = Math.round(thisVector(i)).toDouble
@@ -356,7 +358,7 @@ package object vector {
 
       inline def discretize(): Unit = round()
 
-      inline def discretize(r: Double): Unit = {
+      def discretize(r: Double): Unit = {
         var i = 0
         while (i < dimension) {
           thisVector(i) = r * Math.round(thisVector(i) / r).toDouble
