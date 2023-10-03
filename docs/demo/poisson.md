@@ -17,7 +17,7 @@ dist1.`σ²`
 
 val rand = ai.dragonfly.math.Random.defaultRandom
 type N = 10000
-val v : Vec[N] = dist1.sample[N](10000)(rand)
+val v : NArray[Long] = dist1.sample(10000, rand)
 
 ```
 
