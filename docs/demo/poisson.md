@@ -5,7 +5,7 @@ Example
 
 ```scala mdoc
 import ai.dragonfly.math.stats.probability.distributions.Poisson
-import ai.dragonfly.math.vector.*
+import narr.*
 
 val dist1 = Poisson(1)
 for (i <- 0 to 5) {
