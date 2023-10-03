@@ -54,7 +54,7 @@ class SimpleStats extends munit.FunSuite:
     val vector2 = Vec.fromTuple(68.0, 102.0, 110.0, 112.0, 154.0)
 
     val result = vector1.covariance(vector2)
-    println(result)
+
     assertEqualsDouble(result, 9107.3, 0.001)
 
    }
