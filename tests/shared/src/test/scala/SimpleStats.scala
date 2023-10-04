@@ -56,7 +56,32 @@ class SimpleStats extends munit.FunSuite:
     val result = vector1.covariance(vector2)
 
     assertEqualsDouble(result, 9107.3, 0.001)
+   }
 
+   test("elementRanks") {
+     def assertVecEquals[N <: Int](v1: Vec[N], v2: Vec[N]): Unit = {
+       var i: Int = 0;
+       while (i < v1.dimension) {
+         assertEquals(v1(i), v2(i))
+         i += 1
+       }
+     }
+     assertVecEquals(
+       Vec.tabulate[10]( (i:Int) => 11.0 - i ).elementRanks,
+       Vec[10](10,9,8,7,6,5,4,3,2,1)
+     )
+     assertVecEquals(
+       Vec.fill[5](42.0).elementRanks,
+       Vec[5](3,3,3,3,3)
+     )
+     assertVecEquals(
+       Vec[15](1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).elementRanks,
+       Vec[15](1,2.5,2.5,5,5,5,8.5,8.5,8.5,8.5,13,13,13,13,13)
+     )
+     assertVecEquals(
+       Vec[15](1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 5).elementRanks,
+       Vec[15](3,3,3,3,3,7.5,7.5,7.5,7.5,11,11,11,13.5,13.5,15)
+     )
    }
 
    test("pearson correlation coefficient") {

@@ -252,9 +252,14 @@ package object vector {
         var rank:Int = 1
         while (rank < thisVector.dimension) {
           val temp: Double = indexed(rank)._1
-          if (temp != currentValue) {
-            val avg: Double = (1.0 + (rank + r0)) / 2.0
-            var i:Int = r0; while (i < rank) {
+          val end:Int = {
+            if (temp != currentValue) rank
+            else if (rank == thisVector.dimension - 1) rank + 1
+            else -1
+          }
+          if (end > -1) {
+            val avg: Double = (1.0 + (end + r0)) / 2.0
+            var i:Int = r0; while (i < end) {
               ranks(indexed(i)._2) = avg
               i += 1
             }
