@@ -25,10 +25,34 @@ import scala.language.implicitConversions
 
 import scala.compiletime.ops.any.==
 import scala.compiletime.ops.int.*
+import ai.dragonfly.math.vector.Vec.copy
 
 package object vector {
 
   opaque type Vec[N <: Int] = NArray[Double]
+
+
+  inline def min[N <: Int](inline v: Vec[N], lt: Double) : Vec[N] = {
+    import Vec.dimension
+    val vOut = v.copy
+    var i = 0
+    while (i < v.dimension) {
+      if (v(i) > lt) vOut(i) = lt
+      i = i + 1
+    }
+    vOut
+  }
+
+  inline def max[N <: Int](v: Vec[N], gt: Double) : Vec[N] = {
+    import Vec.dimension
+    val vOut = v.copy
+    var i = 0
+    while (i < v.dimension) {
+      if (v(i) < gt) vOut(i) = gt
+      i = i + 1
+    }
+    vOut
+  }
   object Vec {
 
     export narr.Extensions.given
@@ -299,7 +323,25 @@ package object vector {
 
       inline def euclideanDistanceTo(v0: Vec[N]): Double = Math.sqrt(euclideanDistanceSquaredTo(v0))
 
-      inline def + (v0: Vec[N]): Vec[N] = copy.add(v0)
+      inline def + (inline v0: Vec[N]): Vec[N] = copy.add(v0)
+
+      inline def + (inline scalar: Double): Vec[N] =
+        val vOut = copy
+        var i = 0
+        while (i < dimension) {
+          vOut(i) = vOut(i) + scalar
+          i = i + 1
+        }
+        vOut
+
+      inline def - (inline scalar: Double): Vec[N] =
+        val vOut = copy
+        var i = 0
+        while (i < dimension) {
+          vOut(i) = vOut(i) - scalar
+          i = i + 1
+        }
+        vOut
 
       inline def += (v0: Vec[N]): Vec[N] = add(v0)
 

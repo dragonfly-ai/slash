@@ -11,7 +11,7 @@ import laika.markdown.github.GitHubFlavor
 import laika.parse.code.SyntaxHighlighting
 
 val appVersion:String = "0.101"
-val globalScalaVersion = "3.3.0"
+val globalScalaVersion = "3.3.1"
 
 ThisBuild / organization := "ai.dragonfly"
 ThisBuild / organizationName := "dragonfly.ai"

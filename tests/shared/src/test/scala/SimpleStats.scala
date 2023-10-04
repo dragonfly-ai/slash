@@ -59,13 +59,7 @@ class SimpleStats extends munit.FunSuite:
    }
 
    test("elementRanks") {
-     def assertVecEquals[N <: Int](v1: Vec[N], v2: Vec[N]): Unit = {
-       var i: Int = 0;
-       while (i < v1.dimension) {
-         assertEquals(v1(i), v2(i))
-         i += 1
-       }
-     }
+
      assertVecEquals(
        Vec.tabulate[10]( (i:Int) => 11.0 - i ).elementRanks,
        Vec[10](10,9,8,7,6,5,4,3,2,1)
