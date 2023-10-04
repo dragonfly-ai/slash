@@ -25,34 +25,11 @@ import scala.language.implicitConversions
 
 import scala.compiletime.ops.any.==
 import scala.compiletime.ops.int.*
-import ai.dragonfly.math.vector.Vec.copy
 
 package object vector {
 
   opaque type Vec[N <: Int] = NArray[Double]
 
-
-  inline def min[N <: Int](inline v: Vec[N], lt: Double) : Vec[N] = {
-    import Vec.dimension
-    val vOut = v.copy
-    var i = 0
-    while (i < v.dimension) {
-      if (v(i) > lt) vOut(i) = lt
-      i = i + 1
-    }
-    vOut
-  }
-
-  inline def max[N <: Int](v: Vec[N], gt: Double) : Vec[N] = {
-    import Vec.dimension
-    val vOut = v.copy
-    var i = 0
-    while (i < v.dimension) {
-      if (v(i) < gt) vOut(i) = gt
-      i = i + 1
-    }
-    vOut
-  }
   object Vec {
 
     export narr.Extensions.given
@@ -186,15 +163,27 @@ package object vector {
 
       inline def dimension: Int = thisVector.length
 
-      def copy:Vec[N] = {
-        val copyOfThisVector:Vec[N] = new NArray[Double](dimension)
-        var i = 0
-        while (i < dimension) {
-          copyOfThisVector(i) = thisVector(i)
+      inline def copy:Vec[N] = thisVector.asInstanceOf[NArr[Double]].slice(0, dimension).asInstanceOf[Vec[N]]
+
+      // clamp methods
+
+      def clamp(lt: Double, gt: Double): Vec[N] = {
+        var i = 0; while (i < thisVector.dimension) {
+          if (thisVector(i) < lt) thisVector(i) = lt
+          else if (thisVector(i) > gt) thisVector(i) = gt
           i = i + 1
         }
-        copyOfThisVector
+        thisVector
       }
+
+      inline def clampMin(lt: Double): Vec[N] = clamp(lt, Double.MaxValue)
+      inline def clampMAX(gt: Double): Vec[N] = clamp(Double.MinValue, gt)
+
+      inline def clamped(lt: Double, gt: Double):Vec[N] = copy.clamp(lt, gt)
+
+      inline def clampedMin(lt: Double): Vec[N] = copy.clamp(lt, Double.MaxValue)
+      inline def clampedMAX(gt: Double): Vec[N] = copy.clamp(Double.MinValue, gt)
+
 
       def sum = {
         var sum = 0.0
