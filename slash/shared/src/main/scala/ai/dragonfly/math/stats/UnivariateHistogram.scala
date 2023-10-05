@@ -35,7 +35,7 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN]) {
   val bucketWidth: Double =  (MAX - min).toDouble / size.toDouble
 
   protected val integerDigits: Int = Math.log10(MAX.toDouble).toInt + 1
-  protected val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) (1.0 / bucketWidth) else (100.0 / bucketWidth)).toInt + 1
+  protected val fractionDigits: Int = Math.log10( if (bucketWidth < 1.0) { 1.0 / bucketWidth } else { 100.0 / bucketWidth } ).toInt + 1
 
   protected val binLabelFormat:String = s"%${integerDigits + fractionDigits + 1}.${fractionDigits}f"
 
@@ -53,8 +53,8 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN]) {
   }
 
   def binLabel(bINdex:Int):String = {
-    var floor = min.toDouble + (bINdex * bucketWidth)
-    var ceiling = floor + bucketWidth
+    val floor = min.toDouble + (bINdex * bucketWidth)
+    val ceiling = floor + bucketWidth
     val lastBracket = if (bINdex >= size - 1) "]" else ")"
     s"[${pad(floor)},${pad(ceiling)} $lastBracket"
   }
@@ -72,7 +72,7 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN]) {
     val end = index(MAX)
 
     while (bIndex <= index(MAX)) {
-      maxBinMass = Math.max(maxBinMass, binMass((bIndex)) / mass)
+      maxBinMass = Math.max(maxBinMass, binMass(bIndex) / mass)
       bIndex += 1
     }
 
@@ -245,7 +245,7 @@ object UnivariateGenerativeModel {
 
     var total:Double = 0.0
 
-    var end = hist.index(hist.MAX)
+    val end = hist.index(hist.MAX)
     var bINdex: Int = hist.index(hist.min)
 
     while (bINdex <= end) {
