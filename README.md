@@ -70,8 +70,8 @@ println((v2 + v3).show) // compiler error!
 <h3 id="vectormath">More Vector Math Syntax:</h3>
 
 ```scala
-import ai.dragonfly.math.vector.*
-import ai.dragonfly.math.vector.Vec.*
+import slash.vector.*
+import slash.vector.Vec.*
 
 // create a 3 dimensional vector
 val v1:Vec[3] = Vec[3](1.0, 0.5, 0.0)
@@ -91,7 +91,7 @@ v3 -= v1
 println( v3.euclideanDistanceTo(v2) )
 
 // perform Vector3 specific operations
-import ai.dragonfly.math.vector.Vector3.*
+import slash.vector.Vector3.*
 
 println(v1.x) // .x .y and .z provided by an extension method in Vector3
 
@@ -99,7 +99,7 @@ println(v1.x) // .x .y and .z provided by an extension method in Vector3
 println( (v1 cross v2 ).show )
 println( (v1 ⨯ v2 ).show ) // or with a unicode ⨯ operator
 
-import ai.dragonfly.math.Random.*
+import slash.Random.*
 val r:Random = defaultRandom
 
 // higher dimensional vectors
@@ -167,7 +167,7 @@ var matrixArray:js.Array[Float64Array]
 <h3>Parametric Probability Distributions</h3>
 
 ```scala
-import ai.dragonfly.math.stats.probability.distributions.*
+import slash.stats.probability.distributions.*
 
 // create a gaussian distribution parametrically
 val g:Gaussian = Gaussian(10.0, 42.0)
@@ -179,7 +179,7 @@ g.random() // randomly sample a value from this gaussian model
 <h3>Estimated, also called Online or Streaming, Probability Distributions</h3>
 
 ```scala
-import ai.dragonfly.math.stats.probability.distributions.*
+import slash.stats.probability.distributions.*
 
 // create a gaussian distribution parametrically
 val eg:stream.Gaussian = stream.Gaussian()
@@ -202,7 +202,7 @@ pg.random() // randomly sample a value from the estimated gaussian model
 &nbsp;&nbsp;&nbsp;To compute `logₓ(y)`, where `x` is any value of type: `Double`, we compute: `log₁₀(y) / log₁₀(x)`.  Which can introduce a lot of computational overhead, especially when done in loops which repeatedly compute the same value for `log₁₀(x)`.  To improve performance and legibility, this library provides a `log[BASE <: Double | Int]` macro that computes the `log₁₀(x)` denominator at compile time; it also clarifies the operation by allowing users to write the base of the log into the type parameter and the operand as a method parameter.  As such, instead of: `log(2 /*base*/, 42 /*operand*/)` we can write: `log[2](42)`.
 
 ```scala
-import ai.dragonfly.math.*
+import slash.*
 
 // Compile time optimized Logarithms of known base:
 log[2](42.0)  // Computes log₂(42) at compile time
@@ -218,10 +218,10 @@ var i: Int = 1; while (i > 0) {
 &nbsp;&nbsp;&nbsp;The runtime `Log` class can yield comparable performance in cases when the base of the logarithm can't be known at compile time, or can't be expressed as a constant.
 
 ```scala
-import ai.dragonfly.math.*
+import slash.*
 // Use the runtime Log class for:
 // a base determined by a value:
-import ai.dragonfly.math.Constant.π
+import slash.Constant.π
 val logBasePi: Log = Log(π)
 logBasePi(13)
 // or any base unknown at compile time,
@@ -288,8 +288,8 @@ println((rtv1 + rtv2).render())
   
 //    [error] 57 |    println((rtv1 + rtv2).render())
 //    [error]    |                    ^^^^
-//    [error]    |             Found:    (rtv2 : ai.dragonfly.math.vector.Vec[(l2 : Int)])
-//    [error]    |             Required: ai.dragonfly.math.vector.Vec[(l1 : Int)]
+//    [error]    |             Found:    (rtv2 : slash.vector.Vec[(l2 : Int)])
+//    [error]    |             Required: slash.vector.Vec[(l1 : Int)]
 
 
 // However, you can do this:
@@ -326,7 +326,7 @@ https://github.com/s5bug - Design insights.
 
 https://github.com/BalmungSan - Design insights.
 
-https://github.com/Quafadas - Contributor!  Authored 1st and 2nd PRs.
+https://github.com/Quafadas - Contributor!
 
 https://github.com/JD557 - Design insights and named this library.
 
