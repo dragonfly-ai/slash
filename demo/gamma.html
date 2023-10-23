@@ -105,11 +105,9 @@
 
         <h1 id="gamma" class="title">Gamma</h1>
         <p>Try gamma function</p>
-        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>
-
-</span><span class="keyword">for</span><span> ( </span><span class="identifier">i</span><span> &lt;- </span><span class="number-literal">1</span><span> </span><span class="identifier">until</span><span> </span><span class="number-literal">10</span><span> ) {
+        <pre><code class="nohighlight"><span class="keyword">for</span><span> ( </span><span class="identifier">i</span><span> &lt;- </span><span class="number-literal">1</span><span> </span><span class="identifier">until</span><span> </span><span class="number-literal">10</span><span> ) {
   </span><span class="keyword">val</span><span> </span><span class="identifier">i_1</span><span>:</span><span class="type-name">Int</span><span> = </span><span class="identifier">i</span><span> - </span><span class="number-literal">1</span><span>
-  </span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;</span><span class="escape-sequence">\t</span><span class="string-literal">Γ(</span><span class="substitution">$i</span><span class="string-literal">):</span><span class="substitution">$i_1</span><span class="string-literal">! =&gt; </span><span class="substitution">${math.gamma(i.toDouble)}</span><span class="string-literal"> : </span><span class="substitution">${math.Factorial(i_1)}</span><span class="string-literal">&quot;</span><span>)
+  </span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;</span><span class="escape-sequence">\t</span><span class="string-literal">Γ(</span><span class="substitution">$i</span><span class="string-literal">):</span><span class="substitution">$i_1</span><span class="string-literal">! =&gt; </span><span class="substitution">${slash.gamma(i.toDouble)}</span><span class="string-literal"> : </span><span class="substitution">${slash.Factorial(i_1)}</span><span class="string-literal">&quot;</span><span>)
 }
 </span><span class="comment">// 	Γ(1):0! =&gt; 1.0 : 1
 // 	Γ(2):1! =&gt; 1.0 : 1

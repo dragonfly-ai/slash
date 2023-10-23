@@ -108,7 +108,7 @@
         
         <h2 id="creating-a-vector" class="section"><a class="anchor-link left" href="#creating-a-vector"><i class="icofont-laika link">&#xef71;</i></a>Creating a vector</h2>
         <p>Let&#39;s create some vectors</p>
-        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.</span><span class="identifier">vector</span><span>.*
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">slash</span><span>.</span><span class="identifier">vector</span><span>.*
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">v</span><span> = </span><span class="type-name">Vec</span><span>.</span><span class="identifier">fromTuple</span><span>(</span><span class="number-literal">1.0</span><span>, </span><span class="number-literal">2.0</span><span>, </span><span class="number-literal">3.0</span><span>, </span><span class="number-literal">4.0</span><span>, </span><span class="number-literal">5.0</span><span>)
 </span><span class="comment">// v: Vec[5] = Array(1.0, 2.0, 3.0, 4.0, 5.0)
@@ -125,19 +125,19 @@
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">v_rand</span><span> = </span><span class="type-name">Vec</span><span>.</span><span class="identifier">random</span><span>[</span><span class="number-literal">5</span><span>]()
 </span><span class="comment">// v_rand: Vec[5] = Array(
-//   -0.7481440022329816,
-//   -0.12590866497917796,
-//   -0.8733202877937932,
-//   -0.007377734881694908,
-//   -0.7442084393526046
+//   -0.7486238910640207,
+//   -0.5983521572362768,
+//   -0.7491290760285536,
+//   -0.9939281554339586,
+//   -0.8634166368608758
 // )
 </span><span class="keyword">val</span><span> </span><span class="identifier">v_rand_max_min</span><span> = </span><span class="type-name">Vec</span><span>.</span><span class="identifier">random</span><span>[</span><span class="number-literal">5</span><span>](</span><span class="number-literal">2.0</span><span>, </span><span class="number-literal">0.5</span><span>)
 </span><span class="comment">// v_rand_max_min: Vec[5] = Array(
-//   1.4635191106705827,
-//   0.761481682008784,
-//   1.30352202971507,
-//   1.114183003218368,
-//   1.141708998611529
+//   1.2490830072834167,
+//   1.6541254273861339,
+//   0.7622812872334197,
+//   1.6707001401447044,
+//   1.552328874239625
 // )</span></code></pre>
         <p>And do some stuff</p>
         <pre><code class="nohighlight"><span class="identifier">v</span><span> + </span><span class="identifier">v_fill</span><span>
@@ -159,10 +159,10 @@
 </span><span class="comment">// res6: Double = 3.0
 </span><span>
 </span><span class="identifier">v</span><span>.</span><span class="identifier">corr</span><span>(</span><span class="identifier">v_rand</span><span>)
-</span><span class="comment">// res7: Double = 0.04984027468129193
+</span><span class="comment">// res7: Double = -0.6699138866668766
 </span><span>
 </span><span class="identifier">v_rand</span><span>.</span><span class="identifier">elementRanks</span><span>
-</span><span class="comment">// res8: Vec[5] = Array(2.0, 4.0, 1.0, 5.0, 3.0)</span></code></pre>
+</span><span class="comment">// res8: Vec[5] = Array(4.0, 5.0, 3.0, 1.0, 2.0)</span></code></pre>
 
         
 <hr class="footer-rule"/>

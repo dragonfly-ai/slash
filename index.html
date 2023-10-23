@@ -116,7 +116,7 @@
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">using</span><span> </span><span class="identifier">dep</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>::</span><span class="identifier">slash</span><span>:</span><span class="number-literal">0.1</span></code></pre>
         
         <h2 id="elevator-pitch" class="section"><a class="anchor-link left" href="#elevator-pitch"><i class="icofont-laika link">&#xef71;</i></a>Elevator pitch</h2>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.</span><span class="identifier">vector</span><span>.*
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">slash</span><span>.</span><span class="identifier">vector</span><span>.*
 </span><span class="keyword">val</span><span> </span><span class="identifier">aVector</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">3</span><span>](</span><span class="number-literal">1</span><span>,</span><span class="number-literal">2</span><span>,</span><span class="number-literal">3</span><span>)
 </span><span class="comment">// aVector: Vec[3] = Array(1.0, 2.0, 3.0)
 </span><span class="keyword">val</span><span> </span><span class="identifier">times2</span><span> = </span><span class="identifier">aVector</span><span> * </span><span class="number-literal">2</span><span>
@@ -128,9 +128,8 @@
 </span><span class="identifier">aVector</span><span> + </span><span class="identifier">oopsDimension</span><span>
 
 </span><span class="comment">// error:
-// Found:    (repl.MdocSession.MdocApp.oopsDimension :
-//   ai.dragonfly.math.vector.Vec[(2 : Int)])
-// Required: ai.dragonfly.math.vector.Vec[(3 : Int)]
+// Found:    (repl.MdocSession.MdocApp.oopsDimension : slash.vector.Vec[(2 : Int)])
+// Required: slash.vector.Vec[(3 : Int)]
 // aVector + oopsDimension
 //           ^^^^^^^^^^^^^</span></code></pre>
         <p>These typesafe operations are the same on the JVM, Native and JS platforms. They take advantge of a shim of the underlying <em>native</em> array definitions  - thus maximisng performance, so that you don&#39;t have to. For further reading, see <a href="design/design.html">Design notes</a></p>

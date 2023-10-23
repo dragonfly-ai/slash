@@ -104,7 +104,7 @@
       <main class="content">
 
         <h1 id="matricies-introduction" class="title">Matricies introduction</h1>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">ai</span><span>.</span><span class="identifier">dragonfly</span><span>.</span><span class="identifier">math</span><span>.</span><span class="identifier">matrix</span><span>.*
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">slash</span><span>.</span><span class="identifier">matrix</span><span>.*
 </span><span class="comment">// create a 3 x 2 matrix of zeros.
 </span><span class="keyword">val</span><span> </span><span class="identifier">m</span><span>:</span><span class="type-name">Matrix</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>] = </span><span class="type-name">Matrix</span><span>.</span><span class="identifier">zeros</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>]
 </span><span class="comment">// m: Matrix[3, 2] = 
@@ -120,11 +120,10 @@
 </span><span class="comment">// error:
 // None of the overloaded alternatives of method * in class Matrix with types
 //  [V &lt;: Int]
-//   (thatMatrix: ai.dragonfly.math.matrix.Matrix[(3 : Int), V])
-//     (using x$2: ValueOf[V]): ai.dragonfly.math.matrix.Matrix[(3 : Int), V]
-//  (s: Double): ai.dragonfly.math.matrix.Matrix[(3 : Int), (3 : Int)]
-// match arguments ((repl.MdocSession.MdocApp.m1 :
-//   ai.dragonfly.math.matrix.Matrix[(2 : Int), (3 : Int)]))
+//   (thatMatrix: slash.matrix.Matrix[(3 : Int), V])
+//     (using x$2: ValueOf[V]): slash.matrix.Matrix[(3 : Int), V]
+//  (s: Double): slash.matrix.Matrix[(3 : Int), (3 : Int)]
+// match arguments ((repl.MdocSession.MdocApp.m1 : slash.matrix.Matrix[(2 : Int), (3 : Int)]))
 // val m = m2 * m1
 //         ^^^^</span></code></pre>
         <p>Relatedly, many matrix operations like <code>determinant</code>, Cholesky decomposition, etc, only pertain to square matrices.  This library relies on type conditioned extension methods so that users simply cannot attempt to invoke these operations on rectangular matrices.  More specifically:</p>
