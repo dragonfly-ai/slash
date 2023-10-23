@@ -168,7 +168,8 @@ package object vector {
       // clamp methods
 
       def clamp(lt: Double, gt: Double): Vec[N] = {
-        var i = 0; while (i < thisVector.dimension) {
+        var i = 0;
+        while (i < thisVector.dimension) {
           if (thisVector(i) < lt) thisVector(i) = lt
           else if (thisVector(i) > gt) thisVector(i) = gt
           i = i + 1
@@ -314,23 +315,28 @@ package object vector {
 
       inline def + (inline v0: Vec[N]): Vec[N] = copy.add(v0)
 
-      inline def + (inline scalar: Double): Vec[N] =
-        val vOut = copy
-        var i = 0
-        while (i < dimension) {
-          vOut(i) = vOut(i) + scalar
-          i = i + 1
-        }
-        vOut
 
-      inline def - (inline scalar: Double): Vec[N] =
-        val vOut = copy
+      inline def + (inline scalar: Double): Vec[N] =
+        copy += scalar
+
+      inline def += (scalar: Double): Vec[N] =
         var i = 0
         while (i < dimension) {
-          vOut(i) = vOut(i) - scalar
+          thisVector(i) = thisVector(i) + scalar
           i = i + 1
         }
-        vOut
+        thisVector
+
+      inline def - (scalar: Double): Vec[N] =
+        copy -= scalar
+
+      inline def -= (scalar: Double): Vec[N] =
+        var i = 0
+        while (i < dimension) {
+          thisVector(i) = thisVector(i) - scalar
+          i = i + 1
+        }
+        thisVector
 
       inline def += (v0: Vec[N]): Vec[N] = add(v0)
 

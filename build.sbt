@@ -10,7 +10,6 @@ import laika.ast.*
 import laika.markdown.github.GitHubFlavor
 import laika.parse.code.SyntaxHighlighting
 
-val appVersion:String = "0.101"
 val globalScalaVersion = "3.3.1"
 
 ThisBuild / organization := "ai.dragonfly"
@@ -25,7 +24,8 @@ ThisBuild / tlFatalWarnings := false
 
 ThisBuild / tlSitePublishBranch := Some("main")
 
-ThisBuild / tlBaseVersion := appVersion
+ThisBuild / tlBaseVersion := "0.1" // this isn't used yet, until MIMA gets enabled by changing tlVersionIntroduced
+ThisBuild / tlVersionIntroduced := Map("3" -> "1.0.0")
 ThisBuild / tlCiReleaseBranches := Seq()
 ThisBuild / tlSonatypeUseLegacyHost := false
 
@@ -34,8 +34,6 @@ ThisBuild / nativeConfig ~= {
     .withMode(scala.scalanative.build.Mode.releaseFast)
     .withGC(scala.scalanative.build.GC.commix)
 }
-
-ThisBuild / tlVersionIntroduced := Map("3" -> "1.0.0")
 
 lazy val slash = crossProject(
     JSPlatform,
