@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.*
-import ai.dragonfly.math.interval.*
-import ai.dragonfly.math.interval.Interval.*
+import slash.*
+import slash.interval.*
+import slash.interval.Interval.*
 
 import scala.reflect.ClassTag
 

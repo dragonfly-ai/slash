@@ -15,11 +15,11 @@
  */
 
 import narr.*
-import ai.dragonfly.math.*
-import ai.dragonfly.math.vector.*
-import ai.dragonfly.math.Constant.π
+import slash.*
+import slash.vector.*
+import slash.Constant.π
 
-import ai.dragonfly.math.Random.defaultRandom as r
+import slash.Random.defaultRandom as r
 
 class VectorSpaces extends munit.FunSuite {
   test(" testing kitchen sink ") {

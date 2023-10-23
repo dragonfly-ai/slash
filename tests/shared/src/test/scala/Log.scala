@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.log
-import ai.dragonfly.math.Constant
+import slash.log
+import slash.Constant
 
 class Log extends munit.FunSuite:
     test("logs") {

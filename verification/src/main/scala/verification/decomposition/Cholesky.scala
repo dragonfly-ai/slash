@@ -2,9 +2,9 @@ package verification.decomposition
 
 
 import Jama.{CholeskyDecomposition, Matrix}
-import ai.dragonfly.math.Random.*
+import slash.Random.*
 
-import ai.dragonfly.math.matrix
+import slash.matrix
 import narr.*
 import verification.Verification
 

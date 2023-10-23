@@ -20,7 +20,7 @@ using dep ai.dragonfly::slash:@VERSION@
 ## Elevator pitch
 
 ```scala mdoc
-import ai.dragonfly.math.vector.*
+import slash.vector.*
 val aVector = Vec[3](1,2,3)
 val times2 = aVector * 2
 aVector + times2

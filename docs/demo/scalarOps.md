@@ -4,7 +4,7 @@
 Example
 
 ```scala mdoc
-import ai.dragonfly.math.vector.*
+import slash.vector.*
 
 val v1 = Vec[2](1.5, 2.5)
 v1 + 2.0

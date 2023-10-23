@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.stats.probability.distributions.{EstimatedBinomial, Binomial, stream}
+import slash.stats.probability.distributions.{EstimatedBinomial, Binomial, stream}
 
 class TestBinomial extends munit.FunSuite:
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.vector.*
-import ai.dragonfly.math.stats.probability.distributions.{EstimatedGaussian, Gaussian, stream}
+import slash.vector.*
+import slash.stats.probability.distributions.{EstimatedGaussian, Gaussian, stream}
 
 class TestGaussian extends munit.FunSuite {
 

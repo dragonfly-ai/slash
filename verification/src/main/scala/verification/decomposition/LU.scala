@@ -1,7 +1,7 @@
 package verification.decomposition
 
 import Jama.LUDecomposition
-import ai.dragonfly.math.matrix
+import slash.matrix
 import verification.Verification
 
 import scala.Console.*

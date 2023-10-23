@@ -3,8 +3,8 @@
 Example
 
 ```scala mdoc
-import ai.dragonfly.math.*
-import ai.dragonfly.math.Constant
+import slash.*
+import slash.Constant
 
 log[4](16)
 

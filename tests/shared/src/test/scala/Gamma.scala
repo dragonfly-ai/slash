@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.gamma
-import ai.dragonfly.math.Factorial
+import slash.gamma
+import slash.Factorial
 
 class Gamma extends munit.FunSuite:
     test("gamma") {

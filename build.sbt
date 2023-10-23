@@ -56,7 +56,7 @@ lazy val verification = project
   .enablePlugins(NoPublishPlugin)
   .settings(
     name := "verification",
-    Compile / mainClass := Some("ai.dragonfly.math.Verify"),
+    Compile / mainClass := Some("verification.Verify"),
     libraryDependencies ++= Seq(
       "org.apache.commons" % "commons-math3" % "3.6.1",
       "gov.nist.math" % "jama" % "1.0.3"

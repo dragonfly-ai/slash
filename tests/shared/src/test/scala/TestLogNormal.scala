@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.stats.probability.distributions.{EstimatedLogNormal, LogNormal, stream}
-import ai.dragonfly.math.vector.*
+import slash.stats.probability.distributions.{EstimatedLogNormal, LogNormal, stream}
+import slash.vector.*
 
 class TestLogNormal extends munit.FunSuite {
 

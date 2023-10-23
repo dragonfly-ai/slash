@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.vector.Vec
+import slash.vector.Vec
 
 
 inline def assertVecEquals[N <: Int](inline v1: Vec[N], inline v2: Vec[N])(implicit loc: munit.Location): Unit = {

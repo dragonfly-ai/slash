@@ -62,7 +62,7 @@ package object vector {
 ```
 Please consider also, the flexibility to enable types that use Vectors of varying sizes:
 ```scala
-package ai.dragonfly.math.vector
+package slash.vector
 import Vector.*
 
 // instead of putting the Vector type in the type parameter, just place the vector dimensionality.

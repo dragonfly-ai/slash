@@ -4,7 +4,7 @@
 Example
 
 ```scala mdoc
-import ai.dragonfly.math.stats.probability.distributions.Poisson
+import slash.stats.probability.distributions.Poisson
 import narr.*
 
 val dist1 = Poisson(1)
@@ -15,7 +15,7 @@ for (i <- 0 to 5) {
 dist1.μ
 dist1.`σ²`
 
-val rand = ai.dragonfly.math.Random.defaultRandom
+val rand = slash.Random.defaultRandom
 type N = 10000
 val v : NArray[Long] = dist1.sample(10000, rand)
 

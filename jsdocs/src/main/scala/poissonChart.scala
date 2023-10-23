@@ -3,22 +3,21 @@ package livechart
 import scala.scalajs.js
 import com.raquo.laminar.api.L.*
 import viz.vega.plots.Histogram
-import ai.dragonfly.math.stats.probability.distributions.Poisson
 import narr.*
-
 import viz.PlotTargets.doNothing
-
 import viz.LaminarViz
-
 import viz.vega.facades.VegaView
 import viz.vega.facades.Helpers.*
-import ai.dragonfly.math.vector.Vec
+import slash.vector.Vec
 import com.raquo.airstream.core.Signal
 import narr.native.NArr
+
 import scala.scalajs.js.typedarray.Float64Array
 import io.circe.Encoder
 import io.circe.Decoder
 import io.circe.parser.decode
+import slash.Random
+import slash.stats.probability.distributions.Poisson
 
 case class HistogramBin(
   bin0: Double,
@@ -27,7 +26,7 @@ case class HistogramBin(
 ) derives Decoder, Encoder.AsObject
 
 def poissonChart(): Div = {
-  val rand = ai.dragonfly.math.Random.defaultRandom
+  val rand = Random.defaultRandom
   val λ_ = Var[Double](5.0)
   val n_ = Var[Integer](1000)
   val poissonDist: Signal[Poisson] = λ_.signal.map(Poisson(_))

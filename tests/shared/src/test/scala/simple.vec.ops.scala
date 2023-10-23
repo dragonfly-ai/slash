@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.vector.*
+import slash.vector.*
 import narr.*
 
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.stats.probability.distributions.{PERT, Beta}
+import slash.stats.probability.distributions.{PERT, Beta}
 
 class TestPERT extends munit.FunSuite {
 

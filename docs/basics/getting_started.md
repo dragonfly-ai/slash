@@ -5,7 +5,7 @@
 Let's create some vectors
 
 ```scala mdoc
-import ai.dragonfly.math.vector.*
+import slash.vector.*
 
 val v = Vec.fromTuple(1.0, 2.0, 3.0, 4.0, 5.0)
 val v2 = Vec[5](1.0, 2.0, 3.0, 4.0, 5.0)

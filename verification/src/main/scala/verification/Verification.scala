@@ -17,7 +17,7 @@ object Verification {
 
         if (a1(i) != a2(i)) {
           discrepancies += 1
-          var error: Double = Math.abs(a1(i) - a2(i))
+          val error: Double = Math.abs(a1(i) - a2(i))
           combinedError += error
         }
 
@@ -76,13 +76,13 @@ trait Verification {
   )
 
   val squareJaMa: Jama.Matrix = new Jama.Matrix(squarValues)
-  val squareMa: ai.dragonfly.math.matrix.Matrix[11, 11] = ai.dragonfly.math.matrix.Matrix[11, 11](squarValues)
+  val squareMa: slash.matrix.Matrix[11, 11] = slash.matrix.Matrix[11, 11](squarValues)
 
   val wideJaMa: Jama.Matrix = new Jama.Matrix(wideValues)
-  val wideMa: ai.dragonfly.math.matrix.Matrix[11, 19] = ai.dragonfly.math.matrix.Matrix[11, 19](wideValues)
+  val wideMa: slash.matrix.Matrix[11, 19] = slash.matrix.Matrix[11, 19](wideValues)
 
   val tallJaMa: Jama.Matrix = new Jama.Matrix(tallValues)
-  val tallMa: ai.dragonfly.math.matrix.Matrix[21, 12] = ai.dragonfly.math.matrix.Matrix[21, 12](tallValues)
+  val tallMa: slash.matrix.Matrix[21, 12] = slash.matrix.Matrix[21, 12](tallValues)
 
   def name:String
   def run: Unit

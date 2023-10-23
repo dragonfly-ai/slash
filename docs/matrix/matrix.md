@@ -1,7 +1,7 @@
 # Matricies introduction
 
 ```scala mdoc
-import ai.dragonfly.math.matrix.*
+import slash.matrix.*
 // create a 3 x 2 matrix of zeros.
 val m:Matrix[3, 2] = Matrix.zeros[3, 2]
 ```

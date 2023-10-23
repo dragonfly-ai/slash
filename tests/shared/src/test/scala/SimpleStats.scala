@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.vector.Vec
+import slash.vector.Vec
 import narr.*
 
 class SimpleStats extends munit.FunSuite:

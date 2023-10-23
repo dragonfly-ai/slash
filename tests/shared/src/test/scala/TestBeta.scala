@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import ai.dragonfly.math.interval.*
-import ai.dragonfly.math.stats.PointStatistics
-import ai.dragonfly.math.stats.probability.distributions.{Beta, EstimatedBeta, stream}
-import ai.dragonfly.math.vector.*
+import slash.interval.*
+import slash.stats.PointStatistics
+import slash.stats.probability.distributions.{Beta, EstimatedBeta, stream}
+import slash.vector.*
 
 class TestBeta extends munit.FunSuite {
 
