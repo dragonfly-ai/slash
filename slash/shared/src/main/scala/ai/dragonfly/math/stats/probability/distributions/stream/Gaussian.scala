@@ -16,22 +16,34 @@
 
 package ai.dragonfly.math.stats.probability.distributions.stream
 
+import ai.dragonfly.math.interval.*
 import ai.dragonfly.math.stats.*
 import probability.distributions
 
 
 
-class Gaussian extends OnlineUnivariateProbabilityDistributionEstimator[Double, distributions.Gaussian]  {
+class Gaussian extends OnlineProbabilityDistributionEstimator[Double, distributions.Gaussian] with EstimatesPointStatistics[Double] {
 
-  val estimator: PointStatisticsEstimator[Double] = new PointStatisticsEstimator[Double](distributions.Gaussian.domain)
+  private var s0: Double = 0.0
+  private var s1: Double = 0.0
+  private var s2: Double = 0.0
 
-  override def observe(frequency: Double, observation: Double): Gaussian = {
-    estimator.observe(Array[Double](frequency, observation))
+  private var min: Double = Double.MaxValue
+  private var MAX: Double = Double.MinValue
+
+  override def observe(observation: Double): this.type = observe(1.0, observation)
+
+  override def observe(frequency: Double, observation: Double): this.type = {
+    s0 = s0 + frequency // sample size
+    s1 = s1 + observation * frequency // sample sum
+    s2 = s2 + (observation * observation) * frequency // sum of weighted samples squared
+    min = Math.min(observation, min) // min
+    MAX = Math.max(observation, MAX) // MAX
     this
   }
 
   override def estimate:distributions.EstimatedGaussian = {
-    val sps:PointStatistics[Double] = estimator.samplePointStatistics
+    val sps:PointStatistics[Double] = estimatedPointStatistics
     distributions.EstimatedGaussian(
       sps.bounds,
       distributions.Gaussian(sps.μ, sps.`σ²`),
@@ -39,4 +51,11 @@ class Gaussian extends OnlineUnivariateProbabilityDistributionEstimator[Double, 
     )
   }
 
+  override inline def estimatedMean: Double = s1 / s0
+
+  override inline def estimatedRange: Interval[Double] = `[]`(min, MAX)
+
+  override inline def estimatedVariance: Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
+
+  override inline def totalSampleMass: Double = s0
 }

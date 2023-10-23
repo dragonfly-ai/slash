@@ -16,12 +16,12 @@
 
 package ai.dragonfly.math.stats.probability.distributions
 
+import scala.reflect.ClassTag
+
 
 // ℕ population size symbol for future reference.
 
-trait ProbabilityDistribution[DOMAIN: Numeric] extends Sampleable[DOMAIN] {
-  val `#` = implicitly[Numeric[DOMAIN]]
-
+trait ProbabilityDistribution[DOMAIN:ClassTag] extends Sampleable[DOMAIN] {
   /**
    * Probability Densidy Function: PDF
    * Computes the probability of drawing sample x from this distribution.
@@ -43,7 +43,7 @@ trait ProbabilityDistribution[DOMAIN: Numeric] extends Sampleable[DOMAIN] {
 }
 
 
-trait ParametricProbabilityDistribution[DOMAIN] extends ProbabilityDistribution[DOMAIN] {
+trait ParametricProbabilityDistribution[DOMAIN:ClassTag] extends ProbabilityDistribution[DOMAIN] {
   def μ: Double
   def mean: Double = μ
 

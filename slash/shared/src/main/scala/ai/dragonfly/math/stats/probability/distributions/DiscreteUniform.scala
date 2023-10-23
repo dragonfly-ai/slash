@@ -25,7 +25,7 @@ import scala.language.postfixOps
 
 object DiscreteUniform {
   def apply(b1:Long, b2:Long): DiscreteUniform = {
-    DiscreteUniform(`[]`[Long](Math.min(b1, b2), Math.max(b1, b2)))
+    DiscreteUniform(`[]`(Math.min(b1, b2), Math.max(b1, b2)))
   }
   val domain:Domain[Long] = Domain.ℤ_Long
 }

@@ -17,27 +17,47 @@
 package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.interval.*
-import Interval.*
+import ai.dragonfly.math.{ln, squareInPlace}
 import ai.dragonfly.math.stats.probability.distributions
-import ai.dragonfly.math.stats.PointStatistics
 
+class LogNormal extends OnlineProbabilityDistributionEstimator[Double, distributions.LogNormal] with EstimatesPointStatistics[Double] {
 
-class LogNormal extends OnlineUnivariateProbabilityDistributionEstimator[Double, distributions.LogNormal]  {
+  private var s0: Double = 0.0
+  private var s1: Double = 0.0
+  private var s2: Double = 0.0
 
-  val estimator = new PointStatisticsEstimator[Double](distributions.LogNormal.domain)
+  private var min: Double = Double.MaxValue
+  private var MAX: Double = Double.MinValue
 
-  override def observe(frequency: Double, observation: Double):LogNormal = {
-    estimator.observe(Array[Double](frequency, Math.log(observation)))
+  override inline def observe(observation: Double): this.type = observe(1.0, observation)
+
+  override def observe(frequency: Double, observation: Double): this.type = {
+    val lnob:Double = ln(observation)
+    s0 += frequency // sample size
+    s1 += lnob * frequency // sample sum
+    s2 += squareInPlace(lnob) * frequency // sum of weighted samples squared
+
+    min = Math.min(lnob, min) // min
+    MAX = Math.max(lnob, MAX) // MAX
     this
   }
 
-  override def estimate:distributions.EstimatedLogNormal = {
-    val sps:PointStatistics[Double] = estimator.samplePointStatistics
+  override def estimate:distributions.EstimatedLogNormal = distributions.EstimatedLogNormal(
+    estimatedRange,
+    distributions.LogNormal(estimatedMean, estimatedVariance),
+    s0
+  )
 
-    distributions.EstimatedLogNormal(
-      `[]`[Double](Math.exp(sps.min), Math.exp(sps.MAX)),
-      distributions.LogNormal.fromGaussianParameters(sps.μ, sps.`σ²`),
-      sps.ℕ
-    )
+  private inline def gaussianVariance:Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
+  private inline def gaussianMean:Double = s1 / s0
+  override def estimatedMean: Double = Math.exp(gaussianMean + (gaussianVariance / 2.0))
+
+  override def estimatedRange: Interval[Double] = `[]`(Math.exp(min), Math.exp(MAX))
+
+  override def estimatedVariance: Double = {
+    val `Gσ²`:Double = gaussianVariance
+    (Math.exp(`Gσ²`) - 1.0) * Math.exp(2.0 * gaussianMean + `Gσ²`)
   }
+
+  override def totalSampleMass: Double = s0
 }

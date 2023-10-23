@@ -19,6 +19,7 @@ package ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.interval.Interval
 
 trait EstimatedProbabilityDistribution[DOMAIN: Numeric, PPD <: ParametricProbabilityDistribution[DOMAIN]] {
+
   val idealized: PPD
 
   def ℕ:DOMAIN

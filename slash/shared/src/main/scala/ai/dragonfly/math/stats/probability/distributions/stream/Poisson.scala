@@ -18,28 +18,46 @@ package ai.dragonfly.math.stats.probability.distributions.stream
 
 import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
+import ai.dragonfly.math.accumulation.DiscreteAccumulator
+import ai.dragonfly.math.interval.*
+import ai.dragonfly.math.interval.Interval.*
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
 
-class Poisson extends OnlineUnivariateProbabilityDistributionEstimator[Long, distributions.Poisson] {
+class Poisson extends OnlineProbabilityDistributionEstimator[Long, distributions.Poisson] with EstimatesBoundedMean[Long] {
 
-  val estimator = new BoundedMeanEstimator[Long](distributions.Poisson.domain)
+  private var s0: Long = 0L
+  private val s1: DiscreteAccumulator = new DiscreteAccumulator
 
-  override def observe(frequency: Long, observation: Long):Poisson = {
-    estimator.observe(Array[Long](frequency, observation))
+  private var min: Long = Long.MaxValue
+  private var MAX: Long = Long.MinValue
+
+  override def observe(observation: Long): this.type = observe(1L, observation)
+
+  override def observe(frequency: Long, observation: Long): this.type = {
+    s0 += frequency
+    s1.observeProduct(observation, frequency)
+
+    min = Math.min(min, observation)
+    MAX = Math.max(MAX, observation)
     this
   }
 
   override def estimate:distributions.EstimatedPoisson = {
-    val bμ = estimator.sampleBoundedMean
+    val bμ = estimatedBoundedMean
     distributions.EstimatedPoisson(
       bμ.bounds,
       distributions.Poisson(bμ.μ),
-      bμ.ℕ
+      s0
     )
   }
 
+  override inline def estimatedMean: Double = (BigDecimal(s1.total) / BigDecimal(s0)).toDouble
+
+  override inline def estimatedRange: Interval[Long] = `[]`(min, MAX)
+
+  override def totalSampleMass: Long = s0
 }
 
 case class PoissonDistributionUndefinedForNegativeNumbers(negative:Long) extends Exception(s"Poisson distribution undefined for observation: $negative")

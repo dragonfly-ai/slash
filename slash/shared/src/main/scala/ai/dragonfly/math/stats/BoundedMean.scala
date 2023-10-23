@@ -18,16 +18,18 @@ package ai.dragonfly.math.stats
 
 import ai.dragonfly.math.interval.Interval
 
+import scala.reflect.ClassTag
+
 object BoundedMean {
-  def apply[DOMAIN: Numeric](μ:Double, bounds: Interval[DOMAIN], ℕ:DOMAIN):BoundedMean[DOMAIN] = {
+  def apply[DOMAIN:ClassTag](μ:Double, bounds: Interval[DOMAIN], ℕ:DOMAIN):BoundedMean[DOMAIN] = {
     if (bounds.rangeContains(μ)) new BoundedMean[DOMAIN](μ, bounds, ℕ)
     else throw MeanOutsideBounds[DOMAIN](μ, bounds)
   }
 }
 
-case class BoundedMean[DOMAIN: Numeric](μ:Double, bounds: Interval[DOMAIN], ℕ:DOMAIN) {
-  def min:DOMAIN = bounds.min
-  def MAX:DOMAIN = bounds.MAX
+case class BoundedMean[DOMAIN:ClassTag] private (μ:Double, bounds: Interval[DOMAIN], ℕ:DOMAIN) {
+  inline def min:DOMAIN = bounds.min
+  inline def MAX:DOMAIN = bounds.MAX
 }
 
 case class MeanOutsideBounds[DOMAIN](μ:Double, bounds: Interval[DOMAIN]) extends Exception(

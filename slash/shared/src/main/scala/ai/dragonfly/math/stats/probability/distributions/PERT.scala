@@ -17,41 +17,29 @@
 package ai.dragonfly.math.stats.probability.distributions
 
 
-import ai.dragonfly.math.Random
+import ai.dragonfly.math.{B, Random}
 import ai.dragonfly.math.stats.*
 import ai.dragonfly.math.interval.*
 import Interval.*
-import ai.dragonfly.math.stats.BoundedMean
 
-object PERT {
+case class PERT(min:Double, mode:Double, MAX:Double) extends ParametricProbabilityDistribution[Double] {
 
-  def apply(min:Double, μ:Double, MAX:Double):PERT = PERT(
-    BoundedMean[Double](μ, `[]`[Double](min, MAX), 1.0)
-  )
-
-  val domain:Domain[Double] = Domain.ℝ_Double
-
-}
-
-case class PERT(boundedMean:BoundedMean[Double]) extends ParametricProbabilityDistribution[Double] {
-
-  val interval:Interval[Double] = boundedMean.bounds
-  override val μ:Double = boundedMean.μ
+  lazy val interval:Interval[Double] = `[]`(min, MAX)
+  override val μ:Double = (min + 4.0 * mode + MAX) / 6.0
   override val `σ²`:Double = ((μ - interval.min) * (interval.MAX - μ)) / 7.0
   override lazy val σ:Double = Math.sqrt(`σ²`)
 
-  private lazy val underlying:Beta = Beta.fromPERT(this)
+  private lazy val α = 1.0 + 4 * (mode - min) / (MAX - min)
+  private lazy val β = 1.0 + 4 * (MAX - mode) / (MAX - min)
+  private lazy val `B(α,β)*(MAX-min)^α+β-1` = B(α, β) * Math.pow(MAX - min, α + β - 1)
 
-  override def p(x:Double):Double = underlying.p(x)
+  override def p(x: Double): Double = {
+    Math.pow(x - min, α - 1.0) * Math.pow(MAX - x, β - 1.0) / `B(α,β)*(MAX-min)^α+β-1`
+  }
 
-  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = underlying.random(r)
+  lazy val asBeta:probability.distributions.Beta = probability.distributions.Beta(α, β, min, MAX)
+  override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = asBeta.random(r)
 
   override def toString: String = s"PERT( min = ${interval.min}, μ = $μ, MAX = ${interval.MAX}, σ² = ${`σ²`}, σ = $σ )"
 
-}
-
-
-case class EstimatedPERT(override val idealized: PERT, override val ℕ:Double) extends EstimatedProbabilityDistribution[Double, PERT]{
-  override val interval = idealized.interval
-  override def toString: String = s"EstimatedPERT(min = ${interval.min},  μ = $μ, MAX = ${interval.MAX}, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }

@@ -14,11 +14,27 @@
  * limitations under the License.
  */
 
-package ai.dragonfly.math.stats
+import ai.dragonfly.math.*
+import ai.dragonfly.math.interval.*
+import ai.dragonfly.math.interval.Interval.*
 
-import ai.dragonfly.math.interval.Interval
+import scala.reflect.ClassTag
 
-case class PointStatistics[DOMAIN](μ:Double, `σ²`:Double, bounds: Interval[DOMAIN], ℕ:DOMAIN) {
-  def min:DOMAIN = bounds.min
-  def MAX:DOMAIN = bounds.MAX
+class IntervalTest extends munit.FunSuite {
+
+  case class IntervalTest[DOMAIN:ClassTag](i:Interval[DOMAIN]) {
+    def test():Unit = {
+      assert(i.contains(nextDown(i.min)))
+//      assert(!i.contains(-100))
+//      assert(!i.contains(-100))
+    }
+
+  }
+
+  test(" Testing Intervals: [], [), (], () ") {
+    val i0 = `[]`[Double](-10.0, 10.0)
+    assert(i0.contains(0))
+    assert(!i0.contains(-100))
+    assert(!i0.contains(-100))
+  }
 }

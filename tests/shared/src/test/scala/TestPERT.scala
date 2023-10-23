@@ -14,11 +14,26 @@
  * limitations under the License.
  */
 
-package ai.dragonfly.math.stats
+import ai.dragonfly.math.stats.probability.distributions.{PERT, Beta}
 
-import ai.dragonfly.math.interval.Interval
+class TestPERT extends munit.FunSuite {
 
-case class PointStatistics[DOMAIN](μ:Double, `σ²`:Double, bounds: Interval[DOMAIN], ℕ:DOMAIN) {
-  def min:DOMAIN = bounds.min
-  def MAX:DOMAIN = bounds.MAX
+  test("pert.p(x) and p.asBeta.p(x)") {
+
+    val p:PERT = PERT(0.0, 0.5, 1.0)
+    val b:Beta = p.asBeta
+
+    assertEqualsDouble(p.μ, b.μ, 0.000000001)
+    assertEqualsDouble(p.`σ²`, b.`σ²`, 0.000000001)
+
+    var i:Int = 0; while (i < 99) {
+      val r0:Double = p.random()
+      val r1:Double = p.asBeta.random()
+      assertEqualsDouble(p.p(r0), b.p(r0), 0.000000001)
+      assertEqualsDouble(p.p(r1), b.p(r1), 0.000000001)
+      i += 1
+    }
+
+  }
+
 }

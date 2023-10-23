@@ -34,7 +34,9 @@ case class Gaussian(override val μ:Double, override val `σ²`:Double) extends 
   private lazy val `-1/(2σ²)`: Double = -1.0 / (2.0 * `σ²`)
   private lazy val `1/σ√(2π)`: Double = 1.0 / (σ * `√(2π)`)
 
-  override def p(x: Double): Double = p2(squareInPlace(x - μ))
+  def z(x:Double):Double = (x - μ) / σ
+
+  override inline def p(x: Double): Double = p2(squareInPlace(x - μ))
   def p2(magSquared: Double): Double = `1/σ√(2π)` * Math.exp(`-1/(2σ²)` * magSquared)
 
   override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = μ + (r.nextGaussian() * σ)

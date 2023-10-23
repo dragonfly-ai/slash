@@ -16,7 +16,6 @@
 
 package ai.dragonfly
 
-
 package object math {
 
   inline def squareInPlace(b:Byte): Byte = (b*b).toByte
@@ -36,7 +35,6 @@ package object math {
   inline def cubeInPlace(f:Float): Float = f*f*f
   inline def cubeInPlace(d:Double): Double = d*d*d
   inline def cubeInPlace(bd:BigDecimal): BigDecimal = bd*bd*bd
-
 
   def Γ(x:Double):Double = Math.exp(lnGamma(x))
   def gamma(x:Double):Double = Γ(x)
@@ -71,7 +69,7 @@ package object math {
         }
       //case TermRef(a, b) => println(s"found ${a} ${b}"); 0.0
       case notaconstant =>
-        throw Exception(s"Expected log[Double|Int] but found log[${notaconstant}].")
+        throw Exception(s"Expected log[Double|Int] but found log[$notaconstant].")
     }
 
     '{ Math.log10(${x}) / ${ Expr(Math.log10(base)) } }
@@ -82,7 +80,7 @@ package object math {
    * can't be known at compile time, or can't be expressed as a constant.
    * @param base the base of the logarithm operator.
    */
-  case class Log(val base: Double) {
+  case class Log(base: Double) {
     private val `log10(base)`: Double = Math.log10(base)
 
     /**
@@ -95,4 +93,162 @@ package object math {
 
   inline def degreesToRadians(degrees: Double):Double = degrees * 0.017453292519943295
   inline def radiansToDegrees(radians: Double):Double = radians * 57.29577951308232
+
+  private lazy val bigDecimalInfinitesimal:BigDecimal = BigDecimal(1L, Int.MaxValue)
+
+  def nextUp[N](x: N): N = (x match {
+    case xt: Byte => if (xt < Byte.MaxValue) (xt + 1).toByte else Byte.MaxValue
+    case xt: Short => if (xt < Short.MaxValue) (xt + 1).toShort else Short.MaxValue
+    case xt: Int => if (xt < Int.MaxValue) xt + 1 else Int.MaxValue
+    case xt: Long => if (xt < Long.MaxValue) xt + 1L else Long.MaxValue
+    case xt: BigInt => xt + 1
+    case xt: Float => Math.nextUp(xt)
+    case xt: Double => Math.nextUp(xt)
+    case xt: BigDecimal => xt + bigDecimalInfinitesimal
+  }).asInstanceOf[N]
+
+  def nextDown[N](x: N): N = (x match {
+    case xt: Byte => if (xt > Byte.MinValue) (xt - 1).toByte else Byte.MinValue
+    case xt: Short => if (xt > Short.MinValue) (xt - 1).toShort else Short.MinValue
+    case xt: Int => if (xt > Int.MinValue) xt - 1 else Int.MinValue
+    case xt: Long => if (xt > Long.MinValue) xt - 1L else Long.MinValue
+    case xt: BigInt => xt - 1
+    case xt: Float => Math.nextDown(xt)
+    case xt: Double => Math.nextDown(xt)
+    case xt: BigDecimal => xt - bigDecimalInfinitesimal
+  }).asInstanceOf[N]
+
+
+  extension (b: Byte) {
+    inline def nextUp: Byte = if (b < Byte.MaxValue) (b + 1).toByte else Byte.MaxValue
+    inline def nextDown: Byte = if (b > Byte.MinValue) (b - 1).toByte else Byte.MinValue
+    inline def <(x: BigInt): Boolean = b.toInt < x
+    inline def >(x: BigInt): Boolean = b.toInt > x
+    inline def <=(x: BigInt): Boolean = b.toInt <= x
+    inline def >=(x: BigInt): Boolean = b.toInt >= x
+
+    inline def <(x: BigDecimal): Boolean = b.toFloat < x
+    inline def >(x: BigDecimal): Boolean = b.toFloat > x
+    inline def <=(x: BigDecimal): Boolean = b.toFloat <= x
+    inline def >=(x: BigDecimal): Boolean = b.toFloat >= x
+  }
+
+  extension (b: Short) {
+    inline def nextUp: Short = if (b < Short.MaxValue) (b + 1).toShort else Short.MaxValue
+    inline def nextDown: Short = if (b > Short.MinValue) (b - 1).toShort else Short.MinValue
+    inline def <(x: BigInt): Boolean = b.toInt < x
+    inline def >(x: BigInt): Boolean = b.toInt > x
+    inline def <=(x: BigInt): Boolean = b.toInt <= x
+    inline def >=(x: BigInt): Boolean = b.toInt >= x
+
+    inline def <(x: BigDecimal): Boolean = b.toFloat < x
+    inline def >(x: BigDecimal): Boolean = b.toFloat > x
+    inline def <=(x: BigDecimal): Boolean = b.toFloat <= x
+    inline def >=(x: BigDecimal): Boolean = b.toFloat >= x
+  }
+
+  extension (i:Int) {
+    inline def nextUp:Int = if (i < Int.MaxValue) i + 1 else Int.MaxValue
+    inline def nextDown:Int = if (i > Int.MinValue) i - 1 else Int.MinValue
+
+  }
+
+  extension (l: Long) {
+    inline def nextUp: Long = if (l < Long.MaxValue) l + 1L else Long.MaxValue
+    inline def nextDown: Long = if (l > Long.MinValue) l - 1L else Long.MinValue
+
+  }
+
+  extension (f: Float) {
+    inline def nextUp: Float = Math.nextUp(f)
+    inline def nextDown: Float = Math.nextDown(f)
+    inline def <(x: BigInt): Boolean = BigDecimal(f) < BigDecimal(x)
+    inline def >(x: BigInt): Boolean = BigDecimal(f) > BigDecimal(x)
+    inline def <=(x: BigInt): Boolean = BigDecimal(f) <= BigDecimal(x)
+    inline def >=(x: BigInt): Boolean = BigDecimal(f) >= BigDecimal(x)
+
+    inline def <(x: BigDecimal): Boolean = BigDecimal(f) < x
+    inline def >(x: BigDecimal): Boolean = BigDecimal(f) > x
+    inline def <=(x: BigDecimal): Boolean = BigDecimal(f) <= x
+    inline def >=(x: BigDecimal): Boolean = BigDecimal(f) >= x
+  }
+
+
+
+  extension (d: Double) {
+    inline def nextUp: Double = Math.nextUp(d)
+    inline def nextDown: Double = Math.nextDown(d)
+    inline def <(x: BigInt): Boolean = BigDecimal(d) < BigDecimal(x)
+    inline def >(x: BigInt): Boolean = BigDecimal(d) > BigDecimal(x)
+    inline def <=(x: BigInt): Boolean = BigDecimal(d) <= BigDecimal(x)
+    inline def >=(x: BigInt): Boolean = BigDecimal(d) >= BigDecimal(x)
+  }
+
+
+  /*
+    BigInt needs: byte, short, float, double, BigDecimal
+   */
+
+  extension (bi: BigInt) {
+    inline def nextUp: BigInt = bi + 1
+    inline def nextDown: BigInt = bi - 1
+    inline def <(x: Byte): Boolean = bi < x.toInt
+    inline def >(x: Byte): Boolean = bi > x.toInt
+    inline def <=(x: Byte): Boolean = bi <= x.toInt
+    inline def >=(x: Byte): Boolean = bi >= x.toInt
+
+    inline def <(x: Short): Boolean = bi < x.toInt
+    inline def >(x: Short): Boolean = bi > x.toInt
+    inline def <=(x: Short): Boolean = bi <= x.toInt
+    inline def >=(x: Short): Boolean = bi >= x.toInt
+
+    inline def <(x: Float): Boolean = BigDecimal(bi) < BigDecimal(x.toDouble)
+    inline def >(x: Float): Boolean = BigDecimal(bi) > BigDecimal(x.toDouble)
+    inline def <=(x: Float): Boolean = BigDecimal(bi) <= BigDecimal(x.toDouble)
+    inline def >=(x: Float): Boolean = BigDecimal(bi) >= BigDecimal(x.toDouble)
+
+    inline def <(x: Double): Boolean = BigDecimal(bi) < BigDecimal(x)
+    inline def >(x: Double): Boolean = BigDecimal(bi) > BigDecimal(x)
+    inline def <=(x: Double): Boolean = BigDecimal(bi) <= BigDecimal(x)
+    inline def >=(x: Double): Boolean = BigDecimal(bi) >= BigDecimal(x)
+
+    inline def <(x: BigDecimal): Boolean = BigDecimal(bi) < x
+    inline def >(x: BigDecimal): Boolean = BigDecimal(bi) > x
+    inline def <=(x: BigDecimal): Boolean = BigDecimal(bi) <= x
+    inline def >=(x: BigDecimal): Boolean = BigDecimal(bi) >= x
+  }
+
+
+  /*
+    BigDecimal needs: byte, short, BigInt, float
+   */
+
+  extension (bd: BigDecimal) {
+    inline def nextUp: BigDecimal = bd + bigDecimalInfinitesimal
+    inline def nextDown: BigDecimal = bd - bigDecimalInfinitesimal
+    inline def <(x: Byte): Boolean = bd < x.toInt
+    inline def >(x: Byte): Boolean = bd > x.toInt
+    inline def <=(x: Byte): Boolean = bd <= x.toInt
+    inline def >=(x: Byte): Boolean = bd >= x.toInt
+
+    inline def <(x: Short): Boolean = bd < x.toInt
+    inline def >(x: Short): Boolean = bd > x.toInt
+    inline def <=(x: Short): Boolean = bd <= x.toInt
+    inline def >=(x: Short): Boolean = bd >= x.toInt
+
+    inline def <(x: Float): Boolean = bd < BigDecimal(x.toDouble)
+    inline def >(x: Float): Boolean = bd > BigDecimal(x.toDouble)
+    inline def <=(x: Float): Boolean = bd <= BigDecimal(x.toDouble)
+    inline def >=(x: Float): Boolean = bd >= BigDecimal(x.toDouble)
+
+    inline def <(x: Double): Boolean = bd < BigDecimal(x)
+    inline def >(x: Double): Boolean = bd > BigDecimal(x)
+    inline def <=(x: Double): Boolean = bd <= BigDecimal(x)
+    inline def >=(x: Double): Boolean = bd >= BigDecimal(x)
+
+    inline def <(x: BigInt): Boolean = bd < BigDecimal(x)
+    inline def >(x: BigInt): Boolean = bd > BigDecimal(x)
+    inline def <=(x: BigInt): Boolean = bd <= BigDecimal(x)
+    inline def >=(x: BigInt): Boolean = bd >= BigDecimal(x)
+  }
 }

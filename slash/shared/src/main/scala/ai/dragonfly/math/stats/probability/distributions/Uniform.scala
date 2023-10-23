@@ -28,7 +28,7 @@ import scala.language.postfixOps
 object Uniform {
 
   def apply(b1:Double, b2:Double): Uniform = {
-    Uniform(`[]`[Double](Math.min(b1, b2), Math.max(b1, b2)))
+    Uniform(`[]`(Math.min(b1, b2), Math.max(b1, b2)))
   }
 
   lazy val domain:Domain[Double] = Domain.ℝ_Double

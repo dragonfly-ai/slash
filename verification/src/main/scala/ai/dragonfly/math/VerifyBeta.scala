@@ -4,7 +4,7 @@ import ai.dragonfly.math.stats.DenseHistogramOfContinuousDistribution
 import ai.dragonfly.math.stats.probability.distributions.Beta
 import org.apache.commons.math3.distribution.BetaDistribution
 
-object Verify extends App {
+object VerifyBeta extends App {
 
   val parameters:Seq[Double] = Seq[Double](0.1, 0.5, 1.0, 2.0, 5.0)
 

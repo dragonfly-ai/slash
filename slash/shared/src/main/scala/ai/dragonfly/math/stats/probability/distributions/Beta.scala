@@ -23,15 +23,11 @@ import Interval.*
 
 object Beta {
 
-  def fromPERT(pert:PERT):Beta = {
-    fromMeanVarianceMinMax(pert.μ, pert.`σ²`, pert.interval.min, pert.interval.MAX)
-  }
-
-  inline def fromMeanVarianceMinMax(μ:Double, `σ²`:Double, min:Double = 0.0, MAX:Double = 0.0):Beta = {
+  def fromMeanVarianceMinMax(μ:Double, `σ²`:Double, min:Double = 0.0, MAX:Double = 1.0):Beta = {
     val scale:Double = MAX - min
     val μS:Double = (μ - min) / scale
 
-    val `σ²S`:Double = `σ²` / (scale * scale)
+    val `σ²S`:Double = `σ²` / squareInPlace(scale)
     val `1-μS`:Double = 1.0 - μS
 
     val α = μS * (((μS * `1-μS`)/`σ²S`) - 1.0)
@@ -43,7 +39,7 @@ object Beta {
   val domain:Domain[Double] = Domain.ℝ_Double
 }
 
-case class Beta(α:Double, β:Double, val min:Double = 0.0, val MAX:Double = 1.0) extends ParametricProbabilityDistribution[Double] {
+case class Beta(α:Double, β:Double, min:Double = 0.0, MAX:Double = 1.0) extends ParametricProbabilityDistribution[Double] {
   def alpha:Double = α
   def beta:Double = β
 
@@ -122,7 +118,7 @@ case class Beta(α:Double, β:Double, val min:Double = 0.0, val MAX:Double = 1.0
           }
         }
       }
-      transform(if ( α == `max(α,β)`) w / (β + w) else α / (α + w))
+      transform( if ( α == `max(α,β)`) w / (β + w) else α / (α + w) )
     }
     //Precision.equals(a, a0) ? w / (b + w) : b / (b + w);
     //Precision.equals(a, a0) ? w / (b + w) : b / (b + w);
@@ -136,11 +132,22 @@ case class Beta(α:Double, β:Double, val min:Double = 0.0, val MAX:Double = 1.0
   }
 }
 
+object EstimatedBeta {
+  def apply(ps: PointStatistics[Double]): EstimatedBeta = EstimatedBeta(
+    Beta.fromMeanVarianceMinMax(
+      ps.μ,
+      ps.`σ²`,
+      ps.min,
+      ps.MAX
+    ),
+    ps.ℕ
+  )
+}
 case class EstimatedBeta(override val idealized: Beta, override val ℕ:Double) extends EstimatedProbabilityDistribution[Double, Beta]{
   def α:Double = idealized.α
   def β:Double = idealized.β
 
-  override val interval: Interval[Double] = `[]`[Double](idealized.min, idealized.MAX)
+  override val interval: Interval[Double] = `[]`(idealized.min, idealized.MAX)
 
   override def toString: String = s"BetaEstimate(α = $α, β = $β, min = ${interval.min}, MAX = ${interval.MAX}, μ = $μ, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }

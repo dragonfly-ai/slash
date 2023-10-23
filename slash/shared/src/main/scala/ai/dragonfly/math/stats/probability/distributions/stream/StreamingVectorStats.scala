@@ -25,11 +25,8 @@ import narr.*
  */
 
 
-/**
- * Not thread safe!
- * @param dimension vector dimension
- */
-class StreamingVectorStats[N <: Int](using ValueOf[N]) {
+
+class StreamingVectorStats[N <: Int](using ValueOf[N]) {  // Why doesn't this extend Sampleable?
   val dimension: N = valueOf[N]
 
   var s0: Double = 0.0

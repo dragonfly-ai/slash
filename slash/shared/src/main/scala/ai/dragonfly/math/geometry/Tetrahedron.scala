@@ -70,7 +70,11 @@ case class Tetrahedron(vertices:NArray[Vec[3]]) extends Sampleable[Vec[3]] {
       w2 = t
     }
 
-    (`v1-v4` * w1).add(`v2-v4` * (w2 - w1)).add(`v3-v4` * (w3 - w2)).add(v4)
+    val o:Vec[3] = `v1-v4` * w1
+    o += `v2-v4` * (w2 - w1)
+    o += `v3-v4` * (w3 - w2)
+    o += v4
+    o
   }
 
 

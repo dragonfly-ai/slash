@@ -57,7 +57,7 @@ case class Binomial(n:Long, P:Double) extends ParametricProbabilityDistribution[
    */
 
   override def p(k: Long): Double = {
-    if (k > n || k <= 0) 0.0
+    if (k > n || k < 0) 0.0
     else {
       val `k!`:BigInt = k!
       val `n-k`:Long = n - k
@@ -71,8 +71,9 @@ case class Binomial(n:Long, P:Double) extends ParametricProbabilityDistribution[
    */
   override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Long = {
     var successCount = 0L
-    for (i <- 0L until n) {
+    var i:Long = 0L; while (i < n) {
       if (r.nextDouble() < P) successCount = successCount + 1L
+      i += 1
     }
     successCount
   }

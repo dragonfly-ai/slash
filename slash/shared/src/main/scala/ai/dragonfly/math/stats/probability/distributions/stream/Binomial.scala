@@ -20,72 +20,78 @@ import ai.dragonfly.math.stats.probability.distributions
 import ai.dragonfly.math.*
 import ai.dragonfly.math.interval.*
 import Interval.*
-import ai.dragonfly.math.stats.BoundedMean
+import ai.dragonfly.math.accumulation.DiscreteAccumulator
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
 
+case class FixedBinomial(trialCount: Long) extends OnlineProbabilityDistributionEstimator[Long, distributions.Binomial] with EstimatesBoundedMean[Long] {
 
-case class FixedBinomial(n: Long) extends OnlineUnivariateProbabilityDistributionEstimator[Long, distributions.Binomial]  {
+  private var s0: Long = 0L
+  private val s1: DiscreteAccumulator = new DiscreteAccumulator
 
-  val estimator: BoundedMeanEstimator[Long] = new BoundedMeanEstimator[Long](distributions.Binomial.domain)
+  private var min: Long = Long.MaxValue
+  private var MAX: Long = Long.MinValue
 
-  override def observe(frequency: Long, observation: Long): FixedBinomial = {
-    estimator.observe(Array[Long](frequency, observation))
+  override def observe(successCount: Long): this.type = observe(1L, successCount)
+
+  override def observe(experimentCount: Long, successCount: Long): this.type = {
+    s0 += experimentCount
+    s1.observeProduct(successCount, experimentCount)
+
+    min = Math.min(min, successCount)
+    MAX = Math.min(MAX, successCount)
     this
   }
 
-  override def estimate:distributions.EstimatedBinomial = {
-    val bμ̂:BoundedMean[Long] = estimator.sampleBoundedMean
-    distributions.EstimatedBinomial(
-      bμ̂.bounds,
-      distributions.Binomial(n, bμ̂.μ / n),
-      bμ̂.ℕ
-    )
-  }
+  override def estimate:distributions.EstimatedBinomial = distributions.EstimatedBinomial(
+    estimatedRange,
+    distributions.Binomial(
+      trialCount,
+      estimatedMean / trialCount
+    ),
+    s0
+  )
 
+
+  override inline def estimatedMean: Double = (BigDecimal(s1.total) / BigDecimal(s0)).toDouble
+
+  override inline def estimatedRange: Interval[Long] = `[]`(min, MAX)
+
+  override inline def totalSampleMass: Long = s0
 }
 
+class Binomial extends OnlineProbabilityDistributionEstimator[Long, distributions.Binomial] with OnlineBivariateEstimator[Long] {
 
+  private var s0: Long = 0L
+  private val s1: DiscreteAccumulator = new DiscreteAccumulator
+  private val s2: DiscreteAccumulator = new DiscreteAccumulator
 
-class Binomial extends OnlineBivariateProbabilityDistributionEstimator[Long, distributions.Binomial] {
+  private var minSuccessCount: Long = Long.MaxValue
+  private var successCountMAX: Long = Long.MinValue
 
-  val estimator = new BinomialEstimator()
+  override def observe(experimentCount:Long, successCount:Long, trialCount:Long): this.type = {
 
-  def observe(experimentCount:Long, successCount:Long, trialCount:Long): Binomial = {
-    estimator.observe(Array[Long](experimentCount, successCount, trialCount))
+    s0 += experimentCount
+    s1.observeProduct(successCount, experimentCount)
+    s2.observeProduct(trialCount, experimentCount)
+
+    minSuccessCount = Math.min(minSuccessCount, successCount)
+    successCountMAX = Math.max(successCountMAX, successCount)
+
     this
   }
 
-  def estimate:distributions.EstimatedBinomial = {
-    val si = estimator.getS
-    distributions.EstimatedBinomial(
-      `[]`[Long](si(3), si(4)),
-      distributions.Binomial(
-        si(2) / si(0), // estimated trial count per experiment
-        ( BigDecimal(si(1)) / BigDecimal(si(2)) ).toDouble  // estimated Probability of success per trial.
-      ),
-      si(0)
-    )
-  }
-}
+  def estimate:distributions.EstimatedBinomial = distributions.EstimatedBinomial(
+    `[]`(minSuccessCount, successCountMAX),
+    distributions.Binomial(
+      (BigDecimal(s2.total) / BigDecimal(s0)).toLong, // estimated trial count per experiment
+      ( BigDecimal(s1.total) / BigDecimal(s2.total) ).toDouble  // estimated Probability of success per trial.
+    ),
+    s0
+  )
 
-class BinomialEstimator(override val domain:Domain[Long] = distributions.Binomial.domain) extends OnlineEstimator[Long] {
+  override def observe(successCount:Long, trialCount:Long): Binomial.this.type = observe(1L, successCount, trialCount)
 
-  s = Array[Long](0L, 0L, 0L, Long.MaxValue, Long.MinValue)
-
-  override def observe(xi:Array[Long]):OnlineEstimator[Long] = synchronized {
-    val si = s
-    s = Array[Long](
-      si(0) + xi(0),  // experiment count
-      si(1) + xi(1) * xi(0),  // success count
-      si(2) + xi(2) * xi(0),   // trial count
-      Math.min(si(3), xi(1)),
-      Math.max(si(4), xi(1))
-    )
-    this
-  }
-
-  def getS:Array[Long] = s
-
+  override def totalSampleMass: Long = s0
 }

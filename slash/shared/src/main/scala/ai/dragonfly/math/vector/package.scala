@@ -17,12 +17,12 @@
 package ai.dragonfly.math
 
 import ai.dragonfly.math.Random.nextVec
+import ai.dragonfly.math.interval.Interval
 import ai.dragonfly.math.vector.Vec
 import unicode.*
 import narr.*
 
 import scala.language.implicitConversions
-
 import scala.compiletime.ops.any.==
 import scala.compiletime.ops.int.*
 
@@ -43,10 +43,10 @@ package object vector {
     inline def ones[N <: Int](using ValueOf[N]): Vec[N] = fill[N](1.0)
 
     inline def random[N <: Int](
-      MAX:Double = 1.0,
-      min:Double = 0.0,
-      r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom
-    ): Vec[N] = r.nextVec[N](min, MAX)
+                                 MAX:Double = 1.0,
+                                 min:Double = 0.0,
+                                 r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom
+                               ): Vec[N] = r.nextVec[N](min, MAX)
 
     inline def apply(x: Double, y: Double): Vec[2] = NArray[Double](x, y)
 
@@ -73,6 +73,32 @@ package object vector {
       }
     }
 
+    inline def fill[N <: Int](d: Double): Vec[N] = apply(NArray.fill[Double](valueOf[N])(d))
+
+    inline def tabulate[N <: Int](f: Int => Double): Vec[N] = apply(NArray.tabulate[Double](valueOf[N])(f))
+
+    def midpoint[N <: Int](v0: Vec[N], v1: Vec[N]): Vec[N] = (v0 + v1) * 0.5
+
+    def blend[N <: Int](alpha: Double, v0: Vec[N], v1: Vec[N]): Vec[N] = (v0 * alpha) + (v1 * (1.0 - alpha))
+
+    def mean[N <: Int](`[v₁v₂⋯vₙ]`: Vec[N]*): Vec[N] = {
+      val μ: Vec[N] = `[v₁v₂⋯vₙ]`.head.copy
+      for (v <- `[v₁v₂⋯vₙ]`.tail) {
+        μ += v
+      }
+      μ /= `[v₁v₂⋯vₙ]`.size
+      μ
+    }
+
+    def mean[N <: Int](`[v₀v₁⋯v₍ₙ₋₁₎]`: NArray[Vec[N]]): Vec[N] = {
+      val μ: Vec[N] = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).copy
+      for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
+        μ += `[v₀v₁⋯v₍ₙ₋₁₎]`(i)
+      }
+      μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length //.asInstanceOf[Vec[N]]
+      μ
+    }
+
     private inline def DBL(a:Any):Double = a.asInstanceOf[Double]
 
     def fromTuple(t: (Double, Double)):Vec[2] = Vec[2](t._1, t._2)
@@ -97,7 +123,7 @@ package object vector {
     def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[21] = Vec.tabulate(i => DBL(t(i)))
     def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[22] = Vec.tabulate(i => DBL(t(i)))
 
-    val rankVariableSort: Ordering[(Double, Int)] = Ordering.by(_._1)
+    private val rankVariableSort: Ordering[(Double, Int)] = Ordering.by(_._1)
 
     extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 1 =:= true) {
       inline def x: Double = thisVector(0)
@@ -119,14 +145,13 @@ package object vector {
      * Vec[2] extension methods:
      */
     extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N == 2 =:= true) {
-      inline def rotate(cosTheta: Double, sinTheata: Double): Vec[2] = {
+      inline def rotate(cosTheta: Double, sinTheata: Double): Unit = {
         val x1 = thisVector(0) * cosTheta - thisVector(1) * sinTheata
         thisVector(1) = thisVector(0) * sinTheata + thisVector(1) * cosTheta
         thisVector(0) = x1
-        thisVector
       }
-      inline def rotate(radians: Double): Vec[2] = rotate(Math.cos(radians), Math.sin(radians))
-      inline def rotateDegrees(degrees: Double): Vec[2] = rotate(degreesToRadians(degrees))
+      inline def rotate(radians: Double): Unit = rotate(Math.cos(radians), Math.sin(radians))
+      inline def rotateDegrees(degrees: Double): Unit = rotate(degreesToRadians(degrees))
       inline def pseudoCross(thatVector: Vec[2]): Double = thisVector(0) * thatVector.y + thisVector(1) * thatVector.x
 
       /**
@@ -167,29 +192,54 @@ package object vector {
 
       // clamp methods
 
-      def clamp(lt: Double, gt: Double): Vec[N] = {
-        var i = 0;
-        while (i < thisVector.dimension) {
+      def clamp(lt: Double, gt: Double): Unit = {
+        if (gt < lt) throw Exception(s"Invoked Vec[${thisVector.dimension}].clamp(lt = $lt, gt = $gt) but gt < lt.")
+        var i = 0; while (i < thisVector.dimension) {
           if (thisVector(i) < lt) thisVector(i) = lt
           else if (thisVector(i) > gt) thisVector(i) = gt
           i = i + 1
         }
-        thisVector
       }
 
-      inline def clampMin(lt: Double): Vec[N] = clamp(lt, Double.MaxValue)
-      inline def clampMAX(gt: Double): Vec[N] = clamp(Double.MinValue, gt)
+      inline def clamp(i:Interval[Double]): Unit = clamp(i.set_min, i.set_MAX)
 
-      inline def clamped(lt: Double, gt: Double):Vec[N] = copy.clamp(lt, gt)
+      inline def clamped(lt: Double, gt: Double):Vec[N] = {
+        val o:Vec[N] = copy
+        o.clamp(lt, gt)
+        o
+      }
 
-      inline def clampedMin(lt: Double): Vec[N] = copy.clamp(lt, Double.MaxValue)
-      inline def clampedMAX(gt: Double): Vec[N] = copy.clamp(Double.MinValue, gt)
+      inline def clamped(i:Interval[Double]): Vec[N] = clamped(i.set_min, i.set_MAX)
+
+      def min(lt: Double): Unit = {
+        var i = 0; while (i < thisVector.dimension) {
+          if (thisVector(i) < lt) thisVector(i) = lt
+          i = i + 1
+        }
+      }
+
+      def MAX(gt: Double): Unit = {
+        var i = 0; while (i < thisVector.dimension) {
+          if (thisVector(i) > gt) thisVector(i) = gt
+          i = i + 1
+        }
+      }
+
+      inline def clampedMin(lt: Double): Vec[N] = {
+        val o:Vec[N] = copy
+        o.min(lt)
+        o
+      }
+      inline def clampedMAX(gt: Double): Vec[N] = {
+        val o: Vec[N] = copy
+        o.MAX(gt)
+        o
+      }
 
 
-      def sum = {
+      def sum: Double = {
         var sum = 0.0
-        var i = 0
-        while (i < thisVector.dimension) {
+        var i = 0; while (i < thisVector.dimension) {
           sum = sum + thisVector(i)
           i = i + 1
         }
@@ -202,7 +252,7 @@ package object vector {
       def variance: Double = {
         // https://www.cuemath.com/sample-variance-formula/
         val μ = thisVector.mean
-        thisVector.map(i => squareInPlace(i - μ)).sum / (thisVector.size - 1)
+        thisVector.map(i => squareInPlace(i - μ)).sum / (thisVector.dimension - 1)
       }
 
       // It is assumed, that we consider a sample rather than a complete population
@@ -210,7 +260,7 @@ package object vector {
         // https://www.cuemath.com/data/standard-deviation/
         val mu = thisVector.mean
         val diffs_2 = thisVector.map( num => squareInPlace(num - mu) )
-        Math.sqrt( diffs_2.sum / (thisVector.size - 1 ) )
+        Math.sqrt( diffs_2.sum / (thisVector.dimension - 1 ) )
       }
 
       def covariance(thatVector : Vec[N] ):Double = {
@@ -225,7 +275,7 @@ package object vector {
       }
 
       def pearsonCorrelationCoefficient(thatVector: Vec[N]): Double = {
-        val n = thisVector.size
+        val n = thisVector.dimension
         var i = 0
 
         var sum_x = 0.0
@@ -287,8 +337,7 @@ package object vector {
 
       def normSquared: Double = {
         var mag2 = 0.0
-        var i = 0
-        while (i < dimension) {
+        var i = 0; while (i < dimension) {
           mag2 = mag2 + squareInPlace(thisVector(i))
           i = i + 1
         }
@@ -303,8 +352,7 @@ package object vector {
 
       def euclideanDistanceSquaredTo(v0: Vec[N]): Double = {
         var distance = 0.0
-        var i = 0
-        while (i < dimension) {
+        var i = 0; while (i < dimension) {
           distance = distance + squareInPlace(thisVector(i) - v0(i))
           i = i + 1
         }
@@ -313,105 +361,150 @@ package object vector {
 
       inline def euclideanDistanceTo(v0: Vec[N]): Double = Math.sqrt(euclideanDistanceSquaredTo(v0))
 
-      inline def + (inline v0: Vec[N]): Vec[N] = copy.add(v0)
+      def + (scalar: Double): Vec[N] = {
+        val vOut = copy
+        var i = 0; while (i < dimension) {
+          vOut(i) = vOut(i) + scalar
+          i = i + 1
+        }
+        vOut
+      }
 
-
-      inline def + (inline scalar: Double): Vec[N] =
-        copy += scalar
-
-      inline def += (scalar: Double): Vec[N] =
-        var i = 0
-        while (i < dimension) {
+      inline def +=(scalar: Double): Unit = {
+        var i = 0; while (i < dimension) {
           thisVector(i) = thisVector(i) + scalar
           i = i + 1
         }
-        thisVector
+      }
 
-      inline def - (scalar: Double): Vec[N] =
-        copy -= scalar
+      def + (v0: Vec[N]): Vec[N] = {
+        val o:Vec[N] = copy
+        o.add(v0)
+        o
+      }
 
-      inline def -= (scalar: Double): Vec[N] =
-        var i = 0
-        while (i < dimension) {
-          thisVector(i) = thisVector(i) - scalar
-          i = i + 1
-        }
-        thisVector
+      inline def += (v0: Vec[N]): Unit = add(v0)
 
-      inline def += (v0: Vec[N]): Vec[N] = add(v0)
-
-      def add(v0: Vec[N]): Vec[N] = {
-        var i = 0
-        while (i < dimension) {
+      def add(v0: Vec[N]): Unit = {
+        var i = 0; while (i < dimension) {
           thisVector(i) = thisVector(i) + v0(i)
           i = i + 1
         }
-        thisVector
       }
 
       inline def unary_- : Vec[N] = thisVector * ( -1.0 )
 
+      def - (scalar: Double): Vec[N] = {
+        val vOut = copy
+        var i = 0;while (i < dimension) {
+          vOut(i) = vOut(i) - scalar
+          i = i + 1
+        }
+        vOut
+      }
 
-      inline def -(v0: Vec[N]): Vec[N] = copy.subtract(v0)
-      inline def -= (v0: Vec[N]): Vec[N] = subtract(v0)
+      inline def -=(scalar: Double): Unit = {
+        var i = 0; while (i < dimension) {
+          thisVector(i) = thisVector(i) - scalar
+          i = i + 1
+        }
+      }
 
-      def subtract(v0: Vec[N]): Vec[N] = {
-        var i = 0
-        while (i < dimension) {
+      def -(v0: Vec[N]): Vec[N] = {
+        val o: Vec[N] = copy
+        o.subtract(v0)
+        o
+      }
+
+      inline def -= (v0: Vec[N]): Unit = subtract(v0)
+
+      def subtract(v0: Vec[N]): Unit = {
+        var i = 0; while (i < dimension) {
           thisVector(i) = thisVector(i) - v0(i)
           i = i + 1
         }
-        thisVector
       }
 
       def dot(v0: Vec[N]): Double = {
         var product = 0.0
-        var i = 0
-        while (i < dimension) {
+        var i = 0; while (i < dimension) {
           product = product + thisVector(i) * v0(i)
           i = i + 1
         }
         product
       }
 
-      inline def *(scalar: Double): Vec[N] = copy.scale(scalar)
+      inline def * (scalar: Double): Vec[N] = scaled(scalar)
 
-      inline def *= (scalar: Double): Vec[N] = scale(scalar)
-      def scale(scalar: Double): Vec[N] = {
-        var i = 0
-        while (i < dimension) {
+      inline def *= (scalar: Double): Unit = scale(scalar)
+      def scale(scalar: Double): Unit = {
+        var i = 0; while (i < dimension) {
           thisVector(i) = thisVector(i) * scalar
           i = i + 1
         }
-        thisVector
       }
-      inline def /(divisor: Double): Vec[N] = copy.divide(divisor)
-      inline def /= (divisor: Double): Vec[N] = divide(divisor)
 
-      inline def divide(divisor: Double): Vec[N] = scale(1.0 / divisor)
+      def scaled(scalar: Double): Vec[N] = {
+        val o: Vec[N] = copy
+        o.scale(scalar)
+        o
+      }
+
+      inline def / (divisor: Double): Vec[N] = divided(divisor)
+      inline def /= (divisor: Double): Unit = divide(divisor)
+
+      inline def divide(divisor: Double): Unit = scale(1.0 / divisor)
+
+      def divided(divisor: Double): Vec[N] = {
+        val o: Vec[N] = copy
+        o.divide(divisor)
+        o
+      }
 
       def round(): Unit = {
-        var i = 0
-        while (i < dimension) {
+        var i = 0; while (i < dimension) {
           thisVector(i) = Math.round(thisVector(i)).toDouble
           i = i + 1
         }
       }
 
+      inline def rounded: Vec[N] = {
+        val o: Vec[N] = copy
+        o.round()
+        o
+      }
+
       inline def discretize(): Unit = round()
 
       def discretize(r: Double): Unit = {
-        var i = 0
-        while (i < dimension) {
+        var i = 0; while (i < dimension) {
           thisVector(i) = r * Math.round(thisVector(i) / r).toDouble
           i = i + 1
         }
       }
 
-      inline def normalize(): Vec[N] = {
+      def discritized: Vec[N] = {
+        val o: Vec[N] = copy
+        o.round()
+        o
+      }
+
+      def discritized(r: Double): Vec[N] = {
+        val o: Vec[N] = copy
+        o.discretize(r)
+        o
+      }
+
+      inline def normalize(): Unit = {
         val n: Double = norm
         if (n > 0.0) divide(n)
         else throw VectorNormalizationException(thisVector)
+      }
+
+      def normalized: Vec[N] = {
+        val o: Vec[N] = copy
+        o.normalize()
+        o
       }
 
       // ₂⃗ ²↗ ↗²
@@ -426,8 +519,7 @@ package object vector {
         import format.*
         sb.append(prefix(thisVector))
         val end:Int = dimension - 1
-        var i = 0
-        while (i < end) {
+        var i = 0; while (i < end) {
           sb.append(numberFormatter(thisVector(i)))
             .append(delimiter(i))
           i = i + 1
@@ -440,29 +532,6 @@ package object vector {
       def tsv(sb: StringBuilder = new StringBuilder()): String = render(Format.TSV, sb).toString
     }
 
-    inline def fill[N <: Int](d: Double): Vec[N] = apply(NArray.fill[Double](valueOf[N])(d))
-
-    inline def tabulate[N <: Int](f: Int => Double): Vec[N] = apply(NArray.tabulate[Double](valueOf[N])(f))
-
-    def midpoint[N <: Int](v0: Vec[N], v1: Vec[N]): Vec[N] = (v0 + v1) * 0.5
-
-    def blend[N <: Int](alpha: Double, v0: Vec[N], v1: Vec[N]):Vec[N] = (v0 * alpha) + (v1 * (1.0 - alpha))
-
-    def mean[N <: Int](`[v₁v₂⋯vₙ]`: Vec[N]*): Vec[N] = {
-      val μ: Vec[N] = `[v₁v₂⋯vₙ]`.head.copy
-      for (v <- `[v₁v₂⋯vₙ]`.tail) {
-        μ += v
-      }
-      μ /= `[v₁v₂⋯vₙ]`.size
-    }
-
-    def mean[N <: Int](`[v₀v₁⋯v₍ₙ₋₁₎]`: NArray[Vec[N]]): Vec[N] = {
-      val μ: Vec[N] = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).copy
-      for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
-        μ += `[v₀v₁⋯v₍ₙ₋₁₎]`(i)
-      }
-      μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length //.asInstanceOf[Vec[N]]
-    }
   }
 
   trait Format {
@@ -514,7 +583,7 @@ package object vector {
 
 }
 
-  case class UnsupportedVectorDimension(givenDimension:Int, requiredDimension:Int = -1) extends Exception(
+case class UnsupportedVectorDimension(givenDimension:Int, requiredDimension:Int = -1) extends Exception(
   givenDimension match {
     case gd:Int if gd < 2 => s"Vector dimensions must exceed 1.  Cannot create a vector of dimension: $givenDimension"
     case _ => s"Expected Vector dimension: $requiredDimension, but observed: $givenDimension"

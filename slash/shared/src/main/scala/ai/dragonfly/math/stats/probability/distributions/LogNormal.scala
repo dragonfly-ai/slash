@@ -25,17 +25,17 @@ import Constant.π
 
 object LogNormal {
 
-  def fromGaussianParameters(Gμ:Double, `Gσ²`: Double): LogNormal = fromGaussian( Gaussian(Gμ, `Gσ²`) )
-
-  def fromGaussian(g: Gaussian): LogNormal = LogNormal(
-    Math.exp( g.μ + (g.`σ²` / 2) ),
-    (Math.exp(g.`σ²`) - 1) * Math.exp((2 * g.μ) + (g.`σ²`))
+  def fromGaussianParameters(Gμ:Double, `Gσ²`: Double): LogNormal = LogNormal(
+    Math.exp(Gμ + (`Gσ²` / 2.0)),
+    (Math.exp(`Gσ²`) - 1.0) * Math.exp(2.0 * Gμ + `Gσ²`)
   )
 
-  private val c1:Double = Math.sqrt(2.0 * π)
-  def p(x:Double, μG:Double, σG: Double):Double = {
-    val c2:Double = Math.log(x) - μG
-    (1.0 / (x * (σG * c1))) * Math.exp(-0.5 * ((c2*c2) / (σG * σG)))
+  inline def fromGaussian(g: Gaussian): LogNormal = fromGaussianParameters(g.μ, g.`σ²`)
+
+  private val `√(2π)`:Double = Math.sqrt(2.0 * π)
+  def p(x:Double, μG:Double, σG: Double):Double = if (x <= 0.0) 0.0 else {
+    val `ln(x)-μ`:Double = Math.log(x) - μG
+    (1.0 / (x * (σG * `√(2π)`))) * Math.exp(-0.5 * (squareInPlace(`ln(x)-μ`) / squareInPlace(σG)))
   }
 
   val domain:Domain[Double] = Domain.`ℝ+_Double`
@@ -44,16 +44,16 @@ object LogNormal {
 case class LogNormal(override val μ:Double, override val `σ²`: Double) extends ParametricProbabilityDistribution[Double] {
 
   val G:Gaussian = {
-    val `μ²`:Double = μ * μ
+    val `μ²`:Double = squareInPlace(μ)
     Gaussian(
-      Math.log( `μ²` / Math.sqrt(`μ²` + `σ²`) ), // transform mean
-      Math.log( 1.0 + (`σ²` / `μ²`) ) // transform variance
+      ln( `μ²` / Math.sqrt(`μ²` + `σ²`) ), // transform mean
+      ln( 1.0 + (`σ²` / `μ²`) ) // transform variance
     )
   }
 
   lazy val σ: Double = Math.sqrt(`σ²`)
 
-  def p(x:Double):Double = LogNormal.p(x, G.μ, G.σ)
+  def p(x:Double):Double = LogNormal.p(x, μ, σ)
 
   override def random(r:scala.util.Random = ai.dragonfly.math.Random.defaultRandom): Double = {
     Math.exp(G.random(r))
