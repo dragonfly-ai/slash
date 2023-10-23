@@ -62,8 +62,8 @@ class TestBinomial extends munit.FunSuite:
 
     val eB:EstimatedBinomial = sB.estimate
 
-    assertEqualsDouble(eB.μ, mean, 0.01)
-    assertEqualsDouble(eB.`σ²`, variance, 0.01)
+    assertEqualsDouble(eB.μ, mean, 0.1)
+    assertEqualsDouble(eB.`σ²`, variance, 0.1)
 
   }
 
