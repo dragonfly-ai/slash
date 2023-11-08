@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-import slash.stats.probability.distributions.{PERT, Beta}
+import slash.log
+import slash.Constant
 
-class TestPERT extends munit.FunSuite {
-
-  test("pert.p(x) and p.asBeta.p(x)") {
-
-    val p:PERT = PERT(0.0, 0.5, 1.0)
-    val b:Beta = p.asBeta
-
-    assertEqualsDouble(p.μ, b.μ, 0.000000001)
-    assertEqualsDouble(p.`σ²`, b.`σ²`, 0.000000001)
-
-    var i:Int = 0; while (i < 99) {
-      val r0:Double = p.random()
-      val r1:Double = p.asBeta.random()
-      assertEqualsDouble(p.p(r0), b.p(r0), 0.000000001)
-      assertEqualsDouble(p.p(r1), b.p(r1), 0.000000001)
-      i += 1
-    }
-
+class LogTest extends munit.FunSuite {
+  test("logs") {
+    assertEqualsDouble(log[2](8), 3, 0.000000001)
+    assertEqualsDouble(log[2](65536), 16, 0.000000001)
   }
 
+  test("log e") {
+    assertEqualsDouble(log[2.7182818284590452](Constant.e), 1, 0.000000001)
+  }
+
+  test("negative") {
+    assert(log[10](-1).isNaN())
+  }
 }

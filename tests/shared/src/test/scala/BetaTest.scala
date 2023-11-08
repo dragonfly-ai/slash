@@ -19,7 +19,7 @@ import slash.stats.PointStatistics
 import slash.stats.probability.distributions.{Beta, EstimatedBeta, stream}
 import slash.vector.*
 
-class TestBeta extends munit.FunSuite {
+class BetaTest extends munit.FunSuite {
 
   test("beta.p(x)") {
 

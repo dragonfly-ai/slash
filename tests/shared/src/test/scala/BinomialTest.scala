@@ -16,7 +16,7 @@
 
 import slash.stats.probability.distributions.{EstimatedBinomial, Binomial, stream}
 
-class TestBinomial extends munit.FunSuite:
+class BinomialTest extends munit.FunSuite {
 
   test("binomial.p(x)") {
 
@@ -42,8 +42,8 @@ class TestBinomial extends munit.FunSuite:
 
   test("estimate binomial") {
 
-    val n:Long = 10L
-    val p:Double = 0.25
+    val n: Long = 10L
+    val p: Double = 0.25
 
     val mean = n * p
     val variance = mean * 0.75
@@ -53,18 +53,18 @@ class TestBinomial extends munit.FunSuite:
     assertEqualsDouble(b0.μ, mean, 0.00001)
     assertEqualsDouble(b0.`σ²`, variance, 0.00001)
 
-    val sB:stream.Binomial = stream.Binomial()
-    var i:Int = 0; while (i < 10000) {
-      val rs:Long = b0.random()
+    val sB: stream.Binomial = stream.Binomial()
+    var i: Int = 0;
+    while (i < 10000) {
+      val rs: Long = b0.random()
       sB.observe(rs, 10L)
       i += 1
     }
 
-    val eB:EstimatedBinomial = sB.estimate
+    val eB: EstimatedBinomial = sB.estimate
 
     assertEqualsDouble(eB.μ, mean, 0.1)
     assertEqualsDouble(eB.`σ²`, variance, 0.1)
 
   }
-
-end TestBinomial
+}

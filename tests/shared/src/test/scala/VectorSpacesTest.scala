@@ -21,7 +21,7 @@ import slash.Constant.π
 
 import slash.Random.defaultRandom as r
 
-class VectorSpaces extends munit.FunSuite {
+class VectorSpacesTest extends munit.FunSuite {
   test(" testing kitchen sink ") {
     var runtimeDimension:Int = r.nextInt(42)
     runtimeDimension += 1

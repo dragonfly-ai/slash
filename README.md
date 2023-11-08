@@ -215,17 +215,17 @@ var i: Int = 1; while (i > 0) {
 ```
 
 <h3>Runtime Logarithms</h3>
-&nbsp;&nbsp;&nbsp;The runtime `Log` class can yield comparable performance in cases when the base of the logarithm can't be known at compile time, or can't be expressed as a constant.
+&nbsp;&nbsp;&nbsp;The runtime `LogTest` class can yield comparable performance in cases when the base of the logarithm can't be known at compile time, or can't be expressed as a constant.
 
 ```scala
 import slash.*
-// Use the runtime Log class for:
+// Use the runtime LogTest class for:
 // a base determined by a value:
 import slash.Constant.π
-val logBasePi: Log = Log(π)
+val logBasePi: LogTest = LogTest(π)
 logBasePi(13)
 // or any base unknown at compile time,
-val logBaseRandom:Log = Log(Math.random())
+val logBaseRandom:LogTest = LogTest(Math.random())
 logBaseRandom(42)
 ```
 

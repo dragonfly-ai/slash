@@ -17,7 +17,7 @@
 import slash.stats.probability.distributions.{EstimatedLogNormal, LogNormal, stream}
 import slash.vector.*
 
-class TestLogNormal extends munit.FunSuite {
+class LogNormalTest extends munit.FunSuite {
 
   test("LogNormal.p(x)") {
 

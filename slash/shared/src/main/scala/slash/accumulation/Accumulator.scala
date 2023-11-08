@@ -17,63 +17,50 @@
 package slash.accumulation
 
 trait Accumulator[T <: BigInt | BigDecimal] {
-  def observe(n:T):Accumulator[T]
   def total:T
-
   def observe(b: Byte): Accumulator[T]
-
   def observe(s: Short): Accumulator[T]
-
   def observe(i: Int): Accumulator[T]
-
   def observe(l: Long): Accumulator[T]
-
-  def observe(bi: BigInt): Accumulator[T]
-
+  def observe(bi:BigInt): Accumulator[T]
   inline def observeProduct(n0: Long, n1: Long): this.type = (
     if (n0 == 0L || n1 == 0L) this
     else if (Long.MaxValue / n0 >= n1) observe(n0 * n1)
     else observe(BigInt(n0) * BigInt(n1))
   ).asInstanceOf[this.type]
-
 }
 
 object DiscreteAccumulator {
   val zero:BigInt = BigInt(0)
+  val maxLong:BigInt = BigInt(Long.MaxValue)
 }
 
 class DiscreteAccumulator extends Accumulator[BigInt] {
-  private var big:BigInt = BigInt(0L)
+  private var overflowCount:Long = 0
   private var small:Long = Long.MaxValue
-  private var dirty:Boolean = false
 
   private inline def smallSum:Long = Long.MaxValue - small
-  private inline def resetSmallSum():Unit = {
-    small = Long.MaxValue
-    dirty = false
-  }
 
   private def collapseAndGet():BigInt = {
-    if (dirty) {
-      big = big + BigInt(smallSum)
-      resetSmallSum()
-    }
-    big
+    if (overflowCount > 0) (DiscreteAccumulator.maxLong * BigInt(overflowCount)) + BigInt(smallSum)
+    else BigInt(smallSum)
   }
 
   override def observe(bi:BigInt):DiscreteAccumulator = {
-    big = big + bi
-    dirty = true
-    this
+    if (bi < DiscreteAccumulator.maxLong) observe(bi.toLong)
+    else {
+      overflowCount += (bi / DiscreteAccumulator.maxLong).toLong
+      observe(bi % DiscreteAccumulator.maxLong)
+    }
   }
 
   override def observe(l:Long): DiscreteAccumulator = {
     if (small >= l) small -= l
     else {
-      big = big + BigInt(smallSum)
-      small = Long.MaxValue - l
+      val temp:Long = l - small
+      overflowCount += 1
+      small = Long.MaxValue - temp
     }
-    dirty = true
     this
   }
 
@@ -118,7 +105,7 @@ class ContinuousAccumulator extends Accumulator[BigDecimal] {
     this
   }
 
-  override def observe(bd: BigDecimal): ContinuousAccumulator = {
+  def observe(bd: BigDecimal): ContinuousAccumulator = {
     big = big + bd
     dirty = true
     this

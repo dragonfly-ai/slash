@@ -17,10 +17,10 @@
 import slash.gamma
 import slash.Factorial
 
-class Gamma extends munit.FunSuite:
-    test("gamma") {
-      for(i <- 1 to 15) {
-        assertEqualsDouble(gamma(i),  Factorial(i - 1).toDouble, 0.005  )
-      }
-   }
-end Gamma
+class GammaTest extends munit.FunSuite {
+  test("gamma") {
+    for (i <- 1 to 15) {
+      assertEqualsDouble(gamma(i), Factorial(i - 1).toDouble, 0.005)
+    }
+  }
+}

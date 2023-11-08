@@ -17,14 +17,14 @@
 import slash.vector.Vec
 import narr.*
 
-class Instantiate extends munit.FunSuite:
+class InstantiationTest extends munit.FunSuite {
 
-   test(" ways of making vecs ") {
+  test(" ways of making vecs ") {
 
     //type dim = 5
 
     val v = Vec.fromTuple(1.0, 2.0, 3.0, 4.0, 5.0)
-    assertEquals(v.dimension, 5 )
+    assertEquals(v.dimension, 5)
     val v2 = Vec[5](1.0, 2.0, 3.0, 4.0, 5.0)
     val v_fill = Vec.fill[5](1.0)
     val v_tabulate = Vec.tabulate[5](i => i.toDouble)
@@ -36,13 +36,12 @@ class Instantiate extends munit.FunSuite:
     val v_rand = Vec.random[5]()
     val v_rand_max_min = Vec.random[5](2.0, 0.5)
 
-    assertEquals(v2.dimension, v2.dimension )
-    assertEquals(v2.dimension, v_fill.dimension )
-    assertEquals(v2.dimension, v_tabulate.dimension )
-    assertEquals(v2.dimension, v_zeros.dimension )
-    assertEquals(v2.dimension, v_rand.dimension )
-    assertEquals(v2.dimension, v_rand_max_min.dimension )
+    assertEquals(v2.dimension, v2.dimension)
+    assertEquals(v2.dimension, v_fill.dimension)
+    assertEquals(v2.dimension, v_tabulate.dimension)
+    assertEquals(v2.dimension, v_zeros.dimension)
+    assertEquals(v2.dimension, v_rand.dimension)
+    assertEquals(v2.dimension, v_rand_max_min.dimension)
 
-   }
-
-end Instantiate
+  }
+}

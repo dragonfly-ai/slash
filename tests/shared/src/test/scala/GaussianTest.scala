@@ -17,7 +17,7 @@
 import slash.vector.*
 import slash.stats.probability.distributions.{EstimatedGaussian, Gaussian, stream}
 
-class TestGaussian extends munit.FunSuite {
+class GaussianTest extends munit.FunSuite {
 
   test("gaussian.p(x)") {
 
