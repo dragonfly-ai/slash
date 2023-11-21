@@ -20,12 +20,13 @@ import slash.interval.*
 import slash.stats.*
 import probability.distributions
 import slash.interval.Interval
+import slash.accumulation.ContinuousAccumulator
 
 class Beta extends OnlineProbabilityDistributionEstimator[Double, distributions.Beta] with EstimatesPointStatistics[Double] {
 
-  private var s0: Double = 0.0
-  private var s1: Double = 0.0
-  private var s2: Double = 0.0
+  private val s0: ContinuousAccumulator = ContinuousAccumulator()
+  private val s1: ContinuousAccumulator = ContinuousAccumulator()
+  private val s2: ContinuousAccumulator = ContinuousAccumulator()
 
   private var min: Double = Double.MaxValue
   private var MAX: Double = Double.MinValue
@@ -33,22 +34,23 @@ class Beta extends OnlineProbabilityDistributionEstimator[Double, distributions.
   override inline def observe(observation: Double): this.type = observe(1.0, observation)
 
   override def observe(frequency: Double, observation: Double): this.type = {
-    s0 = s0 + frequency // sample size
-    s1 = s1 + observation * frequency // sample sum
-    s2 = s2 + (observation * observation) * frequency // sum of weighted samples squared
+    val weighted:Double = frequency * observation
+    s0 += frequency // sample size
+    s1 += weighted // sample sum
+    s2.observeProduct(weighted, weighted) // sum of weighted samples squared
     min = Math.min(observation, min) // min
     MAX = Math.max(observation, MAX) // MAX
     this
   }
 
   override inline def estimate:distributions.EstimatedBeta = distributions.EstimatedBeta(estimatedPointStatistics)
-  override inline def estimatedVariance: Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
+  override inline def estimatedVariance: Double = (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
 
   override inline def estimatedRange: Interval[Double] = `[]`(min, MAX)
 
-  override inline def estimatedMean: Double = s1 / s0
+  override inline def estimatedMean: Double = (s1 / s0).total.toDouble
 
-  override inline def totalSampleMass: Double = s0
+  override inline def totalSampleMass: Double = s0.total.toDouble
 }
 
 /*

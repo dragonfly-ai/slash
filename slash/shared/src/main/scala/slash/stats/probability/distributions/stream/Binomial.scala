@@ -28,7 +28,7 @@ import scala.language.implicitConversions
 case class FixedBinomial(trialCount: Long) extends OnlineProbabilityDistributionEstimator[Long, distributions.Binomial] with EstimatesBoundedMean[Long] {
 
   private var s0: Long = 0L
-  private val s1: DiscreteAccumulator = new DiscreteAccumulator
+  private val s1: DiscreteAccumulator = DiscreteAccumulator()
 
   private var min: Long = Long.MaxValue
   private var MAX: Long = Long.MinValue
@@ -64,8 +64,8 @@ case class FixedBinomial(trialCount: Long) extends OnlineProbabilityDistribution
 class Binomial extends OnlineProbabilityDistributionEstimator[Long, distributions.Binomial] with OnlineBivariateEstimator[Long] {
 
   private var s0: Long = 0L
-  private val s1: DiscreteAccumulator = new DiscreteAccumulator
-  private val s2: DiscreteAccumulator = new DiscreteAccumulator
+  private val s1: DiscreteAccumulator = DiscreteAccumulator()
+  private val s2: DiscreteAccumulator = DiscreteAccumulator()
 
   private var minSuccessCount: Long = Long.MaxValue
   private var successCountMAX: Long = Long.MinValue

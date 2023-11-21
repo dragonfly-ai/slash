@@ -29,7 +29,7 @@ import scala.language.implicitConversions
 class Poisson extends OnlineProbabilityDistributionEstimator[Long, distributions.Poisson] with EstimatesBoundedMean[Long] {
 
   private var s0: Long = 0L
-  private val s1: DiscreteAccumulator = new DiscreteAccumulator
+  private val s1: DiscreteAccumulator = DiscreteAccumulator()
 
   private var min: Long = Long.MaxValue
   private var MAX: Long = Long.MinValue

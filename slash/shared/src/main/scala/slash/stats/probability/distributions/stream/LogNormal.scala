@@ -20,12 +20,13 @@ import slash.interval.*
 import slash.{ln, squareInPlace}
 import slash.stats.probability.distributions
 import slash.interval.Interval
+import slash.accumulation.ContinuousAccumulator
 
 class LogNormal extends OnlineProbabilityDistributionEstimator[Double, distributions.LogNormal] with EstimatesPointStatistics[Double] {
 
-  private var s0: Double = 0.0
-  private var s1: Double = 0.0
-  private var s2: Double = 0.0
+  private val s0: ContinuousAccumulator = ContinuousAccumulator()
+  private val s1: ContinuousAccumulator = ContinuousAccumulator()
+  private val s2: ContinuousAccumulator = ContinuousAccumulator()
 
   private var min: Double = Double.MaxValue
   private var MAX: Double = Double.MinValue
@@ -46,11 +47,11 @@ class LogNormal extends OnlineProbabilityDistributionEstimator[Double, distribut
   override def estimate:distributions.EstimatedLogNormal = distributions.EstimatedLogNormal(
     estimatedRange,
     distributions.LogNormal(estimatedMean, estimatedVariance),
-    s0
+    s0.total.toDouble
   )
 
-  private inline def gaussianVariance:Double = (s0 * s2 - s1 * s1) / (s0 * (s0 - 1.0))
-  private inline def gaussianMean:Double = s1 / s0
+  private inline def gaussianVariance:Double = (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
+  private inline def gaussianMean:Double = (s1 / s0).total.toDouble
   override def estimatedMean: Double = Math.exp(gaussianMean + (gaussianVariance / 2.0))
 
   override def estimatedRange: Interval[Double] = `[]`(Math.exp(min), Math.exp(MAX))
@@ -60,5 +61,5 @@ class LogNormal extends OnlineProbabilityDistributionEstimator[Double, distribut
     (Math.exp(`Gσ²`) - 1.0) * Math.exp(2.0 * gaussianMean + `Gσ²`)
   }
 
-  override def totalSampleMass: Double = s0
+  override def totalSampleMass: Double = s0.total.toDouble
 }

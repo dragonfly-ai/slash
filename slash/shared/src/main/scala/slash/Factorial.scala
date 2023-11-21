@@ -21,8 +21,8 @@ import scala.language.postfixOps
 object Factorial {
   // 0! - 20! Source: https://en.wikipedia.org/wiki/Factorial
   /*
-    var bi:BigInt = BigInt(2432902008176640000L) // 20!
-    for(i <- 21 to 100) { bi = bi*BigInt(i); println(s"BigInt(\"$bi\"), // $i!") }
+    var bd:BigInt = BigInt(2432902008176640000L) // 20!
+    for(i <- 21 to 100) { bd = bd*BigInt(i); println(s"BigInt(\"$bd\"), // $i!") }
   */
 
   private lazy val table:Array[BigInt] = Array[BigInt](

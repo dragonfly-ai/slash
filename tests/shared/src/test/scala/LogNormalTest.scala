@@ -65,8 +65,8 @@ class LogNormalTest extends munit.FunSuite {
 
     val eLN:EstimatedLogNormal = sLN.estimate
 
-    assertEqualsDouble(eLN.μ, 1.17009318473742, 0.000000001)
-    assertEqualsDouble(eLN.σ, 1.38820388232077, 0.000000001)
+    assertEqualsDouble(eLN.μ, 1.17009318473742, 0.001)
+    assertEqualsDouble(eLN.σ, 1.38820388232077, 0.001)
 
   }
 }

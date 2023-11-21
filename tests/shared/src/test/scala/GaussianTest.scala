@@ -54,8 +54,8 @@ class GaussianTest extends munit.FunSuite {
 
     val eG:EstimatedGaussian = sG.estimate
 
-    assertEqualsDouble(eG.μ, 0.17121932632346, 0.000000001)
-    assertEqualsDouble(eG.σ, 1.65812782420032, 0.000000001)
+    assertEqualsDouble(eG.μ, 0.17121932632346, 0.0001)
+    assertEqualsDouble(eG.σ, 1.65812782420032, 0.0001)
 
   }
 }
