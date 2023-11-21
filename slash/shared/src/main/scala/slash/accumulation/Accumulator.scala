@@ -246,6 +246,17 @@ class ContinuousAccumulator private (
     (a - (sum - bVirtual)) + (b - bVirtual)
   }
 
+  private inline def addToSmall(dl:Double):Unit = {
+    val temp: Double = small + dl
+    error += calculateError(small, dl, temp)
+    if (temp < 1.0) small = temp
+    else {
+      val tl:Long = temp.toLong
+      discrete += tl
+      small = temp - tl.toDouble
+    }
+  }
+
   override inline def +=(b: Byte): Unit = discrete += b
   override inline def +=(s: Short): Unit = discrete += s
   override inline def +=(i: Int): Unit = discrete += i
@@ -281,14 +292,8 @@ class ContinuousAccumulator private (
 
     // split discrete and fractional parts
     if (d < LongCutOff && d > -LongCutOff) {
-      // discrete
-      discrete += d.toLong
-
-      // fractional
-      val dl: Double = d % 1.0
-      val temp: Double = small + dl
-      error += calculateError(small, dl, temp)
-      small = temp
+      discrete += d.toLong // discrete
+      addToSmall(d % 1.0) // fractional
     } else {
       // This d value already probably suffers from precision loss.
       this += BigDecimal(d)
@@ -305,14 +310,8 @@ class ContinuousAccumulator private (
 
     // split discrete and fractional parts
     if (d < LongCutOff && d > -LongCutOff) {
-      // discrete
-      discrete -= d.toLong
-
-      // fractional
-      val dl: Double = d % 1.0
-      val temp: Double = small - dl
-      error -= calculateError(small, dl, temp)
-      small = temp
+      discrete -= d.toLong  // discrete
+      addToSmall(-d % 1.0)  // fractional
     } else {
       // This d value already probably suffers from precision loss.
       this -= BigDecimal(d)
@@ -326,8 +325,14 @@ class ContinuousAccumulator private (
 
   override def -=(l: Long): Unit = discrete -= l
 
-  def +=(a: ContinuousAccumulator): Unit = this += a.total
-  def -=(a: ContinuousAccumulator): Unit = this -= a.total
+  def +=(a: ContinuousAccumulator): Unit = {
+    this.discrete += a.discrete
+    this += (a.small + a.error)
+  }
+  def -=(a: ContinuousAccumulator): Unit = {
+    this.discrete += a.discrete
+    this += (a.small + a.error)
+  }
 
   def observeProduct(n0: Double, n1: Double): Unit = {
     if (LongCutOff / n0 >= n1) this += (n0 * n1)
@@ -348,17 +353,18 @@ class ContinuousAccumulator private (
     t += a.small
     t
   }
-  override def +(a: ContinuousAccumulator): ContinuousAccumulator = ContinuousAccumulator(
-    this.discrete + a.discrete, small + a.small, error + a.error
-  )
-  override def -(a: DiscreteAccumulator): ContinuousAccumulator = {
-    val t = ContinuousAccumulator(this.discrete - a, small, error)
-    t -= a.small
-    t
+
+  override def +(a: ContinuousAccumulator): ContinuousAccumulator = {
+    val out = this.copy
+    out.discrete += a.discrete
+    out += (a.small + a.error)
+    out
   }
+  override def -(a: DiscreteAccumulator): ContinuousAccumulator = ContinuousAccumulator(this.discrete - a, small, error)
   override def -(a: ContinuousAccumulator): ContinuousAccumulator = {
     val out = this.copy
-    out -= a.total
+    out.discrete -= a.discrete
+    out -= (a.small + a.error)
     out
   }
 

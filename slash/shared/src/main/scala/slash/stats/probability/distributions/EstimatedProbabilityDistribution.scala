@@ -18,7 +18,9 @@ package slash.stats.probability.distributions
 
 import slash.interval.*
 
-trait EstimatedProbabilityDistribution[DOMAIN: Numeric, PPD <: ParametricProbabilityDistribution[DOMAIN]] {
+import scala.reflect.ClassTag
+
+trait EstimatedProbabilityDistribution[DOMAIN:ClassTag, PPD <: ParametricProbabilityDistribution[DOMAIN]] {
 
   val idealized: PPD
 
