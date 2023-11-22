@@ -45,21 +45,21 @@ class LogNormal extends OnlineProbabilityDistributionEstimator[Double, distribut
   }
 
   override def estimate:distributions.EstimatedLogNormal = distributions.EstimatedLogNormal(
-    estimatedRange,
-    distributions.LogNormal(estimatedMean, estimatedVariance),
+    sampleRange,
+    distributions.LogNormal(sampleMean, sampleVariance),
     s0.total.toDouble
   )
 
   private inline def gaussianVariance:Double = (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
   private inline def gaussianMean:Double = (s1 / s0).total.toDouble
-  override def estimatedMean: Double = Math.exp(gaussianMean + (gaussianVariance / 2.0))
+  override def sampleMean: Double = Math.exp(gaussianMean + (gaussianVariance / 2.0))
 
-  override def estimatedRange: Interval[Double] = `[]`(Math.exp(min), Math.exp(MAX))
+  override def sampleRange: Interval[Double] = `[]`(Math.exp(min), Math.exp(MAX))
 
-  override def estimatedVariance: Double = {
+  override def sampleVariance: Double = {
     val `Gσ²`:Double = gaussianVariance
     (Math.exp(`Gσ²`) - 1.0) * Math.exp(2.0 * gaussianMean + `Gσ²`)
   }
 
-  override def totalSampleMass: Double = s0.total.toDouble
+  override def sampleMass: BigDecimal = s0.total
 }

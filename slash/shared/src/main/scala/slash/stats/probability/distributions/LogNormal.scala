@@ -63,6 +63,6 @@ case class LogNormal(override val μ:Double, override val `σ²`: Double) extend
 }
 
 
-case class EstimatedLogNormal(override val interval:Interval[Double], override val idealized: LogNormal, override val ℕ:Double) extends EstimatedProbabilityDistribution[Double, LogNormal]{
-  override def toString: String = s"LogNormalEstimate(min = ${interval.min}, MAX = ${interval.MAX}, μ = $μ, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
+case class EstimatedLogNormal(override val bounds:Interval[Double], override val idealized: LogNormal, override val sampleMass:BigDecimal) extends EstimatedProbabilityDistribution[Double, LogNormal]{
+  override def toString: String = s"LogNormalEstimate(min = ${bounds.min}, MAX = ${bounds.MAX}, μ = $μ, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }

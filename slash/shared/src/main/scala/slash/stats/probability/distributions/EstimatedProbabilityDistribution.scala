@@ -16,29 +16,16 @@
 
 package slash.stats.probability.distributions
 
-import slash.interval.*
-
 import scala.reflect.ClassTag
 
-trait EstimatedProbabilityDistribution[DOMAIN:ClassTag, PPD <: ParametricProbabilityDistribution[DOMAIN]] {
+trait EstimatedProbabilityDistribution[DOMAIN:ClassTag, PPD <: ParametricProbabilityDistribution[DOMAIN]] extends ProbabilityDistribution[DOMAIN] with SampledPointStatistics[DOMAIN] {
 
   val idealized: PPD
 
-  def ℕ:DOMAIN
-  def sampleSize:DOMAIN = ℕ
+  override inline def sampleMean: Double = idealized.mean
+  override inline def sampleVariance: Double = idealized.variance
 
-  def interval:Interval[DOMAIN]
+  inline def p(x: DOMAIN): Double = idealized.p(x)
 
-  def μ: Double = idealized.μ
-  def sampleMean: Double = μ
-
-  def `σ²`: Double = idealized.`σ²`
-  def sampleVariance: Double = `σ²`
-
-  def σ: Double = idealized.σ
-  def sampleStandardDeviation: Double = σ
-
-  def p(x: DOMAIN): Double = idealized.p(x)
-
-  def random(): DOMAIN = idealized.random()
+  override inline def random(r:scala.util.Random = slash.Random.defaultRandom): DOMAIN = idealized.random()
 }

@@ -47,7 +47,7 @@ class SimpleStatsTest extends munit.FunSuite {
   }
 
   test("sample covariance") {
-    // Sample version
+    // SampledMass version
     // https://corporatefinanceinstitute.com/resources/data-science/covariance/
 
     val vector1 = Vec.fromTuple(1692.0, 1978.0, 1884.0, 2151.0, 2519.0)

@@ -134,10 +134,10 @@ def poissonChart(): Div = {
         th("Sampled")
       ),
       tr(
-        td("Mean"), td(child.text <-- poissonDist.map(_.mean.print3DP)), td(child.text <-- sampled.map(_.mean.print3DP))
+        td("SampledMean"), td(child.text <-- poissonDist.map(_.mean.print3DP)), td(child.text <-- sampled.map(_.mean.print3DP))
       ),
       tr(
-        td("Variance"), td(child.text <-- poissonDist.map(_.`σ²`.print3DP)), td(child.text <-- sampled.map(_.variance.print3DP))
+        td("SampledVariance"), td(child.text <-- poissonDist.map(_.`σ²`.print3DP)), td(child.text <-- sampled.map(_.variance.print3DP))
       ),
       tr(
         td( child.text <-- binStream.map{ b => b match

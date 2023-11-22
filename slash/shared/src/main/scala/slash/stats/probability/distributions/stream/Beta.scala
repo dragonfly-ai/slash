@@ -43,14 +43,14 @@ class Beta extends OnlineProbabilityDistributionEstimator[Double, distributions.
     this
   }
 
-  override inline def estimate:distributions.EstimatedBeta = distributions.EstimatedBeta(estimatedPointStatistics)
-  override inline def estimatedVariance: Double = (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
+  override inline def estimate:distributions.EstimatedBeta = distributions.EstimatedBeta(samplePointStatistics)
+  override inline def sampleVariance: Double = (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
 
-  override inline def estimatedRange: Interval[Double] = `[]`(min, MAX)
+  override inline def sampleRange: Interval[Double] = `[]`(min, MAX)
 
-  override inline def estimatedMean: Double = (s1 / s0).total.toDouble
+  override inline def sampleMean: Double = (s1 / s0).total.toDouble
 
-  override inline def totalSampleMass: Double = s0.total.toDouble
+  override inline def sampleMass: BigDecimal = s0.total
 }
 
 /*

@@ -31,7 +31,7 @@ object Interval {
 
 object LongInterval {
   def apply(code:Int, min:Long, MAX:Long):LongInterval = {
-    if (MAX < min) throw Exception(s"Invalid interval: [min = $min, MAX = $MAX] MAX is less than min.")
+    if (MAX < min) throw Exception(s"Invalid sampleRange: [min = $min, MAX = $MAX] MAX is less than min.")
     else new LongInterval(code, min, MAX)
   }
 }
@@ -49,7 +49,7 @@ case class LongInterval private (override val code:Int, override val min:Long, o
 
 object IntInterval {
   def apply(code:Int, min:Int, MAX:Int):IntInterval = {
-    if (MAX < min) throw Exception(s"Invalid interval: [min = $min, MAX = $MAX] MAX is less than min.")
+    if (MAX < min) throw Exception(s"Invalid sampleRange: [min = $min, MAX = $MAX] MAX is less than min.")
     else new IntInterval(code, min, MAX)
   }
 }
@@ -67,7 +67,7 @@ case class IntInterval private (override val code:Int, override val min:Int, ove
 
 object ContinuousInterval {
   def apply(code:Int, min:Double, MAX:Double):ContinuousInterval = {
-    if (MAX < min) throw Exception(s"Invalid interval: [min = $min, MAX = $MAX] MAX is less than min.")
+    if (MAX < min) throw Exception(s"Invalid sampleRange: [min = $min, MAX = $MAX] MAX is less than min.")
     else new ContinuousInterval(code, min, MAX)
   }
 }
@@ -83,7 +83,7 @@ case class ContinuousInterval private (override val code:Int, override val min:D
 
 object FloatInterval {
   def apply(code:Int, min:Float, MAX:Float):FloatInterval = {
-    if (MAX < min) throw Exception(s"Invalid interval: [min = $min, MAX = $MAX] MAX is less than min.")
+    if (MAX < min) throw Exception(s"Invalid sampleRange: [min = $min, MAX = $MAX] MAX is less than min.")
     else new FloatInterval(code, min, MAX)
   }
 }

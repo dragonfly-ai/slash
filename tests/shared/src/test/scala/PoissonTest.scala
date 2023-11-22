@@ -65,6 +65,6 @@ class PoissonTest extends munit.FunSuite {
     assertEqualsDouble(eP.μ, 43.0606060606061, 0.000000001)
     assertEqualsDouble(eP.`σ²`, 43.0606060606061, 0.000000001)
     assertEqualsDouble(eP.σ, Math.sqrt(43.0606060606061), 0.000000001)
-    assertEquals(sP.totalSampleMass, 99L)
+    assertEquals(sP.sampleMass, BigDecimal(99))
   }
 }

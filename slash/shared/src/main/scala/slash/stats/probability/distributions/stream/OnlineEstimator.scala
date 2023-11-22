@@ -24,16 +24,16 @@ import slash.interval.Interval
 
 import scala.reflect.ClassTag
 
-trait OnlineEstimator[DOMAIN:ClassTag] {
-  def totalSampleMass:DOMAIN
+trait OnlineEstimator {
+  def sampleMass:BigDecimal
 }
 
-trait OnlineUnivariateEstimator[DOMAIN:ClassTag] extends OnlineEstimator[DOMAIN] {
+trait OnlineUnivariateEstimator[DOMAIN:ClassTag] extends OnlineEstimator {
   def observe(observation:DOMAIN):this.type
   def observe(frequency:DOMAIN, observation:DOMAIN):this.type
 }
 
-trait OnlineBivariateEstimator[DOMAIN:ClassTag] extends OnlineEstimator[DOMAIN] {
+trait OnlineBivariateEstimator[DOMAIN:ClassTag] extends OnlineEstimator {
   def observe(observation1:DOMAIN, observation2:DOMAIN):this.type
   def observe(frequency:DOMAIN, observation1:DOMAIN, observation2:DOMAIN):this.type
 }
@@ -43,84 +43,28 @@ trait OnlineProbabilityDistributionEstimator[DOMAIN:ClassTag, PPD <: ParametricP
 }
 
 trait EstimatesRange[DOMAIN:ClassTag] extends OnlineUnivariateEstimator[DOMAIN] {
-//  protected var min:DOMAIN
-//  protected var MAX:DOMAIN
-  def estimatedRange:Interval[DOMAIN]
+  def sampleRange:Interval[DOMAIN]
 }
 
 trait EstimatesMean[DOMAIN:ClassTag] extends OnlineUnivariateEstimator[DOMAIN] {
-
-//  protected var s0: DOMAIN
-//  protected var s1: DOMAIN
-
-//  = {
-//    s0 = s0 + frequency
-//    s1 = s1 + observation * frequency
-//    this
-//  }
-
-  def estimatedMean:Double
-  //= s1 / s0
-
+  def sampleMean:Double
 }
 
 trait EstimatesBoundedMean[DOMAIN:ClassTag] extends EstimatesMean[DOMAIN] with EstimatesRange[DOMAIN] {
-
-//  = {
-//    s0 = s0 + frequency
-//    s1 = s1 + observation * frequency
-//    min = minOf[DOMAIN](min, observation)
-//    MAX = MAXof[DOMAIN](MAX, observation)
-//    this
-//  }
-
-  def estimatedBoundedMean:BoundedMean[DOMAIN] = BoundedMean[DOMAIN]( estimatedMean, estimatedRange, totalSampleMass )
+  def sampleBoundedMean:SampleBoundedMean[DOMAIN] = SampleBoundedMean[DOMAIN]( sampleMean, sampleRange, sampleMass )
 }
 
 trait EstimatesMeanAndVariance[DOMAIN:ClassTag] extends EstimatesMean[DOMAIN] {
-
-//  protected var s2: DOMAIN
-
-//  = {
-//    s0 = s0 + frequency  // sample size
-//    s1 = s1 + observation * frequency  // sample sum
-//    s2 = s2 + (observation * observation) * frequency // sum of weighted samples squared
-//    this
-//  }
-
-  def estimatedVariance:Double
-
-  def estimatedMeanAndVariance:MeanAndVariance[DOMAIN] = MeanAndVariance[DOMAIN](estimatedMean, estimatedVariance, totalSampleMass)
-//  = {
-//    MeanAndVariance[DOMAIN](
-//      s1 / s0,
-//      (s0 * s2 - s1 * s1) / (s0 * (s0 - identities.one)),
-//      s0
-//    )
-//  }
+  def sampleVariance:Double
+  def sampleMeanAndVariance:SampleMeanAndVariance = SampleMeanAndVariance(sampleMean, sampleVariance, sampleMass)
 }
 
 trait EstimatesPointStatistics[DOMAIN:ClassTag] extends EstimatesMeanAndVariance[DOMAIN] with EstimatesRange[DOMAIN] {
-
-  def estimatedPointStatistics:PointStatistics[DOMAIN] = PointStatistics[DOMAIN](
-    estimatedMean,
-    estimatedVariance,
-    estimatedRange,
-    totalSampleMass
+  def samplePointStatistics:SamplePointStatistics[DOMAIN] = SamplePointStatistics[DOMAIN](
+    sampleMean,
+    sampleVariance,
+    sampleRange,
+    sampleMass
   )
-//  = {
-//    val mv = estimatedMeanAndVariance
-//    PointStatistics[DOMAIN](
-//      mv.μ,
-//      mv.`σ²`,
-//      estimagedRange,
-//      s0
-//    )
-//    PointStatistics[DOMAIN](
-//      s1 / s0,
-//      (s0 * s2 - s1 * s1) / (s0 * (s0 - identities.one)),
-//      `[]`[DOMAIN](min, MAX),
-//      s0
-//    )
-//  }
+
 }

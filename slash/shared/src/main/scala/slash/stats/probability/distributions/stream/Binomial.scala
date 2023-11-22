@@ -27,7 +27,7 @@ import scala.language.implicitConversions
 
 case class FixedBinomial(trialCount: Long) extends OnlineProbabilityDistributionEstimator[Long, distributions.Binomial] with EstimatesBoundedMean[Long] {
 
-  private var s0: Long = 0L
+  private val s0: DiscreteAccumulator = DiscreteAccumulator()
   private val s1: DiscreteAccumulator = DiscreteAccumulator()
 
   private var min: Long = Long.MaxValue
@@ -45,25 +45,25 @@ case class FixedBinomial(trialCount: Long) extends OnlineProbabilityDistribution
   }
 
   override def estimate:distributions.EstimatedBinomial = distributions.EstimatedBinomial(
-    estimatedRange,
+    sampleRange,
     distributions.Binomial(
       trialCount,
-      estimatedMean / trialCount
+      sampleMean / trialCount
     ),
-    s0
+    BigDecimal(s0.total)
   )
 
 
-  override inline def estimatedMean: Double = (BigDecimal(s1.total) / BigDecimal(s0)).toDouble
+  override inline def sampleMean: Double = (s1 / s0).total.toDouble
 
-  override inline def estimatedRange: Interval[Long] = `[]`(min, MAX)
+  override inline def sampleRange: Interval[Long] = `[]`(min, MAX)
 
-  override inline def totalSampleMass: Long = s0
+  override inline def sampleMass: BigDecimal = BigDecimal(s0.total)
 }
 
 class Binomial extends OnlineProbabilityDistributionEstimator[Long, distributions.Binomial] with OnlineBivariateEstimator[Long] {
 
-  private var s0: Long = 0L
+  private val s0: DiscreteAccumulator = DiscreteAccumulator()
   private val s1: DiscreteAccumulator = DiscreteAccumulator()
   private val s2: DiscreteAccumulator = DiscreteAccumulator()
 
@@ -85,13 +85,13 @@ class Binomial extends OnlineProbabilityDistributionEstimator[Long, distribution
   def estimate:distributions.EstimatedBinomial = distributions.EstimatedBinomial(
     `[]`(minSuccessCount, successCountMAX),
     distributions.Binomial(
-      (BigDecimal(s2.total) / BigDecimal(s0)).toLong, // estimated trial count per experiment
+      (s2 / s0).total.toLong, // estimated trial count per experiment
       ( BigDecimal(s1.total) / BigDecimal(s2.total) ).toDouble  // estimated Probability of success per trial.
     ),
-    s0
+    BigDecimal(s0.total)
   )
 
   override def observe(successCount:Long, trialCount:Long): Binomial.this.type = observe(1L, successCount, trialCount)
 
-  override def totalSampleMass: Long = s0
+  override def sampleMass: BigDecimal = BigDecimal(s0.total)
 }

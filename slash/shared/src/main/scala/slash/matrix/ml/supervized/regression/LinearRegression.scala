@@ -46,7 +46,7 @@ trait LinearRegression[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {
     regression.LinearRegressionModel[N](
       A, lrp.mean, lrp.bias,
       err/size,
-      1.0 - (`err²` / (`EstGaussian(Y)`.sampleVariance * `EstGaussian(Y)`.ℕ))
+      1.0 - (`err²` / (`EstGaussian(Y)`.sampleVariance * `EstGaussian(Y)`.ℕ.toDouble))
     )
   }
 }
@@ -59,7 +59,7 @@ trait LinearRegressionProblem[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) 
   val bias:Double
   val mean:Vec[N]
   val `EstGaussian(Y)`: EstimatedGaussian
-  def size:Double = `EstGaussian(Y)`.ℕ
+  def size:Double = `EstGaussian(Y)`.ℕ.toDouble
 }
 
 object LinearRegressionProblem {

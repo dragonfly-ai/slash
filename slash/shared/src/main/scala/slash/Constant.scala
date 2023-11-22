@@ -22,8 +22,6 @@ object Constant {
   val π: Double = Math.PI // Pi
   val `√(2π)`:Double = Math.sqrt(2.0*π)
   val e: Double = Math.E  // Euler's Number
-  // This break scala meta's parser... do we reaaaaaaallly need it?
-  //val 𝜑: Double = 1.46557123187676802665 // Golden
 
   /**
    * The largest possible Long value such that Double can contiguously represent every Long value in the range: [0L, xL]
@@ -34,5 +32,6 @@ object Constant {
   lazy val log2:Double = Math.log10(2.0) // base 10 logarithm of 2
   lazy val ln2:Double = Math.log(2.0)    // natural logarithm of 2
   lazy val `√2`:Double = Math.sqrt(2.0)  // square root of 2
-
+  lazy val `¹/₃`:Double = 1.0 / 3.0
+  lazy val `¹/₄`:Double = 1.0 / 3.0
 }

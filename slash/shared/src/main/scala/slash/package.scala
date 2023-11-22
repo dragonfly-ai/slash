@@ -34,6 +34,10 @@ package object slash {
   inline def cubeInPlace(d:Double): Double = d*d*d
   inline def cubeInPlace(bd:BigDecimal): BigDecimal = bd*bd*bd
 
+  inline def `√`(d:Double):Double = Math.sqrt(d)
+  inline def `∛`(d:Double):Double = Math.pow(d, Constant.`¹/₃`)
+  inline def `∜`(d:Double):Double = Math.pow(d, Constant.`¹/₄`)
+
   def Γ(x:Double):Double = Math.exp(lnGamma(x))
   def gamma(x:Double):Double = Γ(x)
   def lnGamma(x:Double):Double = Gamma.lnGamma(x)

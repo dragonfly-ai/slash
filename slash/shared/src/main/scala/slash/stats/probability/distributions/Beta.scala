@@ -132,7 +132,7 @@ case class Beta(α:Double, β:Double, min:Double = 0.0, MAX:Double = 1.0) extend
 }
 
 object EstimatedBeta {
-  def apply(ps: PointStatistics[Double]): EstimatedBeta = EstimatedBeta(
+  def apply(ps: SamplePointStatistics[Double]): EstimatedBeta = EstimatedBeta(
     Beta.fromMeanVarianceMinMax(
       ps.μ,
       ps.`σ²`,
@@ -142,11 +142,11 @@ object EstimatedBeta {
     ps.ℕ
   )
 }
-case class EstimatedBeta(override val idealized: Beta, override val ℕ:Double) extends EstimatedProbabilityDistribution[Double, Beta]{
+case class EstimatedBeta(override val idealized: Beta, override val sampleMass:BigDecimal) extends EstimatedProbabilityDistribution[Double, Beta]{
   def α:Double = idealized.α
   def β:Double = idealized.β
 
-  override val interval: Interval[Double] = `[]`(idealized.min, idealized.MAX)
+  override val bounds: Interval[Double] = `[]`(idealized.min, idealized.MAX)
 
-  override def toString: String = s"BetaEstimate(α = $α, β = $β, min = ${interval.min}, MAX = ${interval.MAX}, μ = $μ, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
+  override def toString: String = s"BetaEstimate(α = $α, β = $β, min = ${bounds.min}, MAX = ${bounds.MAX}, μ = $μ, σ² = ${`σ²`}, σ = $σ, ℕ = $ℕ)"
 }

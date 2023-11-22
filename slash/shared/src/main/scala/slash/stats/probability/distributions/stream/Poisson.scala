@@ -28,7 +28,7 @@ import scala.language.implicitConversions
 
 class Poisson extends OnlineProbabilityDistributionEstimator[Long, distributions.Poisson] with EstimatesBoundedMean[Long] {
 
-  private var s0: Long = 0L
+  private val s0: DiscreteAccumulator = DiscreteAccumulator()
   private val s1: DiscreteAccumulator = DiscreteAccumulator()
 
   private var min: Long = Long.MaxValue
@@ -46,19 +46,19 @@ class Poisson extends OnlineProbabilityDistributionEstimator[Long, distributions
   }
 
   override def estimate:distributions.EstimatedPoisson = {
-    val bμ = estimatedBoundedMean
+    val bμ = sampleBoundedMean
     distributions.EstimatedPoisson(
       bμ.bounds,
       distributions.Poisson(bμ.μ),
-      s0
+      BigDecimal(s0.total)
     )
   }
 
-  override inline def estimatedMean: Double = (BigDecimal(s1.total) / BigDecimal(s0)).toDouble
+  override inline def sampleMean: Double = (s1 / s0).total.toDouble
 
-  override inline def estimatedRange: Interval[Long] = `[]`(min, MAX)
+  override inline def sampleRange: Interval[Long] = `[]`(min, MAX)
 
-  override def totalSampleMass: Long = s0
+  override def sampleMass: BigDecimal = BigDecimal(s0.total)
 }
 
 case class PoissonDistributionUndefinedForNegativeNumbers(negative:Long) extends Exception(s"Poisson distribution undefined for observation: $negative")

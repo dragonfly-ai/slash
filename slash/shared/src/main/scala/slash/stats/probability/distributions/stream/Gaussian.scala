@@ -21,6 +21,7 @@ import slash.stats.*
 import probability.distributions
 import slash.interval.Interval
 import slash.accumulation.ContinuousAccumulator
+import slash.stats.probability.distributions.SamplePointStatistics
 
 class Gaussian extends OnlineProbabilityDistributionEstimator[Double, distributions.Gaussian] with EstimatesPointStatistics[Double] {
 
@@ -44,7 +45,7 @@ class Gaussian extends OnlineProbabilityDistributionEstimator[Double, distributi
   }
 
   override def estimate:distributions.EstimatedGaussian = {
-    val sps:PointStatistics[Double] = estimatedPointStatistics
+    val sps:SamplePointStatistics[Double] = samplePointStatistics
     distributions.EstimatedGaussian(
       sps.bounds,
       distributions.Gaussian(sps.μ, sps.`σ²`),
@@ -52,11 +53,11 @@ class Gaussian extends OnlineProbabilityDistributionEstimator[Double, distributi
     )
   }
 
-  override inline def estimatedMean: Double = (s1 / s0).total.toDouble
+  override inline def sampleMean: Double = (s1 / s0).total.toDouble
 
-  override inline def estimatedRange: Interval[Double] = `[]`(min, MAX)
+  override inline def sampleRange: Interval[Double] = `[]`(min, MAX)
 
-  override inline def estimatedVariance: Double = (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
+  override inline def sampleVariance: Double = (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
 
-  override inline def totalSampleMass: Double = s0.total.toDouble
+  override inline def sampleMass: BigDecimal = s0.total
 }

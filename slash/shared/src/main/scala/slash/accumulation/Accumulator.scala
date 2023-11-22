@@ -220,7 +220,7 @@ class DiscreteAccumulator private (var overflowCount:BigInt = BigInt(0), var sma
 }
 
 object ContinuousAccumulator {
-  val LongCutOff:Double = 9007199254740992.0
+  val LongCutOff:Double = slash.Constant.MaxContiguousLong.toDouble
   val One:BigDecimal = BigDecimal(1.0)
   val NegativeOne:BigDecimal = BigDecimal(-1.0)
 

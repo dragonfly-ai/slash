@@ -15,8 +15,7 @@
  */
 
 import slash.interval.*
-import slash.stats.PointStatistics
-import slash.stats.probability.distributions.{Beta, EstimatedBeta, stream}
+import slash.stats.probability.distributions.{Beta, EstimatedBeta, SamplePointStatistics, stream}
 import slash.vector.*
 
 class BetaTest extends munit.FunSuite {
@@ -63,8 +62,8 @@ class BetaTest extends munit.FunSuite {
       i += 1
     }
 
-    val ps:PointStatistics[Double] = sB.estimatedPointStatistics
-    val eB:EstimatedBeta = EstimatedBeta( PointStatistics[Double]( ps.μ, ps.`σ²`, `[]`(0.0, 1.0), ps.ℕ ) )
+    val ps:SamplePointStatistics[Double] = sB.samplePointStatistics
+    val eB:EstimatedBeta = EstimatedBeta( SamplePointStatistics[Double]( ps.μ, ps.`σ²`, `[]`(0.0, 1.0), ps.ℕ ) )
 
 //    println(s"${eB.α}, ${2.08436177}")
     assertEqualsDouble(eB.α, 2.08436177, 0.05)
