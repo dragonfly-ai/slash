@@ -44,7 +44,12 @@ class Beta extends OnlineProbabilityDistributionEstimator[Double, distributions.
   }
 
   override inline def estimate:distributions.EstimatedBeta = distributions.EstimatedBeta(samplePointStatistics)
-  override inline def sampleVariance: Double = (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
+  override inline def sampleVariance: Double = {
+    //(((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
+    val t0:BigDecimal = s0.total
+    val t1:BigDecimal = s1.total
+    ( ((t0 * s2.total) - (t1 * t1)) / (t0 * (t0 - ContinuousAccumulator.One))).toDouble
+  }
 
   override inline def sampleRange: Interval[Double] = `[]`(min, MAX)
 

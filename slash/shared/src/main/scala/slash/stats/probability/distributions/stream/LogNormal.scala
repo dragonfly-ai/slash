@@ -50,7 +50,13 @@ class LogNormal extends OnlineProbabilityDistributionEstimator[Double, distribut
     s0.total.toDouble
   )
 
-  private inline def gaussianVariance:Double = (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
+  private inline def gaussianVariance:Double = {
+//    (((s0 * s2) - (s1 * s1)) / (s0 * (s0 - 1.0))).total.toDouble
+    val t0: BigDecimal = s0.total
+    val t1: BigDecimal = s1.total
+    ( (( t0 * s2.total ) - ( t1 * t1 )) / ( t0 * ( t0 - ContinuousAccumulator.One ) ) ).toDouble
+  }
+
   private inline def gaussianMean:Double = (s1 / s0).total.toDouble
   override def sampleMean: Double = Math.exp(gaussianMean + (gaussianVariance / 2.0))
 

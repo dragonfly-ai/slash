@@ -72,7 +72,4 @@ class BetaTest extends munit.FunSuite {
 
   }
 
-  test("estimate randomized Beta") {
-
-  }
 }
