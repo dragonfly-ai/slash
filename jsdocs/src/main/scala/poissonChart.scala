@@ -3,14 +3,13 @@ package livechart
 import scala.scalajs.js
 import com.raquo.laminar.api.L.*
 import viz.vega.plots.Histogram
-import narr.*
+//import narr.*
 import viz.PlotTargets.doNothing
 import viz.LaminarViz
 import viz.vega.facades.VegaView
 import viz.vega.facades.Helpers.*
 import slash.vector.Vec
 import com.raquo.airstream.core.Signal
-import narr.native.NArr
 
 import scala.scalajs.js.typedarray.Float64Array
 import io.circe.Encoder
@@ -32,6 +31,7 @@ def poissonChart(): Div = {
   val poissonDist: Signal[Poisson] = λ_.signal.map(Poisson(_))
   val sampled : Signal[Vec[Int]] = poissonDist.combineWith(n_.signal).map(
     (dist: Poisson, n: Integer) => {
+      import narr.*
       val poissonSample:NArray[Long] = dist.sample(n, rand)
       NArray.tabulate[Double](n)((i:Int) => poissonSample(i).toDouble).asInstanceOf[Vec[Int]]
     }
