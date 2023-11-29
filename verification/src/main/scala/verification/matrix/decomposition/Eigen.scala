@@ -1,4 +1,4 @@
-package verification.decomposition
+package verification.matrix.decomposition
 
 import Jama.EigenvalueDecomposition
 import slash.matrix
@@ -18,8 +18,8 @@ object Eigen extends Verification {
     println(s"\tComparing Real Eigen Values: ${Verification.arrayCompare(jed.getRealEigenvalues(), med.realEigenvalues.asInstanceOf[Array[Double]])}")
     println(s"\tComparing Imaginary Eigen Values: ${Verification.arrayCompare(jed.getImagEigenvalues(), med.imaginaryEigenvalues.asInstanceOf[Array[Double]])}")
 
-    println(s"\tComparing V : ${Verification.arrayCompare2D(jed.getV.getArray, med.Q.values)}")
-    println(s"\tComparing D : ${Verification.arrayCompare2D(jed.getD.getArray, med.Λ.values)}")
+    println(s"\tComparing V : ${Verification.matrixCompare(jed.getV, med.Q)}")
+    println(s"\tComparing D : ${Verification.matrixCompare(jed.getD, med.Λ)}")
 
   }
 }

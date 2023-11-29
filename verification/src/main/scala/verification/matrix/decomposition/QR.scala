@@ -1,4 +1,4 @@
-package verification.decomposition
+package verification.matrix.decomposition
 
 import Jama.QRDecomposition
 import slash.matrix
@@ -16,9 +16,9 @@ object QR extends Verification {
     val mqr:matrix.decomposition.QR[11, 11] = matrix.decomposition.QR[11, 11](squareMa)
     println("\tSquare Matrix[11, 11] decomposition:")
     println(s"\tComparing isFullRank: ${jqr.isFullRank} vs ${mqr.isFullRank}")
-    println(s"\tComparing Q : ${Verification.arrayCompare2D(jqr.getQ.getArray, mqr.Q.values)}")
-    println(s"\tComparing H : ${Verification.arrayCompare2D(jqr.getH.getArray, mqr.H.values)}")
-    println(s"\tComparing R : ${Verification.arrayCompare2D(jqr.getR.getArray, mqr.R.values)}")
+    println(s"\tComparing Q : ${Verification.matrixCompare(mqr.Q, jqr.getQ)}")
+    println(s"\tComparing H : ${Verification.matrixCompare( mqr.H, jqr.getH)}")
+    println(s"\tComparing R : ${Verification.matrixCompare(mqr.R, jqr.getR)}")
 
 //    val jqrWide: QRDecomposition = new QRDecomposition(wideJaMa)
 //    val mqrWide: matrix.decomposition.QR[11, 19] = matrix.decomposition.QR[11, 19](wideMa)
@@ -32,8 +32,8 @@ object QR extends Verification {
     val mqrTall: matrix.decomposition.QR[21, 12] = matrix.decomposition.QR[21, 12](tallMa)
     println("\tTall Matrix[21, 12] decomposition:")
     println(s"\tComparing isFullRank: ${jqrTall.isFullRank} vs ${mqrTall.isFullRank}")
-    println(s"\tComparing Q : ${Verification.arrayCompare2D(jqrTall.getQ.getArray, mqrTall.Q.values)}")
-    println(s"\tComparing H : ${Verification.arrayCompare2D(jqrTall.getH.getArray, mqrTall.H.values)}")
-    println(s"\tComparing R : ${Verification.arrayCompare2D(jqrTall.getR.getArray, mqrTall.R.values)}")
+    println(s"\tComparing Q : ${Verification.matrixCompare( mqrTall.Q, jqrTall.getQ)}")
+    println(s"\tComparing H : ${Verification.matrixCompare(mqrTall.H, jqrTall.getH)}")
+    println(s"\tComparing R : ${Verification.matrixCompare(mqrTall.R, jqrTall.getR)}")
   }
 }

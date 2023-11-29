@@ -54,7 +54,7 @@ object StaticUnsupervisedData {
 
 class StaticUnsupervisedData[M <: Int, N <: Int](examples:NArray[Vec[N]])(using ValueOf[M], ValueOf[N]) extends UnsupervisedData[M, N] {
 
-  private val Xar:NArray[NArray[Double]] = NArray.ofSize[NArray[Double]](sampleSize)
+  private val Xar:NArray[Vec[N]] = NArray.ofSize[Vec[N]](sampleSize)
 
   // Compute sample point statistics and populate Xar and X
   val temp = {
@@ -68,7 +68,7 @@ class StaticUnsupervisedData[M <: Int, N <: Int](examples:NArray[Vec[N]])(using 
     val sampleMean:Vec[N] = sampleVectorStats.average()
 
     i = 0; while (i < sampleSize) {
-      Xar(i) = (examples(i) - sampleMean).asInstanceOf[NArray[Double]]
+      Xar(i) = examples(i) - sampleMean
       i += 1
     }
 
@@ -89,7 +89,7 @@ class StaticUnsupervisedData[M <: Int, N <: Int](examples:NArray[Vec[N]])(using 
 
   override val X: Matrix[M, N] = Matrix[M, N](Xar)
 
-  override def example(i: Int): Vec[N] =  Vec[N]( Xar(i) ) + sampleMean
+  override def example(i: Int): Vec[N] = Xar(i) + sampleMean
 
 }
 
@@ -103,7 +103,7 @@ trait SupervisedData[M <: Int, N <: Int] extends Data[M, N] {
 
 class StaticSupervisedData[M <: Int, N <: Int](labeledExamples:NArray[LabeledVec[N]])(using ValueOf[M], ValueOf[N]) extends SupervisedData[M, N] {
 
-  private val Xar:NArray[NArray[Double]] = NArray.ofSize[NArray[Double]](sampleSize)
+  private val Xar:NArray[Vec[N]] = NArray.ofSize[Vec[N]](sampleSize)
   private val Yar:NArray[Double] = NArray.ofSize[Double](sampleSize)
 
   // Compute the average Vector
@@ -121,7 +121,7 @@ class StaticSupervisedData[M <: Int, N <: Int](labeledExamples:NArray[LabeledVec
     val labelStats:EstimatedGaussian = labelStatsEstimator.estimate
 
     i = 0; while (i < sampleSize) {
-      Xar(i) = (labeledExamples(i).vector - sampleMean).asInstanceOf[NArray[Double]]
+      Xar(i) = (labeledExamples(i).vector - sampleMean)
       Yar(i) = labeledExamples(i).y - labelStats.sampleMean
       i += 1
     }
@@ -146,7 +146,7 @@ class StaticSupervisedData[M <: Int, N <: Int](labeledExamples:NArray[LabeledVec
   override val X: Matrix[M, N] = Matrix(Xar)
   override val Y: Matrix[M, 1] = y.asColumnMatrix
 
-  def example(i: Int): Vec[N] = Vec[N]( Xar(i) ) + sampleMean
+  def example(i: Int): Vec[N] = Xar(i) + sampleMean
 
   def labeledExample(i: Int): LabeledVec[N] = SimpleLabeledVector(Yar(i) + labelStats.sampleMean, example(i))
 

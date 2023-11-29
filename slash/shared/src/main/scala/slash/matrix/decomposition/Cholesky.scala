@@ -18,7 +18,6 @@ package slash.matrix.decomposition
 
 import slash.matrix.*
 import slash.matrix.util.MatrixNotSymmetricPositiveDefinite
-import narr.*
 
 object Cholesky {
 
@@ -36,37 +35,39 @@ object Cholesky {
 
   def apply[N <: Int](m:Matrix[N, N])(using ValueOf[N]):Cholesky[N] = {
     // Initialize.
-    val A = m.copyValues
-    val n = A.length
-    val L = Matrix.zeros[N, N].values
+    val A = m.copy
+    val n = A.rows
+    val L = Matrix.zeros[N, N]
     var isspd:Boolean = true
     // Main loop.
     var j:Int = 0; while (j < n) {
-      val Lrowj = L(j)
+      //val Lrowj = L(j)
       var d = 0.0
       var k:Int = 0; while (k < j) {
-        val Lrowk = L(k)
+        //val Lrowk = L(k)
         var s = 0.0
         var i:Int = 0; while (i < k) {
-          s += Lrowk(i) * Lrowj(i)
+          //s += Lrowk(i) * Lrowj(i)
+          s += L(k, i) * L(j, i)
           i += 1
         }
-        s = (A(j)(k) - s) / L(k)(k)
-        Lrowj(k) = s
+        s = (A(j, k) - s) / L(k, k)
+        //Lrowj(k) = s
+        L(j, k) = s
         d = d + s * s
-        isspd = isspd & (A(k)(j) == A(j)(k))
+        isspd = isspd & (A(k, j) == A(j, k))
         k += 1
       }
-      d = A(j)(j) - d
+      d = A(j, j) - d
       isspd = isspd & (d > 0.0)
-      L(j)(j) = Math.sqrt(Math.max(d, 0.0))
+      L(j, j) = Math.sqrt(Math.max(d, 0.0))
       k = j + 1; while (k < n) { // recycling k
-        L(j)(k) = 0.0
+        L(j, k) = 0.0
         k += 1
       }
       j += 1
     }
-    if (isspd) new Cholesky(Matrix[N, N](L))
+    if (isspd) new Cholesky[N](L)
     else throw MatrixNotSymmetricPositiveDefinite[N, N](m)
   }
 }
@@ -85,33 +86,33 @@ class Cholesky[N <: Int] private(val L: Matrix[N, N])(using ValueOf[N]) {
   def solve[V <: Int](B: Matrix[N, V])(using ValueOf[V]): Matrix[N, V] = {
 
     // Copy right hand side.
-    val X: NArray[NArray[Double]] = B.copyValues
+    val X: Matrix[N, V] = B.copy
     val nx: Int = B.columns
     // Solve L*Y = B;
     var k:Int = 0; while (k < mn) {
       var j:Int = 0; while (j < nx) {
         var i:Int = 0; while (i < k) {
-          X(k)(j) = X(k)(j) - X(i)(j) * L(k, i)
+          X(k, j) = X(k, j) - X(i, j) * L(k, i)
           i += 1
         }
-        X(k)(j) = X(k)(j) / L(k, k)
+        X(k, j) = X(k, j) / L(k, k)
         j += 1
       }
       k += 1
     }
-    // Solve L'*X = Y;
+    // Solve L'*thatMatrix = Y;
     k = mn - 1; while  (k > -1) { // recycling k
       var j:Int = 0; while (j < nx) {
         var i:Int = k + 1; while (i < mn) {
-          X(k)(j) = X(k)(j) - X(i)(j) * L(i, k)
+          X(k, j) = X(k, j) - X(i, j) * L(i, k)
           i += 1
         }
-        X(k)(j) = X(k)(j) / L(k, k)
+        X(k, j) = X(k, j) / L(k, k)
         j += 1
       }
       k -= 1
     }
-    Matrix[N, V](X)
+    X
   }
 
 }

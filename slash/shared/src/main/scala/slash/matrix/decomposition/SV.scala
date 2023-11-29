@@ -22,9 +22,9 @@ import slash.matrix.*
 import narr.*
 import scala.math.hypot
 import scala.compiletime.ops.int.*
-//import SV.hypot
-object SV {
 
+object SV {
+//
 //  /** This hypot function is a direct port from Jama.util.maths.
 //   *
 //   * this matrix library uses scala.math.hypot from the Java standard lib, but doing so introduces a small difference
@@ -58,13 +58,13 @@ object SV {
     val rows:Int = valueOf[M]
     val columns:Int = valueOf[N]
 
-    val minDim:Int = Math.min(rows, columns);
+    val minDim:Int = Math.min(rows, columns)
 
     val s: Vec[N] = Vec.zeros[N]
     val U: Matrix[M, N] = Matrix.zeros[M, N]
     val V: Matrix[N, N] = Matrix.zeros[N, N]
-    val e: Vec[M] = Vec.fill[M](0.0)
-    val work = NArray.fill[Double](rows)(0.0)
+    val e: Vec[M] = Vec.zeros[M]
+    val work: Vec[M] = Vec.zeros[M]
 
     // Reduce A to bidiagonal form, storing the diagonal elements
     // in s and the super-diagonal elements in e.
@@ -156,7 +156,7 @@ object SV {
           }
           var j0:Int = k0 + 1; while (j0 < columns) {
             var i2:Int = k0 + 1; while (i2 < rows) {
-              work(i2) += e(j0) * A(i2, j0)
+              work(i2) = work(i2) + e(j0) * A(i2, j0)
               i2 += 1
             }
             j0 += 1
@@ -224,7 +224,7 @@ object SV {
           j0 += 1
         }
         var i:Int = k; while (i < rows) {
-          U(i, k) = -U(i, k)
+          U(i, k) = -(U(i, k))
           i += 1
         }
         U(k, k) = 1.0 + U(k, k)
@@ -448,7 +448,7 @@ object SV {
         case 4 =>
           // Make the singular values positive.
           if (s(k) <= 0.0) {
-            s(k) = (if (s(k) < 0.0) -s(k) else 0.0)
+            s(k) = if (s(k) < 0.0) -s(k) else 0.0
             var i:Int = 0; while (i <= pp) {
               V(i, k) = -V(i, k)
               i += 1

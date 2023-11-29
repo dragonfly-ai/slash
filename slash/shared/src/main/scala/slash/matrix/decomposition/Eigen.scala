@@ -826,23 +826,31 @@ object Eigen {
     new Eigen[N](Q, λ, λi)
   }
 
-  def apply[N <: Int](m:Matrix[N, N])(using ValueOf[N]): Eigen[N] = {
+  def apply[N <: Int](A:Matrix[N, N])(using ValueOf[N]): Eigen[N] = {
 
-    val A = m.values
-    val n = valueOf[N] //Arg.getColumnDimension()
+    val n = valueOf[N]
 
     var isSymmetric = true
 
-    val Q:Matrix[N, N] = Matrix[N, N](
-      NArray.tabulate[NArray[Double]](n)(
-        (row: Int) => NArray.tabulate[Double](n)(
-          (col: Int) => {
-            if (isSymmetric) isSymmetric = A(row)(col) == A(col)(row)
-            A(row)(col)
+    val Q:Matrix[N, N] = {
+      val values: NArray[Double] = new NArray[Double](slash.squareInPlace(n))
+      var i: Int = 0
+      var r: Int = 0;
+      while (r < n) {
+        var c: Int = 0;
+        while (c < n) {
+          values(i) = {
+            if (isSymmetric) isSymmetric = A(r, c) == A(c, r)
+            A(r, c)
           }
-        )
-      )
-    )
+          i += 1
+          c += 1
+        }
+        r += 1
+      }
+      Matrix[N, N](values)
+    }
+
 
     if (isSymmetric) tred2[N](Q)  // Tridiagonalize
     else orthes[N](Q)  // Reduce to Hessenberg form

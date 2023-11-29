@@ -32,8 +32,6 @@ object LU {
 
     var pivsign:Double = 1.0
 
-    var LUrowi:NArray[Double] = null
-
     val LUcolj:NArray[Double] = NArray.fill[Double](m)(0.0)
 
     // Outer loop.
@@ -45,16 +43,15 @@ object LU {
       }
       // Apply previous transformations.
       i = 0; while (i < m) {  // recycling i
-        LUrowi = lu.values(i)
         // Most of the time is spent in the following dot product.
         val kmax = Math.min(i, j)
         var s = 0.0
         var k:Int = 0; while (k < kmax) {
-          s += LUrowi(k) * LUcolj(k)
+          s += lu(i, k) * LUcolj(k)
           k += 1
         }
         LUcolj(i) = LUcolj(i) - s
-        LUrowi(j) = LUcolj(i)
+        lu(i, j) = LUcolj(i)
         i += 1
       }
       // Find pivot and exchange if necessary.
@@ -132,33 +129,43 @@ class LU[M <: Int, N <: Int] private (
     *
     * @return L
     */
-  def L: Matrix[M, N] = Matrix[M, N](
-    NArray.tabulate[NArray[Double]](m)(
-      (r:Int) => NArray.tabulate[Double](n)(
-        (c:Int) => {
+  lazy val L: Matrix[M, N] = {
+    val values:NArray[Double] = new NArray[Double](m * n)
+    var i:Int = 0
+    var r:Int = 0; while (r < m) {
+      var c: Int = 0; while (c < n) {
+        values(i) = {
           if (r > c) LU(r, c)
           else if (r == c) 1.0
           else 0.0
         }
-      )
-    )
-  )
-
+        i += 1
+        c += 1
+      }
+      r += 1
+    }
+    Matrix[M, N](values)
+  }
 
   /** Return upper triangular factor
     *
     * @return U
     */
-  def U: Matrix[N, N] = Matrix[N, N](
-    NArray.tabulate[NArray[Double]](n)(
-      (r:Int) => NArray.tabulate[Double](n)(
-        (c:Int) => {
-          if (r > c) 0.0
-          else LU(r, c)
-        }
-      )
-    )
-  )
+  def U: Matrix[N, N] = {
+    val values: NArray[Double] = new NArray[Double](slash.squareInPlace(n))
+    var i: Int = 0
+    var r: Int = 0;
+    while (r < n) {
+      var c: Int = 0;
+      while (c < n) {
+        values(i) = if (r > c) 0.0 else LU(r, c)
+        i += 1
+        c += 1
+      }
+      r += 1
+    }
+    Matrix[N, N](values)
+  }
 
   /** Return pivot permutation vector
     *
@@ -203,14 +210,13 @@ class LU[M <: Int, N <: Int] private (
 
     // Copy right hand side with pivoting
     val nx:Int = B.columns
-    val Xmat:Matrix[N, V] = B.getMatrix[N, V](piv, 0)
-    val X = Xmat.values
+    val X:Matrix[N, V] = B.subMatrix[N, V](piv, 0)
 
     // Solve L*Y = B(piv,:)
     var k:Int = 0; while (k < n) {
       var i:Int = k + 1; while (i < n) {
         var j:Int = 0; while (j < nx) {
-          X(i)(j) = X(i)(j) - (X(k)(j) * LU(i, k))
+          X(i, j) = X(i, j) - (X(k, j) * LU(i, k))
           j += 1
         }
         i += 1
@@ -220,18 +226,18 @@ class LU[M <: Int, N <: Int] private (
     // Solve U*X = Y;
     k = n - 1; while (k > -1) { // recycling k
       var j:Int = 0; while (j < nx) {
-        X(k)(j) = X(k)(j) / LU(k, k)
+        X(k, j) = X(k, j) / LU(k, k)
         j += 1
       }
       var i:Int = 0; while (i < k) {
         var j1:Int = 0; while (j1 < nx) {
-          X(i)(j1) = X(i)(j1) - (X(k)(j1) * LU(i, k))
+          X(i, j1) = X(i, j1) - (X(k, j1) * LU(i, k))
           j1 += 1
         }
         i += 1
       }
       k -= 1
     }
-    Xmat
+    X
   }
 }

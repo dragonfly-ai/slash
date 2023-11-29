@@ -28,7 +28,7 @@ import slash.vector.Vec.*
 
 
 case class LinearRegressionModel[N <: Int](A: Matrix[N, 1], mean: Vec[N], bias: Double, standardError: Double, `R²`: Double) {
-  val a: Vec[N] = A.asVector.asInstanceOf[Vec[N]]
+  val a: Vec[N] = A.copy.values.asInstanceOf[Vec[N]]
 
   def apply(x: Vec[N]): Double = (a dot (x - mean)) + bias
   //  def apply(X:Matrix):Matrix = {

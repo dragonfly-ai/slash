@@ -38,8 +38,8 @@ object PCA {
 
     // arrange the matrix of centered points
     val Xc: Matrix[M, N] = Matrix[M, N](
-      NArray.tabulate[NArray[Double]](data.sampleSize)(
-        (row:Int) => (data.example(row) - data.sampleMean).asInstanceOf[NArray[Double]]
+      NArray.tabulate[Vec[N]](data.sampleSize)(
+        (row:Int) => (data.example(row) - data.sampleMean)
       )
     )
 
@@ -59,15 +59,15 @@ case class PCA[N <: Int](svd: SV[N, N], mean: Vec[N])(using ValueOf[N]) {
   lazy val Uᵀ:Matrix[N, N] = svd.U.transpose
 
   inline def getReducer[K <: Int](using ValueOf[K]): DimensionalityReducerPCA[N, K] = {
-    DimensionalityReducerPCA[N, K](Matrix(Uᵀ.values.take(valueOf[K])), mean)
+    DimensionalityReducerPCA[N, K](Matrix(Uᵀ.rowVectors.take(valueOf[K])), mean)
   }
 
   lazy val basisPairs: Seq[BasisPair[N]] = {
     val singularValues = svd.singularValues
-    val arr: NArray[NArray[Double]] = Uᵀ.values
+    val arr: NArray[Vec[N]] = Uᵀ.rowVectors
     var pairs:Seq[BasisPair[N]] = Seq[BasisPair[N]]()
     var i:Int = 0; while (i < arr.length) {
-      pairs = pairs :+ BasisPair[N]( singularValues(i), Vec[N](arr(i)) )
+      pairs = pairs :+ BasisPair[N]( singularValues(i), arr(i) )
       i += 1
     }
     pairs
@@ -84,7 +84,7 @@ case class DimensionalityReducerPCA[N <: Int, K <: Int](Ak:Matrix[K, N], mean: V
    * @return rangeDimensioned vector
    */
   def apply(v:Vec[N]):Vec[K] = {
-    (Ak * (v - mean).asColumnMatrix).asVector.asInstanceOf[Vec[K]]
+    (Ak * (v - mean).asColumnMatrix).values.asInstanceOf[Vec[K]]
   }
 
   def domainDimension:Int = mean.dimension
@@ -97,6 +97,6 @@ case class DimensionalityReducerPCA[N <: Int, K <: Int](Ak:Matrix[K, N], mean: V
    * @param v rangeDimensioned vector
    * @return rangeDimensioned vector
    */
-  inline def unapply(v:Vec[K])(using ValueOf[K]):Vec[N] = (v.asRowMatrix * Ak).asVector.asInstanceOf[Vec[N]] + mean
+  inline def unapply(v:Vec[K])(using ValueOf[K]):Vec[N] = (v.asRowMatrix * Ak).values.asInstanceOf[Vec[N]] + mean
 
 }

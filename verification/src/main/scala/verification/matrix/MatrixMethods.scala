@@ -1,0 +1,49 @@
+package verification.matrix
+
+import slash.matrix.*
+import verification.*
+
+object MatrixMethods extends Verification {
+  override def name: String = "Matrix Methods"
+
+  def kitchenSink[M <: Int, N <: Int](j:Jama.Matrix, m: Matrix[M, N])(using ValueOf[M], ValueOf[N]):Unit = {
+    println("Comparing ...")
+    println(s"\t- matrices : ${Verification.matrixCompare(j, m)}")
+    println(s"\t- rowPackedCopy : ${Verification.arrayCompare(j.getRowPackedCopy, m.values)}")
+    println(s"\t- columnPackedCopy : ${Verification.arrayCompare(j.getColumnPackedCopy, m.columnPackedArray)}")
+    println(s"\t- columnPackedCopy : ${Verification.arrayCompare2D(j.getArray, m.rowVectors.asInstanceOf[Array[Array[Double]]])}")
+    println(s"\t- transpose : ${Verification.matrixCompare(j.transpose(), m.transpose)}")
+    println(s"\t- norm1 : ${j.norm1() == m.norm1}")
+    println(s"\t- normInfinity : ${j.normInf() == m.normInfinity}")
+    println(s"\t- normFrobenius : ${j.normF()} == ${m.normFrobenius} ${j.normF() == m.normFrobenius}")
+    println(s"\t- Matrix + Matrix : ${Verification.matrixCompare(j.copy().plus(j), m + m)}")
+    println(s"\t- Matrix - Matrix : ${Verification.matrixCompare(j.copy().minus(j), m - m)}")
+    println(s"\t- -Matrix : ${Verification.matrixCompare(j.copy().times(-1.0), -m)}")
+    println(s"\t- MxMᵀ : ${Verification.matrixCompare(j.times(j.transpose()), m * m.transpose)}")
+    println(s"\t- MᵀxM : ${Verification.matrixCompare(j.transpose().times(j), m.transpose * m)}")
+    println(s"\t- trace : ${j.trace() == m.trace}")
+    println(s"\t- subMatrix : ${Verification.matrixCompare(j.getMatrix(2, 4, 2, 4), m.subMatrix[3, 3](2, 2))}")
+    val odd:Array[Int] = Array[Int](1,3,4,5)
+    val even:Array[Int] = Array[Int](0,2,4,6)
+    println(s"\t- subMatrix([],[]) : ${Verification.matrixCompare(j.getMatrix(odd, even), m.subMatrix[4,4](odd, even))}")
+    println(s"\t- subMatrix([], 7) : ${Verification.matrixCompare(j.getMatrix(3, 7, odd), m.subMatrix[5,4](3, odd))}")
+    println(s"\t- subMatrix(7, []) : ${Verification.matrixCompare(j.getMatrix(even, 2, 6), m.subMatrix[4,5](even, 2))}")
+
+    // setMatrix
+//    println(s"\t- subMatrix(7, []) : ${
+//      Verification.matrixCompare(
+//        j.setMatrix(2, 2+littleValues.length, 3, 3 + littleValues(0).length, littleJaMa),
+//        m.setMatrix[4,5](even, 2)
+//      )
+//    }")
+
+  }
+
+  override def run:Unit = {
+    kitchenSink(squareJaMa, squareMa)
+    kitchenSink(tallJaMa, tallMa)
+    kitchenSink(wideJaMa, wideMa)
+
+    println(s"\t- SQ x SQ : ${Verification.matrixCompare(squareJaMa.times(squareJaMa), squareMa * squareMa)}")
+  }
+}
