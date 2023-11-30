@@ -18,21 +18,30 @@ package slash.matrix
 
 import narr.NArray
 import slash.Random
-import slash.vector.Vec
+import slash.vector.*
 
 import scala.compiletime.ops.int.*
 
 object MatrixSpace {
-  def apply(rowDimension:Int, columnDimension:Int):MatrixSpace[rowDimension.type, columnDimension.type] = new MatrixSpace[rowDimension.type, columnDimension.type]
+
+  def apply(rowDimension:Int, columnDimension:Int):MatrixSpace[rowDimension.type, columnDimension.type] = apply(
+  VectorSpace(rowDimension),
+  VectorSpace(columnDimension)
+  )
+
+  def apply[M <: Int, N <: Int](rowVectorSpace:VectorSpace[M], columnVectorSpace:VectorSpace[N]):MatrixSpace[M, N] = {
+    new MatrixSpace[M, N](rowVectorSpace, columnVectorSpace)
+  }
+
 }
 
-class MatrixSpace[M0 <: Int, N0 <: Int](using m0: ValueOf[M0], n0: ValueOf[N0]) {
+class MatrixSpace[M0 <: Int, N0 <: Int](val rowVectorSpace:VectorSpace[M0], val columnVectorSpace:VectorSpace[N0]) {
 
-  val rowDimension:Int = m0.value
-  val columnDimension:Int = n0.value
+  val rowDimension:Int = rowVectorSpace.dimension
+  val columnDimension:Int = columnVectorSpace.dimension
 
-  opaque type M <: Int = M0
-  opaque type N <: Int = N0
+  opaque type M <: Int = rowVectorSpace.N
+  opaque type N <: Int = columnVectorSpace.N
   opaque type MN <: Int = M * N
 
   inline def apply(values: NArray[Double]): Matrix[M, N] = Matrix[M, N](values)
