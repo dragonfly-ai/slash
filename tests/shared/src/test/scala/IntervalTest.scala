@@ -22,14 +22,14 @@ import scala.reflect.ClassTag
 
 class IntervalTest extends munit.FunSuite {
 
-  case class IntervalTest[DOMAIN:ClassTag](i:Interval[DOMAIN]) {
-    def test():Unit = {
-      assert(i.contains(nextDown(i.min)))
-//      assert(!i.contains(-100))
-//      assert(!i.contains(-100))
-    }
-
-  }
+//  case class IntervalTest[DOMAIN:ClassTag](i:Interval[DOMAIN]) {
+//    def test():Unit = {
+//      assert(i.contains(nextDown(i.min)))
+////      assert(!i.contains(-100))
+////      assert(!i.contains(-100))
+//    }
+//
+//  }
 
   test(" Testing Intervals: [], [), (], () ") {
     val i0 = `[]`[Double](-10.0, 10.0)

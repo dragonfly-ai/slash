@@ -20,7 +20,7 @@ object Cholesky extends Verification {
      * https://math.stackexchange.com/questions/357980/how-to-generate-random-symmetric-positive-definite-matrices-using-matlab
      */
 
-    var spd: matrix.Matrix[11, 11] = matrix.Matrix.random[11, 11](10.0)
+    var spd: matrix.Matrix[11, 11] = matrix.Matrix.random[11, 11](-10.0, 10.0)
     spd = spd * spd.transpose + matrix.Matrix.diagonal[11](defaultRandom.nextVec[11](2.0))
 
     val sqJCh: CholeskyDecomposition = new CholeskyDecomposition(new Matrix(spd.values, spd.rows))

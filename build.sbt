@@ -52,7 +52,7 @@ lazy val slash = crossProject(
   .jsSettings()
   .nativeSettings()
 
-lazy val verification = project
+lazy val verification = project // should move verification into JVM only tests.
   .dependsOn( slash.projects( JVMPlatform ) )
   .enablePlugins(NoPublishPlugin)
   .settings(
