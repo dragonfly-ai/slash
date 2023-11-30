@@ -20,6 +20,7 @@ import slash.vector.*
 import slash.vector.Vec.*
 import narr.*
 
+import scala.compiletime.ops.int.*
 import scala.math.hypot
 
 /**
@@ -32,24 +33,61 @@ object Matrix {
    * @param values array of doubles.
    * @throws IllegalArgumentException All rows must have the same length
    */
-  def constructWithCopy[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]): Matrix[M, N] = {
-    new Matrix[M, N](narr.copy[Double](values))
-  }
+  inline def copyFrom[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]): Matrix[M, N] = apply(narr.copy[Double](values))
 
-  /** Generate matrix with random elements
-   * @param maxNorm optional Maximum random generated value allowed.
+  /**
+   * Generates an MxN matrix which consists of elements randomized between [-1.0, 1.0] inclusive.
    * @param r optional random instance.
    * @tparam M the number of rows
    * @tparam N the number of columns
    * @return An MxN matrix with uniformly distributed random elements.
    */
+  inline def random[M <: Int, N <: Int](r:scala.util.Random = slash.Random.defaultRandom)(using ValueOf[M], ValueOf[N]):Matrix[M, N] = {
+    random(slash.interval.`[]`(-1.0, 1.0), r)
+  }
+
+
+  /** Generate matrix with random elements
+   *
+   * @param minNorm Minimum random generated value allowed, inclusive.
+   * @param normMAX Maximum random generated value allowed, inclusive.
+   * @tparam M the number of rows
+   * @tparam N the number of columns
+   * @return An MxN matrix with uniformly distributed random elements.
+   */
+  inline def random[M <: Int, N <: Int](
+    minNorm: Double,
+    normMAX: Double
+  )(using ValueOf[M], ValueOf[N]): Matrix[M, N] = random[M, N](minNorm, normMAX, slash.Random.defaultRandom)
+
+
+  /** Generate matrix with random elements
+   * @param minNorm Minimum random generated value allowed, inclusive.
+   * @param normMAX Maximum random generated value allowed, inclusive.
+   * @param r optional random instance.
+   * @tparam M the number of rows
+   * @tparam N the number of columns
+   * @return An MxN matrix with uniformly distributed random elements.
+   */
+  inline def random[M <: Int, N <: Int](
+    minNorm:Double,
+    normMAX:Double,
+    r:scala.util.Random
+  )(using ValueOf[M], ValueOf[N]): Matrix[M, N] = random[M, N](slash.interval.`[]`(minNorm, normMAX), r)
+
+  /** Generate matrix with random elements
+   *
+   * @param interval from which to draw matrix component values.
+   * @param r       optional random instance.
+   * @tparam M the number of rows
+   * @tparam N the number of columns
+   * @return An MxN matrix with uniformly distributed random elements.
+   */
   def random[M <: Int, N <: Int](
-    maxNorm:Double = 1.0,
-    r:scala.util.Random = slash.Random.defaultRandom
+    interval:slash.interval.Interval[Double],
+    r: scala.util.Random
   )(using ValueOf[M], ValueOf[N]): Matrix[M, N] = new Matrix[M, N](
-    NArray.tabulate[Double](valueOf[M] * valueOf[N])(
-      if (maxNorm == 1.0) _ => maxNorm * r.nextDouble()
-      else _ => r.nextDouble())
+    NArray.tabulate[Double]( valueOf[M] * valueOf[N] )( _ => interval.random(r) )
   )
 
   /** Generate identity matrix
@@ -142,7 +180,7 @@ object Matrix {
    * @tparam N the number of columns
    * @return an MxN constant matrix.
    */
-  def apply[M <: Int, N <: Int](value: Double)(using ValueOf[M], ValueOf[N]):Matrix[M, N] = apply[M, N](
+  def fill[M <: Int, N <: Int](value: Double)(using ValueOf[M], ValueOf[N]):Matrix[M, N] = apply[M, N](
     NArray.fill[Double](valueOf[M] * valueOf[N])(value)
   )
 
@@ -151,26 +189,33 @@ object Matrix {
    * @tparam M the number of rows
    * @tparam N the number of columns
    */
-  def zeros[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]):Matrix[M, N] = apply[M, N](0.0)
+  def zeros[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]):Matrix[M, N] = fill[M, N](0.0)
+
+  /** Construct an MxN matrix of ones.
+   *
+   * @tparam M the number of rows
+   * @tparam N the number of columns
+   */
+  def ones[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Matrix[M, N] = fill[M, N](1.0)
 
 
-  /** Construct a matrix from a one-dimensional packed array
+  /** Construct a matrix by copying a one-dimensional packed array
    *
    * @param values One-dimensional array of doubles, packed by rows.
    * @param A    Number of rows.
    * @throws IllegalArgumentException Array length must be a multiple of A.
    */
-  def apply[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]):Matrix[M, N] = new Matrix[M, N](narr.copy[Double](values))
+  def apply[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]):Matrix[M, N] = new Matrix[M, N](values)
 
 }
 
-class Matrix[M <: Int, N <: Int] private(val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {
+class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {
 
   val rows: Int = valueOf[M]
   val columns: Int = valueOf[N]
 
   val MxN: Int = rows * columns
-  type MN = MxN.type
+  opaque type MN <: Int = M * N
 
   require(rows * columns == values.length, s"Product of $rows x $columns != ${values.length}")
 

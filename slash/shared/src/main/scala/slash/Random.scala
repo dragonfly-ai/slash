@@ -20,6 +20,7 @@ import Constant.log2
 import slash.vector.*
 import Vec.*
 import narr.*
+import slash.matrix.*
 
 import java.math.MathContext
 
@@ -41,9 +42,14 @@ object Random {
     def nextBigDecimal(precision: Int): BigDecimal = { val bd = BigDecimal( r.nextBigInt(precision) ); BigDecimal(bd.bigDecimal.movePointLeft(bd.precision)) }
     def nextBigDecimal(norm: BigDecimal, scale: Int): BigDecimal = norm * r.nextBigDecimal(scale)(new MathContext((norm.precision - norm.scale) + scale))
     def between(min: BigDecimal, MAX: BigDecimal): BigDecimal = min + r.nextBigDecimal(MAX - min, Math.max(min.precision, MAX.precision))
+
     inline def nextVec[N <: Int](maxNorm:Double = 1.0): Vec[N] = Vec.apply[N]( NArray.tabulate[Double](valueOf[N])((i:Int) => maxNorm * r.nextDouble() ) )
     inline def nextVec[N <: Int](minNorm:Double, normMAX:Double): Vec[N] = Vec.apply[N]( NArray.tabulate[Double](valueOf[N])((i:Int) => r.between(minNorm, normMAX) ) )
     inline def nextVec[N <: Int](componentNorm:Vec[N]):Vec[N] = Vec[N]( NArray.tabulate[Double](componentNorm.dimension)((i:Int) => componentNorm(i) * r.nextDouble() ) )
+
+    inline def nextMatrix[M <: Int, N <: Int](maxNorm:Double = 1.0)(using ValueOf[M], ValueOf[N]): Matrix[M, N] = Matrix.random[M, N](0.0, maxNorm, r)
+    inline def nextMatrix[M <: Int, N <: Int](minNorm:Double, normMAX:Double)(using ValueOf[M], ValueOf[N]): Matrix[M, N] = Matrix.random[M, N](minNorm, normMAX, r)
+
     inline def between[N <: Int](min:Vec[N], MAX:Vec[N]):Vec[N] = Vec[N](NArray.tabulate[Double](min.dimension)((i: Int) => r.between(min(i), MAX(i))))
 
 }

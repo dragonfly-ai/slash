@@ -17,7 +17,6 @@
 import slash.vector.*
 import Vec.*
 import slash.matrix.*
-import slash.matrix.util.*
 
 class VectorExtensionsTest extends munit.FunSuite {
   test("Vec[N] -> Matrix[1, N] -> Vec[N]") {

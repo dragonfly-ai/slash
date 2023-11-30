@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package slash.matrix
+package slash
 
 import narr.*
 import slash.vector.{Vec, *}
@@ -25,7 +25,7 @@ import scala.compiletime.ops.int.*
 import scala.compiletime.ops.any.==
 import scala.compiletime.ops.boolean.||
 
-package object util {
+package object matrix {
 
   extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N]) {
     inline def asRowMatrix: Matrix[1, N] = Matrix[1, N](thisVector.asInstanceOf[NArray[Double]])

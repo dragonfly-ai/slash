@@ -25,7 +25,6 @@ import stats.{LabeledVec, SimpleLabeledVector}
 import stats.probability.distributions.{EstimatedGaussian, stream}
 import stream.StreamingVectorStats
 import matrix.*
-import matrix.util.*
 
 import scala.language.{existentials, implicitConversions}
 

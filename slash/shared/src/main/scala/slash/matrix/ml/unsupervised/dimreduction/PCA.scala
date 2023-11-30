@@ -18,7 +18,6 @@ package slash.matrix.ml.unsupervised.dimreduction
 
 import slash.*
 
-import slash.matrix.util.*
 import slash.matrix.*
 import slash.matrix.decomposition.SV
 import slash.matrix.ml.data.*
