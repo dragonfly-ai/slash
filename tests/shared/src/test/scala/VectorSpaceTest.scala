@@ -16,10 +16,9 @@
 
 import narr.*
 import slash.*
-import slash.vector.*
 import slash.Constant.π
-
 import slash.Random.defaultRandom as r
+import slash.vector.*
 
 class VectorSpaceTest extends munit.FunSuite {
   test(" testing kitchen sink ") {

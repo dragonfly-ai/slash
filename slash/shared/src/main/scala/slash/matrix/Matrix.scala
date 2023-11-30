@@ -669,6 +669,8 @@ class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], 
 
   def dim: String = s"dim(${rows}x$columns)"
 
+  def asNativeArray2D:NArray[NArray[Double]] = rowVectors.asInstanceOf[NArray[NArray[Double]]]
+
   override def toString: String = {
     val sb: StringBuilder = StringBuilder()
     var r: Int = 0;
