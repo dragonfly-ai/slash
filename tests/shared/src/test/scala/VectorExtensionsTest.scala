@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-import slash.vector.Vec
-import slash.matrix.Matrix
+import slash.vector.*
+import Vec.*
+import slash.matrix.*
+import slash.matrix.util.*
 
-
-inline def assertVecEquals[N <: Int](inline v1: Vec[N], inline v2: Vec[N])(implicit loc: munit.Location): Unit = {
-  var i: Int = 0;
-  while (i < v1.dimension) {
-    munit.Assertions.assertEquals(v1(i), v2(i))
-    i += 1
-  }
-}
-
-inline def assertMatrixEquals[M <: Int, N <: Int](inline m1: Matrix[M, N], inline m2: Matrix[M, N])(implicit loc: munit.Location): Unit = {
-  var i: Int = 0;
-  while (i < m1.MxN) {
-    munit.Assertions.assertEquals(m1.values(i), m2.values(i))
-    i += 1
+class VectorExtensionsTest extends munit.FunSuite {
+  test("Vec[N] -> Matrix[1, N] -> Vec[N]") {
+    val v1:Vec[7] = Vec.random[7]()
+    val mR:Matrix[7, 1] = v1.asColumnMatrix
+    val mC:Matrix[1, 7] = v1.asRowMatrix
+    assertVecEquals(v1, mR.asVector)
+    assertVecEquals(v1, mC.asVector)
   }
 }

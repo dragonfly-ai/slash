@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package slash
-
 import slash.vector.*
-import scala.compiletime.ops.any.==
-import scala.compiletime.ops.boolean.||
+import slash.matrix.*
+import slash.matrix.util.*
 
-package object matrix {
-  extension[M <: Int, N <: Int] (thisMatrix: Matrix[M, N])(using ValueOf[M], ValueOf[N], (M == 1 || N == 1) =:= true) {
-    def asVector: Vec[thisMatrix.MN] = thisMatrix.rowPackedArray.asInstanceOf[Vec[thisMatrix.MN]]
+class MatrixExtensionsTest extends munit.FunSuite {
+  test("Matrix[1, N] -> Vec[N] -> Matrix[1, N]") {
+    val m1x1:Matrix[1,1] = Matrix.random[1,1]()
+    val m1x1Vec:Vec[1] = m1x1.asVector
+    assertMatrixEquals[1, 1]( m1x1, m1x1Vec.asRowMatrix )
+    assertMatrixEquals[1, 1]( m1x1, m1x1Vec.asColumnMatrix )
+
+    type N = 42
+    val m: Matrix[1, N] = Matrix.random[1, N]()
+    val mVec: Vec[N] = m.asVector
+    assertMatrixEquals[1, N](m, mVec.asRowMatrix)
+
   }
 }

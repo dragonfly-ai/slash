@@ -22,6 +22,9 @@ import slash.matrix.*
 import slash.matrix.decomposition.{SV, *}
 
 import scala.compiletime.ops.int.*
+import scala.compiletime.ops.any.==
+import scala.compiletime.ops.boolean.||
+
 package object util {
 
   extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N]) {
@@ -119,6 +122,11 @@ package object util {
      */
     def rightInverse(using ValueOf[Min[M, M]]): Matrix[N, M] = QR[M, N](m).solve(Matrix.identity[M, M])
 
+  }
+
+  extension[M <: Int, N <: Int] (m: Matrix[M, N])(using (M == 1 || N == 1) =:= true) {
+    def asVector: Vec[M*N] = m.values.asInstanceOf[Vec[M*N]]
+    inline def copyAsVector[MN <: Int](using MN == (M * N) =:= true): Vec[MN] = narr.copy[Double](m.values).asInstanceOf[Vec[MN]]
   }
 
 }
