@@ -406,12 +406,12 @@ class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], 
    * @tparam N1 Column dimension of thatMatrix
    */
   def setMatrix[M1 <: Int, N1 <: Int](r0: Int, c0: Int, thatMatrix: Matrix[M1, N1])(using ValueOf[M1], ValueOf[N1]): Unit = {
-    val r1: Int = valueOf[M1]
-    val c1: Int = valueOf[N1]
+    val rEnd: Int = valueOf[M1] + r0
+    val cEnd: Int = valueOf[N1] + c0
     var r:Int = r0
-    while (r <= r1) {
+    while (r < rEnd) {
       var c = c0
-      while (c <= c1) {
+      while (c < cEnd) {
         update(r, c, thatMatrix(r-r0,c-c0))
         c = c + 1
       }
@@ -450,7 +450,7 @@ class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], 
     var r:Int = 0
     while (r < rowIndices.length) {
       var c:Int = c0
-      while (c <= c1) {
+      while (c < c1) {
         update(rowIndices(r), c, thatMatrix(r, c - c0))
         c = c + 1
       }
@@ -469,7 +469,7 @@ class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], 
   def setMatrix[M1 <: Int, N1 <: Int](r0: Int, columnIndices: NArray[Int], thatMatrix: Matrix[M1, N1])(using ValueOf[M1], ValueOf[N1]): Unit = {
     val r1:Int = r0 + valueOf[M1]
     var r:Int = r0
-    while (r <= r1) {
+    while (r < r1) {
       var c:Int = 0
       while (c < columnIndices.length) {
         update(r, columnIndices(c), thatMatrix(r - r0, c))

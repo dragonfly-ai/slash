@@ -22,19 +22,38 @@ import scala.reflect.ClassTag
 
 class IntervalTest extends munit.FunSuite {
 
-//  case class IntervalTest[DOMAIN:ClassTag](i:Interval[DOMAIN]) {
-//    def test():Unit = {
-//      assert(i.contains(nextDown(i.min)))
-////      assert(!i.contains(-100))
-////      assert(!i.contains(-100))
-//    }
-//
-//  }
+  case class IntervalTester[DOMAIN:ClassTag](i:Interval[DOMAIN]) {
+    def test():Unit = {
+      if (i.leftClosed) assert(i.contains(i.min))
+      else assert(!i.contains(i.min))
+
+      if (i.rightClosed) assert(i.contains(i.MAX))
+      else assert(!i.contains(i.MAX))
+
+      assert(!i.contains(nextDown(i.min)))
+      assert(i.contains(nextUp(i.min)))
+      assert(i.contains(nextDown(i.MAX)))
+      assert(!i.contains(nextUp(i.MAX)))
+
+      var i0:Int = 0; while(i0 < 100) {
+        assert(i.contains(i.random()))
+        i0 += 1
+      }
+    }
+
+  }
+
+  val intervalTests = Array[IntervalTester[Double]](
+    IntervalTester(`[]`[Double](-9.3542, 11.0006)),
+    IntervalTester(`[)`[Double](-9.3542, 11.0006)),
+    IntervalTester(`(]`[Double](-9.3542, 11.0006)),
+    IntervalTester(`()`[Double](-9.3542, 11.0006))
+  )
 
   test(" Testing Intervals: [], [), (], () ") {
-    val i0 = `[]`[Double](-10.0, 10.0)
-    assert(i0.contains(0))
-    assert(!i0.contains(-100))
-    assert(!i0.contains(-100))
+    var i:Int = 0; while (i < intervalTests.length) {
+      intervalTests(i).test()
+      i += 1
+    }
   }
 }

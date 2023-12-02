@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-import slash.vector.*
-import Vec.*
-import slash.matrix.*
+class MatrixTest extends munit.FunSuite {
 
-class VectorExtensionsTest extends munit.FunSuite {
-  test("Vec[N] -> Matrix[1, N] -> Vec[N]") {
-    val v1:Vec[7] = Vec.random[7]
-    val mR:Matrix[7, 1] = v1.asColumnMatrix
-    val mC:Matrix[1, 7] = v1.asRowMatrix
-    assertVecEquals(v1, mR.asVector)
-    assertVecEquals(v1, mC.asVector)
-  }
+  
+
 }

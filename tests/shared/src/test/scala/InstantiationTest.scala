@@ -33,8 +33,8 @@ class InstantiationTest extends munit.FunSuite {
     val v_ones = Vec.ones[5]
     assertEquals(v_ones.sum, 5.0)
 
-    val v_rand = Vec.random[5]()
-    val v_rand_max_min = Vec.random[5](2.0, 0.5)
+    val v_rand = Vec.random[5]
+    val v_rand_max_min = Vec.random[5](0.5, 2.0)
 
     assertEquals(v2.dimension, v2.dimension)
     assertEquals(v2.dimension, v_fill.dimension)

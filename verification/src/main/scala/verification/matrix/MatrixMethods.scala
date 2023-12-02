@@ -23,6 +23,7 @@ object MatrixMethods extends Verification {
     println(s"\t- MᵀxM : ${Verification.matrixCompare(j.transpose().times(j), m.transpose * m)}")
     println(s"\t- trace : ${j.trace() == m.trace}")
     println(s"\t- subMatrix : ${Verification.matrixCompare(j.getMatrix(2, 4, 2, 4), m.subMatrix[3, 3](2, 2))}")
+
     val odd:Array[Int] = Array[Int](1,3,4,5)
     val even:Array[Int] = Array[Int](0,2,4,6)
     println(s"\t- subMatrix([],[]) : ${Verification.matrixCompare(j.getMatrix(odd, even), m.subMatrix[4,4](odd, even))}")
@@ -30,13 +31,73 @@ object MatrixMethods extends Verification {
     println(s"\t- subMatrix(7, []) : ${Verification.matrixCompare(j.getMatrix(even, 2, 6), m.subMatrix[4,5](even, 2))}")
 
     // setMatrix
-//    println(s"\t- subMatrix(7, []) : ${
-//      Verification.matrixCompare(
-//        j.setMatrix(2, 2+littleValues.length, 3, 3 + littleValues(0).length, littleJaMa),
-//        m.setMatrix[4,5](even, 2)
-//      )
-//    }")
 
+    // def setMatrix[M1 <: Int, N1 <: Int](r0: Int, c0: Int, thatMatrix: Matrix[M1, N1])
+    println(s"\t- setMatrix(1, 2, ${littleMa.dim}) : ${
+      Verification.matrixCompare(
+        {
+          val t = j.copy()
+          t.setMatrix(1, littleJaMa.getRowDimension, 2, littleJaMa.getColumnDimension + 1, littleJaMa)
+          t
+        },
+        {
+          val t = m.copy
+          t.setMatrix(1, 2, littleMa)
+          t
+        }
+      )
+    }")
+
+    val m4x4: Matrix[4, 4] = Matrix.random[4, 4]()
+    // def setMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], c0: Int, thatMatrix: Matrix[M1, N1])
+    println(s"\t- setMatrix([], 3, ${m4x4.dim}) : ${
+      val jm4x4: Jama.Matrix = new Jama.Matrix(m4x4.rowVectors.asInstanceOf[Array[Array[Double]]])
+      Verification.matrixCompare(
+        {
+          val t = j.copy()
+          t.setMatrix(even, 3, 6, jm4x4)
+          t
+        },
+        {
+          val t = m.copy
+          t.setMatrix(even, 3, m4x4)
+          t
+        }
+      )
+    }")
+    // def setMatrix[M1 <: Int, N1 <: Int](r0: Int, columnIndices: NArray[Int], thatMatrix: Matrix[M1, N1])
+    println(s"\t- setMatrix(3, [], ${m4x4.dim}) : ${
+      val jm4x4: Jama.Matrix = new Jama.Matrix(m4x4.rowVectors.asInstanceOf[Array[Array[Double]]])
+      Verification.matrixCompare(
+        {
+          val t = j.copy()
+          t.setMatrix(3, 6, odd, jm4x4)
+          t
+        },
+        {
+          val t = m.copy
+          t.setMatrix(3, odd, m4x4)
+          t
+        }
+      )
+    }")
+
+    // def setMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], columnIndices: NArray[Int], thatMatrix: Matrix[M1, N1])
+    println(s"\t- setMatrix([], [], ${m4x4.dim}) : ${
+      val jm4x4:Jama.Matrix = new Jama.Matrix(m4x4.rowVectors.asInstanceOf[Array[Array[Double]]])
+      Verification.matrixCompare(
+        {
+          val t = j.copy()
+          t.setMatrix(even, odd, jm4x4)
+          t
+        },
+        {
+          val t = m.copy
+          t.setMatrix(even, odd, m4x4)
+          t
+        }
+      )
+    }")
   }
 
   override def run:Unit = {

@@ -42,11 +42,23 @@ package object vector {
 
     inline def ones[N <: Int](using ValueOf[N]): Vec[N] = fill[N](1.0)
 
+    inline def random[N <: Int]: Vec[N] = random(0.0, 1.0, slash.Random.defaultRandom)
+
+    inline def random[N <: Int](MAX: Double):Vec[N] = random(0.0, MAX, slash.Random.defaultRandom)
+
+    inline def random[N <: Int](min: Double, MAX: Double):Vec[N] = random(min, MAX, slash.Random.defaultRandom)
+
     inline def random[N <: Int](
-                                 MAX:Double = 1.0,
-                                 min:Double = 0.0,
-                                 r:scala.util.Random = slash.Random.defaultRandom
-                               ): Vec[N] = r.nextVec[N](min, MAX)
+      min:Double,
+      MAX:Double,
+      r:scala.util.Random
+    ): Vec[N] = r.nextVec[N](min, MAX)
+
+    def random[N <: Int](
+      interval: slash.interval.Interval[Double],
+      r: scala.util.Random
+    )(using ValueOf[N]): Vec[N] = Vec.tabulate[N](_ => interval.random(r))
+
 
     inline def apply(x: Double, y: Double): Vec[2] = NArray[Double](x, y)
 
