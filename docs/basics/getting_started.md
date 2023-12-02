@@ -15,8 +15,8 @@ val v_zeros = Vec.zeros[5]
 val v_ones = Vec.ones[5]
 
 
-val v_rand = Vec.random[5]()
-val v_rand_max_min = Vec.random[5](2.0, 0.5)
+val v_rand = Vec.random[5]
+val v_rand_max_min = Vec.random[5](0.5, 2.0)
 ```
 
 And do some stuff
