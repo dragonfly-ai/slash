@@ -13,7 +13,7 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJSVersion)
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % crossVer)
 
 // continuous integration
-addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.5.4")
+addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.6.3")
 
 // Make me a website!
-addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "0.5.4")
+addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "0.6.3")
