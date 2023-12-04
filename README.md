@@ -328,7 +328,7 @@ https://github.com/BalmungSan - Design insights.
 
 https://github.com/Quafadas - Contributor!
 
-https://github.com/JD557 - Design insights and named this library.
+https://github.com/JD557 - Design insights and named this library.  Contributor!
 
 https://github.com/J-mie6 - Git advice.
 
