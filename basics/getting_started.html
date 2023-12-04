@@ -20,13 +20,12 @@
   
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:500">
   
-  <link rel="stylesheet" type="text/css" href="../helium/icofont.min.css" />
-    <link rel="stylesheet" type="text/css" href="../helium/laika-helium.css" />
-  
-  <script src="../helium/laika-helium.js"></script>
+  <link rel="stylesheet" type="text/css" href="../helium/site/icofont.min.css" />
+    <link rel="stylesheet" type="text/css" href="../helium/site/laika-helium.css" />
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <script src="../helium/site/laika-helium.js"></script>
   
   
   <script> /* for avoiding page load transitions */ </script>
@@ -125,19 +124,19 @@
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">v_rand</span><span> = </span><span class="type-name">Vec</span><span>.</span><span class="identifier">random</span><span>[</span><span class="number-literal">5</span><span>]
 </span><span class="comment">// v_rand: Vec[5] = Array(
-//   -0.8774586582639944,
-//   -0.7724075449497901,
-//   -0.6984770156397188,
-//   -0.4664424718479807,
-//   -0.7643437872578166
+//   -0.5055716771120722,
+//   -0.21994721374553572,
+//   -0.7863815852033694,
+//   -0.14363374620292713,
+//   -0.8085461180156099
 // )
 </span><span class="keyword">val</span><span> </span><span class="identifier">v_rand_max_min</span><span> = </span><span class="type-name">Vec</span><span>.</span><span class="identifier">random</span><span>[</span><span class="number-literal">5</span><span>](</span><span class="number-literal">0.5</span><span>, </span><span class="number-literal">2.0</span><span>)
 </span><span class="comment">// v_rand_max_min: Vec[5] = Array(
-//   0.9704768492124505,
-//   1.7383219186155179,
-//   0.5572750563276501,
-//   1.756639028419845,
-//   0.9798821343390005
+//   1.79843219734525,
+//   0.5930111378744003,
+//   1.7858214452498664,
+//   0.8412363385479038,
+//   0.6027754237964368
 // )</span></code></pre>
         <p>And do some stuff</p>
         <pre><code class="nohighlight"><span class="identifier">v</span><span> + </span><span class="identifier">v_fill</span><span>
@@ -159,10 +158,10 @@
 </span><span class="comment">// res6: Double = 3.0
 </span><span>
 </span><span class="identifier">v</span><span>.</span><span class="identifier">corr</span><span>(</span><span class="identifier">v_rand</span><span>)
-</span><span class="comment">// res7: Double = 0.5484105929692487
+</span><span class="comment">// res7: Double = -0.2708381202585246
 </span><span>
 </span><span class="identifier">v_rand</span><span>.</span><span class="identifier">elementRanks</span><span>
-</span><span class="comment">// res8: Vec[5] = Array(1.0, 2.0, 4.0, 5.0, 3.0)</span></code></pre>
+</span><span class="comment">// res8: Vec[5] = Array(3.0, 4.0, 2.0, 5.0, 1.0)</span></code></pre>
 
         
 <hr class="footer-rule"/>
