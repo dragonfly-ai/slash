@@ -8,7 +8,7 @@ import viz.PlotTargets.doNothing
 import viz.LaminarViz
 import viz.vega.facades.VegaView
 import viz.vega.facades.Helpers.*
-import slash.vector.Vec
+import slash.vector.*
 import com.raquo.airstream.core.Signal
 
 import scala.scalajs.js.typedarray.Float64Array

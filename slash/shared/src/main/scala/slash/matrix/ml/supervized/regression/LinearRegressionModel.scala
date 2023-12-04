@@ -18,7 +18,6 @@ package slash.matrix.ml.supervized.regression
 
 import slash.matrix.*
 import slash.vector.*
-import slash.vector.Vec.*
 
 /**
  * @param A

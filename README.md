@@ -71,7 +71,6 @@ println((v2 + v3).show) // compiler error!
 
 ```scala
 import slash.vector.*
-import slash.vector.Vec.*
 
 // create a 3 dimensional vector
 val v1:Vec[3] = Vec[3](1.0, 0.5, 0.0)

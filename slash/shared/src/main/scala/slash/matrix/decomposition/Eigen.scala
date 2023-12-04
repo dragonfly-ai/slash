@@ -16,8 +16,8 @@
 
 package slash.matrix.decomposition
 
+import slash.vector.*
 import slash.matrix.*
-import slash.vector.Vec
 import narr.*
 
 import scala.math.hypot

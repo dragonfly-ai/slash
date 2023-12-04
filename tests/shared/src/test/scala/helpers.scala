@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import slash.vector.Vec
+import slash.vector.*
 import slash.matrix.Matrix
 
 

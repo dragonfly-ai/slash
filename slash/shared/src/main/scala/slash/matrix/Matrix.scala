@@ -17,7 +17,6 @@
 package slash.matrix
 
 import slash.vector.*
-import slash.vector.Vec.*
 import narr.*
 
 import scala.compiletime.ops.int.*

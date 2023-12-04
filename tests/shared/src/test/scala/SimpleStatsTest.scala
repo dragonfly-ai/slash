@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import slash.vector.Vec
+import slash.vector.*
 import narr.*
 
 class SimpleStatsTest extends munit.FunSuite {
@@ -91,7 +91,7 @@ class SimpleStatsTest extends munit.FunSuite {
     /*
     1.0 is the first, but has as tied rank. Take the average - 1.5
     */
-    assertEquals(v.elementRanks.csv(), Array[Double](1.5, 4.5, 3.0, 6.0, 1.5, 4.5).mkString(","))
+    assertEquals(v.elementRanks.csv, Array[Double](1.5, 4.5, 3.0, 6.0, 1.5, 4.5).mkString(","))
   }
 
   test("spearmans rank") {

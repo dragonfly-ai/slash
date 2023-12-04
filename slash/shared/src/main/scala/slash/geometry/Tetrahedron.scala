@@ -17,7 +17,6 @@
 package slash.geometry
 
 import slash.vector.*
-import slash.vector.Vec.*
 import narr.*
 import slash.Random
 import slash.stats.probability.distributions.Sampleable

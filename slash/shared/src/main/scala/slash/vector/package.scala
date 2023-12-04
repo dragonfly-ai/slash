@@ -17,7 +17,7 @@
 package slash
 
 import slash.Random.nextVec
-import slash.vector.Vec
+import slash.vector.*
 import narr.*
 import slash.interval.*
 import slash.unicode.*
@@ -543,11 +543,15 @@ package object vector {
           .append(suffix(thisVector))
       }
 
+      def csv: String = csv(new StringBuilder()).toString
       def csv(sb: StringBuilder = new StringBuilder()): String = render(Format.CSV, sb).toString
+      def tsv: String = tsv(new StringBuilder()).toString
       def tsv(sb: StringBuilder = new StringBuilder()): String = render(Format.TSV, sb).toString
     }
 
   }
+
+  export Vec.*
 
   trait Format {
     def prefix[N <: Int](v:Vec[N]): String
@@ -559,15 +563,13 @@ package object vector {
   object Format {
 
     object Default extends Format {
-      import Vec.*
-      override def prefix[N <: Int](v: Vec[N]): String = s"《${exalt(v.dimension)}↗〉"
+      override def prefix[N <: Int](v: Vec[N]): String = s"《${exalt(v.length)}↗〉"
       override def delimiter(i: Int): String = ", "
       override def suffix[N <: Int](v: Vec[N]): String = "〉"
     }
 
     object Indexed extends Format {
-      import Vec.*
-      override def prefix[N <: Int](v: Vec[N]): String = s"《${exalt(v.dimension)}↗〉"
+      override def prefix[N <: Int](v: Vec[N]): String = s"《${exalt(v.length)}↗〉"
       override def delimiter(i: Int): String = s"${abase(i)} "
       override def suffix[N <: Int](v: Vec[N]): String = "〉"
     }
