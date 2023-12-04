@@ -1,14 +1,9 @@
-import laika.ast
-import laika.ast.Path.Root
+
 import laika.helium.config.HeliumIcon
 import laika.helium.config.IconLink
-import java.time.Instant
 import laika.helium.Helium
-import laika.helium.config.Favicon
-import laika.helium.config.ImageLink
-import laika.ast.*
-import laika.markdown.github.GitHubFlavor
-import laika.parse.code.SyntaxHighlighting
+import laika.format.Markdown
+import laika.config.SyntaxHighlighting
 
 val globalScalaVersion = "3.3.1"
 
@@ -37,10 +32,10 @@ ThisBuild / nativeConfig ~= {
 }
 
 lazy val slash = crossProject(
-    JSPlatform,
-    JVMPlatform,
-    NativePlatform
-  )
+  JSPlatform,
+  JVMPlatform,
+  NativePlatform
+)
   .crossType(CrossType.Full)
   .settings(
     description := "High performance, low footprint, cross platform, Linear Algebra and Statistics Hacks!",
@@ -79,43 +74,41 @@ lazy val jsdocs = project
   .enablePlugins(NoPublishPlugin)
 
 lazy val docs = project
-.in(file("site"))
-.dependsOn(slash.jvm)
-.settings(
-  mdocJS := Some(jsdocs),
-  laikaExtensions := Seq(GitHubFlavor, SyntaxHighlighting),
-  laikaConfig ~= { _.withRawContent },
-  //tlSiteHeliumExtensions :=  Seq(GitHubFlavor, SyntaxHighlighting),
-  tlSiteHelium := {
-    Helium.defaults.site.metadata(
-      title = Some("S"),
-      language = Some("en"),
-      description = Some("S"),
-      authors = Seq("one"),
-    )
-    .site
-    .topNavigationBar(
-      homeLink = IconLink.internal(laika.ast.Path(List("index.md")), HeliumIcon.home),
-      navLinks = Seq(IconLink.external("https://github.com/dragonfly-ai/slash", HeliumIcon.github))
-    )
-    .site
-    .externalJS(
-      url = "https://cdn.jsdelivr.net/npm/vega@5"
-    )
-    .site
-    .externalJS(
-      url = "https://cdn.jsdelivr.net/npm/vega-lite@5"
-    )
-    .site
-    .externalJS(
-      url = "https://cdn.jsdelivr.net/npm/vega-embed@6"
-    )
-    .site
-    .autoLinkJS()
-  }
-)
-.enablePlugins(TypelevelSitePlugin)
-.enablePlugins(NoPublishPlugin)
+  .in(file("site"))
+  .dependsOn(slash.jvm)
+  .settings(
+    mdocJS := Some(jsdocs),
+    laikaExtensions := Seq(Markdown.GitHubFlavor, SyntaxHighlighting),
+    laikaConfig ~= { _.withRawContent },
+    //tlSiteHeliumExtensions :=  Seq(GitHubFlavor, SyntaxHighlighting),
+    tlSiteHelium := {
+      Helium.defaults.site.metadata(
+          title = Some("S"),
+          language = Some("en"),
+          description = Some("S"),
+          authors = Seq("one"),
+        )
+        .site
+        .topNavigationBar(
+          homeLink = IconLink.internal(laika.ast.Path(List("index.md")), HeliumIcon.home),
+          navLinks = Seq(IconLink.external("https://github.com/dragonfly-ai/slash", HeliumIcon.github))
+        )
+        .site
+        .externalJS(
+          url = "https://cdn.jsdelivr.net/npm/vega@5"
+        )
+        .site
+        .externalJS(
+          url = "https://cdn.jsdelivr.net/npm/vega-lite@5"
+        )
+        .site
+        .externalJS(
+          url = "https://cdn.jsdelivr.net/npm/vega-embed@6"
+        )
+    }
+  )
+  .enablePlugins(TypelevelSitePlugin)
+  .enablePlugins(NoPublishPlugin)
 
 lazy val unidocs = project
   .in(file("unidocs"))
@@ -131,10 +124,10 @@ lazy val unidocs = project
   )
 
 lazy val tests = crossProject(
-    JVMPlatform,
-    JSPlatform,
-    NativePlatform
-  )
+  JVMPlatform,
+  JSPlatform,
+  NativePlatform
+)
   .in(file("tests"))
   .enablePlugins(NoPublishPlugin)
   .dependsOn(slash)
