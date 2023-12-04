@@ -39,7 +39,7 @@ lazy val slash = crossProject(
   .crossType(CrossType.Full)
   .settings(
     description := "High performance, low footprint, cross platform, Linear Algebra and Statistics Hacks!",
-    libraryDependencies += "ai.dragonfly" %%% "narr" % "0.104"
+    libraryDependencies += "ai.dragonfly" %%% "narr" % "0.105"
   )
   .jvmSettings(
     libraryDependencies ++= Seq( "org.scala-js" %% "scalajs-stubs" % "1.1.0" )

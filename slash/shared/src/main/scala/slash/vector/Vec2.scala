@@ -25,8 +25,6 @@ import narr.*
 
 object Vec2 {
 
-  import Vec.*
-
   def rotateAllDegrees(vectors:NArray[Vec[2]], degrees: Double): NArray[Vec[2]] = {
     rotateAll(vectors, degreesToRadians(degrees))
   }
