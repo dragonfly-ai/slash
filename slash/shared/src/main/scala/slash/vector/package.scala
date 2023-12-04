@@ -202,6 +202,9 @@ package object vector {
 
       inline def copy:Vec[N] = thisVector.asInstanceOf[NArr[Double]].slice(0, dimension).asInstanceOf[Vec[N]]
 
+      inline def asNativeArray: NArray[Double] = thisVector.asInstanceOf[NArray[Double]]
+
+
       // clamp methods
 
       def clamp(lt: Double, gt: Double): Unit = {

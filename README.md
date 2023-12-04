@@ -147,11 +147,11 @@ extension [MN <: Int] (m: Matrix[MN, MN])(using ValueOf[MN]) {
 
 &nbsp;&nbsp;&nbsp;Because matrix relies on <a href="https://github.com/dragonfly-ai/narr">NArr</a>, JavaScript environments store matrix data as:
 ```scala
-var matrixArray:NArray[NArray[Double]]
+var matrixArray:NArray[Double]
 ```
 &nbsp;&nbsp;&nbsp;which is equivalent to:
 ```scala
-var matrixArray:js.Array[Float64Array]
+var matrixArray:Float64Array
 ```
 &nbsp;&nbsp;&nbsp;In JVM and Native environments, matrix data occupies normal scala `Array[Double]`.
 
