@@ -157,9 +157,9 @@ package object vector {
      * Vec[2] extension methods:
      */
     extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N == 2 =:= true) {
-      inline def rotate(cosTheta: Double, sinTheata: Double): Unit = {
-        val x1 = thisVector(0) * cosTheta - thisVector(1) * sinTheata
-        thisVector(1) = thisVector(0) * sinTheata + thisVector(1) * cosTheta
+      inline def rotate(cosTheta: Double, sinTheta: Double): Unit = {
+        val x1 = thisVector(0) * cosTheta - thisVector(1) * sinTheta
+        thisVector(1) = thisVector(0) * sinTheta + thisVector(1) * cosTheta
         thisVector(0) = x1
       }
       inline def rotate(radians: Double): Unit = rotate(Math.cos(radians), Math.sin(radians))
