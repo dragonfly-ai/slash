@@ -48,7 +48,7 @@ object MatrixMethods extends Verification {
       )
     }")
 
-    val m4x4: Matrix[4, 4] = Matrix.random[4, 4]()
+    val m4x4: Matrix[4, 4] = Matrix.random[4, 4]
     // def setMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], c0: Int, thatMatrix: Matrix[M1, N1])
     println(s"\t- setMatrix([], 3, ${m4x4.dim}) : ${
       val jm4x4: Jama.Matrix = new Jama.Matrix(m4x4.rowVectors.asInstanceOf[Array[Array[Double]]])

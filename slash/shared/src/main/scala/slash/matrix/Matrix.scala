@@ -16,8 +16,8 @@
 
 package slash.matrix
 
-import slash.vector.*
 import narr.*
+import slash.vector.*
 
 import scala.compiletime.ops.int.*
 import scala.math.hypot
@@ -34,6 +34,8 @@ object Matrix {
    */
   inline def copyFrom[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]): Matrix[M, N] = apply(narr.copy[Double](values))
 
+  inline def random[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Matrix[M, N] = random[M, N](slash.Random.defaultRandom)
+
   /**
    * Generates an MxN matrix which consists of elements randomized between [-1.0, 1.0] inclusive.
    * @param r optional random instance.
@@ -41,7 +43,7 @@ object Matrix {
    * @tparam N the number of columns
    * @return An MxN matrix with uniformly distributed random elements.
    */
-  inline def random[M <: Int, N <: Int](r:scala.util.Random = slash.Random.defaultRandom)(using ValueOf[M], ValueOf[N]):Matrix[M, N] = {
+  inline def random[M <: Int, N <: Int](r:scala.util.Random)(using ValueOf[M], ValueOf[N]):Matrix[M, N] = {
     random(slash.interval.`[]`(-1.0, 1.0), r)
   }
 
@@ -252,13 +254,30 @@ class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], 
     */
   inline def rowPackedArray: NArray[Double] = copyValues
 
-  def columnVectors: NArray[Vec[M]] = NArray.tabulate[Vec[M]](columns)(
-    (i: Int) => columnPackedArray.slice(i * rows, columns).asInstanceOf[Vec[M]]
+  /**
+   * @param row the row of the matrix to return as a vector.
+   * @return a copy of the specified matrix row in Vec[N] format.
+   */
+  inline def rowVector(row:Int):Vec[N] = Vec.apply[N](
+    values.asInstanceOf[NArr[Double]].slice(row * columns, (row * columns) + columns).asInstanceOf[NArray[Double]]
   )
 
-  def rowVectors: NArray[Vec[N]] = NArray.tabulate[Vec[N]](rows)(
-    (i: Int) => values.slice(i * columns, (i * columns) + columns).asInstanceOf[Vec[N]]
-  )
+  /**
+   * @return a copy of this matrix in the form of an array of row vectors.
+   */
+  def rowVectors: NArray[Vec[N]] = NArray.tabulate[Vec[N]](rows)( (row: Int) => rowVector(row) )
+
+  /**
+   * @param column the column of the matrix to return as a vector.
+   * @return a copy of the specified matrix column in Vec[M] format.
+   */
+  inline def columnVector(column:Int):Vec[M] = Vec.tabulate[M]( (r:Int) => apply(r, column) )
+
+  /**
+   * @return a copy of this matrix in the form of an array of column vectors.
+   */
+  def columnVectors: NArray[Vec[M]] = transpose.rowVectors
+
 
   /** Get row dimension.
     *

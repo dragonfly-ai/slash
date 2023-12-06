@@ -14,8 +14,32 @@
  * limitations under the License.
  */
 
+import narr.*
+import slash.vector.*
+import slash.matrix.*
+
 class MatrixTest extends munit.FunSuite {
 
-  
+  val m:Matrix[11, 7] = Matrix.random[11, 7]
+  val mT: Matrix[7, 11] = m.transpose
 
+  test( " m == m.transpose.transpose " ) {
+    assertMatrixEquals(m, mT.transpose)
+  }
+
+  test(" compare m.rowVector to m.transpose.columnVector ") {
+
+    // compare m's row vectors to mT's column vectors:
+    var i: Int = 0;
+    while (i < m.rowDimension ) {
+      assertVecEquals(m.rowVector(i), mT.columnVector(i))
+      i += 1
+    }
+
+    var j: Int = 0;
+    while (j < m.columns) {
+      assertVecEquals(m.columnVector(j), mT.rowVector(j))
+      j += 1
+    }
+  }
 }
