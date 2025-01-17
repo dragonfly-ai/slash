@@ -12,17 +12,16 @@ import slash.vector.*
 import com.raquo.airstream.core.Signal
 
 import scala.scalajs.js.typedarray.Float64Array
-import io.circe.Encoder
-import io.circe.Decoder
-import io.circe.parser.decode
+
 import slash.Random
 import slash.stats.probability.distributions.Poisson
+import upickle.default.*
 
 case class HistogramBin(
   bin0: Double,
   bin1: Double,
   count: Int
-) derives Decoder, Encoder.AsObject
+) derives ReadWriter
 
 def poissonChart(): Div = {
   val rand = Random.defaultRandom
@@ -39,7 +38,7 @@ def poissonChart(): Div = {
 
   def bin0(in: js.UndefOr[js.Dynamic]): Option[HistogramBin] =
     if in == js.undefined then None
-    else decode[HistogramBin](js.JSON.stringify(in.asInstanceOf[js.Object])).toOption
+    else Some(upickle.default.read[HistogramBin](js.JSON.stringify(in.asInstanceOf[js.Object])))
   end bin0
 
   extension (in: Double)
@@ -115,6 +114,8 @@ def poissonChart(): Div = {
     ),
 
     chartDiv.amend(
+      width := "40vmin",
+      height := "40vmin",
       viewOpt.map{ (vvOpt : Option[VegaView]) =>
         vvOpt.foreach(_.safeAddSignalListener("tooltip", hoverCallback))
       } --> Observer{_ => ()},
