@@ -1,6 +1,6 @@
 val crossVer = "1.3.2"
 val scalaJSVersion = "1.18.1"
-val scalaNativeVersion = "0.4.16"
+val scalaNativeVersion = "0.4.17"
 
 addDependencyTreePlugin
 
@@ -13,7 +13,7 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJSVersion)
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % crossVer)
 
 // continuous integration
-addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.6.3")
+addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.6.7")
 
 // Make me a website!
-addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "0.6.3")
+addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "0.6.7")
