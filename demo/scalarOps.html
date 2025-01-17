@@ -121,37 +121,39 @@
 </span><span class="comment">// res4: Vec[2] = Array(-1.5, -2.5)
 </span><span>
 </span><span class="comment">// mutating (no copy) methods
-</span><span class="keyword">val</span><span> </span><span class="identifier">v2A</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>); </span><span class="identifier">v2A</span><span> += </span><span class="number-literal">2.5</span><span>; </span><span class="identifier">v2A</span><span>
-</span><span class="comment">// v2A: Vec[2] = Array(4.0, 5.0); v2A += 2.5; v2A; v2A
-// res6: Vec[2] = Array(4.0, 5.0)
-</span><span class="keyword">val</span><span> </span><span class="identifier">v2B</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>); </span><span class="identifier">v2B</span><span> -= </span><span class="number-literal">2.5</span><span>; </span><span class="identifier">v2B</span><span>
-</span><span class="comment">// v2B: Vec[2] = Array(-1.0, 0.0); v2B -= 2.5; v2B; v2B
-// res8: Vec[2] = Array(-1.0, 0.0)
-</span><span class="keyword">val</span><span> </span><span class="identifier">v2C</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>); </span><span class="identifier">v2C</span><span> *= </span><span class="number-literal">2.5</span><span>; </span><span class="identifier">v2C</span><span>
-</span><span class="comment">// v2C: Vec[2] = Array(3.75, 6.25); v2C *= 2.5; v2C; v2C
-// res10: Vec[2] = Array(3.75, 6.25)
-</span><span class="keyword">val</span><span> </span><span class="identifier">v2D</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>); </span><span class="identifier">v2D</span><span> /= </span><span class="number-literal">2.5</span><span>; </span><span class="identifier">v2D</span><span> 
-</span><span class="comment">// v2D: Vec[2] = Array(0.6000000000000001, 1.0); v2D /= 2.5; v2D ; v2D 
-// res12: Vec[2] = Array(0.6000000000000001, 1.0) 
+</span><span class="keyword">val</span><span> </span><span class="identifier">v2A</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>)
+</span><span class="comment">// v2A: Vec[2] = Array(4.0, 5.0)
+</span><span class="identifier">v2A</span><span> += </span><span class="number-literal">2.5</span><span>
+</span><span class="identifier">v2A</span><span>.</span><span class="identifier">show</span><span>
+</span><span class="comment">// res6: String = &quot;《²↗〉4.0ᵢ 5.0ⱼ〉&quot;
 </span><span>
-</span><span class="identifier">v1</span><span>.</span><span class="identifier">clampedMin</span><span>(</span><span class="number-literal">2.0</span><span>)
-</span><span class="comment">// res13: Vec[2] = Array(2.0, 2.5)
-</span><span class="identifier">v1</span><span>.</span><span class="identifier">clampedMAX</span><span>(</span><span class="number-literal">2.0</span><span>)
-</span><span class="comment">// res14: Vec[2] = Array(1.5, 2.0)
+</span><span class="keyword">val</span><span> </span><span class="identifier">v2B</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>)
+</span><span class="comment">// v2B: Vec[2] = Array(-1.0, 0.0)
+</span><span class="identifier">v2B</span><span> -= </span><span class="number-literal">2.5</span><span>
+</span><span class="identifier">v2B</span><span>.</span><span class="identifier">show</span><span>
+</span><span class="comment">// res8: String = &quot;《²↗〉-1.0ᵢ 0.0ⱼ〉&quot;
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">v2C</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>)
+</span><span class="comment">// v2C: Vec[2] = Array(3.75, 6.25)
+</span><span class="identifier">v2C</span><span> *= </span><span class="number-literal">2.5</span><span>
+</span><span class="identifier">v2C</span><span>.</span><span class="identifier">show</span><span>
+</span><span class="comment">// res10: String = &quot;《²↗〉3.75ᵢ 6.25ⱼ〉&quot;
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">v2D</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>)
+</span><span class="comment">// v2D: Vec[2] = Array(0.6000000000000001, 1.0)
+</span><span class="identifier">v2D</span><span> /= </span><span class="number-literal">2.5</span><span>
+</span><span class="identifier">v2D</span><span>
+</span><span class="comment">// res12: Vec[2] = Array(0.6000000000000001, 1.0)
+</span><span>
+</span><span class="identifier">v1</span><span>.</span><span class="identifier">clampedMin</span><span>(</span><span class="number-literal">2.0</span><span>).</span><span class="identifier">show</span><span>
+</span><span class="comment">// res13: String = &quot;《²↗〉2.0ᵢ 2.5ⱼ〉&quot;
+</span><span class="identifier">v1</span><span>.</span><span class="identifier">clampedMAX</span><span>(</span><span class="number-literal">2.0</span><span>).</span><span class="identifier">show</span><span>
+</span><span class="comment">// res14: String = &quot;《²↗〉1.5ᵢ 2.0ⱼ〉&quot;
 </span><span>
 </span><span class="keyword">val</span><span> </span><span class="identifier">v2</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">3</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>, </span><span class="number-literal">3.5</span><span>)
 </span><span class="comment">// v2: Vec[3] = Array(1.5, 2.5, 3.5)
 </span><span class="identifier">v2</span><span>.</span><span class="identifier">clamped</span><span>(</span><span class="number-literal">2.0</span><span>, </span><span class="number-literal">3.0</span><span>)
-</span><span class="comment">// res15: Vec[3] = Array(2.0, 2.5, 3.0)
-</span><span>
-</span><span class="comment">// mutating (no copy) versions
-</span><span class="keyword">val</span><span> </span><span class="identifier">v2E</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>); </span><span class="identifier">v2E</span><span>.</span><span class="identifier">min</span><span>(</span><span class="number-literal">2.0</span><span>); </span><span class="identifier">v2E</span><span>
-</span><span class="comment">// v2E: Vec[2] = Array(2.0, 2.5); v2E.min(2.0); v2E; v2E
-// res17: Vec[2] = Array(2.0, 2.5)
-</span><span class="keyword">val</span><span> </span><span class="identifier">v2F</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>); </span><span class="identifier">v2F</span><span>.</span><span class="type-name">MAX</span><span>(</span><span class="number-literal">2.0</span><span>); </span><span class="identifier">v2F</span><span>
-</span><span class="comment">// v2F: Vec[2] = Array(1.5, 2.0); v2F.MAX(2.0); v2F; v2F
-// res19: Vec[2] = Array(1.5, 2.0)
-</span><span class="identifier">v2</span><span>.</span><span class="identifier">copy</span><span>.</span><span class="identifier">clamp</span><span>(</span><span class="number-literal">2.0</span><span>, </span><span class="number-literal">3.0</span><span>)</span></code></pre>
+</span><span class="comment">// res15: Vec[3] = Array(2.0, 2.5, 3.0)</span></code></pre>
 
         
 <hr class="footer-rule"/>

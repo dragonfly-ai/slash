@@ -118,9 +118,12 @@
 </span><span>
 </span><span class="identifier">println</span><span>( </span><span class="string-literal">s&quot;log[2.0](42.0) = </span><span class="substitution">${log[2.0](42.0)}</span><span class="string-literal">&quot;</span><span> )
 </span><span class="comment">// log[2.0](42.0) = 5.392317422778761
-</span><span class="keyword">var</span><span> </span><span class="identifier">i</span><span>: </span><span class="type-name">Int</span><span> = </span><span class="number-literal">1</span><span>; </span><span class="keyword">while</span><span> (</span><span class="identifier">i</span><span> &gt; </span><span class="number-literal">0</span><span>) {
-</span><span class="comment">// i: Int = 1; while (i &gt; 0) {
-</span><span>  </span><span class="identifier">println</span><span>( </span><span class="string-literal">s&quot;log[2](</span><span class="substitution">$i</span><span class="string-literal">) = </span><span class="substitution">${log[2](i)}</span><span class="string-literal">&quot;</span><span> )
+</span><span>
+</span><span class="keyword">var</span><span> </span><span class="identifier">i</span><span>: </span><span class="type-name">Int</span><span> = </span><span class="number-literal">1</span><span>;
+</span><span class="comment">// i: Int = 1
+</span><span>
+</span><span class="keyword">while</span><span> (</span><span class="identifier">i</span><span> &gt; </span><span class="number-literal">0</span><span>) {
+  </span><span class="identifier">println</span><span>( </span><span class="string-literal">s&quot;log[2](</span><span class="substitution">$i</span><span class="string-literal">) = </span><span class="substitution">${log[2](i)}</span><span class="string-literal">&quot;</span><span> )
   </span><span class="identifier">i</span><span> = </span><span class="identifier">i</span><span> &lt;&lt; </span><span class="number-literal">1</span><span>
 }
 </span><span class="comment">// log[2](1) = 0.0
