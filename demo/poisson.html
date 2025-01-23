@@ -126,57 +126,57 @@
 </span><span class="comment">// res2: Double = 1.0
 </span><span>
 </span><span class="keyword">val</span><span> </span><span class="identifier">rand</span><span> = </span><span class="identifier">slash</span><span>.</span><span class="type-name">Random</span><span>.</span><span class="identifier">defaultRandom</span><span>
-</span><span class="comment">// rand: Random = scala.util.Random@6f781bb1
+</span><span class="comment">// rand: Random = scala.util.Random@3fe23745
 </span><span class="keyword">type</span><span> </span><span class="type-name">N</span><span> = </span><span class="number-literal">10000</span><span>
 </span><span class="keyword">val</span><span> </span><span class="identifier">v</span><span> : </span><span class="type-name">NArray</span><span>[</span><span class="type-name">Long</span><span>] = </span><span class="identifier">dist1</span><span>.</span><span class="identifier">sample</span><span>(</span><span class="number-literal">10000</span><span>, </span><span class="identifier">rand</span><span>)
 </span><span class="comment">// v: Array[Long] = Array(
-//   0L,
-//   0L,
-//   0L,
-//   1L,
-//   0L,
-//   1L,
-//   0L,
+//   2L,
 //   1L,
 //   0L,
 //   0L,
+//   2L,
+//   4L,
+//   2L,
+//   2L,
 //   1L,
 //   2L,
-//   0L,
 //   1L,
-//   1L,
-//   2L,
-//   0L,
 //   3L,
 //   1L,
-//   1L,
-//   3L,
-//   0L,
-//   1L,
-//   1L,
+//   2L,
+//   2L,
 //   1L,
 //   2L,
+//   1L,
+//   1L,
+//   3L,
+//   2L,
+//   0L,
+//   2L,
+//   0L,
+//   2L,
+//   4L,
 //   0L,
 //   1L,
 //   1L,
+//   4L,
 //   0L,
+//   2L,
 //   1L,
-//   1L,
-//   0L,
+//   3L,
 //   1L,
 //   2L,
 //   4L,
 //   1L,
 //   0L,
-//   1L,
-//   2L,
-//   0L,
-//   0L,
-//   3L,
-//   1L,
-//   1L,
 //   0L,
 //   2L,
+//   2L,
+//   4L,
+//   0L,
+//   0L,
+//   0L,
+//   1L,
 //   3L,
 // ...</span></code></pre>
         
@@ -185,8 +185,8 @@
         <p>As we&#39;re using native (read - pretty quick) JS arrays behind the scenes - we can rag the ui thread pretty hard (100k samples) before we start to see any lag in our plots and stats.</p>
         <p>For funsies - we compare theoretical and empirical distributions. This little app lets you pick a λ and a number of samples. Hover over a bar to see it&#39;s theoretical and sampled probability.</p>
         <div id="mdoc-html-run0" data-mdoc-js></div>
-        <p><script type="text/javascript" src="poisson.md.js" defer></script>
-        <script type="text/javascript" src="mdoc.js" defer></script></p>
+        <script type="text/javascript" src="poisson.md.js" defer></script>
+        <script type="text/javascript" src="mdoc.js" defer></script>
 
         
 <hr class="footer-rule"/>
