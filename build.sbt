@@ -23,7 +23,6 @@ ThisBuild / tlSitePublishBranch := Some("main")
 ThisBuild / tlBaseVersion := "0.3" // this isn't used yet, until MIMA gets enabled by changing tlVersionIntroduced
 ThisBuild / tlVersionIntroduced := Map("3" -> "1.0.0")
 ThisBuild / tlCiReleaseBranches := Seq()
-ThisBuild / tlSonatypeUseLegacyHost := false
 
 ThisBuild / nativeConfig ~= {
   _.withLTO(scala.scalanative.build.LTO.thin)
