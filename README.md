@@ -117,13 +117,21 @@ println( (v42a + v42b).tsv() ) // output vector sum tab separated values
 ```scala
 // create an 3 x 2 matrix of zeros.
 val m:Matrix[3, 2] = Matrix.zeros[3, 2]
+
+// create a 3 x 3 matrix with convenient matrix literal syntax:
+val m0:Matrix[3, 3] = Matrix[3,3](
+  1, 2, 3,
+  4, 5, 6,
+  7, 8, 9
+)
 ```
 
 &nbsp;&nbsp;&nbsp;By encoding the matrix's row and column dimensions into its type, the compiler can prevent a whole category of runtime errors that arise from mismatched matrix dimensions:
 
 ```scala
-// create an 3 x 2 matrix of zeros.
+// create an 3 x 2 matrix of zeros:
 val m0:Matrix[3, 2] = Matrix.zeros[3, 2]
+// create an 2 x 3 matrix of zeros:
 val m1:Matrix[2, 3] = Matrix.zeros[2, 3]
 
 val m2:Matrix[3, 3] = m0 * m1

@@ -208,6 +208,18 @@ object Matrix {
    */
   def apply[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]):Matrix[M, N] = new Matrix[M, N](values)
 
+  /**
+   *
+   * @param values the matrix elements.
+   * @tparam M the number of rows
+   * @tparam N the number of columns
+   * @return an M x N matrix consisting of values.
+   */
+  def apply[M <: Int, N <: Int](values: Double*)(using ValueOf[M], ValueOf[N]):Matrix[M, N] = {
+    dimensionCheck(values.size, valueOf[M] * valueOf[N])
+    new Matrix[M, N](NArray[Double](values: _*))
+  }
+
 }
 
 class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {

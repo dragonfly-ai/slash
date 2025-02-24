@@ -20,10 +20,19 @@ import slash.matrix.*
 
 class MatrixTest extends munit.FunSuite {
 
+  val m0:Matrix[3, 3] = Matrix[3,3](
+    1, 2, 3,
+    4, 5, 6,
+    7, 8, 9
+  )
+
+  //println(m0)
+
   val m:Matrix[11, 7] = Matrix.random[11, 7]
   val mT: Matrix[7, 11] = m.transpose
 
   test( " m == m.transpose.transpose " ) {
+    assertMatrixEquals(m0, m0.transpose.transpose)
     assertMatrixEquals(m, mT.transpose)
   }
 
