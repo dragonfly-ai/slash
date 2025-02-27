@@ -19,6 +19,7 @@ import Vec.*
 import slash.matrix.*
 
 class VectorExtensionsTest extends munit.FunSuite {
+
   test("Vec[N] -> Matrix[1, N] -> Vec[N]") {
     val v1:Vec[7] = Vec.random[7]
     val mR:Matrix[7, 1] = v1.asColumnMatrix

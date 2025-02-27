@@ -307,7 +307,16 @@ val rtv2: Vec[l2.type] = r.nextVec[l2.type]()
 println((rtv1 + rtv2.asInstanceOf[Vec[l1.type]]).render())
 ```
 
-We recommend writing a representation of a vector space that contains a reference to a dimension type, then sharing that type across all of the vectors in that space.  Unfortunately, this means having to think about a concept that no other math library has had, but it can also head off all kinds of run time errors caused by mismatched dimension exceptions.
+To coordinate runtime vector dimensions across a system, SLASH provides the `VectorSpace` and `MatrixSpace` classes:
+
+```scala
+val l1: Int = r.nextInt(100)
+val vs = VectorSpace(l1)
+val rtv1: Vec[vs.N] = r.nextVec[vs.N]()
+val rtv2: Vec[vs.N] = r.nextVec[vs.N]()
+println((rtv1 + rtv2.asInstanceOf[Vec[vs.N]]).render())
+```
+Unfortunately, this means having to think about a concept that no other math library has had, but it can also head off all kinds of run time errors caused by mismatched dimension exceptions.
 </li>
 </ul>
 <br />
