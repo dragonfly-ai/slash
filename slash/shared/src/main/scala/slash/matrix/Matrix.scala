@@ -21,6 +21,8 @@ import slash.vector.*
 
 import scala.compiletime.ops.int.*
 import scala.math.hypot
+import narr.NArray
+import scala.compiletime.{constValue, summonInline}
 
 /**
   * This library is fundamentally an adaptation of the Java Matrix library, JaMa, by MathWorks Inc. and the National Institute of Standards and Technology.
@@ -220,6 +222,106 @@ object Matrix {
     new Matrix[M, N](NArray[Double](values: _*))
   }
 
+  /** Construct a Matrix from Tuple literal, with optional dimensions at call site.
+   *  `((a,b,c...),(d,e,f,...),...)`.
+   *
+   * Where:
+   *    inner tuples share the same arity
+   *    tuple Numeric fields converted to type Double
+   *    non-numeric fields, if present converted to `Double.NaN`
+   * @param tup a tuple with M Number tuples of arity N
+   * @return an M x N matrix consisting of values.
+   */
+  transparent inline def Mat[T <: Tuple & Singleton](inline t: T)(using ValueOf[RowSize[T]], ValueOf[ColSize[T]], ValueOf[MatrixSize[T]]) = {
+    //dimensionCheck(t.productArity, dimension)
+    val rows = valueOf[RowSize[T]]
+    val cols = valueOf[ColSize[T]]
+    val itr1:Iterator[Any] = t.productIterator
+    val matsize1: Int = valueOf[MatrixSize[T]]
+    //val matsize2: Int = summon[ValueOf[MatrixSize[T]]].value
+    val v:NArray[Double] = new NArray[Double](matsize1)
+    var i:Int = 0
+    while (itr1.hasNext) {
+      val inner = itr1.next().asInstanceOf[Tuple]
+      val itr2:Iterator[Any] = inner.productIterator
+      while (itr2.hasNext) {
+        v(i) = toDouble(itr2.next().asInstanceOf[Number])
+        i += 1
+      }
+    }
+    inline (rows, cols) match {
+    case (r, c) =>
+      new Matrix[r.type, c.type](v)
+    }
+  }
+
+  type Number = Double | Int | Long | Float | BigDecimal
+
+  // recursive compile-time type functions
+  type RowSize[T <: Tuple] <: Int = T match
+    case EmptyTuple => 0
+    case h *: t => S[RowSize[t]]
+
+  type ColSize[T <: Tuple] <: Int = T match
+    case EmptyTuple => 0
+    case h *: _ => TupleSize[h]
+
+  type TupleSize[T <: Tuple] <: Int = T match
+    case EmptyTuple => 0
+    case h *: t => S[TupleSize[t]]
+
+  type Product[A <: Int, B <: Int] <: Int = A match
+    case 0 => 0
+    case S[aMinus1] => B + Product[aMinus1, B]
+
+  type MatrixSize[T <: Tuple] = Product[RowSize[T], ColSize[T]]
+
+
+  inline def dims[T <: Tuple](inline tup: T): (Int, Int) = {
+    (constValue[RowSize[T]], constValue[ColSize[T]])
+  }
+
+
+  inline def toDouble(inline num: Number): Double = {
+    num match {
+    case d: Double     => d
+    case d: Int        => d.toDouble
+    case d: Long       => d.toDouble
+    case d: Float      => d.toDouble
+    case d: BigDecimal => d.toDouble
+    }
+  }
+
+  /*
+  transparent inline def Mat[T <: Tuple](inline tup: T) = {
+    def values: NArray[Double] = tup.productIterator.map {
+      case t: Tuple => t.productIterator.map {
+        case n: Number => toDouble(n)
+      }.toArray.asInstanceOf[NArray[Double]]
+    }.toArray.flatten.asInstanceOf[NArray[Double]]
+    val (rows: Int, cols: Int) = dims(tup)
+    def values: NArray[Double] = tup.productIterator.map {
+      case t: Tuple => t.productIterator.map {
+        case n: Number => toDouble(n)
+      }.toArray.asInstanceOf[NArray[Double]]
+    }.toArray.flatten.asInstanceOf[NArray[Double]]
+    //val matsize = constValue[MatSize[T]]
+    val values: NArray[Double] = new NArray[Double](rows * cols)
+    var i = 0
+    tup.productIterator.map {
+      case t: Tuple =>
+        t.productIterator.map {
+          case n: Number =>
+            values(i) = toDouble(n)
+            i += 1
+        }
+    }
+    inline dims(tup) match {
+    case (r, c) =>
+      new Matrix[r.type, c.type](values)
+    }
+  }
+  */
 }
 
 class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {

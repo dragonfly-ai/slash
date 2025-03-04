@@ -16,6 +16,7 @@
 
 import slash.vector.*
 import slash.matrix.*
+import slash.matrix.Matrix.*
 
 class MatrixExtensionsTest extends munit.FunSuite {
   test("Matrix[1, N] -> Vec[N] -> Matrix[1, N]") {
@@ -29,5 +30,13 @@ class MatrixExtensionsTest extends munit.FunSuite {
     val mVec: Vec[N] = m.asVector
     assertMatrixEquals[1, N](m, mVec.asRowMatrix)
 
+  }
+
+  test("Matrix can be initialized from Tuple literal") {
+    import slash.matrix.*
+    val tup3x2 = ( (1, 2), (3, 4), (5, 6))
+    val m01: Matrix[3, 2] = Mat(tup3x2)
+    val m02               = Mat(tup3x2)
+    assert(m01.toString == m02.toString)
   }
 }
