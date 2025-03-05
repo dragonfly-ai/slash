@@ -21,6 +21,8 @@ import slash.vector.*
 
 import scala.compiletime.ops.int.*
 import scala.math.hypot
+//import narr.NArray
+import scala.compiletime.{constValue, summonInline}
 
 /**
   * This library is fundamentally an adaptation of the Java Matrix library, JaMa, by MathWorks Inc. and the National Institute of Standards and Technology.
@@ -217,7 +219,85 @@ object Matrix {
    */
   def apply[M <: Int, N <: Int](values: Double*)(using ValueOf[M], ValueOf[N]):Matrix[M, N] = {
     dimensionCheck(values.size, valueOf[M] * valueOf[N])
-    new Matrix[M, N](NArray[Double](values: _*))
+    new Matrix[M, N](NArray[Double](values *))
+  }
+
+  /** Construct a Matrix from Tuple literal, with optional dimensions at call site.
+   *  `((a,b,c...),(d,e,f,...),...)`.
+   *
+   * Where:
+   *    inner tuples share the same arity
+   *    tuple Numeric fields converted to type Double
+   *    non-numeric fields, if present converted to `Double.NaN`
+   * @param tup a tuple with M Number tuples of arity N
+   * @return an M x N matrix consisting of values.
+   */
+  transparent inline def apply[T <: Tuple](inline t: T) = {
+    val itr1:Iterator[Any] = t.productIterator
+    val matsize1: Int = valueOf[MatrixSize[T]]
+    val v:NArray[Double] = new NArray[Double](matsize1)
+    var i:Int = 0
+    var columnCount = 0
+    while (itr1.hasNext) {
+      val inner = itr1.next().asInstanceOf[Tuple]
+      val itr2:Iterator[Any] = inner.productIterator
+      var j:Int = 0
+      while (itr2.hasNext) {
+        itr2.next match {
+        case n: Number =>
+          v(i) = toDouble(n)
+        case x =>
+          throw new IllegalArgumentException(s"non-numeric Tuple field [$x]")
+        }
+        i += 1
+        j += 1
+      }
+      if columnCount == 0 then
+        columnCount = j
+      else
+        require(j == columnCount)
+    }
+    inline (constValue[RowSize[T]], constValue[ColSize[T]]) match {
+    case (r, c) =>
+      new Matrix[r.type, c.type](v)
+    }
+  }
+
+  type Number = Int | Float | Double | Long
+
+  // recursive compile-time type functions
+  // S is the Int successor type, denoting N + 1 at the type level
+  type RowSize[T <: Tuple] <: Int = T match
+    case EmptyTuple => 0
+    case h *: t => S[RowSize[t]]
+
+  type ColSize[T <: Tuple] <: Int = T match
+    case EmptyTuple => 0
+    case h *: _ => TupleSize[h]
+
+  type TupleSize[T <: Tuple] <: Int = T match
+    case EmptyTuple => 0
+    case h *: t => S[TupleSize[t]]
+
+  type Product[A <: Int, B <: Int] <: Int = A match
+    case 0 => 0
+    case S[aMinus1] => B + Product[aMinus1, B]
+
+  type MatrixSize[T <: Tuple] = Product[RowSize[T], ColSize[T]]
+
+
+  inline def dims[T <: Tuple](inline tup: T): (Int, Int) = {
+    (constValue[RowSize[T]], constValue[ColSize[T]])
+  }
+
+
+  inline def toDouble(inline num: Number): Double = {
+    num match {
+    case d: Double     => d
+    case d: Int        => d.toDouble
+    case d: Long       => d.toDouble
+    case d: Float      => d.toDouble
+    }
   }
 
 }
@@ -716,4 +796,19 @@ class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], 
     sb.toString()
   }
 
+  def strictEquals(obj: Any): Boolean = {
+    obj match {
+      case that: Matrix[?, ?] =>
+        var i: Int = 0
+        var same: Boolean = this.MxN == that.MxN && this.rows == that.rows
+        while (i < this.MxN && same) {
+          inline def thisi = this.values(i)
+          inline def thati = that.values(i)
+          same &&= (thisi == thati) // || (thisi.isNaN && thati.isNaN)
+          i += 1
+        }
+        same
+      case _ => false
+    }
+  }
 }
