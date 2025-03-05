@@ -36,30 +36,30 @@ class MatrixExtensionsTest extends munit.FunSuite {
     val tup3x2 = (((1, 2), (3, 4), (5, 6)))
     val m01: Matrix[3, 2] = Matrix(tup3x2)
     val m02 = Matrix(((1, 2), (3, 4), (5, 6)))
-    assert(m01 == m02)
+    assert(m01.strictEquals(m02))
   }
   test("Matrix equality for Tuples with mixed number types") {
     // values selected to avoid roundoff errors
     val m01: Matrix[2, 2] = Matrix(((1, 2L), (2.0, 4f))) // Int, Long, Double, Float
     val m02: Matrix[2, 2] = Matrix(((1L, 2.0), (2f, 4))) // Long, Double, Float, Int
-    assert(m01 == m02)
+    assert(m01.strictEquals(m02))
   }
   test("Same values but unequal Dimensions should not equate") {
     val mat3x2 = Matrix[3,2](1, 2, 3, 4, 5, 6)
     val mat2x3 = Matrix[2,3](1, 2, 3, 4, 5, 6)
-    assert(mat3x2 != mat2x3)
+    assert(!mat3x2.strictEquals(mat2x3))
   }
   test("Single or repeating Tuple parameters should be equivalent") {
     val tup1 = (((1, 2), (3, 4), (5, 6))) // single Tuple[Tuple] arg
     val tup2 =  ((1, 2), (3, 4), (5, 6))  // repeating Tuple args
     val m01: Matrix[3, 2] = Matrix(tup1)
     val m02: Matrix[3, 2] = Matrix(tup2)
-    assert(m01 == m02)
+    assert(m01.strictEquals(m02))
   }
   test("Matrix with NaN fields unequal even if NaNs are aligned") {
     val m01: Matrix[1, 2] = Matrix(3, Double.NaN)
     val m02: Matrix[1, 2] = Matrix(3, Double.NaN)
-    assert(m01 != m02)
+    assert(!m01.strictEquals(m02))
   }
   test("Tuples with non-number fields throw IllegalArgumentException") {
     val tup1 = (((1, 2), (3, 4), ("", false))) // last row is (NaN, NaN)

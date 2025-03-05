@@ -21,7 +21,7 @@ import slash.vector.*
 
 import scala.compiletime.ops.int.*
 import scala.math.hypot
-import narr.NArray
+//import narr.NArray
 import scala.compiletime.{constValue, summonInline}
 
 /**
@@ -219,7 +219,7 @@ object Matrix {
    */
   def apply[M <: Int, N <: Int](values: Double*)(using ValueOf[M], ValueOf[N]):Matrix[M, N] = {
     dimensionCheck(values.size, valueOf[M] * valueOf[N])
-    new Matrix[M, N](NArray[Double](values: _*))
+    new Matrix[M, N](NArray[Double](values *))
   }
 
   /** Construct a Matrix from Tuple literal, with optional dimensions at call site.
@@ -232,7 +232,7 @@ object Matrix {
    * @param tup a tuple with M Number tuples of arity N
    * @return an M x N matrix consisting of values.
    */
-  transparent inline def apply[T <: Tuple](inline t: T)(using ValueOf[RowSize[T]], ValueOf[ColSize[T]], ValueOf[MatrixSize[T]]) = {
+  transparent inline def apply[T <: Tuple](inline t: T) = {
     val itr1:Iterator[Any] = t.productIterator
     val matsize1: Int = valueOf[MatrixSize[T]]
     val v:NArray[Double] = new NArray[Double](matsize1)
@@ -257,10 +257,7 @@ object Matrix {
       else
         require(j == columnCount)
     }
-    // RowSize[T] fails for "inline (valueOf[RowSize[T]], valueOf[ColSize[T]]) match {"
-    // the following triggers an "unused local definition" compiler warning
-    val (rows, cols) = (valueOf[RowSize[T]], valueOf[ColSize[T]])
-    inline (rows, cols) match {
+    inline (constValue[RowSize[T]], constValue[ColSize[T]]) match {
     case (r, c) =>
       new Matrix[r.type, c.type](v)
     }
@@ -799,24 +796,19 @@ class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], 
     sb.toString()
   }
 
-  override def equals(obj: Any): Boolean = {
+  def strictEquals(obj: Any): Boolean = {
     obj match {
       case that: Matrix[?, ?] =>
         var i: Int = 0
         var same: Boolean = this.MxN == that.MxN && this.rows == that.rows
         while (i < this.MxN && same) {
-          same &&= (
-            (this.values(i) == that.values(i))
-            // || (this.values(i).isNaN && that.values(i).isNaN)
-          )
+          inline def thisi = this.values(i)
+          inline def thati = that.values(i)
+          same &&= (thisi == thati) // || (thisi.isNaN && thati.isNaN)
           i += 1
         }
         same
       case _ => false
     }
   }
-  override def hashCode: Int = {
-    java.util.Arrays.hashCode(this.values.asInstanceOf[Array[Double]]) + this.MxN
-  }
-  
 }
