@@ -232,32 +232,44 @@ object Matrix {
    * @param tup a tuple with M Number tuples of arity N
    * @return an M x N matrix consisting of values.
    */
-  transparent inline def Mat[T <: Tuple & Singleton](inline t: T)(using ValueOf[RowSize[T]], ValueOf[ColSize[T]], ValueOf[MatrixSize[T]]) = {
-    //dimensionCheck(t.productArity, dimension)
-    val rows = valueOf[RowSize[T]]
-    val cols = valueOf[ColSize[T]]
+  transparent inline def apply[T <: Tuple](inline t: T)(using ValueOf[RowSize[T]], ValueOf[ColSize[T]], ValueOf[MatrixSize[T]]) = {
     val itr1:Iterator[Any] = t.productIterator
     val matsize1: Int = valueOf[MatrixSize[T]]
-    //val matsize2: Int = summon[ValueOf[MatrixSize[T]]].value
     val v:NArray[Double] = new NArray[Double](matsize1)
     var i:Int = 0
+    var columnCount = 0
     while (itr1.hasNext) {
       val inner = itr1.next().asInstanceOf[Tuple]
       val itr2:Iterator[Any] = inner.productIterator
+      var j:Int = 0
       while (itr2.hasNext) {
-        v(i) = toDouble(itr2.next().asInstanceOf[Number])
+        itr2.next match {
+        case n: Number =>
+          v(i) = toDouble(n)
+        case x =>
+          throw new IllegalArgumentException(s"non-numeric Tuple field [$x]")
+        }
         i += 1
+        j += 1
       }
+      if columnCount == 0 then
+        columnCount = j
+      else
+        require(j == columnCount)
     }
+    // RowSize[T] fails for "inline (valueOf[RowSize[T]], valueOf[ColSize[T]]) match {"
+    // the following triggers an "unused local definition" compiler warning
+    val (rows, cols) = (valueOf[RowSize[T]], valueOf[ColSize[T]])
     inline (rows, cols) match {
     case (r, c) =>
       new Matrix[r.type, c.type](v)
     }
   }
 
-  type Number = Double | Int | Long | Float | BigDecimal
+  type Number = Int | Float | Double | Long
 
   // recursive compile-time type functions
+  // S is the Int successor type, denoting N + 1 at the type level
   type RowSize[T <: Tuple] <: Int = T match
     case EmptyTuple => 0
     case h *: t => S[RowSize[t]]
@@ -288,40 +300,9 @@ object Matrix {
     case d: Int        => d.toDouble
     case d: Long       => d.toDouble
     case d: Float      => d.toDouble
-    case d: BigDecimal => d.toDouble
     }
   }
 
-  /*
-  transparent inline def Mat[T <: Tuple](inline tup: T) = {
-    def values: NArray[Double] = tup.productIterator.map {
-      case t: Tuple => t.productIterator.map {
-        case n: Number => toDouble(n)
-      }.toArray.asInstanceOf[NArray[Double]]
-    }.toArray.flatten.asInstanceOf[NArray[Double]]
-    val (rows: Int, cols: Int) = dims(tup)
-    def values: NArray[Double] = tup.productIterator.map {
-      case t: Tuple => t.productIterator.map {
-        case n: Number => toDouble(n)
-      }.toArray.asInstanceOf[NArray[Double]]
-    }.toArray.flatten.asInstanceOf[NArray[Double]]
-    //val matsize = constValue[MatSize[T]]
-    val values: NArray[Double] = new NArray[Double](rows * cols)
-    var i = 0
-    tup.productIterator.map {
-      case t: Tuple =>
-        t.productIterator.map {
-          case n: Number =>
-            values(i) = toDouble(n)
-            i += 1
-        }
-    }
-    inline dims(tup) match {
-    case (r, c) =>
-      new Matrix[r.type, c.type](values)
-    }
-  }
-  */
 }
 
 class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {
@@ -818,4 +799,24 @@ class Matrix[M <: Int, N <: Int] (val values: NArray[Double])(using ValueOf[M], 
     sb.toString()
   }
 
+  override def equals(obj: Any): Boolean = {
+    obj match {
+      case that: Matrix[?, ?] =>
+        var i: Int = 0
+        var same: Boolean = this.MxN == that.MxN && this.rows == that.rows
+        while (i < this.MxN && same) {
+          same &&= (
+            (this.values(i) == that.values(i))
+            // || (this.values(i).isNaN && that.values(i).isNaN)
+          )
+          i += 1
+        }
+        same
+      case _ => false
+    }
+  }
+  override def hashCode: Int = {
+    java.util.Arrays.hashCode(this.values.asInstanceOf[Array[Double]]) + this.MxN
+  }
+  
 }
