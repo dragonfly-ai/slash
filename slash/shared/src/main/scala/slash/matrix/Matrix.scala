@@ -266,7 +266,7 @@ object Matrix {
    *  `((a,b,c...),(d,e,f,...),...)`.
    *
    * Where:
-   *    sequence of tuples share the same arity
+   *    the sequence of tuples share the same arity
    *    tuple Numeric fields converted to type Double
    *    non-numeric fields, if present converted to `Double.NaN`
    * @param tup a tuple with M Number tuples of arity N
@@ -274,7 +274,10 @@ object Matrix {
    */
   transparent inline def apply[T <: Tuple](inline t: T *) = {
     val rows: Int = t.size
-    val cols: Int = t.take(1).size
+    val cols: Int = t.toList match {
+      case Nil => 0
+      case head :: _ => head.productIterator.toArray.size
+    }
     val itr1:Iterator[Any] = t.iterator
     val matsize1: Int = rows * cols
     val v:NArray[Double] = new NArray[Double](matsize1)
@@ -293,7 +296,7 @@ object Matrix {
         i += 1
         j += 1
       }
-      require(j == cols)
+      require(j == cols, s"i[$i]: j[$j] != cols[$cols]")
     }
     inline (rows, cols) match {
     case (r, c) =>

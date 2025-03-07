@@ -85,7 +85,7 @@ class MatrixExtensionsTest extends munit.FunSuite {
     assert(compilerError)
   }
   test("Can create a Matrix from a Seq of row Tuple arguments") {
-    val mat = Matrix(((1, 2), (3, 4), (5.0, 6.0)))
+    val mat = Matrix((1, 2), (3, 4), (5, 6))
     assert(mat.rows == 3 && mat.columns == 2)
   }
   test("Seq[Tuple] Matrix with jagged rows should throw IllegalArgumentException") {
@@ -94,7 +94,7 @@ class MatrixExtensionsTest extends munit.FunSuite {
       printf("%s\n", mat)
       false // fail if exception not thrown 
     } catch {
-      case _ =>
+      case t =>
         true // as expected
     } 
     assert(compilerError)
