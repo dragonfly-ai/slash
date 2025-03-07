@@ -234,7 +234,7 @@ object Matrix {
    */
   transparent inline def apply[T <: Tuple](inline t: T) = {
     val itr1:Iterator[Any] = t.productIterator
-    val matsize1: Int = valueOf[MatrixSize[T]]
+    val matsize1: Int = valueOf[TupleMatsize[T]]
     val v:NArray[Double] = new NArray[Double](matsize1)
     var i:Int = 0
     var columnCount = 0
@@ -262,6 +262,47 @@ object Matrix {
       new Matrix[r.type, c.type](v)
     }
   }
+  /** Construct a Matrix from a sequence of Tuple literals, with optional dimensions at call site.
+   *  `((a,b,c...),(d,e,f,...),...)`.
+   *
+   * Where:
+   *    the sequence of tuples share the same arity
+   *    tuple Numeric fields converted to type Double
+   *    non-numeric fields, if present converted to `Double.NaN`
+   * @param tup a tuple with M Number tuples of arity N
+   * @return an M x N matrix consisting of values.
+   */
+  transparent inline def apply[T <: Tuple](inline t: T *) = {
+    val rows: Int = t.size
+    val cols: Int = t.toList match {
+      case Nil => 0
+      case head :: _ => head.productIterator.toArray.size
+    }
+    val itr1:Iterator[Any] = t.iterator
+    val matsize1: Int = rows * cols
+    val v:NArray[Double] = new NArray[Double](matsize1)
+    var i:Int = 0
+    while (itr1.hasNext) {
+      val inner = itr1.next().asInstanceOf[Tuple]
+      val itr2:Iterator[Any] = inner.productIterator
+      var j:Int = 0
+      while (itr2.hasNext) {
+        itr2.next match {
+        case n: Number =>
+          v(i) = toDouble(n)
+        case x =>
+          throw new IllegalArgumentException(s"non-numeric Tuple field [$x]")
+        }
+        i += 1
+        j += 1
+      }
+      require(j == cols, s"i[$i]: j[$j] != cols[$cols]")
+    }
+    inline (rows, cols) match {
+    case (r, c) =>
+      new Matrix[r.type, c.type](v)
+    }
+  }
 
   type Number = Int | Float | Double | Long
 
@@ -283,8 +324,7 @@ object Matrix {
     case 0 => 0
     case S[aMinus1] => B + Product[aMinus1, B]
 
-  type MatrixSize[T <: Tuple] = Product[RowSize[T], ColSize[T]]
-
+  type TupleMatsize[T <: Tuple] = Product[RowSize[T], ColSize[T]]
 
   inline def dims[T <: Tuple](inline tup: T): (Int, Int) = {
     (constValue[RowSize[T]], constValue[ColSize[T]])
