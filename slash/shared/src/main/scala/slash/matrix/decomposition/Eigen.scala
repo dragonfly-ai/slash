@@ -26,7 +26,7 @@ object Eigen {
 
   // Symmetric Householder reduction to tridiagonal form.
 
-  private def tred2[N <: Int](Q: Matrix[N, N])(using ValueOf[N]): Eigen[N] = {
+  private def tred2[N <: Int](Q: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
     //  This is derived from the Algol procedures tred2 by
     //  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
     //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
@@ -160,7 +160,7 @@ object Eigen {
 
   // Symmetric tridiagonal QL algorithm.
 
-  private def tql2[N <: Int](Q: Matrix[N, N], λ: Vec[N], λi: Vec[N])(using ValueOf[N]): Eigen[N] = {
+  private def tql2[N <: Int](Q: Mat[N, N], λ: Vec[N], λi: Vec[N])(using ValueOf[N]): Eigen[N] = {
     //  This is derived from the Algol procedures tql2, by
     //  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
     //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
@@ -275,7 +275,7 @@ object Eigen {
     new Eigen[N](Q, λ, λi)
   }
 
-  private def orthes[N <: Int](Q: Matrix[N, N])(using ValueOf[N]): Eigen[N] = {
+  private def orthes[N <: Int](Q: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
     //  This is derived from the Algol procedures orthes and ortran,
     //  by Martin and Wilkinson, Handbook for Auto. Comp.,
     //  Vol.ii-Linear Algebra, and the corresponding
@@ -283,7 +283,7 @@ object Eigen {
 
     val n:Int = valueOf[N]
 
-    val H: Matrix[N, N] = Q.copy
+    val H: Mat[N, N] = Q.copy
 
     val ort: NArray[Double] = NArray.fill[Double](n)(0.0)
 
@@ -382,7 +382,7 @@ object Eigen {
 
   // Nonsymmetric reduction from Hessenberg to real Schur form.
 
-  private def hqr2[N <: Int](Q: Matrix[N, N], H: Matrix[N, N])(using ValueOf[N]): Eigen[N] = {
+  private def hqr2[N <: Int](Q: Mat[N, N], H: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
     val nn: Int = valueOf[N]
 
     //  This is derived from the Algol procedure hqr2,
@@ -826,13 +826,13 @@ object Eigen {
     new Eigen[N](Q, λ, λi)
   }
 
-  def apply[N <: Int](A:Matrix[N, N])(using ValueOf[N]): Eigen[N] = {
+  def apply[N <: Int](A:Mat[N, N])(using ValueOf[N]): Eigen[N] = {
 
     val n = valueOf[N]
 
     var isSymmetric = true
 
-    val Q:Matrix[N, N] = {
+    val Q:Mat[N, N] = {
       val values: NArray[Double] = new NArray[Double](slash.squareInPlace(n))
       var i: Int = 0
       var r: Int = 0;
@@ -848,7 +848,7 @@ object Eigen {
         }
         r += 1
       }
-      Matrix[N, N](values)
+      Mat[N, N](values)
     }
 
 
@@ -870,18 +870,12 @@ object Eigen {
  * with the real eigenvalues in 1-by-1 blocks and any complex eigenvalues,
  * lambda + i*mu, in 2-by-2 blocks, [lambda, mu; -mu, lambda].  The
  * columns of V represent the eigenvectors in the sense that A*V = V*D,
- *i.e. A.times(V) equals V.times(D).  The matrix V may be badly
+ * i.e. A.times(V) equals V.times(D).  The matrix V may be badly
  * conditioned, or even singular, so the validity of the equation
  * A = V*D*inverse(V) depends upon V.cond().
  * */
 
-/** Check for symmetry, then construct the eigenvalue decomposition
- * Structure to access D and V.
- *
- * @param Arg Square matrix
- */
-
-class Eigen[N <: Int] private(val Q:Matrix[N, N], val λ:Vec[N], val λi:Vec[N])(using ValueOf[N]) {
+class Eigen[N <: Int] private(val Q:Mat[N, N], val λ:Vec[N], val λi:Vec[N])(using ValueOf[N]) {
 
   val n:Int = valueOf[N]
 
@@ -897,13 +891,13 @@ class Eigen[N <: Int] private(val Q:Matrix[N, N], val λ:Vec[N], val λi:Vec[N])
    */
   def imaginaryEigenvalues: Vec[N] = λi
 
-  inline def D: Matrix[N, N] = Λ
+  inline def D: Mat[N, N] = Λ
   /** Return the block diagonal eigenvalue matrix
    *
    * @return Λ
    */
-  def Λ: Matrix[N, N] = {
-    val X = Matrix.diagonal[N](λ)
+  def Λ: Mat[N, N] = {
+    val X = Mat.diagonal[N](λ)
     var i:Int = 0; while (i < n) {
       //X(i, i) = λ(i)
       if (λi(i) > 0) X(i, i + 1) = λi(i)

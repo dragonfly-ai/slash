@@ -15,21 +15,17 @@
  */
 
 import slash.vector.*
-import slash.matrix.Matrix
+import slash.matrix.Mat
 
 
 inline def assertVecEquals[N <: Int](inline v1: Vec[N], inline v2: Vec[N])(implicit loc: munit.Location): Unit = {
-  var i: Int = 0;
+  var i: Int = 0
   while (i < v1.dimension) {
     munit.Assertions.assertEquals(v1(i), v2(i))
     i += 1
   }
 }
 
-inline def assertMatrixEquals[M <: Int, N <: Int](inline m1: Matrix[M, N], inline m2: Matrix[M, N])(implicit loc: munit.Location): Unit = {
-  var i: Int = 0;
-  while (i < m1.MxN) {
-    munit.Assertions.assertEquals(m1.values(i), m2.values(i))
-    i += 1
-  }
+inline def assertMatrixEquals[M <: Int, N <: Int](inline m1: Mat[M, N], inline m2: Mat[M, N])(implicit loc: munit.Location): Unit = {
+  munit.Assertions.assert(m1.strictEquals(m2))
 }

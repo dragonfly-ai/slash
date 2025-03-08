@@ -17,14 +17,14 @@
 package slash.matrix.util
 
 import slash.matrix.*
-import slash.matrix.Matrix
+import slash.matrix.Mat
 
-case class CannotExpressMatrixAsVector[M <: Int, N <: Int](m:Matrix[M, N]) extends Exception(
+case class CannotExpressMatrixAsVector[M <: Int, N <: Int](m:Mat[M, N]) extends Exception(
   s"To convert a Matrix to a Vector, one of its dimensions must be 1, but this matrix has dimensions: [${m.rows}x${m.columns}]"
 )
 
 case class UnsupportedMatrixDimension(rows:Int, columns:Int) extends Exception(s"Can't create matrix with rows = $rows and columns = $columns.")
 
-case class MatrixNotSymmetricPositiveDefinite[M <: Int, N <: Int](m: Matrix[M, N]) extends Exception(
-  s"Matrix is not symmetric positive definite: Matrix[${m.rows}x${m.columns}]."
+case class MatrixNotSymmetricPositiveDefinite[M <: Int, N <: Int](m: Mat[M, N]) extends Exception(
+  s"Matrix is not symmetric positive definite: Mat[${m.rows}x${m.columns}]."
 )

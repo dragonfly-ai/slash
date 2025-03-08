@@ -12,7 +12,7 @@ object Verification {
 
       var discrepancies: Int = 0
       var combinedError: Double = 0.0
-      var i: Int = 0;
+      var i: Int = 0
       while (i < a1.length) {
 
         if (a1(i) != a2(i)) {
@@ -34,11 +34,11 @@ object Verification {
     if (a1.length == a2.length && a1(0).length == a2(0).length) {
 
       var discrepancies: Int = 0
-      var r: Int = 0;
+      var r: Int = 0
       var combinedError: Double = 0.0
 
       while (r < a1.length) {
-        var c: Int = 0;
+        var c: Int = 0
         while (c < a1(0).length) {
           val v0: Double = a1(r)(c)
           val v1: Double = a2(r)(c)
@@ -59,20 +59,20 @@ object Verification {
 
   }
 
-  def matrixCompare[M <: Int, N <: Int](jm: Jama.Matrix, sm: slash.matrix.Matrix[M, N])(using ValueOf[M], ValueOf[N]): MatrixComparison = {
+  def matrixCompare[M <: Int, N <: Int](jm: Jama.Matrix, sm: slash.matrix.Mat[M, N])(using ValueOf[M], ValueOf[N]): MatrixComparison = {
     matrixCompare[M, N](sm, jm)
   }
 
-    def matrixCompare[M <: Int, N <: Int](sm: slash.matrix.Matrix[M, N], jm: Jama.Matrix)(using ValueOf[M], ValueOf[N]): MatrixComparison = {
+    def matrixCompare[M <: Int, N <: Int](sm: slash.matrix.Mat[M, N], jm: Jama.Matrix)(using ValueOf[M], ValueOf[N]): MatrixComparison = {
 
     if (sm.rows == jm.getRowDimension && sm.columns == jm.getColumnDimension) {
 
       var discrepancies: Int = 0
-      var r: Int = 0;
+      var r: Int = 0
       var combinedError: Double = 0.0
 
       while (r < sm.rows) {
-        var c: Int = 0;
+        var c: Int = 0
         while (c < sm.columns) {
           val v0: Double = sm(r,c)
           val v1: Double = jm.get(r,c)
@@ -102,7 +102,7 @@ trait Verification {
   )
 
   val littleJaMa: Jama.Matrix = new Jama.Matrix(littleValues)
-  val littleMa: slash.matrix.Matrix[5, 7] = slash.matrix.Matrix[5, 7](littleJaMa.getRowPackedCopy)
+  val littleMa: slash.matrix.Mat[5, 7] = slash.matrix.Mat[5, 7](littleJaMa.getRowPackedCopy)
 
   val squareValues: NArray[NArray[Double]] = NArray.tabulate[NArray[Double]](11)(
     (_: Int) => NArray.tabulate[Double](11)((_: Int) => Math.random())
@@ -117,13 +117,13 @@ trait Verification {
   )
 
   val squareJaMa: Jama.Matrix = new Jama.Matrix(squareValues)
-  val squareMa: slash.matrix.Matrix[11, 11] = slash.matrix.Matrix[11, 11](squareJaMa.getRowPackedCopy)
+  val squareMa: slash.matrix.Mat[11, 11] = slash.matrix.Mat[11, 11](squareJaMa.getRowPackedCopy)
 
   val wideJaMa: Jama.Matrix = new Jama.Matrix(wideValues)
-  val wideMa: slash.matrix.Matrix[11, 19] = slash.matrix.Matrix[11, 19](wideJaMa.getRowPackedCopy)
+  val wideMa: slash.matrix.Mat[11, 19] = slash.matrix.Mat[11, 19](wideJaMa.getRowPackedCopy)
 
   val tallJaMa: Jama.Matrix = new Jama.Matrix(tallValues)
-  val tallMa: slash.matrix.Matrix[21, 12] = slash.matrix.Matrix[21, 12](tallJaMa.getRowPackedCopy)
+  val tallMa: slash.matrix.Mat[21, 12] = slash.matrix.Mat[21, 12](tallJaMa.getRowPackedCopy)
 
   def name:String
   def run: Unit

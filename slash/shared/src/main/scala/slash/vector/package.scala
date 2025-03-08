@@ -530,7 +530,7 @@ package object vector {
         case _ => render().toString()
       }
 
-      def render(format:Format = Format.Default, sb: StringBuilder = new StringBuilder() ): StringBuilder = {
+      def render(format:VecFormat = VecFormat.Default, sb: StringBuilder = new StringBuilder() ): StringBuilder = {
         import format.*
         sb.append(prefix(thisVector))
         val end:Int = dimension - 1
@@ -544,43 +544,43 @@ package object vector {
       }
 
       def csv: String = csv(new StringBuilder()).toString
-      def csv(sb: StringBuilder = new StringBuilder()): String = render(Format.CSV, sb).toString
+      def csv(sb: StringBuilder = new StringBuilder()): String = render(VecFormat.CSV, sb).toString
       def tsv: String = tsv(new StringBuilder()).toString
-      def tsv(sb: StringBuilder = new StringBuilder()): String = render(Format.TSV, sb).toString
+      def tsv(sb: StringBuilder = new StringBuilder()): String = render(VecFormat.TSV, sb).toString
     }
 
   }
 
   export Vec.*
 
-  trait Format {
+  trait VecFormat {
     def prefix[N <: Int](v:Vec[N]): String
     def delimiter(index:Int): String
     def suffix[N <: Int](v:Vec[N]): String
     def numberFormatter(value: Double): String = value.toString
   }
 
-  object Format {
+  object VecFormat {
 
-    object Default extends Format {
+    object Default extends VecFormat {
       override def prefix[N <: Int](v: Vec[N]): String = s"《${exalt(v.length)}↗〉"
       override def delimiter(i: Int): String = ", "
       override def suffix[N <: Int](v: Vec[N]): String = "〉"
     }
 
-    object Indexed extends Format {
+    object Indexed extends VecFormat {
       override def prefix[N <: Int](v: Vec[N]): String = s"《${exalt(v.length)}↗〉"
       override def delimiter(i: Int): String = s"${abase(i)} "
       override def suffix[N <: Int](v: Vec[N]): String = "〉"
     }
 
-    object CSV extends Format {
+    object CSV extends VecFormat {
       override def prefix[N <: Int](v: Vec[N]): String = ""
       override def delimiter(i: Int): String = ","
       override def suffix[N <: Int](v: Vec[N]): String = ""
     }
 
-    object TSV extends Format {
+    object TSV extends VecFormat {
       override def prefix[N <: Int](v: Vec[N]): String = ""
 
       override def delimiter(i: Int): String = "\t"

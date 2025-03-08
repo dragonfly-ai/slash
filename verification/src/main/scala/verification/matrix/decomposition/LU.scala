@@ -14,7 +14,7 @@ object LU extends Verification {
 
     val jluSquare: LUDecomposition = new LUDecomposition(squareJaMa)
     val sluSquare: matrix.decomposition.LU[11, 11] = matrix.decomposition.LU[11, 11](squareMa)
-    println("\tSquare Matrix[11, 11] decomposition:")
+    println("\tSquare Mat[11, 11] decomposition:")
     println(s"\tComparing Determinants: ${jluSquare.det()} vs ${sluSquare.determinant} error = ${Math.abs(jluSquare.det() - sluSquare.determinant)}")
     println(s"\tComparing L : ${Verification.matrixCompare(jluSquare.getL, sluSquare.L)}")
     println(s"\tComparing U : ${Verification.matrixCompare(jluSquare.getU, sluSquare.U)}")
@@ -27,7 +27,7 @@ object LU extends Verification {
 
     val jluTall: LUDecomposition = new LUDecomposition(tallJaMa)
     val mluTall: matrix.decomposition.LU[21, 12] = matrix.decomposition.LU[21, 12](tallMa)
-    println("\tTall Matrix[21, 12] decomposition:")
+    println("\tTall Mat[21, 12] decomposition:")
     println("\tRectangular matrices have no determinant.")
     println(s"\tComparing L : ${Verification.matrixCompare(jluTall.getL, mluTall.L)}")
     println(s"\tComparing U : ${Verification.matrixCompare(jluTall.getU, mluTall.U)}")

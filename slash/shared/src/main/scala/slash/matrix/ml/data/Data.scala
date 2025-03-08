@@ -31,7 +31,7 @@ import scala.language.{existentials, implicitConversions}
 trait Data[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {
   val sampleSize:Int = valueOf[M]
   val dimension:Int = valueOf[N]
-  def X:Matrix[M, N]
+  def X:Mat[M, N]
   //def asVectors:Set[Vector]
   def example(i:Int):Vec[N]
   def sampleMean:Vec[N]
@@ -56,7 +56,7 @@ class StaticUnsupervisedData[M <: Int, N <: Int](examples:NArray[Vec[N]])(using 
   private val Xar:NArray[Vec[N]] = NArray.ofSize[Vec[N]](sampleSize)
 
   // Compute sample point statistics and populate Xar and X
-  val temp = {
+  val temp:(Vec[N], Vec[N], Vec[N], NArray[Interval[Double]]) = {
     val sampleVectorStats: StreamingVectorStats[N] = new stream.StreamingVectorStats[N]
 
     var i:Int = 0; while (i < sampleSize) {
@@ -86,7 +86,7 @@ class StaticUnsupervisedData[M <: Int, N <: Int](examples:NArray[Vec[N]])(using 
 
   override def domainComponent(i: Int):Interval[Double] = intervals(i)
 
-  override val X: Matrix[M, N] = Matrix[M, N](Xar)
+  override val X: Mat[M, N] = Mat[M, N](Xar)
 
   override def example(i: Int): Vec[N] = Xar(i) + sampleMean
 
@@ -94,7 +94,7 @@ class StaticUnsupervisedData[M <: Int, N <: Int](examples:NArray[Vec[N]])(using 
 
 trait SupervisedData[M <: Int, N <: Int] extends Data[M, N] {
   def y:Vec[M]
-  def Y: Matrix[M, 1]
+  def Y: Mat[M, 1]
   def labeledExample(i:Int):LabeledVec[N]
   def labelStats:EstimatedGaussian
   def rangeBias:Double = labelStats.sampleMean
@@ -111,7 +111,7 @@ class StaticSupervisedData[M <: Int, N <: Int](labeledExamples:NArray[LabeledVec
     val sampleVectorStats:stream.StreamingVectorStats[N] = new stream.StreamingVectorStats[N]
 
     var i:Int = 0; while (i < sampleSize) {
-      sampleVectorStats.apply(labeledExamples(i).vector, 1.0)
+      sampleVectorStats.apply(labeledExamples(i).vector)
       labelStatsEstimator.observe(labeledExamples(i).y)
       i += 1
     }
@@ -120,7 +120,7 @@ class StaticSupervisedData[M <: Int, N <: Int](labeledExamples:NArray[LabeledVec
     val labelStats:EstimatedGaussian = labelStatsEstimator.estimate
 
     i = 0; while (i < sampleSize) {
-      Xar(i) = (labeledExamples(i).vector - sampleMean)
+      Xar(i) = labeledExamples(i).vector - sampleMean
       Yar(i) = labeledExamples(i).y - labelStats.sampleMean
       i += 1
     }
@@ -142,8 +142,8 @@ class StaticSupervisedData[M <: Int, N <: Int](labeledExamples:NArray[LabeledVec
 
   override val y: Vec[M] = Vec[M](Yar)
 
-  override val X: Matrix[M, N] = Matrix(Xar)
-  override val Y: Matrix[M, 1] = y.asColumnMatrix
+  override val X: Mat[M, N] = Mat(Xar)
+  override val Y: Mat[M, 1] = y.asColumnMatrix
 
   def example(i: Int): Vec[N] = Xar(i) + sampleMean
 

@@ -21,13 +21,13 @@ import narr.*
 
 object LU {
 
-  def apply[M <: Int, N <: Int](A:Matrix[M, N])(using ValueOf[M], ValueOf[N]):LU[M, N] = {
+  def apply[M <: Int, N <: Int](A:Mat[M, N])(using ValueOf[M], ValueOf[N]):LU[M, N] = {
 
     val m:Int = valueOf[M]
     val n:Int = valueOf[N]
     val minDim:Int = Math.min(m, n)
 
-    val lu:Matrix[M, N] = A.copy
+    val lu:Mat[M, N] = A.copy
     val piv:NArray[Int] = NArray.tabulate[Int](m)((i:Int) => i)
 
     var pivsign:Double = 1.0
@@ -100,14 +100,21 @@ object LU {
   * linear equations.  This will fail if isNonsingular() returns false.
   */
 
-/** LU Decomposition
-  * Structure to access L, U and piv.
-  *
-  * @param  A Rectangular matrix
-  */
+/**
+ * LU Decomposition
+ * Structure to access L, U and piv.
+ *
+ * @param LU
+ * @param piv
+ * @param pivsign
+ * @param x$4
+ * @param x$5
+ * @tparam M
+ * @tparam N
+ */
 
 class LU[M <: Int, N <: Int] private (
-  val LU:Matrix[M, N], piv:NArray[Int], pivsign:Double
+  val LU:Mat[M, N], piv:NArray[Int], pivsign:Double
 )(using ValueOf[M], ValueOf[N]) {  // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
 
   val m:Int = valueOf[M]
@@ -129,7 +136,7 @@ class LU[M <: Int, N <: Int] private (
     *
     * @return L
     */
-  lazy val L: Matrix[M, N] = {
+  lazy val L: Mat[M, N] = {
     val values:NArray[Double] = new NArray[Double](m * n)
     var i:Int = 0
     var r:Int = 0; while (r < m) {
@@ -144,19 +151,19 @@ class LU[M <: Int, N <: Int] private (
       }
       r += 1
     }
-    Matrix[M, N](values)
+    Mat[M, N](values)
   }
 
   /** Return upper triangular factor
     *
     * @return U
     */
-  def U: Matrix[N, N] = {
+  def U: Mat[N, N] = {
     val values: NArray[Double] = new NArray[Double](slash.squareInPlace(n))
     var i: Int = 0
-    var r: Int = 0;
+    var r: Int = 0
     while (r < n) {
-      var c: Int = 0;
+      var c: Int = 0
       while (c < n) {
         values(i) = if (r > c) 0.0 else LU(r, c)
         i += 1
@@ -164,7 +171,7 @@ class LU[M <: Int, N <: Int] private (
       }
       r += 1
     }
-    Matrix[N, N](values)
+    Mat[N, N](values)
   }
 
   /** Return pivot permutation vector
@@ -183,10 +190,10 @@ class LU[M <: Int, N <: Int] private (
   /** Determinant
     *
     * @return det(A)
-    * @throws IllegalArgumentException  Matrix must be square
+    * @throws IllegalArgumentException  Mat must be square
     */
   def determinant: Double = {
-    if (m != n) throw new IllegalArgumentException("Matrix must be square.")
+    if (m != n) throw new IllegalArgumentException("Mat must be square.")
 
     var d:Double = pivsign
 
@@ -200,17 +207,17 @@ class LU[M <: Int, N <: Int] private (
 
   /** Solve A*X = B
     *
-    * @param  B A Matrix with as many rows as A and as many columns as B.
+    * @param  B A Mat with as many rows as A and as many columns as B.
     * @return X so that L*U*X = B(piv,:)
-    * @throws IllegalArgumentException Matrix row dimensions must agree.
-    * @throws RuntimeException  Matrix is singular.
+    * @throws IllegalArgumentException Mat row dimensions must agree.
+    * @throws RuntimeException  Mat is singular.
     */
-  def solve[V <: Int](B: Matrix[M, V])(using ValueOf[V]): Matrix[N, V] = {
-    if ( this.isSingular ) throw new RuntimeException( "Matrix is singular." )
+  def solve[V <: Int](B: Mat[M, V])(using ValueOf[V]): Mat[N, V] = {
+    if ( this.isSingular ) throw new RuntimeException( "Mat is singular." )
 
     // Copy right hand side with pivoting
     val nx:Int = B.columns
-    val X:Matrix[N, V] = B.subMatrix[N, V](piv, 0)
+    val X:Mat[N, V] = B.subMatrix[N, V](piv, 0)
 
     // Solve L*Y = B(piv,:)
     var k:Int = 0; while (k < n) {

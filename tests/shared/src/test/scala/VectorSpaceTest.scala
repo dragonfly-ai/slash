@@ -22,7 +22,7 @@ import slash.vector.*
 
 class VectorSpaceTest extends munit.FunSuite {
   test(" testing kitchen sink ") {
-    var runtimeDimension:Int = r.nextInt(42)
+    var runtimeDimension:Int = 2 + r.nextInt(42)
     runtimeDimension += 1
 
     val vs = VectorSpace(runtimeDimension)

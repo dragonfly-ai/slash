@@ -18,7 +18,6 @@ package slash
 
 import narr.*
 import slash.vector.{Vec, *}
-import slash.matrix.*
 import slash.matrix.decomposition.{SV, *}
 
 import scala.compiletime.ops.int.*
@@ -28,34 +27,34 @@ import scala.compiletime.ops.boolean.||
 package object matrix {
 
   extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N]) {
-    inline def asRowMatrix: Matrix[1, N] = Matrix[1, N](thisVector.asInstanceOf[NArray[Double]])
-    inline def asColumnMatrix: Matrix[N, 1] = Matrix[N, 1](thisVector.asInstanceOf[NArray[Double]])
+    inline def asRowMatrix: Mat[1, N] = Mat[1, N](thisVector.asInstanceOf[NArray[Double]])
+    inline def asColumnMatrix: Mat[N, 1] = Mat[N, 1](thisVector.asInstanceOf[NArray[Double]])
 
-    def times [M <: Int] (thatMatrix: Matrix[N, M])(using ValueOf[M]): Matrix[1, M] = asRowMatrix * thatMatrix
-    inline def * [M <: Int] (thatMatrix: Matrix[N, M])(using ValueOf[M]): Matrix[1, M] = times(thatMatrix)
+    def times [M <: Int](thatMatrix: Mat[N, M])(using ValueOf[M]): Mat[1, M] = asRowMatrix * thatMatrix
+    inline def * [M <: Int](thatMatrix: Mat[N, M])(using ValueOf[M]): Mat[1, M] = times(thatMatrix)
   }
 
   /**
    * Extension Methods for Square Matrices.
    */
-  extension [MN <: Int] (m: Matrix[MN, MN])(using ValueOf[MN]) {
+  extension [MN <: Int](m: Mat[MN, MN])(using ValueOf[MN]) {
     /**
      * https://en.wikipedia.org/wiki/Invertible_matrix
      *
-     * Computes the inverse of Square Matrix m.
-     * @throws RuntimeException( "Matrix is singular." )
+     * Computes the inverse of Square Mat m.
+     * @throws RuntimeException( "Mat is singular." )
      * @return the inverse of matrix m
      */
-    def inverse: Matrix[MN, MN] = solve(Matrix.identity[MN, MN])
+    def inverse: Mat[MN, MN] = solve(Mat.identity[MN, MN])
 
     /** Solve a * x = b
      *
      * @param b right hand side
-     * @return x = Matrix[MN, V] such that a * x = b
+     * @return x = Mat[MN, V] such that a * x = b
      */
-    def solve[V <: Int](b: Matrix[MN, V])(using ValueOf[V]): Matrix[MN, V] = LU[MN, MN](m).solve(b)
+    def solve[V <: Int](b: Mat[MN, V])(using ValueOf[V]): Mat[MN, V] = LU[MN, MN](m).solve(b)
 
-    /** Matrix determinant
+    /** Mat determinant
      * https://en.wikipedia.org/wiki/Determinant
      * the determinant is nonzero if and only if the matrix is invertible and the linear map represented by the matrix is an isomorphism
      * @return the determinant of this matrix.
@@ -68,24 +67,24 @@ package object matrix {
   /**
    * Extension methods for rectangular matrices.
    */
-  extension[M <: Int, N <: Int] (a: Matrix[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M, N]], (N =:= M) =:= false) {
+  extension[M <: Int, N <: Int](a: Mat[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M, N]], (N =:= M) =:= false) {
     /** Solve a * x = b
      *
      * @param b right hand side
-     * @return least squares solution x = Matrix[M, V] such that a * x = b
+     * @return least squares solution x = Mat[M, V] such that a * x = b
      */
-    def solve[V <: Int](b: Matrix[M, V])(using ValueOf[V]): Matrix[N, V] = QR[M, N](a).solve(b)
+    def solve[V <: Int](b: Mat[M, V])(using ValueOf[V]): Mat[N, V] = QR[M, N](a).solve(b)
   }
   /**
    * Extension methods for rectangular matrices where M > N.
    */
 
-  extension[M <: Int, N <: Int] (m: Matrix[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M, N]], M >= N =:= true) {
+  extension[M <: Int, N <: Int](m: Mat[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M, N]], M >= N =:= true) {
     /** Solve b * m = I[N, N]
-     * m = Matrix[M, N] with M > N and Rank = N, has a left inverse b = Matrix[N, M] such that b * m = I[N, N]
-     * @return b = Matrix[N, M] the Left Inverse of Matrix m.
+     * m = Mat[M, N] with M > N and Rank = N, has a left inverse b = Mat[N, M] such that b * m = I[N, N]
+     * @return b = Mat[N, M] the Left Inverse of Mat m.
      */
-    def leftInverse: Matrix[N, M] = {
+    def leftInverse: Mat[N, M] = {
       val svd = SV[M, N](m)
       svd.V * svd.S_inverse * svd.U.transpose
     }
@@ -97,13 +96,13 @@ package object matrix {
      */
     def norm2: Double = SV[M, N](m).norm2
 
-    /** Matrix rank
+    /** Mat rank
      *
      * @return effective numerical rank, obtained from SV.
      */
     def rank: Int = SV[M, N](m).rank
 
-    /** Matrix condition (2 norm)
+    /** Mat condition (2 norm)
      *
      * @return ratio of largest to smallest singular value.
      */
@@ -115,16 +114,16 @@ package object matrix {
    * Extension methods for rectangular matrices where M < N.
    */
 
-  extension[M <: Int, N <: Int] (m: Matrix[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M, N]], N > M =:= true) {
+  extension[M <: Int, N <: Int](m: Mat[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M, N]], N > M =:= true) {
     /**
-     * m = Matrix[M, N] with M < N and Rank = M, has a right inverse b = Matrix[N, M] such that m * b = Identity[M, M]
-     * @return the Right Inverse of Matrix a.
+     * m = Mat[M, N] with M < N and Rank = M, has a right inverse b = Mat[N, M] such that m * b = Identity[M, M]
+     * @return the Right Inverse of Mat a.
      */
-    def rightInverse(using ValueOf[Min[M, M]]): Matrix[N, M] = QR[M, N](m).solve(Matrix.identity[M, M])
+    def rightInverse(using ValueOf[Min[M, M]]): Mat[N, M] = QR[M, N](m).solve(Mat.identity[M, M])
 
   }
 
-  extension[M <: Int, N <: Int] (m: Matrix[M, N])(using (M == 1 || N == 1) =:= true) {
+  extension[M <: Int, N <: Int](m: Mat[M, N])(using (M == 1 || N == 1) =:= true) {
     def asVector: Vec[M*N] = m.values.asInstanceOf[Vec[M*N]]
     inline def copyAsVector[MN <: Int](using MN == (M * N) =:= true): Vec[MN] = narr.copy[Double](m.values).asInstanceOf[Vec[MN]]
   }

@@ -14,7 +14,7 @@ object SV extends Verification {
 
   override def run: Unit = {
 
-    def compareJaMaToDragonflySVD[M <: Int, N <: Int](j: Jama.Matrix, m: matrix.Matrix[M, N])(using ValueOf[M], ValueOf[N], M >= N =:= true): Unit = {
+    def compareJaMaToSlashSVD[M <: Int, N <: Int](j: Jama.Matrix, m: matrix.Mat[M, N])(using ValueOf[M], ValueOf[N], M >= N =:= true): Unit = {
       val jsvd: SingularValueDecomposition = new SingularValueDecomposition(j)
       val msvd: matrix.decomposition.SV[M, N] = matrix.decomposition.SV[M, N](m)
 
@@ -35,7 +35,7 @@ object SV extends Verification {
         s"\tJaMa Comparing M to USVᵀ: ${
           Verification.matrixCompare(
             m,
-            jsvd.getU().times(jsvd.getS()).times(jsvd.getV().transpose())
+            jsvd.getU.times(jsvd.getS.times(jsvd.getV.transpose())
           )
         }"
       )
@@ -50,13 +50,13 @@ object SV extends Verification {
       )
     }
 
-    println("Compare Singular Value Decompositions on Square Matrix:")
-    compareJaMaToDragonflySVD[11, 11](squareJaMa, squareMa)
+    println("Compare Singular Value Decompositions on Square Mat:")
+    compareJaMaToSlashSVD[11, 11](squareJaMa, squareMa)
 
-    println("Compare Singular Value Decompositions on Tall Matrix:")
-    compareJaMaToDragonflySVD[21, 12](tallJaMa, tallMa)
+    println("Compare Singular Value Decompositions on Tall Mat:")
+    compareJaMaToSlashSVD[21, 12](tallJaMa, tallMa)
 
-//    println("Compare Singular Value Decompositions on Wide Matrix:")
+//    println("Compare Singular Value Decompositions on Wide Mat:")
 //    compareJaMaToDragonflySVD[11, 19](wideMa)
 
   }

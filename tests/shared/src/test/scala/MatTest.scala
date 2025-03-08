@@ -18,9 +18,9 @@ import narr.*
 import slash.vector.*
 import slash.matrix.*
 
-class MatrixTest extends munit.FunSuite {
+class MatTest extends munit.FunSuite {
 
-  val m0:Matrix[3, 3] = Matrix[3,3](
+  val m0:Mat[3, 3] = Mat[3,3](
     1, 2, 3,
     4, 5, 6,
     7, 8, 9
@@ -28,8 +28,8 @@ class MatrixTest extends munit.FunSuite {
 
   //println(m0)
 
-  val m:Matrix[11, 7] = Matrix.random[11, 7]
-  val mT: Matrix[7, 11] = m.transpose
+  val m:Mat[11, 7] = Mat.random[11, 7]
+  val mT: Mat[7, 11] = m.transpose
 
   test( " m == m.transpose.transpose " ) {
     assertMatrixEquals(m0, m0.transpose.transpose)
@@ -39,13 +39,13 @@ class MatrixTest extends munit.FunSuite {
   test(" compare m.rowVector to m.transpose.columnVector ") {
 
     // compare m's row vectors to mT's column vectors:
-    var i: Int = 0;
+    var i: Int = 0
     while (i < m.rowDimension ) {
       assertVecEquals(m.rowVector(i), mT.columnVector(i))
       i += 1
     }
 
-    var j: Int = 0;
+    var j: Int = 0
     while (j < m.columns) {
       assertVecEquals(m.columnVector(j), mT.rowVector(j))
       j += 1

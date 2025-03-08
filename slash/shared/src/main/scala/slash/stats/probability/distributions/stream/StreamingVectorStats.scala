@@ -18,7 +18,7 @@ package slash.stats.probability.distributions.stream
 
 import slash.vector.*
 import narr.*
-import slash.vector.VecBounds
+import slash.vector.VectorBounds
 
 /**
  * Created by c on 1/10/17.
@@ -67,7 +67,7 @@ class StreamingVectorStats[N <: Int](using ValueOf[N]) {  // Why doesn't this ex
 
   inline def standardDeviation: Vec[N] = Vec.tabulate[N](i => Math.sqrt(componentVariance(s1(i), s2(i))))
 
-  inline def bounds(): VecBounds[N] = VecBounds[N](
+  inline def bounds(): VectorBounds[N] = VectorBounds[N](
     Vec[N](minValues),
     Vec[N](maxValues)
   )

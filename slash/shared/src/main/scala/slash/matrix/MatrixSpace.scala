@@ -44,44 +44,44 @@ class MatrixSpace[M0 <: Int, N0 <: Int](val rowVectorSpace:VectorSpace[M0], val 
   opaque type N <: Int = columnVectorSpace.N
   opaque type MN <: Int = M * N
 
-  inline def apply(values: NArray[Double]): Matrix[M, N] = Matrix[M, N](values)
+  inline def apply(values: NArray[Double]): Mat[M, N] = Mat[M, N](values)
 
-  inline def copyFrom(values: NArray[Double]): Matrix[M, N] = Matrix[M, N](narr.copy[Double](values))
+  inline def copyFrom(values: NArray[Double]): Mat[M, N] = Mat[M, N](narr.copy[Double](values))
 
-  inline def fromVec(v: Vec[MN]): Matrix[M, N] = apply(v.asInstanceOf[NArray[Double]])
+  inline def fromVec(v: Vec[MN]): Mat[M, N] = apply(v.asInstanceOf[NArray[Double]])
 
-  inline def copyFromVec(v: Vec[MN]): Matrix[M, N] = fromVec(v.copy)
+  inline def copyFromVec(v: Vec[MN]): Mat[M, N] = fromVec(v.copy)
 
 
-  inline def identity: Matrix[M, N] = diagonal(1.0)
+  inline def identity: Mat[M, N] = diagonal(1.0)
 
-  inline def diagonal(value:Double): Matrix[M, N] = Matrix.diagonal[M, N](value)
+  inline def diagonal(value:Double): Mat[M, N] = Mat.diagonal[M, N](value)
 
-  inline def fill(d: Double): Matrix[M, N] = Matrix.fill[M, N](d)
+  inline def fill(d: Double): Mat[M, N] = Mat.fill[M, N](d)
 
-  inline def zeros: Matrix[M, N] = Matrix.zeros[M, N]
+  inline def zeros: Mat[M, N] = Mat.zeros[M, N]
 
-  inline def ones: Matrix[M, N] = Matrix.ones[M, N]
+  inline def ones: Mat[M, N] = Mat.ones[M, N]
 
   import slash.Random.nextMatrix
 
-  inline def random: Matrix[M, N] = Matrix.random[M, N](Random.defaultRandom)
-  inline def random(r: scala.util.Random): Matrix[M, N] = Matrix.random[M, N](r)
+  inline def random: Mat[M, N] = Mat.random[M, N](Random.defaultRandom)
+  inline def random(r: scala.util.Random): Mat[M, N] = Mat.random[M, N](r)
 
   inline def random(
     interval: slash.interval.Interval[Double],
     r: scala.util.Random = Random.defaultRandom
-  ): Matrix[M, N] = Matrix.random[M, N](interval, r)
+  ): Mat[M, N] = Mat.random[M, N](interval, r)
 
   inline def random(
     minNorm: Double,
     normMAX: Double
-  ): Matrix[M, N] = random(minNorm, normMAX, Random.defaultRandom)
+  ): Mat[M, N] = random(minNorm, normMAX, Random.defaultRandom)
 
   inline def random(
      minNorm: Double,
      normMAX: Double,
      r: scala.util.Random
-   ): Matrix[M, N] = r.nextMatrix[M, N](minNorm, normMAX)
+   ): Mat[M, N] = r.nextMatrix[M, N](minNorm, normMAX)
 
 }

@@ -33,11 +33,11 @@ object Cholesky {
    * @throws MatrixNotSymmetricPositiveDefinite exception if m is not a square, symmetric, positive definite matrix.
    */
 
-  def apply[N <: Int](m:Matrix[N, N])(using ValueOf[N]):Cholesky[N] = {
+  def apply[N <: Int](m:Mat[N, N])(using ValueOf[N]):Cholesky[N] = {
     // Initialize.
     val A = m.copy
     val n = A.rows
-    val L = Matrix.zeros[N, N]
+    val L = Mat.zeros[N, N]
     var isspd:Boolean = true
     // Main loop.
     var j:Int = 0; while (j < n) {
@@ -72,21 +72,21 @@ object Cholesky {
   }
 }
 
-class Cholesky[N <: Int] private(val L: Matrix[N, N])(using ValueOf[N]) {
+class Cholesky[N <: Int] private(val L: Mat[N, N])(using ValueOf[N]) {
 
   val mn:Int = valueOf[N]
 
   /** Solve A*X = B
     *
-    * @param  B A Matrix with as many rows as A and any number of columns.
+    * @param  B A Mat with as many rows as A and any number of columns.
     * @return X so that L*L'*X = B
-    * @throws IllegalArgumentException  Matrix row dimensions must agree.
-    * @throws RuntimeException  Matrix is not symmetric positive definite.
+    * @throws IllegalArgumentException  Mat row dimensions must agree.
+    * @throws RuntimeException  Mat is not symmetric positive definite.
     */
-  def solve[V <: Int](B: Matrix[N, V])(using ValueOf[V]): Matrix[N, V] = {
+  def solve[V <: Int](B: Mat[N, V])(using ValueOf[V]): Mat[N, V] = {
 
     // Copy right hand side.
-    val X: Matrix[N, V] = B.copy
+    val X: Mat[N, V] = B.copy
     val nx: Int = B.columns
     // Solve L*Y = B;
     var k:Int = 0; while (k < mn) {

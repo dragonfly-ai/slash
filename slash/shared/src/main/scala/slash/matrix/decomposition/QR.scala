@@ -25,9 +25,9 @@ import scala.math.hypot
 
 object QR {
 
-  def apply[M <: Int, N <: Int](M: Matrix[M, N])(using ValueOf[M], ValueOf[N]): QR[M, N] = {
+  def apply[M <: Int, N <: Int](M: Mat[M, N])(using ValueOf[M], ValueOf[N]): QR[M, N] = {
     // Initialize.
-    val qr:Matrix[M, N] = M.copy
+    val qr:Mat[M, N] = M.copy
     val rows:Int = M.rows
     val columns:Int = M.columns
     val Rdiag:Vec[N] = Vec.fill[N](0.0)
@@ -81,14 +81,21 @@ object QR {
   * of simultaneous linear equations.  This will fail if isFullRank()
   * returns false.
   */
-/** QR Decomposition, computed by Householder reflections.
-  * Structure to access R and the Householder vectors and compute Q.
-  *
-  * @param A Rectangular matrix
-  */
+
+/**
+ * QR Decomposition, computed by Householder reflections.
+ * Structure to access R and the Householder vectors and compute Q.
+ *
+ * @param QR
+ * @param Rdiag
+ * @param x$3
+ * @param x$4
+ * @tparam M
+ * @tparam N
+ */
 
 class QR[M <: Int, N <: Int] private (
-  val QR: Matrix[M, N], val Rdiag: Vec[N]
+  val QR: Mat[M, N], val Rdiag: Vec[N]
 )(using ValueOf[M], ValueOf[N]) {
 
   val rows:Int = valueOf[M]
@@ -108,12 +115,12 @@ class QR[M <: Int, N <: Int] private (
     *
     * @return Lower trapezoidal matrix whose columns define the reflections
     */
-  def H: Matrix[M, N] = {
+  def H: Mat[M, N] = {
     val values: NArray[Double] = new NArray[Double](rows * columns)
     var i: Int = 0
-    var r: Int = 0;
+    var r: Int = 0
     while (r < rows) {
-      var c: Int = 0;
+      var c: Int = 0
       while (c < columns) {
         values(i) = if (r >= c) QR(r, c) else 0.0
         i += 1
@@ -121,19 +128,19 @@ class QR[M <: Int, N <: Int] private (
       }
       r += 1
     }
-    Matrix[M, N](values)
+    Mat[M, N](values)
   }
 
   /** Return the upper triangular factor
     *
     * @return R
     */
-  def R: Matrix[N, N] = {
+  def R: Mat[N, N] = {
     val values: NArray[Double] = new NArray[Double](slash.squareInPlace(columns))
     var i: Int = 0
-    var r: Int = 0;
+    var r: Int = 0
     while (r < columns) {
-      var c: Int = 0;
+      var c: Int = 0
       while (c < columns) {
         values(i) = {
           if (r < c) QR(r, c)
@@ -145,15 +152,15 @@ class QR[M <: Int, N <: Int] private (
       }
       r += 1
     }
-    Matrix[N, N](values)
+    Mat[N, N](values)
   }
 
   /** Generate and return the (economy-sized) orthogonal factor
     *
     * @return Q
     */
-  def Q: Matrix[M, N] = {
-    val X = Matrix.zeros[M, N]
+  def Q: Mat[M, N] = {
+    val X = Mat.zeros[M, N]
     var k:Int = columns - 1; while (k > -1) {
       var i:Int = 0; while (i < rows) {
         X(i, k) = 0.0
@@ -182,13 +189,13 @@ class QR[M <: Int, N <: Int] private (
 
   /** Least squares solution of A*X = B
     *
-    * @param B A Matrix with as many rows as A and any number of columns.
+    * @param B A Mat with as many rows as A and any number of columns.
     * @return X that minimizes the two norm of Q*R*X-B.
-    * @throws IllegalArgumentException  Matrix row dimensions must agree.
-    * @throws RuntimeException  Matrix is rank deficient.
+    * @throws IllegalArgumentException  Mat row dimensions must agree.
+    * @throws RuntimeException  Mat is rank deficient.
     */
-  def solve[V <: Int](B: Matrix[M, V])(using ValueOf[V]): Matrix[N, V] = {
-    if (!this.isFullRank) throw new RuntimeException("Matrix is rank deficient.")
+  def solve[V <: Int](B: Mat[M, V])(using ValueOf[V]): Mat[N, V] = {
+    if (!this.isFullRank) throw new RuntimeException("Mat is rank deficient.")
 
     // Copy right hand side
     val nx = B.columns

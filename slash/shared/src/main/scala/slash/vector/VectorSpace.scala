@@ -17,9 +17,6 @@
 package slash.vector
 
 import narr.NArray
-import slash.Random
-
-import scala.compiletime.ops.int.*
 
 object VectorSpace {
   def apply(dimension:Int):VectorSpace[dimension.type] = new VectorSpace[dimension.type]
@@ -32,7 +29,6 @@ class VectorSpace[N0 <: Int](using dt: ValueOf[N0]) {
   dimensionCheck(dimension, dt.value)
 
   opaque type N <: Int = N0
-
   given n: ValueOf[N] = dt
 
   inline def apply(a: NArray[Double]): Vec[N] = {
@@ -62,12 +58,18 @@ class VectorSpace[N0 <: Int](using dt: ValueOf[N0]) {
 
   inline def ones: Vec[N] = apply(NArray.fill[Double](dimension)(1.0))
 
-  import slash.Random.nextVec
+  import slash.Random.*
 
   inline def random(
-    MAX: Double = 1.0,
     min: Double = 0.0,
-    r: scala.util.Random = Random.defaultRandom
+    MAX: Double = 1.0,
+    r: scala.util.Random = slash.Random.defaultRandom
   ): Vec[N] = r.nextVec[N](min, MAX)
+
+  def between[N <: Int](
+    min: Vec[N],
+    MAX: Vec[N],
+    r: scala.util.Random = slash.Random.defaultRandom
+  )(using ValueOf[N]): Vec[N] = r.between[N](min, MAX)
 
 }

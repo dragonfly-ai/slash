@@ -20,10 +20,10 @@ import slash.matrix.*
 
 class VectorExtensionsTest extends munit.FunSuite {
 
-  test("Vec[N] -> Matrix[1, N] -> Vec[N]") {
+  test("Vec[N] -> Mat[1, N] -> Vec[N]") {
     val v1:Vec[7] = Vec.random[7]
-    val mR:Matrix[7, 1] = v1.asColumnMatrix
-    val mC:Matrix[1, 7] = v1.asRowMatrix
+    val mR:Mat[7, 1] = v1.asColumnMatrix
+    val mC:Mat[1, 7] = v1.asRowMatrix
     assertVecEquals(v1, mR.asVector)
     assertVecEquals(v1, mC.asVector)
   }

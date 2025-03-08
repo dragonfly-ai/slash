@@ -16,7 +16,7 @@
 
 package slash.stats.probability.distributions
 
-import slash.{B, Random}
+import slash.B
 import slash.stats.*
 import slash.interval.*
 import slash.interval.Interval

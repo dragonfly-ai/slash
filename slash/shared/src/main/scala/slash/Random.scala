@@ -45,11 +45,10 @@ object Random {
 
     inline def nextVec[N <: Int](maxNorm:Double = 1.0): Vec[N] = Vec.apply[N]( NArray.tabulate[Double](valueOf[N])((i:Int) => maxNorm * r.nextDouble() ) )
     inline def nextVec[N <: Int](minNorm:Double, normMAX:Double): Vec[N] = Vec.apply[N]( NArray.tabulate[Double](valueOf[N])((i:Int) => r.between(minNorm, normMAX) ) )
-    inline def nextVec[N <: Int](componentNorm:Vec[N]):Vec[N] = Vec[N]( NArray.tabulate[Double](componentNorm.dimension)((i:Int) => componentNorm(i) * r.nextDouble() ) )
+    inline def nextVec[N <: Int](maxComponentNorm:Vec[N]):Vec[N] = Vec[N]( NArray.tabulate[Double](maxComponentNorm.dimension)((i:Int) => maxComponentNorm(i) * r.nextDouble() ) )
+    inline def between[N <: Int](min:Vec[N], MAX:Vec[N])(using ValueOf[N]):Vec[N] = Vec[N](NArray.tabulate[Double](min.dimension)((i: Int) => r.between(min(i), MAX(i))))
 
-    inline def nextMatrix[M <: Int, N <: Int](maxNorm:Double = 1.0)(using ValueOf[M], ValueOf[N]): Matrix[M, N] = Matrix.random[M, N](0.0, maxNorm, r)
-    inline def nextMatrix[M <: Int, N <: Int](minNorm:Double, normMAX:Double)(using ValueOf[M], ValueOf[N]): Matrix[M, N] = Matrix.random[M, N](minNorm, normMAX, r)
-
-    inline def between[N <: Int](min:Vec[N], MAX:Vec[N]):Vec[N] = Vec[N](NArray.tabulate[Double](min.dimension)((i: Int) => r.between(min(i), MAX(i))))
+    inline def nextMatrix[M <: Int, N <: Int](maxNorm:Double = 1.0)(using ValueOf[M], ValueOf[N]): Mat[M, N] = Mat.random[M, N](0.0, maxNorm, r)
+    inline def nextMatrix[M <: Int, N <: Int](minNorm:Double, normMAX:Double)(using ValueOf[M], ValueOf[N]): Mat[M, N] = Mat.random[M, N](minNorm, normMAX, r)
 
 }

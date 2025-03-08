@@ -21,19 +21,19 @@ import slash.matrix.ml.data.SupervisedData
 import slash.matrix.ml.supervized
 import slash.matrix.ml.supervized.regression
 
-import slash.stats.probability.distributions.{EstimatedGaussian}
+import slash.stats.probability.distributions.EstimatedGaussian
 import slash.vector.*
 
 trait LinearRegression[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {
 
-  def estimateBeta(X:Matrix[M, N], Y:Matrix[M, 1]): Matrix[N, 1]
+  def estimateBeta(X:Mat[M, N], Y:Mat[M, 1]): Mat[N, 1]
 
   def train(lrp:LinearRegressionProblem[M, N]): LinearRegressionModel[N] = {
     import lrp.*
 
-    val A:Matrix[N, 1] = estimateBeta(X, Y)
+    val A:Mat[N, 1] = estimateBeta(X, Y)
 
-    val errors:Matrix[M, 1] = (X * A) - Y
+    val errors:Mat[M, 1] = (X * A) - Y
 
     var err:Double = 0.0
     var `err²`: Double = 0.0
@@ -54,8 +54,8 @@ trait LinearRegression[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {
 trait LinearRegressionProblem[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {
   val sampleSize:Int = valueOf[M]
   val dimension:Int = valueOf[N]
-  val X: Matrix[M, N]
-  val Y: Matrix[M, 1]
+  val X: Mat[M, N]
+  val Y: Mat[M, 1]
   val bias:Double
   val mean:Vec[N]
   val `EstGaussian(Y)`: EstimatedGaussian
@@ -66,8 +66,8 @@ object LinearRegressionProblem {
 
   def apply[M <: Int, N <: Int](trainingData:SupervisedData[M, N])(using ValueOf[M], ValueOf[N]):LinearRegressionProblem[M, N] = {
     new LinearRegressionProblem[M, N] {
-      override val X: Matrix[M, N] = trainingData.X
-      override val Y: Matrix[M, 1] = trainingData.Y
+      override val X: Mat[M, N] = trainingData.X
+      override val Y: Mat[M, 1] = trainingData.Y
       override val mean:Vec[N] = trainingData.sampleMean
       override val bias:Double = trainingData.rangeBias
       override val `EstGaussian(Y)`: EstimatedGaussian = trainingData.labelStats

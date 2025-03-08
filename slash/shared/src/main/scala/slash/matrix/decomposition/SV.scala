@@ -48,11 +48,11 @@ object SV {
 //    r
 //  }
 
-  def apply[M <: Int, N <: Int](mtrx:Matrix[M, N])(using ValueOf[M], ValueOf[N], M >= N =:= true):SV[M, N] = {
+  def apply[M <: Int, N <: Int](mtrx:Mat[M, N])(using ValueOf[M], ValueOf[N], M >= N =:= true):SV[M, N] = {
 
     // Derived from LINPACK code.
     // Initialize.
-    val A: Matrix[M, N] = mtrx.copy
+    val A: Mat[M, N] = mtrx.copy
 
     val rows:Int = valueOf[M]
     val columns:Int = valueOf[N]
@@ -60,8 +60,8 @@ object SV {
     val minDim:Int = Math.min(rows, columns)
 
     val s: Vec[N] = Vec.zeros[N]
-    val U: Matrix[M, N] = Matrix.zeros[M, N]
-    val V: Matrix[N, N] = Matrix.zeros[N, N]
+    val U: Mat[M, N] = Mat.zeros[M, N]
+    val V: Mat[N, N] = Mat.zeros[N, N]
     val e: Vec[M] = Vec.zeros[M]
     val work: Vec[M] = Vec.zeros[M]
 
@@ -223,7 +223,7 @@ object SV {
           j0 += 1
         }
         var i:Int = k; while (i < rows) {
-          U(i, k) = -(U(i, k))
+          U(i, k) = -U(i, k)
           i += 1
         }
         U(k, k) = 1.0 + U(k, k)
@@ -507,14 +507,22 @@ object SV {
 
 // Derived from LINPACK code.
 
-/** Construct the singular value decomposition
+/**
+ * Construct the singular value decomposition
  * Structure to access U, S and V.
  *
- * @param M Rectangular matrix
+ * @param U
+ * @param V
+ * @param singularValues
+ * @param x$4
+ * @param x$5
+ * @param x$6
+ * @tparam M
+ * @tparam N
  */
 
 class SV[M <: Int, N <: Int] private(
-  val U:Matrix[M, N], val V:Matrix[N, N], val singularValues:Vec[N]
+  val U:Mat[M, N], val V:Mat[N, N], val singularValues:Vec[N]
 )(using ValueOf[M], ValueOf[N], M >= N =:= true) {
   val m:Int = valueOf[M]
   val n:Int = valueOf[N]
@@ -523,7 +531,7 @@ class SV[M <: Int, N <: Int] private(
     *
     * @return S
     */
-  inline def S: Matrix[N, N] = Matrix.diagonal[N](singularValues)
+  inline def S: Mat[N, N] = Mat.diagonal[N](singularValues)
 
   /** Return the diagonal matrix of singular values
    *
@@ -532,7 +540,7 @@ class SV[M <: Int, N <: Int] private(
    *
    * @return S
    */
-  inline def S_inverse: Matrix[N, N] = Matrix.diagonal[N](
+  inline def S_inverse: Mat[N, N] = Mat.diagonal[N](
     Vec.tabulate[N]( (i:Int) => 1.0 / singularValues(i) )
   )
 

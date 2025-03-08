@@ -23,7 +23,7 @@ import scala.compiletime.ops.int.*
 
 class LinearRegressionSVD[M <: Int, N <: Int](using ValueOf[M], ValueOf[N], M >= N =:= true) extends LinearRegression[M, N] {
 
-  override def estimateBeta(X: Matrix[M, N], Y: Matrix[M, 1]): Matrix[N, 1] = {
+  override def estimateBeta(X: Mat[M, N], Y: Mat[M, 1]): Mat[N, 1] = {
     // Â = VS⁻ⁱUᵀ * Y
     val svd: SV[M, N] = SV[M, N](X)
     //svd.getV() * (svd.getS_Inverse() * svd.getU().transpose) * Y

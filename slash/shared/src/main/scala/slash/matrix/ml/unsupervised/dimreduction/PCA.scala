@@ -36,13 +36,13 @@ object PCA {
   def apply[M <: Int, N <:  Int](data: UnsupervisedData[M, N])(using ValueOf[M], ValueOf[N], N >= N =:= true): PCA[N] = {
 
     // arrange the matrix of centered points
-    val Xc: Matrix[M, N] = Matrix[M, N](
+    val Xc: Mat[M, N] = Mat[M, N](
       NArray.tabulate[Vec[N]](data.sampleSize)(
-        (row:Int) => (data.example(row) - data.sampleMean)
+        (row:Int) => data.example(row) - data.sampleMean
       )
     )
 
-    val m:Matrix[N, N] = (Xc.transpose * Xc) * (1.0 / data.sampleSize)
+    val m:Mat[N, N] = (Xc.transpose * Xc) * (1.0 / data.sampleSize)
 
     new PCA[N](
       SV[N, N](m), // Compute Singular Value Decomposition
@@ -55,10 +55,10 @@ case class PCA[N <: Int](svd: SV[N, N], mean: Vec[N])(using ValueOf[N]) {
 
   val dimension: Double = valueOf[N]
 
-  lazy val Uᵀ:Matrix[N, N] = svd.U.transpose
+  lazy val Uᵀ:Mat[N, N] = svd.U.transpose
 
   inline def getReducer[K <: Int](using ValueOf[K]): DimensionalityReducerPCA[N, K] = {
-    DimensionalityReducerPCA[N, K](Matrix(Uᵀ.rowVectors.take(valueOf[K])), mean)
+    DimensionalityReducerPCA[N, K](Mat(Uᵀ.rowVectors.take(valueOf[K])), mean)
   }
 
   lazy val basisPairs: Seq[BasisPair[N]] = {
@@ -75,7 +75,7 @@ case class PCA[N <: Int](svd: SV[N, N], mean: Vec[N])(using ValueOf[N]) {
 
 case class BasisPair[N <: Int](variance: Double, basisVector: Vec[N])(using ValueOf[N])
 
-case class DimensionalityReducerPCA[N <: Int, K <: Int](Ak:Matrix[K, N], mean: Vec[N])(using ValueOf[N], ValueOf[K]) {
+case class DimensionalityReducerPCA[N <: Int, K <: Int](Ak:Mat[K, N], mean: Vec[N])(using ValueOf[N], ValueOf[K]) {
 
   /**
    * Reduce dimensionality of vector from domainDimension to rangeDimension
