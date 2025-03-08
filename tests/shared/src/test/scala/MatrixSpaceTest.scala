@@ -29,7 +29,7 @@ class MatrixSpaceTest extends munit.FunSuite {
     assertEquals(ms.rowDimension, runtimeRowDimension)
     assertEquals(ms.columnDimension, runtimeColumnDimension)
 
-    val m: Matrix[ms.M, ms.N] = ms.fill(0.01) + (ms.ones + ms.diagonal(42.0) - ms.diagonal(42.0)) * 7.0
+    val m: Mat[ms.M, ms.N] = ms.fill(0.01) + (ms.ones + ms.diagonal(42.0) - ms.diagonal(42.0)) * 7.0
 
     // this exercises VectorSpace.{ones, zeros, tabulate, and fill}
     var i:Int = 0; while (i < m.values.length) {
