@@ -51,6 +51,11 @@ class SimpleVecOpsTest extends munit.FunSuite {
     val vResult = Vec[3](3.0, 5.0, 7.0)
     assertVecEquals(v1 * 2.0, vResult)
   }
+  test("scalar left multiplication") {
+    val v1 = Vec[3](1.5, 2.5, 3.5)
+    val vResult = Vec[3](3.0, 5.0, 7.0)
+    assertVecEquals(2.0 * v1, vResult)
+  }
 
   test("scalar division") {
     val v1 = Vec[3](1.5, 2.5, 3.5)

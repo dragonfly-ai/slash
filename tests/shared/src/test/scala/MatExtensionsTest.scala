@@ -99,4 +99,20 @@ class MatExtensionsTest extends munit.FunSuite {
     } 
     assert(compilerError)
   }
+
+  test("scalar multiplication") {
+    val m1 = Mat[1,3](1.5, 2.5, 3.5)
+    val expected = Mat[1,3](3.0, 5.0, 7.0)
+    val result = m1 * 2.0
+    assert(result.strictEquals(expected))
+  }
+
+  test("scalar left multiplication") {
+    val m1 = Mat[1,3](1.5, 2.5, 3.5)
+    val expected = Mat[1,3](3.0, 5.0, 7.0)
+    val result = 2.0 * m1
+    assert(result.strictEquals(expected))
+  }
+
+
 }

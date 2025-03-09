@@ -345,6 +345,10 @@ object Mat {
     }
   }
 
+  // support left multiply by scalar
+  extension (d: Double) {
+    def *[M <: Int, N <: Int](m: Mat[M,N]): Mat[M,N] = m * d // same as right multiply
+  }
 }
 
 class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {
