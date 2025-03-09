@@ -549,6 +549,9 @@ package object vector {
       def tsv(sb: StringBuilder = new StringBuilder()): String = render(VecFormat.TSV, sb).toString
     }
 
+    extension (d: Double) {
+      def *[N <: Int](v:Vec[N]):Vec[N] = v * d
+    }
   }
 
   export Vec.*
