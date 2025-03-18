@@ -20,9 +20,10 @@ import narr.*
 import slash.vector.*
 
 import scala.compiletime.ops.int.*
+import scala.compiletime.{constValue, summonFrom, error}
 import scala.math.hypot
-//import narr.NArray
-import scala.compiletime.{constValue, summonInline}
+import scala.Tuple.*
+
 
 /**
   * This library is fundamentally an adaptation of the Java Mat library, JaMa, by MathWorks Inc. and the National Institute of Standards and Technology.
@@ -36,6 +37,8 @@ object Mat {
    */
   inline def copyFrom[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]): Mat[M, N] = apply(narr.copy[Double](values))
 
+  /** Construct a matrix of random values.
+   */
   inline def random[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = random[M, N](slash.Random.defaultRandom)
 
   /**
@@ -108,7 +111,7 @@ object Mat {
    * @param value scalar multiplier
    * @param x$2 implicit
    * @param x$3 implicit
-   * @tparam M Number of rows.
+   * @tparam M number of rows.
    * @tparam N  number of columns.
    * @return An MxN matrix with ones on the diagonal and zeros elsewhere.
    */
@@ -210,7 +213,7 @@ object Mat {
   /** Construct a matrix by copying a one-dimensional packed array
    *
    * @param values One-dimensional array of doubles, packed by rows.
-   * @param A    Number of rows.
+   * @param A    number of rows.
    * @throws IllegalArgumentException Array length must be a multiple of A.
    */
   def apply[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]):Mat[M, N] = new Mat[M, N](values)
@@ -222,94 +225,89 @@ object Mat {
    * @tparam N the number of columns
    * @return an M x N matrix consisting of values.
    */
-  def apply[M <: Int, N <: Int](values: Double*)(using ValueOf[M], ValueOf[N]):Mat[M, N] = {
+  def apply[M <: Int, N <: Int](values: Double *)(using ValueOf[M], ValueOf[N]):Mat[M, N] = {
     dimensionCheck(values.size, valueOf[M] * valueOf[N])
     new Mat[M, N](NArray[Double](values *))
   }
 
-  /** Construct a Mat from Tuple literal, with optional dimensions at call site.
-   *  `((a,b,c...),(d,e,f,...),...)`.
+  /** Construct a Mat from a tuple literal.
+   *  `((a,b,c...),(d,e,f,...),...)`. << nested tuple fields define rows
+   *  `(a,b,c...)`.                   << fields of single tuple define columns
    *
-   * Where:
-   *    inner tuples share the same arity
+   *    if nested tuples share the same arity
    *    tuple Numeric fields converted to type Double
    *    non-numeric fields, if present converted to `Double.NaN`
-   * @param tup a tuple with M Number tuples of arity N
-   * @return an M x N matrix consisting of values.
-   */
-  transparent inline def apply[T <: Tuple](inline t: T) = {
-    val itr1:Iterator[Any] = t.productIterator
-    val matsize1: Int = valueOf[TupleMatsize[T]]
-    val v:NArray[Double] = new NArray[Double](matsize1)
-    var i:Int = 0
-    var columnCount = 0
-    while (itr1.hasNext) {
-      val inner = itr1.next().asInstanceOf[Tuple]
-      val itr2:Iterator[Any] = inner.productIterator
-      var j:Int = 0
-      while (itr2.hasNext) {
-        itr2.next match {
-        case n: Number =>
-          v(i) = toDouble(n)
-        case x =>
-          throw new IllegalArgumentException(s"non-numeric Tuple field [$x]")
-        }
-        i += 1
-        j += 1
-      }
-      if columnCount == 0 then
-        columnCount = j
-      else
-        require(j == columnCount)
-    }
-    inline (constValue[RowSize[T]], constValue[ColSize[T]]) match {
-    case (r, c) =>
-      new Mat[r.type, c.type](v)
-    }
-  }
-  /** Construct a Mat from a sequence of Tuple literals, with optional dimensions at call site.
-   *  `((a,b,c...),(d,e,f,...),...)`.
    *
-   * Where:
-   *    the sequence of tuples share the same arity
-   *    tuple Numeric fields converted to type Double
-   *    non-numeric fields, if present converted to `Double.NaN`
-   * @param tup a tuple with M Number tuples of arity N
+   * @throws IllegalArgumentException on non-numeric fields.
+   * @param t0     a Tuple with M numeric columns (minimum of one row expected)
+   * @param tuparg zero or more Tuples each with M numeric columns
    * @return an M x N matrix consisting of values.
    */
-  transparent inline def apply[T <: Tuple](inline t: T *) = {
-    val rows: Int = t.size
-    val cols: Int = t.toList match {
-      case Nil => 0
-      case head :: _ => head.productIterator.toArray.size
-    }
-    val itr1:Iterator[Any] = t.iterator
+  transparent inline def apply[M <: Int, N <: Int](tuparg: Tuple)(using ValueOf[M], ValueOf[N]): Mat[M,N] = {
+    val rows: Int = valueOf[M]
+    val cols: Int = valueOf[N]
     val matsize1: Int = rows * cols
-    val v:NArray[Double] = new NArray[Double](matsize1)
+    val values:NArray[Double] = new NArray[Double](matsize1)
     var i:Int = 0
-    while (itr1.hasNext) {
-      val inner = itr1.next().asInstanceOf[Tuple]
-      val itr2:Iterator[Any] = inner.productIterator
-      var j:Int = 0
-      while (itr2.hasNext) {
-        itr2.next match {
-        case n: Number =>
-          v(i) = toDouble(n)
+    var j:Int = 0
+    def iterateRow(iter: Iterator[Any]): Unit = {
+      iter.foreach {
+        case nested: Product if nested.productArity > 0 => // Check if it's a nested tuple or product
+          j = 0
+          iterateRow(nested.productIterator)
+          require(j == cols, s"# j[$j] != cols[$cols]")
+        case element: Number =>
+          values(i) = toDouble(element) // Process non-tuple elements
+          i += 1
+          j += 1
         case x =>
-          throw new IllegalArgumentException(s"non-numeric Tuple field [$x]")
-        }
-        i += 1
-        j += 1
+          throw new IllegalArgumentException(s"non-numeric field [$x] [${x.getClass}]")
       }
-      require(j == cols, s"i[$i]: j[$j] != cols[$cols]")
     }
-    inline (rows, cols) match {
-    case (r, c) =>
-      new Mat[r.type, c.type](v)
-    }
+    iterateRow(tuparg.productIterator)
+    new Mat[M,N](values)
   }
 
-  type Number = Int | Float | Double | Long
+  /** Construct a Mat from a sequence of 2 or more Tuple literals.
+   *  `((a,b,c...),(d,e,f,...),...)`.
+   *
+   * Where:
+   *    inner row tuples share the same arity
+   *    tuple Numeric fields converted to type Double
+   *    non-numeric fields, if present converted to `Double.NaN`
+   * @param tup a tuple with M Number tuples of arity N
+   * @return an M x N matrix consisting of values.
+   */
+  transparent inline def fromTuples[M <: Int, N <: Int](tuprows: Tuple *)(using ValueOf[M], ValueOf[N]): Mat[M, N] = {
+    val rows: Int = valueOf[M]
+    val cols: Int = valueOf[N]
+    val matsize1: Int = rows * cols
+    val values:NArray[Double] = new NArray[Double](matsize1)
+    var i:Int = 0
+    var j:Int = 0
+    def iterateRow(iter: Iterator[Any]): Unit = {
+      iter.foreach {
+        case nested: Product if nested.productArity > 0 => // Check if it's a nested tuple or product
+          j = 0
+          iterateRow(nested.productIterator)
+          require(j == cols, s"j[$j] != cols[$cols]")
+        case element: Number =>
+          values(i) = toDouble(element) // Process non-tuple elements
+          i += 1
+          j += 1
+        case x =>
+          throw new IllegalArgumentException(s"non-numeric field [$x] [${x.getClass}]")
+      }
+    }
+    iterateRow(tuprows.iterator)
+    new Mat[M,N](values)
+  }
+
+  type Number = Int | Float | Long | Double
+
+  type IsSingleton[T] <: Boolean = T match
+    case Singleton => true // Matches singleton types
+    case _ => false        // Matches all other types
 
   // recursive compile-time type functions
   // S is the Int successor type, denoting N + 1 at the type level
@@ -324,17 +322,11 @@ object Mat {
   type TupleSize[T <: Tuple] <: Int = T match
     case EmptyTuple => 0
     case h *: t => S[TupleSize[t]]
+    case _ => 1 // non-tuple elements
 
-  type Product[A <: Int, B <: Int] <: Int = A match
+  type Prod[A <: Int, B <: Int] <: Int = A match
     case 0 => 0
-    case S[aMinus1] => B + Product[aMinus1, B]
-
-  type TupleMatsize[T <: Tuple] = Product[RowSize[T], ColSize[T]]
-
-  inline def dims[T <: Tuple](inline tup: T): (Int, Int) = {
-    (constValue[RowSize[T]], constValue[ColSize[T]])
-  }
-
+    case S[aMinus1] => B + Prod[aMinus1, B]
 
   inline def toDouble(inline num: Number): Double = {
     num match {
@@ -345,16 +337,40 @@ object Mat {
     }
   }
 
+  inline def dims[T <: Tuple](inline tup: T): (Int, Int) = {
+    (constValue[RowSize[T]], constValue[ColSize[T]])
+  }
+
   // support left multiply by scalar
   extension (d: Double) {
     def *[M <: Int, N <: Int](m: Mat[M,N]): Mat[M,N] = m * d // same as right multiply
   }
+
+  /*
+   * usage:
+   *   val mat: Mat[4,5] = dmFix[4,5](mat) // <<-- whether mat is based on literals or MatrixSpace
+   */
+  inline def dmFix[N <: Int, M <: Int](inline m: AnyRef)(using ValueOf[M], ValueOf[N]): Mat[M,N] = {
+    def mat = m.asInstanceOf[Mat[?,?]]
+    Mat[M,N](mat.values)
+  }
+
+  inline def sameSpace[M <: Int, N <: Int, P <: Int, Q <: Int](mat1: Mat[M, N], mat2: Mat[P, Q]): Boolean = {
+    summonFrom {
+      case ev1: (M =:= P) =>
+        summonFrom {
+          case ev2: (N =:= Q) => true
+          case _ => false
+        }
+      case _ => false
+    }
+  }
 }
 
 class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {
-
   val rows: Int = valueOf[M]
   val columns: Int = valueOf[N]
+  def dims = (rows,columns)
 
   val MxN: Int = rows * columns
   opaque type MN <: Int = M * N
