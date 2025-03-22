@@ -267,6 +267,7 @@ object Mat {
       new Mat[r.type, c.type](v)
     }
   }
+
   /** Construct a Mat from a sequence of Tuple literals, with optional dimensions at call site.
    *  `((a,b,c...),(d,e,f,...),...)`.
    *
@@ -307,6 +308,31 @@ object Mat {
     case (r, c) =>
       new Mat[r.type, c.type](v)
     }
+  }
+
+  /** Construct a Mat from a String.
+   * @param content a String with rows of delimited numeric columns.
+   * @tparam M the number of rows
+   * @tparam N the number of columns
+   * @return an M x N matrix
+   */
+  inline def apply[M <: Int, N <: Int](inline content: String)(using ValueOf[M], ValueOf[N]): Mat[M, N] = {
+    val matrix = Util.fromString(content)
+    val (rows, cols) = (matrix.rows, matrix.columns)
+    val (r, c) = (valueOf[M], valueOf[N])
+    require(
+      r == rows && c == cols,
+      s"expecting $r x $c but found $rows x $cols"
+    )
+    matrix.asInstanceOf[Mat[M, N]]
+  }
+
+  /** Construct a Mat from a String.
+   * @param content a String with rows of delimited numeric columns.
+   * @return an M x N matrix
+   */
+  inline def fromString(inline content: String) = {
+    Util.fromString(content)
   }
 
   type Number = Int | Float | Double | Long
