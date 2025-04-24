@@ -128,4 +128,14 @@ package object matrix {
     inline def copyAsVector[MN <: Int](using MN == (M * N) =:= true): Vec[MN] = narr.copy[Double](m.values).asInstanceOf[Vec[MN]]
   }
 
+  /*
+   * convert a Mat with non-literal dimensions to canonical form.
+   */
+  extension(m: Mat[?,?]) {
+    def cast[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M,N] = {
+      dimensionCheck(m.values.size, valueOf[M] * valueOf[N])
+      Mat[M,N](m.values)
+    }
+  }
+
 }
