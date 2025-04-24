@@ -27,7 +27,7 @@ class MatStringTest extends munit.FunSuite {
   test("can create matrix from String data") {
     val (rows, cols) = (19, 11)
     val test: Mat[rows.type,cols.type] = Mat.random[rows.type,cols.type](-1.0, 2.0)
-    val mat1 = Mat.fromString(test.toString)
+    val mat1 = Mat[19,11](test.toString)
     assert(mat1.rows == rows && mat1.columns == cols)
   }
 }

@@ -24,7 +24,6 @@ import scala.compiletime.{constValue, summonFrom, error}
 import scala.math.hypot
 import scala.Tuple.*
 
-
 /**
   * This library is fundamentally an adaptation of the Java Mat library, JaMa, by MathWorks Inc. and the National Institute of Standards and Technology.
   */
@@ -239,7 +238,6 @@ object Mat {
    *    non-numeric fields, if present converted to `Double.NaN`
    *
    * @throws IllegalArgumentException on non-numeric fields.
-   * @param t0     a Tuple with M numeric columns (minimum of one row expected)
    * @param tuparg zero or more Tuples each with M numeric columns
    * @return an M x N matrix consisting of values.
    */
@@ -304,6 +302,7 @@ object Mat {
     new Mat[M,N](values)
   }
 
+
   /** Construct a Mat from a String.
    * @param content a String with rows of delimited numeric columns.
    * @tparam M the number of rows
@@ -318,15 +317,71 @@ object Mat {
       r == rows && c == cols,
       s"expecting $r x $c but found $rows x $cols"
     )
-    matrix.asInstanceOf[Mat[M, N]]
+    matrix.cast[M, N]
   }
 
-  /** Construct a Mat from a String.
-   * @param content a String with rows of delimited numeric columns.
-   * @return an M x N matrix
+  /** Horizontal tiling of one or more matrices (having same number of rows) */
+  inline def horzcat[M <: Int](matrices: Mat[M,?] *)(using ValueOf[M]): Mat[M,? <: Int] = {
+    if (matrices.isEmpty) throw new IllegalArgumentException("empty parameter list")
+    val numRows = matrices.map(_.rows).toList.distinct match {
+    case num :: Nil =>
+      num
+    case list =>
+      sys.error(s"Matrices have diverse number of rows: $list")
+    }
+    val numCols = matrices.map(_.columns).sum
+    val res = Mat.zeros[numRows.type,numCols.type]
+    var offset = 0
+    for (m <- matrices) {
+      for (i <- 0 until numRows) {
+        for (j <- 0 until m.columns) {
+          res(i,j+offset) = m(i,j)
+        }
+      }
+      offset += m.columns
+    }
+    res.asInstanceOf[Mat[M,numCols.type]]
+  }
+
+  /** Vertical tiling of one or more matrices (having same number of columns)
    */
-  inline def fromString(inline content: String) = {
-    Util.fromString(content)
+  inline def vertcat[N <: Int](matrices: Mat[?,N] *)(using ValueOf[N]): Mat[? <: Int, N] = {
+    if (matrices.isEmpty) throw new IllegalArgumentException("empty parameter list")
+    val numCols = matrices.map(_.columns).toList.distinct match {
+    case num :: Nil =>
+      num
+    case list =>
+      sys.error(s"Matrices have diverse number of columns: $list")
+    }
+    val numRows = matrices.map(_.rows).sum
+    val res = Mat.zeros[numRows.type, numCols.type]
+    var offset = 0
+    for (m <- matrices) {
+      for (i <- 0 until m.rows) {
+        for (j <- 0 until numCols) {
+          res(i+offset,j) = m(i,j)
+        }
+      }
+      offset += m.rows
+    }
+    res.asInstanceOf[Mat[numRows.type, N]]
+  }
+
+  /**
+   * Support left add / multiply by scalars.
+   */
+  extension(s: Double) {
+    inline def +[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.addScalar(s)
+    inline def +=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.addScalar(s)
+    inline def *[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.times(s)
+    inline def *=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.times(s)
+  }
+
+  extension(s: Int) {
+    inline def +[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.addScalar(s.toDouble)
+    inline def +=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.addScalar(s.toDouble)
+    inline def *[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.times(s.toDouble)
+    inline def *=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.times(s.toDouble)
   }
 
   type Number = Int | Float | Long | Double
@@ -348,11 +403,12 @@ object Mat {
   type TupleSize[T <: Tuple] <: Int = T match
     case EmptyTuple => 0
     case h *: t => S[TupleSize[t]]
-    case _ => 1 // non-tuple elements
 
   type Prod[A <: Int, B <: Int] <: Int = A match
     case 0 => 0
     case S[aMinus1] => B + Prod[aMinus1, B]
+
+  type TupleMatsize[T <: Tuple] = Prod[RowSize[T], ColSize[T]]
 
   inline def toDouble(inline num: Number): Double = {
     num match {
@@ -367,20 +423,6 @@ object Mat {
     (constValue[RowSize[T]], constValue[ColSize[T]])
   }
 
-  // support left multiply by scalar
-  extension (d: Double) {
-    def *[M <: Int, N <: Int](m: Mat[M,N]): Mat[M,N] = m * d // same as right multiply
-  }
-
-  /*
-   * usage:
-   *   val mat: Mat[4,5] = dmFix[4,5](mat) // <<-- whether mat is based on literals or MatrixSpace
-   */
-  inline def dmFix[N <: Int, M <: Int](inline m: AnyRef)(using ValueOf[M], ValueOf[N]): Mat[M,N] = {
-    def mat = m.asInstanceOf[Mat[?,?]]
-    Mat[M,N](mat.values)
-  }
-
   inline def sameSpace[M <: Int, N <: Int, P <: Int, Q <: Int](mat1: Mat[M, N], mat2: Mat[P, Q]): Boolean = {
     summonFrom {
       case ev1: (M =:= P) =>
@@ -391,9 +433,11 @@ object Mat {
       case _ => false
     }
   }
+
 }
 
 class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {
+
   val rows: Int = valueOf[M]
   val columns: Int = valueOf[N]
   def dims = (rows,columns)
@@ -403,7 +447,15 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   require(rows * columns == values.length, s"Product of $rows x $columns != ${values.length}")
 
-  inline def lindex(r:Int, c:Int):Int = (r * columns) + c
+  inline def lindex(inline r:Int, c:Int):Int = {
+    (rowIndex(r) * columns) + colIndex(c)
+  }
+  // negative index is relative to max index
+  inline def rowIndex(inline r:Int):Int = if r < 0 then r + rows else r
+  inline def colIndex(inline c:Int):Int = if c < 0 then c + columns else c
+
+  /** @return a row-major Vec */
+  def flatten = rowPackedArray.asInstanceOf[Vec[MN]]
 
   /** Make a deep copy of a matrix
     */
@@ -562,7 +614,6 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     var i: Int = 0
     var ri: Int = r0; while (ri < rEnd) {
       var ci: Int = 0; while (ci < columnIndices.length) {
-//        println(s"$ci ($ri, ${columnIndices(ci)}) and ${lindex(ri, columnIndices(ci))} of ${values.length}")
         vs(i) = apply(ri, columnIndices(ci))
         i += 1
         ci += 1
@@ -767,6 +818,50 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     this
   }
 
+  /** A = A + d
+    *
+    * @param d a Double
+    * @return A element-wise plus d
+    */
+  def + (d: Double): Mat[M, N] = copy.addScalar(d)
+  def += (d: Double): Mat[M, N] = addScalar(d)
+  
+  /** A = A + d
+    *
+    * @param d an Int
+    * @return A element-wise plus d
+    */
+  def + (d: Int): Mat[M, N] = copy.addScalar(d.toDouble)
+  def += (d: Int): Mat[M, N] = addScalar(d.toDouble)
+
+  /** A = A + d
+  *
+  * @param d a scalar
+  * @return A + d
+  */
+  def addScalar(d: Double)(using ValueOf[N]): Mat[M,N] = {
+    for(i <- 0 until rows){
+      for(j <- 0 until columns){
+        apply(i,j) += d
+      }
+    }
+    this
+  }
+
+  /** A = A + d
+  *
+  * @param d a scalar
+  * @return A + d
+  */
+  def addScalar(d: Int)(using ValueOf[N]): Mat[M,N] = {
+    for(i <- 0 until rows){
+      for(j <- 0 until columns){
+        apply(i,j) += d.toDouble
+      }
+    }
+    this
+  }
+
   /** Unary minus
    *
    * @return -A
@@ -802,14 +897,22 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     */
   inline def * (s: Double): Mat[M, N] = copy.times(s)
 
-  inline def += (s:Double):Mat[M, N] = times(s)
+  inline def *= (s:Double):Mat[M, N] = times(s)
 
   /** Multiply a matrix by a scalar in place, A = s*A
     *
     * @param s scalar
     * @return replace A by s*A
     */
-  def times(s: Double): Mat[M, N] = {
+  inline def times(s: Double): Mat[M, N] = {
+    var i:Int = 0; while (i < values.length) {
+      values(i) = values(i) * s
+      i += 1
+    }
+    this
+  }
+  inline def times(num: Int): Mat[M, N] = {
+    inline val s: Double = num.toDouble
     var i:Int = 0; while (i < values.length) {
       values(i) = values(i) * s
       i += 1
@@ -902,4 +1005,61 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
       case _ => false
     }
   }
+
+  /** 
+   *  Matrix row vector view.
+   */
+  inline def apply(inline row:Int, cons: ::.type): MatRow = {
+    new MatRow(row)
+  }
+
+  /** 
+   *  Matrix column vector view.
+   */
+  inline def apply(cons: ::.type, inline column:Int): MatCol = {
+    new MatCol(column)
+  }
+
+  /**
+   * Wrapper class to represent row on LHS or RHS
+   */
+  class MatRow(r: Int) {
+    val row = rowIndex(r)
+    inline def :=(inline vector: Vec[N]): Unit = {
+      val start: Int = row * columns
+      var i = 0
+      while(i < columns) {
+        values(start+i) = vector(i)
+        i += 1
+      }
+    }
+    def show: String = rowVector(row).show
+    def asVec: Vec[N] = rowVector(row)
+  }
+
+  /**
+   * Wrapper class to represent column on LHS or RHS
+   */
+  class MatCol(c: Int) {
+    val column = colIndex(c)
+    inline def :=(inline vector: Vec[M]): Unit = {
+      var row = 0
+      while(row < rows) {
+        values(row * columns + column) = vector(row)
+        row += 1
+      }
+    }
+    def show: String = columnVector(column).show
+    def asVec: Vec[M] = columnVector(column)
+  }
+
+  import scala.language.implicitConversions
+  given matRowConversion: Conversion[MatRow, Vec[N]] with
+    def apply(rowSlice: MatRow): Vec[N] = rowSlice.asVec
+
+  given matColConversion: Conversion[MatCol, Vec[M]] with
+    def apply(colSlice: MatCol): Vec[M] = colSlice.asVec
+
+  export this.given
 }
+

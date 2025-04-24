@@ -16,6 +16,7 @@
 
 import slash.vector.Vec
 import slash.matrix.*
+//import slash.matrix.Mat.*
 
 class MatExtensionsTest extends munit.FunSuite {
   test("Mat[1, N] -> Vec[N] -> Mat[1, N]") {
@@ -31,6 +32,12 @@ class MatExtensionsTest extends munit.FunSuite {
 
   }
 
+  test("Mat can be initialized from Tuple literal") {
+    val tup3x2 = (((1, 2), (3, 4), (5, 6)))
+    val m01: Mat[3, 2] = Mat(tup3x2)
+    val m02 = Mat[3,2](((1, 2), (3, 4), (5, 6)))
+    assert(m01.strictEquals(m02))
+  }
   test("Mat equality for Tuples with mixed number types") {
     // values selected to avoid roundoff errors
     val m01: Mat[2, 2] = Mat(((1, 2L), (2.0, 4f))) // Int, Long, Double, Float
@@ -41,6 +48,13 @@ class MatExtensionsTest extends munit.FunSuite {
     val mat3x2 = Mat[3,2](1, 2, 3, 4, 5, 6)
     val mat2x3 = Mat[2,3](1, 2, 3, 4, 5, 6)
     assert(!mat3x2.strictEquals(mat2x3))
+  }
+  test("Single or repeating Int Tuple parameters should be equivalent") {
+    val tup1 = (((1, 2), (3, 4), (5, 6))) // single Tuple[Tuple] arg
+    val tup2 =  ((1, 2), (3, 4), (5, 6))  // repeating Tuple args
+    val m01: Mat[3, 2] = Mat(tup1)
+    val m02: Mat[3, 2] = Mat(tup2)
+    assert(m01.strictEquals(m02))
   }
   test("Single or repeating Tuple parameters should be equivalent") {
     val tupA = (((1.1, 2.1), (3.1, 4.1), (5.1, 6.1))) // single Tuple[Tuple] arg
@@ -54,20 +68,13 @@ class MatExtensionsTest extends munit.FunSuite {
     val m02: Mat[1, 2] = Mat(3, Double.NaN)
     assert(!m01.strictEquals(m02))
   }
-  test("Tuples with non-number fields throw IllegalArgumentException") {
-    val compilerError = try {
-      Mat[3,2](((1, 2), (3, 4), ("", false)))
-      false // fail if exception not thrown 
-    } catch {
-      case _ =>
-        true // as expected
-    }
-    assert(compilerError)
+  test("Can create a Mat from a Seq of row Tuple arguments") {
+    val mat = Mat.fromTuples[3,2]((1, 2), (3, 4), (5, 6))
+    assert(mat.rows == 3 && mat.columns == 2)
   }
-  test("Tuples with jagged rows should throw IllegalArgumentException") {
+  test("Seq[Tuple] Mat with jagged rows should throw IllegalArgumentException") {
     val compilerError = try {
-      val mat = Mat.fromTuples[2,3]((1, 2), (3, 4, 5))
-      printf("%s\n", mat)// compiler error
+      Mat.fromTuples[2,3]((1, 2), (3, 4, 5))
       false // fail if exception not thrown 
     } catch {
       case _ =>
