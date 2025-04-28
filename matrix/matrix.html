@@ -106,10 +106,10 @@
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">slash</span><span>.</span><span class="identifier">matrix</span><span>.*
 </span><span class="comment">// create a 3 x 2 matrix of zeros.
 </span><span class="keyword">val</span><span> </span><span class="identifier">m</span><span>:</span><span class="type-name">Mat</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>] = </span><span class="type-name">Mat</span><span>.</span><span class="identifier">zeros</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>]
-</span><span class="comment">// m: Mat[3, 2] = 
-// 0.0, 0.0, 
-// 0.0, 0.0, 
-// 0.0, 0.0,</span></code></pre>
+</span><span class="comment">// m: Mat[3, 2] = 0.0, 0.0
+// 0.0, 0.0
+// 0.0, 0.0
+//</span></code></pre>
         <p>By encoding the matrix&#39;s row and column dimensions into its type, the compiler can prevent a whole category of runtime errors that arise from mismatched matrix dimensions:</p>
         <pre><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">m0</span><span>:</span><span class="type-name">Mat</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>] = </span><span class="type-name">Mat</span><span>.</span><span class="identifier">zeros</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>]
 </span><span class="keyword">val</span><span> </span><span class="identifier">m1</span><span>:</span><span class="type-name">Mat</span><span>[</span><span class="number-literal">2</span><span>, </span><span class="number-literal">3</span><span>] = </span><span class="type-name">Mat</span><span>.</span><span class="identifier">zeros</span><span>[</span><span class="number-literal">2</span><span>, </span><span class="number-literal">3</span><span>]
