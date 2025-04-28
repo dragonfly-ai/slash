@@ -20,7 +20,7 @@ import Vec.*
 import slash.*
 
 case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
-
+  lazy val dimension:Int = valueOf[N]
   lazy val center:Vec[N] = (min + MAX) / 2.0
   lazy val boundingRadius:Double = Math.max(min.magnitude, MAX.magnitude)
 
@@ -48,6 +48,20 @@ case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
   import slash.Random.*
 
   def random(r: scala.util.Random = Random.defaultRandom):Vec[N] = r.between[N](min, MAX)
+
+  def intersects(that: VectorBounds[N]): Boolean = {
+    var overlaps: Boolean = true
+    var i: Int = 0
+    while (overlaps && i < min.dimension) {
+      overlaps = min(i) <= that.MAX(i) && that.min(i) <= MAX(i)
+      i += 1
+    }
+    overlaps
+  }
+
+  def copy:VectorBounds[N] = VectorBounds[N](min.copy, MAX.copy)
+
+  override def toString: String = s"VectorBounds[$dimension](\n  ${min.show},\n  ${MAX.show}\n)"
 
   // Grok 2.0 suggests adding these methods:
 

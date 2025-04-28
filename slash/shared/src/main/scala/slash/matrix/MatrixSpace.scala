@@ -39,10 +39,15 @@ class MatrixSpace[M0 <: Int, N0 <: Int](val rowVectorSpace:VectorSpace[M0], val 
 
   val rowDimension:Int = rowVectorSpace.dimension
   val columnDimension:Int = columnVectorSpace.dimension
+  val MxN:Int = rowDimension * columnDimension
 
   opaque type M <: Int = rowVectorSpace.N
   opaque type N <: Int = columnVectorSpace.N
   opaque type MN <: Int = M * N
+
+  given m: ValueOf[M] = rowVectorSpace.n
+  given n: ValueOf[N] = columnVectorSpace.n
+
 
   inline def apply(values: NArray[Double]): Mat[M, N] = Mat[M, N](values)
 

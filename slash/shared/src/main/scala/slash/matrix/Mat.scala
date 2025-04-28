@@ -20,7 +20,7 @@ import narr.*
 import slash.vector.*
 
 import scala.compiletime.ops.int.*
-import scala.compiletime.{constValue, summonFrom, error}
+import scala.compiletime.{constValue, error, summonFrom}
 import scala.math.hypot
 import scala.Tuple.*
 
@@ -870,22 +870,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   def dim: String = s"dim(${rows}x$columns)"
 
-  def asNativeArray2D:NArray[NArray[Double]] = rowVectors.asInstanceOf[NArray[NArray[Double]]]
-
-  override def toString: String = {
-    val sb: StringBuilder = StringBuilder()
-    var r: Int = 0
-    while (r < rows) {
-      sb.append("\n")
-      var c: Int = 0
-      while (c < columns) {
-        sb.append(s"${apply(r, c)}, ")
-        c = c + 1
-      }
-      r = r + 1
-    }
-    sb.toString()
-  }
+  def asNativeArray2D: NArray[NArray[Double]] = rowVectors.asInstanceOf[NArray[NArray[Double]]]
 
   def strictEquals(obj: Any): Boolean = {
     obj match {
@@ -894,7 +879,9 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
         var same: Boolean = this.MxN == that.MxN && this.rows == that.rows
         while (i < this.MxN && same) {
           inline def thisi = this.values(i)
+
           inline def thati = that.values(i)
+
           same &&= (thisi == thati) // || (thisi.isNaN && thati.isNaN)
           i += 1
         }
@@ -902,4 +889,376 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
       case _ => false
     }
   }
+
+  def render(
+    format: MatFormat = MatFormat.DEFAULT,
+    alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
+    sb: StringBuilder = new StringBuilder()
+  ): StringBuilder = {
+    format.render(this, alignment, sb)
+  }
+
+  override def toString: String = csv
+
+  def csv: String = csv(MatFormat.UNALIGNED, new StringBuilder()).toString
+
+  def csv(
+    alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
+    sb: StringBuilder = new StringBuilder()
+  ): String = render(MatFormat.CSV, alignment, sb).toString
+
+  def tsv: String = tsv(MatFormat.UNALIGNED, new StringBuilder()).toString
+
+  def tsv(
+    alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
+    sb: StringBuilder = new StringBuilder()
+  ): String = render(MatFormat.TSV, alignment, sb).toString
+}
+
+case class MatColumnMetrics(leftLength: NArray[Int], rightLength: NArray[Int], maxLength: NArray[Int])
+
+trait MatFormat {
+  def prefix[M <: Int, N <: Int](m: Mat[M, N]): String
+
+  def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String
+
+  def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String
+
+  def suffix[M <: Int, N <: Int](m: Mat[M, N]): String
+
+  def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String
+
+  def format(d: Double): String = d.toString
+
+  def render[M <: Int, N <: Int](
+    m: Mat[M, N],
+    alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
+    sb: StringBuilder = new StringBuilder()
+  ): StringBuilder = {
+
+    val aligned:NArray[NArray[String]] = alignment(m, this)
+
+    val dlm = delimiter(m)
+    sb.append(prefix(m))
+
+    var r = 0
+    while (r < m.rows) {
+      sb.append(rowPrefix(m))
+      var c = 0
+      while (c < m.columns) {
+        sb.append(aligned(r)(c))
+        sb.append(dlm(r, c))
+        c = c + 1
+      }
+      sb.append(rowSuffix(m)).append("\n")
+      r = r + 1
+    }
+    sb.append(suffix(m))
+  }
+
+  def columnMetrics(m: Mat[? <: Int, ? <: Int]): MatColumnMetrics = {
+    val leftLength: NArray[Int] = NArray.fill[Int](m.columns)(0)
+    val rightLength: NArray[Int] = NArray.fill[Int](m.columns)(0)
+    val maxLength: NArray[Int] = NArray.fill[Int](m.columns)(0)
+
+    var r = 0
+    while (r < m.rows) {
+      var c = 0
+      while (c < m.columns) {
+        val s = format(m(r, c))
+        val parts = s.split('.')
+
+        leftLength(c) = Math.max(leftLength(c), parts(0).length)
+        rightLength(c) = Math.max(rightLength(c), parts(1).length)
+        maxLength(c) = Math.max(maxLength(c), s.length)
+
+        c = c + 1
+      }
+      r = r + 1
+    }
+    MatColumnMetrics(leftLength, rightLength, maxLength)
+  }
+}
+
+object MatFormat {
+
+  import slash.unicode.*
+
+  val UNALIGNED: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m: Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
+    NArray.tabulate[NArray[String]](m.rows)((r: Int) => NArray.tabulate[String](m.columns)((c: Int) => fmt.format(m(r, c))))
+  }
+
+  val ALIGN_LEFT: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
+    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
+      NArray.tabulate[String](m.columns)((c: Int) => {
+        val value = m(r, c)
+        var s = fmt.format(value)
+        while (s.length < mcms.maxLength(c)) s = s + " "
+        s
+      })
+    })
+    out
+  }
+
+  val ALIGN_RIGHT: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
+    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
+      NArray.tabulate[String](m.columns)((c: Int) => {
+        val value = m(r, c)
+        var s = fmt.format(value)
+        while (s.length < mcms.maxLength(c)) s = " " + s
+        s
+      })
+    })
+    out
+  }
+
+  val ALIGN_CENTER: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
+    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
+      NArray.tabulate[String](m.columns)((c: Int) => {
+        val value = m(r, c)
+        var s = fmt.format(value)
+        while (s.length < mcms.maxLength(c)) {
+          s = " " + s
+          if (s.length < mcms.maxLength(c)) s = s + " "
+        }
+        s
+      })
+    })
+    out
+  }
+
+  val ALIGN_ON_DECIMAL: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
+    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
+      NArray.tabulate[String](m.columns)((c: Int) => {
+        val value = m(r, c)
+        var s = fmt.format(value)
+//        val xpnnt: Int = slash.native.getExponent(value)
+//        if (xpnnt > 0) {
+//          val parts = s.split('.')
+//          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
+//          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
+//          s = parts(0) + "." + parts(1)
+//        } else if (xpnnt < 0) {
+//          val parts = s.split('.')
+//          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
+//          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
+//          s = parts(0) + "." + parts(1)
+//        } else {
+          val parts = s.split('.')
+          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
+          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
+          s = parts(0) + "." + parts(1)
+//        }
+        s
+      })
+    })
+    out
+  }
+
+  object DEFAULT extends MatFormat {
+    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = s"Mat[${m.rows}, ${m.columns}](\n"
+
+    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = {
+      if (c == m.columns - 1) {
+        if (r == m.rows - 1) "" else ","
+      } else ", "
+    }
+
+    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ")\n"
+
+    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "  "
+
+    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+  }
+
+  object TUPLE extends MatFormat {
+    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = s"Mat(\n"
+
+    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = {
+      if (c == m.columns - 1) {
+        if (r == m.rows - 1) ")" else "),"
+      } else ", "
+    }
+
+    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ")\n"
+
+    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "  ("
+
+    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+  }
+
+  object TEXTBOOK extends MatFormat {
+    // Mat₍₃ₓ₅₎
+    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = s"Mat${abase(m.rows)}ₓ${abase(m.columns)}\n"
+
+    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = " "
+
+    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = "\n"
+
+    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "│  "
+
+    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = " │\n"
+
+    override def render[M <: Int, N <: Int](
+      m: Mat[M, N],
+      alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
+      sb: StringBuilder = new StringBuilder()
+    ): StringBuilder = {
+
+      val aligned: NArray[NArray[String]] = alignment(m, this)
+
+      val dlm = delimiter(m)
+      sb.append(prefix(m))
+
+      val firstRow: StringBuilder = new StringBuilder()
+      var i:Int = 0
+      while (i < m.columns) {
+        firstRow.append(aligned(0)(i))
+        firstRow.append(dlm(0, i))
+        i = i + 1
+      }
+
+      sb.append("┌ ")
+      i = 0
+      while (i < firstRow.length) {
+        sb.append(" ")
+        i = i + 1
+      }
+      sb.append("  ┐\n")
+
+      sb.append(rowPrefix(m)).append(s"$firstRow").append(rowSuffix(m))
+      var r = 1
+      while (r < m.rows) {
+        sb.append(rowPrefix(m))
+        var c = 0
+        while (c < m.columns) {
+          sb.append(aligned(r)(c))
+          sb.append(dlm(r, c))
+          c = c + 1
+        }
+        sb.append(rowSuffix(m))
+        r = r + 1
+      }
+      sb.append("└ ")
+
+      i = 0
+      while (i < firstRow.length) {
+        sb.append(" ")
+        i = i + 1
+      }
+      sb.append("  ┘")
+      sb.append(suffix(m))
+    }
+  }
+
+  object INDEXED extends MatFormat {
+    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = s"Mat[${m.rows}x${m.columns}]\n"
+
+    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+
+    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = {
+      val maxRowDigits = m.rows.toString.length
+      val maxColDigits = m.columns.toString.length
+      var rs = abase(r + 1)
+      while (rs.length < maxRowDigits) rs = "₀" + rs
+      var cs = abase(c + 1)
+      while (cs.length < maxColDigits) cs = "₀" + cs
+      s"$rs,$cs "
+    }
+
+    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "│  "
+
+    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = "│"
+  }
+
+  case class Delimited(delimeter: String) extends MatFormat {
+    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+
+    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+
+    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = {
+      if (c == m.columns - 1) "" else s"$delimeter "
+    }
+
+    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+
+    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+  }
+
+  lazy val CSV: MatFormat = Delimited(",")
+
+  lazy val TSV: MatFormat = Delimited("\t")
+
+
+  object ASCII extends MatFormat {
+    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+
+    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = if (c == m.columns - 1) "" else ", "
+
+    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+
+    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "| "
+
+    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = " |"
+  }
+
+  def main(args: Array[String]): Unit = {
+    println("Matrix Printing Demo")
+
+    import slash.Random.*
+    val r: scala.util.Random = defaultRandom
+
+    val m = r.nextMatrix[10, 15](Short.MinValue.toDouble, Short.MaxValue.toDouble)
+    //val m = r.nextMatrix[10, 10](Float.MinValue.toDouble, Float.MaxValue.toDouble)
+    m.values(r.nextInt(m.MxN)) = Double.MinPositiveValue
+    m.values(r.nextInt(m.MxN)) = Math.random()
+    m.values(r.nextInt(m.MxN)) = Math.random()
+    m.values(r.nextInt(m.MxN)) = Math.random() / 9875379845.0
+    m.values(r.nextInt(m.MxN)) = Math.random() / 9875379845.0
+    m.values(r.nextInt(m.MxN)) = Math.random() / 9875379845.0
+    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
+    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
+    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
+    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
+    m.values(r.nextInt(m.MxN)) = Double.MaxValue
+
+
+
+    val alignments:Array[(String, Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]])] = {
+      Array[(String, Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]])](
+        ("MatFormat.ALIGN_RIGHT", MatFormat.ALIGN_RIGHT),
+        ("MatFormat.ALIGN_LEFT", MatFormat.ALIGN_LEFT),
+        ("MatFormat.ALIGN_CENTER", MatFormat.ALIGN_CENTER),
+        ("MatFormat.ALIGN_ON_DECIMAL", MatFormat.ALIGN_ON_DECIMAL)
+      )
+    }
+
+    println("Unaligned CSV:")
+    println(m.csv)
+    println("Unaligned TSV:")
+    println(m.tsv)
+
+    for (a <- alignments) {
+      println(s"\n/******** ${a._1} ********/\n")
+      println("DEFAULT:")
+      println(m.render(alignment = a._2))
+      println("TUPLE:")
+      println(m.render(TUPLE, a._2))
+      println("TEXTBOOK:")
+      println(m.render(TEXTBOOK, a._2))
+      println("CSV:")
+      println(m.csv(a._2))
+      println("TSV:")
+      println(m.tsv(a._2))
+      println("ASCII:")
+      println(m.render(ASCII, a._2))
+      println("INDEXED:")
+      println(m.render(INDEXED, a._2))
+    }
+  }
+
 }

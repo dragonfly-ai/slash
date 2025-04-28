@@ -77,7 +77,7 @@ case class ContinuousInterval private (override val code:Int, override val min:D
   override def mean: Double = (MAX - min) / 2.0
   override inline def contains(x: Double): Boolean = x <= MAX && x >= min
   override inline def rangeContains(x:Double):Boolean = contains(x)
-  override def random(r0: Random): Double = r0.between(min, MAX.nextUp)
+  override def random(r0: Random): Double = r0.between(min, if (MAX < Double.MaxValue) MAX.nextUp else MAX)
 }
 
 

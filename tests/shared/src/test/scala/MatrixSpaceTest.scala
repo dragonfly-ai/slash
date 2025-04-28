@@ -17,8 +17,10 @@
 import slash.Random.defaultRandom as r
 import slash.matrix.*
 
+import scala.compiletime.ops.int.*
+
 class MatrixSpaceTest extends munit.FunSuite {
-  test(" testing kitchen sink ") {
+  test(" Runtime Dimensions Test ") {
     var runtimeRowDimension:Int = r.nextInt(42)
     runtimeRowDimension += 2
     var runtimeColumnDimension: Int = r.nextInt(42)
@@ -31,11 +33,15 @@ class MatrixSpaceTest extends munit.FunSuite {
 
     val m: Mat[ms.M, ms.N] = ms.fill(0.01) + (ms.ones + ms.diagonal(42.0) - ms.diagonal(42.0)) * 7.0
 
-    // this exercises VectorSpace.{ones, zeros, tabulate, and fill}
     var i:Int = 0; while (i < m.values.length) {
       assertEquals(m.values(i), 0.01 + 7.0)
       i += 1
     }
+
+    val m1: Mat[ms.M, ms.N] = ms.diagonal(1.0)
+    if (m1.columns > m1.rows) assertEquals(true, Mat.diagonal[ms.M, ms.M](1.0).strictEquals(m1 * m1.transpose))
+    else assertEquals(true, Mat.diagonal[ms.N, ms.N](1.0).strictEquals(m1.transpose * m1))
+
   }
 
 }
