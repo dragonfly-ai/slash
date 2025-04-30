@@ -1035,29 +1035,43 @@ object MatFormat {
     val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
       NArray.tabulate[String](m.columns)((c: Int) => {
         val value = m(r, c)
-        var s = fmt.format(value)
-//        val xpnnt: Int = slash.native.getExponent(value)
-//        if (xpnnt > 0) {
-//          val parts = s.split('.')
-//          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
-//          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
-//          s = parts(0) + "." + parts(1)
-//        } else if (xpnnt < 0) {
-//          val parts = s.split('.')
-//          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
-//          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
-//          s = parts(0) + "." + parts(1)
-//        } else {
-          val parts = s.split('.')
-          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
-          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
-          s = parts(0) + "." + parts(1)
-//        }
-        s
+        val parts = fmt.format(value).split('.')
+        while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
+        while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
+        parts(0) + "." + parts(1)
       })
     })
     out
   }
+  
+//  val ALIGN_ON_MAGNITUDE: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
+//    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+//    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
+//      NArray.tabulate[String](m.columns)((c: Int) => {
+//        val value = m(r, c)
+//        var s = fmt.format(value)
+//        //        val xpnnt: Int = slash.native.getExponent(value)
+//        //        if (xpnnt > 0) {
+//        //          val parts = s.split('.')
+//        //          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
+//        //          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
+//        //          s = parts(0) + "." + parts(1)
+//        //        } else if (xpnnt < 0) {
+//        //          val parts = s.split('.')
+//        //          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
+//        //          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
+//        //          s = parts(0) + "." + parts(1)
+//        //        } else {
+//        val parts = s.split('.')
+//        while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
+//        while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
+//        s = parts(0) + "." + parts(1)
+//        //        }
+//        s
+//      })
+//    })
+//    out
+//  }
 
   object DEFAULT extends MatFormat {
     override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = s"Mat[${m.rows}, ${m.columns}](\n"

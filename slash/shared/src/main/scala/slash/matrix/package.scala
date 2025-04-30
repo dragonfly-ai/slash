@@ -131,7 +131,7 @@ package object matrix {
   /*
    * convert a Mat with non-literal dimensions to canonical form.
    */
-  extension(m: Mat[?,?]) {
+  extension(m: Mat[? <: Int,? <: Int]) {
     def cast[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M,N] = {
       assert(valueOf[M] == m.rows && valueOf[N] == m.columns)
       Mat[M,N](m.values)
