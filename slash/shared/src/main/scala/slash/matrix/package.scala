@@ -133,7 +133,7 @@ package object matrix {
    */
   extension(m: Mat[?,?]) {
     def cast[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M,N] = {
-      dimensionCheck(m.values.size, valueOf[M] * valueOf[N])
+      assert(valueOf[M] == m.rows && valueOf[N] == m.columns)
       Mat[M,N](m.values)
     }
   }
