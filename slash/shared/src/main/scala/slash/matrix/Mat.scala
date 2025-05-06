@@ -403,7 +403,12 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   require(rows * columns == values.length, s"Product of $rows x $columns != ${values.length}")
 
-  inline def lindex(r:Int, c:Int):Int = (r * columns) + c
+  inline def lindex(inline r:Int, c:Int):Int = {
+    (rowIndex(r) * columns) + colIndex(c)
+  }
+  // negative index is relative to max index
+  inline def rowIndex(inline r:Int):Int = if r < 0 then r + rows else r
+  inline def colIndex(inline c:Int):Int = if c < 0 then c + columns else c
 
   /** Make a deep copy of a matrix
     */
@@ -913,6 +918,62 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
     sb: StringBuilder = new StringBuilder()
   ): String = render(MatFormat.TSV, alignment, sb).toString
+
+  /** 
+   *  Matrix row vector view.
+   */
+  inline def apply(inline row:Int, cons: ::.type): MatRow = {
+    new MatRow(row)
+  }
+
+  /** 
+   *  Matrix column vector view.
+   */
+  inline def apply(cons: ::.type, inline column:Int): MatCol = {
+    new MatCol(column)
+  }
+
+  /**
+   * Wrapper class to represent row on LHS or RHS
+   */
+  class MatRow(r: Int) {
+    val row = rowIndex(r)
+    inline def :=(inline vector: Vec[N]): Unit = {
+      val start: Int = row * columns
+      var i = 0
+      while(i < columns) {
+        values(start+i) = vector(i)
+        i += 1
+      }
+    }
+    def show: String = rowVector(row).show
+    def asVec: Vec[N] = rowVector(row)
+  }
+
+  /**
+   * Wrapper class to represent column on LHS or RHS
+   */
+  class MatCol(c: Int) {
+    val column = colIndex(c)
+    inline def :=(inline vector: Vec[M]): Unit = {
+      var row = 0
+      while(row < rows) {
+        values(row * columns + column) = vector(row)
+        row += 1
+      }
+    }
+    def show: String = columnVector(column).show
+    def asVec: Vec[M] = columnVector(column)
+  }
+
+  import scala.language.implicitConversions
+  given matRowConversion: Conversion[MatRow, Vec[N]] with
+    def apply(rowSlice: MatRow): Vec[N] = rowSlice.asVec
+
+  given matColConversion: Conversion[MatCol, Vec[M]] with
+    def apply(colSlice: MatCol): Vec[M] = colSlice.asVec
+
+  export this.given
 }
 
 case class MatColumnMetrics(leftLength: NArray[Int], rightLength: NArray[Int], maxLength: NArray[Int])
