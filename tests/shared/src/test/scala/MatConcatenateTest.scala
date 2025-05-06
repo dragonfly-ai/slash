@@ -49,4 +49,33 @@ class MatConcatenateTest extends munit.FunSuite {
     val allRows = Mat.concatenateColumns(mat1,mat2)
     assert(allRows.strictEquals(expected))
   }
+  test("can multiply concatenated matrices") {
+    val allRows: Mat[4,3] = {
+      val mat1 = Mat[2,3](
+        0,1,2,
+        3,4,5
+      )
+      val mat2 = Mat[2,3](
+        6,7,8,
+        10,11,12
+      )
+      Mat.concatenateRows(mat1,mat2)
+    }
+
+    val allCols: Mat[3,6] = {
+      val mat3 = Mat[3,3](
+        0,1,2,
+        3,4,5,
+        6,7,8,
+      )
+      val mat4 = Mat[3,3](
+        6,7,8,
+        10,11,12,
+        13,14,15
+      )
+      Mat.concatenateColumns(mat3,mat4)
+    }
+    val chek: Mat[4,6] = allRows * allCols
+    printf("%s\n", chek)
+  }
 }
