@@ -154,6 +154,7 @@ class MatUpperLowerTest extends munit.FunSuite {
     val expected = Vec[3](3,6,4)
     printf("mat:\n%s\n", mat)
     val diag: Vec[3] = mat.diagonalVector
+    printf("expected:\n%s\n", expected)
     printf("mat.diagonalVector:\n%s\n", diag)
     assertVecEquals(diag, expected)
   }
