@@ -111,51 +111,6 @@ package object matrix {
   }
 
   /**
-   * Extension methods.
-   */
-  extension[M <: Int, N <: Int](m: Mat[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M,N]]) {
-
-    inline def upperTriangular: Mat[M,N] = {
-      val out:Mat[M, N] = m.copy
-      var i = 0
-      while(i < m.rows){
-        var j = 0
-        while(j < i){
-          out(i,j) = 0.0
-          j += 1
-        }
-        i += 1
-      }
-      out
-    }
-
-    inline def lowerTriangular: Mat[M,N] = {
-      val out:Mat[M, N] = m.copy
-      var i = 0
-      while(i < m.rows){
-        var j = i+1
-        while(j < m.columns){
-          out(i,j) = 0.0
-          j += 1
-        }
-        i += 1
-      }
-      out
-    }
-
-    inline def diagonalVector: Vec[Min[M, N]] = {
-      val dim: Int = valueOf[M].min(valueOf[N])
-      val arr = Vec.zeros[Min[M,N]] // (NArray.fill[Double](dim)(0.0))
-      var i = 0
-      while(i < dim) {
-        arr(i) = m(i,i)
-        i += 1
-      }
-      arr
-    }
-  }
-
-  /**
    * Extension methods for rectangular matrices where M < N.
    */
 
