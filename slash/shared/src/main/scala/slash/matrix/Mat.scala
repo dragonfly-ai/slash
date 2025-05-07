@@ -800,10 +800,10 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
   * @return A + d
   */
   def addScalar(d: Double)(using ValueOf[N]): Mat[M,N] = {
-    for(i <- 0 until rows){
-      for(j <- 0 until columns){
-        apply(i,j) += d
-      }
+    var i:Int = 0
+    while(i < values.length){
+      values(i) += d
+      i += 1
     }
     this
   }
@@ -813,15 +813,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
   * @param d a scalar
   * @return A + d
   */
-  def addScalar(n: Int)(using ValueOf[N]): Mat[M,N] = {
-    val d = n.toDouble
-    for(i <- 0 until rows){
-      for(j <- 0 until columns){
-        apply(i,j) += d.toDouble
-      }
-    }
-    this
-  }
+  def addScalar(n: Int)(using ValueOf[N]): Mat[M,N] = addScalar(n.toDouble)
 
   /** Multiply a matrix by a scalar, C = A * s
     *
@@ -851,10 +843,6 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @return A + s
     */
   inline def - (s: Double): Mat[M, N] = copy.addScalar(-s)
-  inline def - (s: Int): Mat[M, N] = copy.addScalar(-s)
-
-  inline def -= (s:Double):Mat[M, N] = addScalar(-s)
-  inline def -= (s:Int):Mat[M, N] = addScalar(-s)
 
   /** Multiply a matrix by a scalar in place, A = s*A
     *
