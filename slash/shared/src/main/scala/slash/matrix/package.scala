@@ -45,12 +45,7 @@ package object matrix {
     * @param C new horizontal dimension
     * @return same values, but recast to RxC
     */
-    def reshape[R <: Int, C <: Int](using ValueOf[R], ValueOf[C]): Mat[R,C] = {
-      val (msize,nsize) = (valueOf[M], valueOf[N])
-      val (r,c) = (valueOf[R], valueOf[C])
-      require(msize*nsize == r*c, s"$msize x $nsize != $r x $c")
-      new Mat[R,C](a.values)
-    }
+    def reshape[R <: Int, C <: Int](using ValueOf[R], ValueOf[C]): Mat[R,C] = new Mat[R,C](a.values)
 
     /** values as a Vector.
      */
