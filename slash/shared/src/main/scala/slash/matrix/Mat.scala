@@ -919,6 +919,45 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     sb: StringBuilder = new StringBuilder()
   ): String = render(MatFormat.TSV, alignment, sb).toString
 
+  def upperTriangular: Mat[M,N] = {
+    val out:Mat[M, N] = copy
+    var i = 0
+    while(i < rows){
+      var j = 0
+      while(j < i){
+        out(i,j) = 0.0
+        j += 1
+      }
+      i += 1
+    }
+    out
+  }
+
+  def lowerTriangular: Mat[M,N] = {
+    val out:Mat[M, N] = copy
+    var i = 0
+    while(i < rows){
+      var j = i+1
+      while(j < columns){
+        out(i,j) = 0.0
+        j += 1
+      }
+      i += 1
+    }
+    out
+  }
+
+  def diagonalVector(using ValueOf[Min[M,N]]): Vec[Min[M,N]] = {
+    val dim: Int = valueOf[M].min(valueOf[N])
+    val arr: Vec[Min[M,N]] = new DoubleArray(dim).asInstanceOf[Vec[Min[M,N]]]
+    var i = 0
+    while(i < dim) {
+      arr(i) = apply(i,i)
+      i += 1
+    }
+    arr
+  }
+
   /** 
    *  Matrix row vector view.
    */
