@@ -58,6 +58,22 @@ package object matrix {
     inline def *=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.times(s.toDouble)
   }
 
+   * Extension methods for all matrices.
+   */
+  extension[M <: Int, N <: Int](a: Mat[M, N])(using ValueOf[M], ValueOf[N]) {
+
+    /** cast matrix as Mat[R,C]
+    *
+    * @param R new vertical dimension
+    * @param C new horizontal dimension
+    * @return same values, but recast to RxC
+    */
+    def reshape[R <: Int, C <: Int](using ValueOf[R], ValueOf[C]): Mat[R,C] = new Mat[R,C](a.values)
+
+    /** values as a Vector.
+     */
+    def flatten: Vec[M*N] = a.values.asInstanceOf[Vec[M*N]]
+  }
 
   /**
    * Extension Methods for Square Matrices.
