@@ -403,12 +403,17 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   require(rows * columns == values.length, s"Product of $rows x $columns != ${values.length}")
 
-  inline def lindex(inline r:Int, c:Int):Int = {
-    (rowIndex(r) * columns) + colIndex(c)
+  inline def lindex(inline r:Int, c:Int):Int = (rowIndex(r) * columns) + colIndex(c)
+
+  // negative indices are relative to max index
+  inline def rowIndex(inline r:Int):Int = {
+    require(r.abs < rows, s"illegal effective row index $r")
+    if r < 0 then r + rows else r
   }
-  // negative index is relative to max index
-  inline def rowIndex(inline r:Int):Int = if r < 0 then r + rows else r
-  inline def colIndex(inline c:Int):Int = if c < 0 then c + columns else c
+  inline def colIndex(inline c:Int):Int = {
+    require(c.abs < columns, s"illegal effective column index $c")
+    if c < 0 then c + columns else c
+  }
 
   /** Make a deep copy of a matrix
     */
@@ -976,33 +981,33 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
    * Wrapper class to represent row on LHS or RHS
    */
   class MatRow(r: Int) {
-    val row = rowIndex(r)
+    val rowidx: Int = rowIndex(r)
     inline def :=(inline vector: Vec[N]): Unit = {
-      val start: Int = row * columns
+      val start: Int = rowidx * columns
       var i = 0
       while(i < columns) {
         values(start+i) = vector(i)
         i += 1
       }
     }
-    def show: String = rowVector(row).show
-    def asVec: Vec[N] = rowVector(row)
+    def show: String = rowVector(rowidx).show
+    def asVec: Vec[N] = rowVector(rowidx)
   }
 
   /**
    * Wrapper class to represent column on LHS or RHS
    */
   class MatCol(c: Int) {
-    val column = colIndex(c)
+    val colidx: Int = colIndex(c)
     inline def :=(inline vector: Vec[M]): Unit = {
       var row = 0
       while(row < rows) {
-        values(row * columns + column) = vector(row)
+        values(row * columns + colidx) = vector(row)
         row += 1
       }
     }
-    def show: String = columnVector(column).show
-    def asVec: Vec[M] = columnVector(column)
+    def show: String = columnVector(colidx).show
+    def asVec: Vec[M] = columnVector(colidx)
   }
 
   import scala.language.implicitConversions

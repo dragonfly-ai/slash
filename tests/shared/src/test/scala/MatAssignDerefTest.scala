@@ -104,5 +104,75 @@ class MatAssignDerefTest extends munit.FunSuite {
     val expect = Vec[4](5, 6, 7, 8)
     assert(midrow.show == expect.show)
   }
+  
+  // tests for illegal indexes
+  test("verify IllegalArgumentException for row index < -rows"){
+    val mat = Mat[3,4](
+       1,  2,  3,  4,
+       5,  6,  7,  8,
+       9, 10, 11, 12,
+    )
+    val badRowCheck: Boolean = try {
+      val illegalRow: Vec[4] = mat(-4, ::)
+      printf("illegalRow:\n%s\n", illegalRow)
+      false
+    } catch {
+    case _:IllegalArgumentException =>
+      true
+    }
+    printf("badRowCheck is %s\n", badRowCheck)
+    assert(badRowCheck, "failed to throw exception on negative row index")
+  }
+  test("verify IllegalArgumentException for row index >= rows"){
+    val mat = Mat[3,4](
+       1,  2,  3,  4,
+       5,  6,  7,  8,
+       9, 10, 11, 12,
+    )
+    val badRowCheck: Boolean = try {
+      val illegalRow: Vec[4] = mat(3, ::)
+      printf("illegalRow:\n%s\n", illegalRow)
+      false
+    } catch {
+    case _:IllegalArgumentException =>
+      true
+    }
+    printf("badRowCheck is %s\n", badRowCheck)
+    assert(badRowCheck, "failed to throw exception on above bound row index")
+  }
+  test("verify IllegalArgumentException for column index < -columns"){
+    val mat = Mat[3,4](
+       1,  2,  3,  4,
+       5,  6,  7,  8,
+       9, 10, 11, 12,
+    )
+    val badColumnCheck: Boolean = try {
+      val illegalCol: Vec[3] = mat(::, -5)
+      printf("illegalCol:\n%s\n", illegalCol)
+      false
+    } catch {
+    case _:IllegalArgumentException =>
+      true
+    }
+    printf("badColumnCheck is %s\n", badColumnCheck)
+    assert(badColumnCheck, "failed to throw exception on above bound column index")
+  }
+  test("verify IllegalArgumentException for column index >= columns"){
+    val mat = Mat[3,4](
+       1,  2,  3,  4,
+       5,  6,  7,  8,
+       9, 10, 11, 12,
+    )
+    val badColumnCheck: Boolean = try {
+      val illegalCol: Vec[3] = mat(::, 4)
+      printf("illegalCol:\n%s\n", illegalCol)
+      false
+    } catch {
+    case _:IllegalArgumentException =>
+      true
+    }
+    printf("badColumnCheck is %s\n", badColumnCheck)
+    assert(badColumnCheck, "failed to throw exception on above bound column index")
+  }
 
 }
