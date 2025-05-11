@@ -39,25 +39,8 @@ package object matrix {
    */
   extension(s: Double) {
     inline def +[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.addScalar(s)
-    inline def +=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.addScalar(s)
-    inline def -[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.addScalar(-s)
-    inline def -=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.addScalar(-s)
     inline def *[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.times(s)
-    inline def *=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.times(s)
   }
-
-  /**
-   * Support left add / multiply by Ints.
-   */
-  extension(s: Int) {
-    inline def +[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.addScalar(s.toDouble)
-    inline def +=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.addScalar(s.toDouble)
-    inline def -[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.addScalar(-s.toDouble)
-    inline def -=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.addScalar(-s.toDouble)
-    inline def *[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.times(s.toDouble)
-    inline def *=[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.times(s.toDouble)
-  }
-
 
   /**
    * Extension Methods for Square Matrices.

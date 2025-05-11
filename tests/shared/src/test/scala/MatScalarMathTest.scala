@@ -46,4 +46,20 @@ class MatScalarMathTest extends munit.FunSuite {
     assert(m1.strictEquals(m2) && m1.strictEquals(m3) && m1.strictEquals(m4))
   }
 
+  test("verify Mat - scalar") {
+    val matrix = Mat[2,6]( 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+    val expect = Mat[2,6](-1, 0, 1, 2, 3, 4, 5, 6,  7,  8,  9, 10)
+    val matmod = matrix - 3
+    printf("%s\n", matmod)
+    assert(matmod.strictEquals(expect))
+  }
+
+  test("verify Mat -= scalar") {
+    val matrix = Mat[2,6]( 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+    val expect = Mat[2,6](-1, 0, 1, 2, 3, 4, 5, 6,  7,  8,  9, 10)
+    matrix -= 3
+    printf("%s\n", matrix)
+    assert(matrix.strictEquals(expect))
+  }
+
 }

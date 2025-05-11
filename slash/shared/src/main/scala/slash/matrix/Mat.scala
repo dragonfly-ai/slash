@@ -826,12 +826,9 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   inline def += (s:Double):Mat[M, N] = addScalar(s)
 
-  /** Subtract a scalar from a matrix, C = A + s
-    *
-    * @param s scalar
-    * @return A + s
-    */
   inline def - (s: Double): Mat[M, N] = copy.addScalar(-s)
+
+  inline def -= (s: Double): Mat[M, N] = addScalar(-s)
 
   /** Multiply a matrix by a scalar in place, A = s*A
     *
