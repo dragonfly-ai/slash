@@ -239,8 +239,7 @@ object Mat {
    *    non-numeric fields, if present converted to `Double.NaN`
    *
    * @throws IllegalArgumentException on non-numeric fields.
-   * @param t0     a Tuple with M numeric columns (minimum of one row expected)
-   * @param tuparg zero or more Tuples each with M numeric columns
+   * @param tuparg Tuple of Doubles or Tuple of Tuple of Double
    * @return an M x N matrix consisting of values.
    */
   transparent inline def apply[M <: Int, N <: Int](tuparg: Tuple)(using ValueOf[M], ValueOf[N]): Mat[M,N] = {
@@ -795,14 +794,41 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     this
   }
 
-  /** Multiply a matrix by a scalar, C = s*A
+  /** A = A + d
+  *
+  * @param d a scalar
+  * @return A + d
+  */
+  def addScalar(d: Double)(using ValueOf[N]): Mat[M,N] = {
+    var i:Int = 0
+    while(i < values.length){
+      values(i) += d
+      i += 1
+    }
+    this
+  }
+
+  /** Multiply a matrix by a scalar, C = A * s
     *
     * @param s scalar
-    * @return s*A
+    * @return A * s
     */
   inline def * (s: Double): Mat[M, N] = copy.times(s)
 
-  inline def += (s:Double):Mat[M, N] = times(s)
+  inline def *= (s:Double):Mat[M, N] = times(s)
+
+  /** Add a scalar to a matrix, C = A + s
+    *
+    * @param s scalar
+    * @return A + s
+    */
+  inline def + (s: Double): Mat[M, N] = copy.addScalar(s)
+
+  inline def += (s:Double):Mat[M, N] = addScalar(s)
+
+  inline def - (s: Double): Mat[M, N] = copy.addScalar(-s)
+
+  inline def -= (s: Double): Mat[M, N] = addScalar(-s)
 
   /** Multiply a matrix by a scalar in place, A = s*A
     *
