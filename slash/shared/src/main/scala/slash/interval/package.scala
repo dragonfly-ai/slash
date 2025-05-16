@@ -18,6 +18,7 @@ package slash
 
 package object interval {
 
+  import narr.NArray
   import slash.interval.Interval.*
 
   def `[]`(min: Long, MAX: Long): LongInterval = LongInterval(CLOSED, min, MAX)
@@ -68,5 +69,26 @@ package object interval {
     case _: Float => `[]`(min.asInstanceOf[Float], MAX.asInstanceOf[Float]).asInstanceOf[Interval[DOMAIN]]
     case _: Double => `[]`(min.asInstanceOf[Double], MAX.asInstanceOf[Double]).asInstanceOf[Interval[DOMAIN]]
     case a => throw Exception(s"minOf[$a] expects numeric types")
+  }
+
+  /**
+   * Similar semantics to numpy linspace.
+   * @param start starting value of numeric sequence
+   * @param stop last value of sequence
+   * @param num number of samples to generate.  Default is 50.
+   * @returns NArray[Double]
+   */
+  def arithmeticProgression(start: Double, stop: Double, num: Int = 100): NArray[Double] = {
+    assert(num > 1, s"num[$num] is not > 1")
+    val arr = new NArray[Double](num)
+    val dincr: Double = (stop - start) / (num-1).toDouble
+    var d0: Double = start
+    var i = 0
+    while(i < num) { 
+      arr(i) = d0
+      d0 += dincr
+      i += 1
+    }
+    arr
   }
 }
