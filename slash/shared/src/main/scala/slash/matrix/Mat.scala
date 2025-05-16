@@ -328,6 +328,55 @@ object Mat {
     Util.fromString(content)
   }
 
+  /** Vertical tiling of one or more matrices (having same number of columns)
+   */
+  inline def concatenateRows[M <: Int, N <: Int, P <: Int, Q <: Int](m1: Mat[M,N], m2: Mat[P,Q])
+    (using ValueOf[M], ValueOf[N], ValueOf[P], ValueOf[Q], ValueOf[Sum[M,P]], N =:= Q): Mat[Sum[M,P], N] = {
+    val numCols = valueOf[N]
+    val res = Mat.zeros[Sum[M,P], N]
+    var j = 0
+    while(j < numCols) {
+      var i = 0
+      while(i < m1.rows) {
+        res(i,j) = m1(i,j)
+        i += 1
+      }
+      i = 0
+      while(i < m2.rows) {
+        res(i+m1.rows,j) = m2(i,j)
+        i += 1
+      }
+      j += 1
+    }
+    res
+  }
+
+  /** Horizontal tiling of one or more matrices (having same number of rows) */
+  inline def concatenateColumns[M <: Int, N <: Int, P <: Int, Q <: Int](m1: Mat[M,N], m2: Mat[P,Q])
+    (using ValueOf[M], ValueOf[N], ValueOf[P], ValueOf[Q], ValueOf[Sum[N,Q]], M =:= P): Mat[M, Sum[N,Q]] = {
+    val numRows = valueOf[M]
+    val res = Mat.zeros[M, Sum[N,Q]]
+    var i = 0
+    while(i < numRows){
+      var j = 0;
+      while(j < m1.columns) {
+        res(i,j) = m1(i,j)
+        j += 1
+      }
+      j = 0
+      while(j < m2.columns) {
+        res(i,j+m1.columns) = m2(i,j)
+        j += 1
+      }
+      i += 1
+    }
+    res
+  }
+
+  type Sum[N <: Int, Q <: Int] <: Int = N match
+    case 0 => Q
+    case S[n] => S[Sum[n, Q]]
+
   type Number = Int | Float | Long | Double
 
   type IsSingleton[T] <: Boolean = T match
