@@ -984,11 +984,8 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     val rowidx: Int = rowIndex(r)
     inline def :=(inline vector: Vec[N]): Unit = {
       val start: Int = rowidx * columns
-      var i = 0
-      while(i < columns) {
-        values(start+i) = vector(i)
-        i += 1
-      }
+      val src = vector.asInstanceOf[NArray[Double]]
+      narr.native.NArray.copyDoubleArray(src, 0, values, start, columns)
     }
     def show: String = rowVector(rowidx).show
     def asVec: Vec[N] = rowVector(rowidx)
