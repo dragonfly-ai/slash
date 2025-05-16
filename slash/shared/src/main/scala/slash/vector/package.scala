@@ -552,6 +552,7 @@ package object vector {
     extension (d: Double) {
       def *[N <: Int](v: Vec[N]):Vec[N] = v * d
     }
+
   }
 
   export Vec.*
