@@ -19,7 +19,6 @@ package slash.stats.probability.distributions
 import slash.*
 import stats.*
 import slash.interval.*
-import slash.interval.{Domain, Interval}
 
 import scala.language.postfixOps
 

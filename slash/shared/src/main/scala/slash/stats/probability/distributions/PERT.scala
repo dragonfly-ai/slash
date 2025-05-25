@@ -19,7 +19,6 @@ package slash.stats.probability.distributions
 import slash.B
 import slash.stats.*
 import slash.interval.*
-import slash.interval.Interval
 
 case class PERT(min:Double, mode:Double, MAX:Double) extends ParametricProbabilityDistribution[Double] {
 

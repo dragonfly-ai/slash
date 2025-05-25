@@ -20,7 +20,6 @@ import slash.*
 import stats.*
 import slash.Factorial.!
 import slash.interval.*
-import slash.interval.{Domain, Interval}
 
 import scala.language.postfixOps
 
@@ -52,7 +51,7 @@ case class Binomial(n:Long, P:Double) extends ParametricProbabilityDistribution[
    *   n₀ ⊆ ℕ₀ where n₀ = {0, 1, 2, ..., n} and ℕ₀ = ℕ* ∪ {0} = {0, 1, 2, ... ∞}: the natural numbers and 0.
    * and ∀ k < 0 or k > n, PMF(k) = 0.
 
-   * @param x a specific number of successful outcomes given n trials.
+   * @param k a specific number of successful outcomes given n trials.
    *  @return Probability of x successes given n trials.
    */
 

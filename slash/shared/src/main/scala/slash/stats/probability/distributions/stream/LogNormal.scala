@@ -19,7 +19,6 @@ package slash.stats.probability.distributions.stream
 import slash.interval.*
 import slash.{ln, squareInPlace}
 import slash.stats.probability.distributions
-import slash.interval.Interval
 import slash.accumulation.ContinuousAccumulator
 
 class LogNormal extends OnlineProbabilityDistributionEstimator[Double, distributions.LogNormal] with EstimatesPointStatistics[Double] {

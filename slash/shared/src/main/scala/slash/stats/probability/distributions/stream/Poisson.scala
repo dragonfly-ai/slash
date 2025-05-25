@@ -21,7 +21,6 @@ import slash.*
 import slash.interval.*
 import slash.interval.Interval.*
 import slash.accumulation.DiscreteAccumulator
-import slash.interval.Interval
 
 import scala.language.postfixOps
 import scala.language.implicitConversions

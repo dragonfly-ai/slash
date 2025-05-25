@@ -19,7 +19,6 @@ package slash.stats.probability.distributions.stream
 import slash.interval.*
 import slash.stats.*
 import probability.distributions
-import slash.interval.Interval
 import slash.accumulation.ContinuousAccumulator
 import slash.stats.probability.distributions.SamplePointStatistics
 

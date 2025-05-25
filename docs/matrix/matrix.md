@@ -12,8 +12,8 @@ By encoding the matrix's row and column dimensions into its type, the compiler c
 val m0:Mat[3, 2] = Mat.zeros[3, 2]
 val m1:Mat[2, 3] = Mat.zeros[2, 3]
 
-val m2:Mat[3, 3] = m0 * m1
-val m = m2 * m1
+val m:Mat[3, 3] = m0 * m1
+val m = m * m1
 ```
 
 Relatedly, many matrix operations like `determinant`, Cholesky decomposition, etc, only pertain to square matrices.  This library relies on type conditioned extension methods so that users simply cannot attempt to invoke these operations on rectangular matrices.  More specifically:

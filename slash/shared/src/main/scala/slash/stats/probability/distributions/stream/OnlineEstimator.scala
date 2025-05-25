@@ -20,7 +20,6 @@ import slash.*
 import stats.*
 import slash.interval.*
 import probability.distributions.*
-import slash.interval.Interval
 
 import scala.reflect.ClassTag
 

@@ -18,7 +18,6 @@ package slash.stats.probability.distributions.stream
 
 import slash.vector.*
 import narr.*
-import slash.vector.VectorBounds
 
 /**
  * Created by c on 1/10/17.

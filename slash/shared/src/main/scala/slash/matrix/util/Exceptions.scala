@@ -17,7 +17,6 @@
 package slash.matrix.util
 
 import slash.matrix.*
-import slash.matrix.Mat
 
 case class CannotExpressMatrixAsVector[M <: Int, N <: Int](m:Mat[M, N]) extends Exception(
   s"To convert a Matrix to a Vector, one of its dimensions must be 1, but this matrix has dimensions: [${m.rows}x${m.columns}]"

@@ -20,7 +20,6 @@ import slash.stats.probability.distributions
 import slash.*
 import slash.interval.*
 import slash.accumulation.DiscreteAccumulator
-import slash.interval.Interval
 
 import scala.language.postfixOps
 import scala.language.implicitConversions

@@ -153,7 +153,7 @@ class MatExtensionsTest extends munit.FunSuite {
   }
   test("single row Mat from numeric args representing a single row"){
     val m2 = Mat[1,4](1,2,3,4)
-    assert(m2.rows == 1 && m2.columns == 4, s"m2.rows[${m2.rows}] != 1 || m2.columns[${m2.columns}] != 4")
+    assert(m2.rows == 1 && m2.columns == 4, s"m.rows[${m2.rows}] != 1 || m.columns[${m2.columns}] != 4")
   }
   test("single row Mat from a single tuple"){
     val m3 = Mat[1,4]((1,2,3,4))
@@ -177,7 +177,7 @@ class MatExtensionsTest extends munit.FunSuite {
       (-25818.603476607503,   5330.547028842389, -19754.31142736372 ),
       (-14414.095464827511,  17658.70671706525 ,  28269.642346736226)
     ))
-    assert(m1.strictEquals(m2), s"m1[$m1] != m2[$m2]")
-    assert(m2.strictEquals(m3), s"m2[$m2] != m3[$m3]")
+    assert(m1.strictEquals(m2), s"m1[$m1] != m[$m2]")
+    assert(m2.strictEquals(m3), s"m[$m2] != m3[$m3]")
   }
 }

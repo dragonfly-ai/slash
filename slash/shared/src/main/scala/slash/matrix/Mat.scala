@@ -22,8 +22,6 @@ import slash.vector.*
 import scala.compiletime.ops.int.*
 import scala.compiletime.{constValue, error, summonFrom}
 import scala.math.hypot
-import scala.Tuple.*
-
 
 /**
   * This library is fundamentally an adaptation of the Java Mat library, JaMa, by MathWorks Inc. and the National Institute of Standards and Technology.
@@ -210,11 +208,12 @@ object Mat {
   def ones[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = fill[M, N](1.0)
 
 
-  /** Construct a matrix by copying a one-dimensional packed array
+  /** Construct a matrix from a one-dimensional packed array
    *
    * @param values One-dimensional array of doubles, packed by rows.
-   * @param A    number of rows.
-   * @throws IllegalArgumentException Array length must be a multiple of A.
+   * @tparam M the number of rows
+   * @tparam N the number of columns
+   * @throws IllegalArgumentException NArray length must equal M * N
    */
   def apply[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]):Mat[M, N] = new Mat[M, N](values)
 
@@ -275,7 +274,7 @@ object Mat {
    *    inner row tuples share the same arity
    *    tuple Numeric fields converted to type Double
    *    non-numeric fields, if present converted to `Double.NaN`
-   * @param tup a tuple with M Number tuples of arity N
+   * @param tuprows a series of tuples, each representing a row.
    * @return an M x N matrix consisting of values.
    */
   transparent inline def fromTuples[M <: Int, N <: Int](tuprows: Tuple *)(using ValueOf[M], ValueOf[N]): Mat[M, N] = {
@@ -327,55 +326,6 @@ object Mat {
   inline def fromString(inline content: String) = {
     Util.fromString(content)
   }
-
-  /** Vertical tiling of one or more matrices (having same number of columns)
-   */
-  inline def concatenateRows[M <: Int, N <: Int, P <: Int, Q <: Int](m1: Mat[M,N], m2: Mat[P,Q])
-    (using ValueOf[M], ValueOf[N], ValueOf[P], ValueOf[Q], ValueOf[Sum[M,P]], N =:= Q): Mat[Sum[M,P], N] = {
-    val numCols = valueOf[N]
-    val res = Mat.zeros[Sum[M,P], N]
-    var j = 0
-    while(j < numCols) {
-      var i = 0
-      while(i < m1.rows) {
-        res(i,j) = m1(i,j)
-        i += 1
-      }
-      i = 0
-      while(i < m2.rows) {
-        res(i+m1.rows,j) = m2(i,j)
-        i += 1
-      }
-      j += 1
-    }
-    res
-  }
-
-  /** Horizontal tiling of one or more matrices (having same number of rows) */
-  inline def concatenateColumns[M <: Int, N <: Int, P <: Int, Q <: Int](m1: Mat[M,N], m2: Mat[P,Q])
-    (using ValueOf[M], ValueOf[N], ValueOf[P], ValueOf[Q], ValueOf[Sum[N,Q]], M =:= P): Mat[M, Sum[N,Q]] = {
-    val numRows = valueOf[M]
-    val res = Mat.zeros[M, Sum[N,Q]]
-    var i = 0
-    while(i < numRows){
-      var j = 0;
-      while(j < m1.columns) {
-        res(i,j) = m1(i,j)
-        j += 1
-      }
-      j = 0
-      while(j < m2.columns) {
-        res(i,j+m1.columns) = m2(i,j)
-        j += 1
-      }
-      i += 1
-    }
-    res
-  }
-
-  type Sum[N <: Int, Q <: Int] <: Int = N match
-    case 0 => Q
-    case S[n] => S[Sum[n, Q]]
 
   type Number = Int | Float | Long | Double
 
@@ -944,6 +894,49 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
   }
 
   def dim: String = s"dim(${rows}x$columns)"
+
+
+  inline def concatenateRows[M1 <: Int](m: Mat[M1, N])(using ValueOf[M1], ValueOf[+[M, M1]]): Mat[+[M, M1], N] = {
+    val out:NArray[Double] = new NArray[Double](values.length + m.values.length)
+    narr.native.NArray.copyDoubleArray( values, 0, out, 0, values.length )
+    narr.native.NArray.copyDoubleArray( m.values, 0, out, values.length, m.values.length)
+    new Mat[+[M, M1], N](out)
+  }
+
+  inline def concatenateRows(m: Mat[? <: Int, ? <: Int]): NArray[Double] = {
+    val out: NArray[Double] = new NArray[Double](values.length + m.values.length)
+    narr.native.NArray.copyDoubleArray(values, 0, out, 0, values.length)
+    narr.native.NArray.copyDoubleArray(m.values, 0, out, values.length, m.values.length)
+    out
+  }
+
+  inline def concatenateColumns[N1 <: Int](m: Mat[M,N1])(using ValueOf[N1], ValueOf[+[N,N1]]): Mat[M, +[N,N1]] = {
+    val out:NArray[Double] = new NArray[Double](values.length + m.values.length)
+    var r:Int = 0
+    var i:Int = 0
+    while (r < rows) {
+      narr.native.NArray.copyDoubleArray( values, r * columns, out, i, columns )
+      i = i + columns
+      narr.native.NArray.copyDoubleArray( m.values, r * m.columns, out, i, m.columns )
+      i = i + m.columns
+      r = r + 1
+    }
+    new Mat[M, +[N, N1]](out)
+  }
+
+  inline def concatenateColumns(m: Mat[? <: Int, ? <: Int]): NArray[Double] = {
+    val out:NArray[Double] = new NArray[Double](values.length + m.values.length)
+    var r:Int = 0
+    var i:Int = 0
+    while (r < rows) {
+      narr.native.NArray.copyDoubleArray( values, r * columns, out, i, columns )
+      i = i + columns
+      narr.native.NArray.copyDoubleArray( m.values, r * m.columns, out, i, m.columns )
+      i = i + m.columns
+      r = r + 1
+    }
+    out
+  }
 
   def asNativeArray2D: NArray[NArray[Double]] = rowVectors.asInstanceOf[NArray[NArray[Double]]]
 
