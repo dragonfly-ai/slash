@@ -114,17 +114,21 @@
         <pre><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">m0</span><span>:</span><span class="type-name">Mat</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>] = </span><span class="type-name">Mat</span><span>.</span><span class="identifier">zeros</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">2</span><span>]
 </span><span class="keyword">val</span><span> </span><span class="identifier">m1</span><span>:</span><span class="type-name">Mat</span><span>[</span><span class="number-literal">2</span><span>, </span><span class="number-literal">3</span><span>] = </span><span class="type-name">Mat</span><span>.</span><span class="identifier">zeros</span><span>[</span><span class="number-literal">2</span><span>, </span><span class="number-literal">3</span><span>]
 
-</span><span class="keyword">val</span><span> </span><span class="identifier">m2</span><span>:</span><span class="type-name">Mat</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">3</span><span>] = </span><span class="identifier">m0</span><span> * </span><span class="identifier">m1</span><span>
-</span><span class="keyword">val</span><span> </span><span class="identifier">m</span><span> = </span><span class="identifier">m2</span><span> * </span><span class="identifier">m1</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">m</span><span>:</span><span class="type-name">Mat</span><span>[</span><span class="number-literal">3</span><span>, </span><span class="number-literal">3</span><span>] = </span><span class="identifier">m0</span><span> * </span><span class="identifier">m1</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">m</span><span> = </span><span class="identifier">m</span><span> * </span><span class="identifier">m1</span><span>
 </span><span class="comment">// error:
-// None of the overloaded alternatives of method * in class Mat with types
-//  [V &lt;: Int]
-//   (thatMatrix: slash.matrix.Mat[(3 : Int), V])
-//     (using x$2: ValueOf[V]): slash.matrix.Mat[(3 : Int), V]
-//  (s: Double): slash.matrix.Mat[(3 : Int), (3 : Int)]
-// match arguments ((repl.MdocSession.MdocApp.m1 : slash.matrix.Mat[(2 : Int), (3 : Int)]))
-// val m = m2 * m1
-//         ^^^^</span></code></pre>
+// Recursive value m needs type
+// 
+//  Run with -explain-cyclic for more details.
+// val m = m * m1
+//         ^
+// error:
+// Double definition:
+// val m: slash.matrix.Mat[(3 : Int), (2 : Int)] in object MdocApp at line 5 and
+// val m: slash.matrix.Mat[(3 : Int), (3 : Int)] in object MdocApp at line 8
+// 
+// val m:Mat[3, 3] = m0 * m1
+//     ^</span></code></pre>
         <p>Relatedly, many matrix operations like <code>determinant</code>, Cholesky decomposition, etc, only pertain to square matrices.  This library relies on type conditioned extension methods so that users simply cannot attempt to invoke these operations on rectangular matrices.  More specifically:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">extension</span><span> [</span><span class="type-name">MN</span><span> &lt;: </span><span class="type-name">Int</span><span>] (</span><span class="identifier">m</span><span>: </span><span class="type-name">Mat</span><span>[</span><span class="type-name">MN</span><span>, </span><span class="type-name">MN</span><span>])(</span><span class="identifier">using</span><span> </span><span class="type-name">ValueOf</span><span>[</span><span class="type-name">MN</span><span>]) {
   </span><span class="keyword">def</span><span> </span><span class="declaration-name">determinant</span><span>: </span><span class="type-name">Double</span><span> = </span><span class="type-name">LU</span><span>[</span><span class="type-name">MN</span><span>, </span><span class="type-name">MN</span><span>](</span><span class="identifier">m</span><span>).</span><span class="identifier">determinant</span><span>
