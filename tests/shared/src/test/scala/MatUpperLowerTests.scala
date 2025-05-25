@@ -30,9 +30,9 @@ class MatUpperLowerTest extends munit.FunSuite {
       0,2,4,6,
       0,0,6,9,
     )
-    printf("mat:\n%s\n", mat)
+    // printf("mat:\n%s\n", mat)
     val tri = mat.upperTriangular
-    printf("tri.upperTriangular:\n%s\n", tri)
+    // printf("tri.upperTriangular:\n%s\n", tri)
     assert(tri.strictEquals(expected))
   }
   test("verify correct lower triangular wide matrix") {
@@ -46,9 +46,9 @@ class MatUpperLowerTest extends munit.FunSuite {
       6,7,0,0,
       1,3,6,0,
     )
-    printf("mat:\n%s\n", mat)
+    // printf("mat:\n%s\n", mat)
     val tri = mat.lowerTriangular
-    printf("mat.lowerTriangular:\n%s\n", tri)
+    // printf("mat.lowerTriangular:\n%s\n", tri)
     assert(tri.strictEquals(expected))
   }
   test("verify correct upper triangular tall matrix") {
@@ -64,9 +64,9 @@ class MatUpperLowerTest extends munit.FunSuite {
       0,0,2,
       0,0,0,
     )
-    printf("mat tall:\n%s\n", mat)
+    // printf("mat tall:\n%s\n", mat)
     val tri = mat.upperTriangular
-    printf("mat.upperTriangular:\n%s\n", tri)
+    // printf("mat.upperTriangular:\n%s\n", tri)
     assert(tri.strictEquals(expected))
   }
   test("verify correct lower triangular tall matrix") {
@@ -82,9 +82,9 @@ class MatUpperLowerTest extends munit.FunSuite {
       7,3,2,
       4,6,8,
     )
-    printf("mat:\n%s\n", mat)
+    // printf("mat:\n%s\n", mat)
     val tri = mat.lowerTriangular
-    printf("mat.lowerTriangular:\n%s\n", tri)
+    // printf("mat.lowerTriangular:\n%s\n", tri)
     assert(tri.strictEquals(expected))
   }
   test("verify correct upper triangular square matrix") {
@@ -98,9 +98,9 @@ class MatUpperLowerTest extends munit.FunSuite {
       0,5,6,
       0,0,2,
     )
-    printf("mat square:\n%s\n", mat)
+    // printf("mat square:\n%s\n", mat)
     val tri = mat.upperTriangular
-    printf("mat.upperTriangular:\n%s\n", tri)
+    // printf("mat.upperTriangular:\n%s\n", tri)
     assert(tri.strictEquals(expected))
   }
   test("verify correct lower triangular square matrix") {
@@ -114,9 +114,9 @@ class MatUpperLowerTest extends munit.FunSuite {
       4,5,0,
       7,3,2,
     )
-    printf("mat:\n%s\n", mat)
+    // printf("mat:\n%s\n", mat)
     val tri = mat.lowerTriangular
-    printf("mat.lowerTriangular:\n%s\n", tri)
+    // printf("mat.lowerTriangular:\n%s\n", tri)
     assert(tri.strictEquals(expected))
   }
 
@@ -127,9 +127,9 @@ class MatUpperLowerTest extends munit.FunSuite {
       1,3,6,9,
     )
     val expected = Vec[3](1,2,6)
-    printf("mat:\n%s\n", mat)
+    // printf("mat:\n%s\n", mat)
     val diag: Vec[3] = mat.diagonalVector
-    printf("mat.diagonalVector:\n%s\n", diag)
+    // printf("mat.diagonalVector:\n%s\n", diag)
     assertVecEquals(diag, expected)
   }
   test("verify correct diagnonal vector for tall matrix") {
@@ -140,9 +140,9 @@ class MatUpperLowerTest extends munit.FunSuite {
       2,3,4,
     )
     val expected = Vec[3](1,2,9)
-    printf("mat:\n%s\n", mat)
+    // printf("mat:\n%s\n", mat)
     val diag: Vec[3] = mat.diagonalVector
-    printf("mat.diagonalVector:\n%s\n", diag)
+    // printf("mat.diagonalVector:\n%s\n", diag)
     assertVecEquals(diag, expected)
   }
   test("verify correct diagnonal vector for square matrix") {
@@ -152,10 +152,10 @@ class MatUpperLowerTest extends munit.FunSuite {
       2,3,4,
     )
     val expected = Vec[3](3,6,4)
-    printf("mat:\n%s\n", mat)
+    // printf("mat:\n%s\n", mat)
     val diag: Vec[3] = mat.diagonalVector
-    printf("expected:\n%s\n", expected)
-    printf("mat.diagonalVector:\n%s\n", diag)
+    // printf("expected:\n%s\n", expected)
+    // printf("mat.diagonalVector:\n%s\n", diag)
     assertVecEquals(diag, expected)
   }
 }

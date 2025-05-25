@@ -66,8 +66,8 @@ class MatExtensionsTest extends munit.FunSuite {
   }
   test("Tuples with jagged rows should throw IllegalArgumentException") {
     val compilerError = try {
-      val mat = Mat.fromTuples[2,3]((1, 2), (3, 4, 5))
-      printf("%s\n", mat)// compiler error
+      Mat.fromTuples[2,3]((1, 2), (3, 4, 5))
+      // printf("%s\n", mat)// compiler error
       false // fail if exception not thrown 
     } catch {
       case _ =>

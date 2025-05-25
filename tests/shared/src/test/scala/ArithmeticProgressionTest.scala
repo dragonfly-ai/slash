@@ -24,8 +24,8 @@ class ArithmeticProgressionTest extends munit.FunSuite {
     val expect = NArray[Double](-1.0, -0.5, 0.0, 0.5, 1.0)
     val adump = a.mkString(",")
     val edump = expect.mkString(",")
-    printf("a[%s]\n", adump)
-    printf("e[%s]\n", edump)
+    // printf("a[%s]\n", adump)
+    // printf("e[%s]\n", edump)
     assert(adump == edump)
   }
   test("verify arithmeticProgression default length parameter"){
@@ -33,8 +33,8 @@ class ArithmeticProgressionTest extends munit.FunSuite {
     val expect = arithmeticProgression(-1, +1, 100)
     val adump = a.mkString(",")
     val edump = expect.mkString(",")
-    printf("a[%s]\n", adump.take(50))
-    printf("e[%s]\n", edump.take(50))
+    // printf("a[%s]\n", adump.take(50))
+    // printf("e[%s]\n", edump.take(50))
     assert(adump == edump)
   }
 
