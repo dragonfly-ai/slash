@@ -753,14 +753,10 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @return A + B
     */
   def add(B: Mat[M, N]): Mat[M, N] = {
-    var r:Int = 0
-    while (r < rows) {
-      var c:Int = 0
-      while (c < columns) {
-        update(r, c, apply(r, c) + B(r, c))
-        c = c + 1
-      }
-      r = r + 1
+    var v:Int = 0
+    while (v < values.length) {
+      values(v) = values(v) + B.values(v)
+      v = v + 1
     }
     this
   }
@@ -781,14 +777,10 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @return A - B
     */
   def subtract(B: Mat[M, N]): Mat[M, N] = {
-    var r:Int = 0
-    while (r < rows) {
-      var c:Int = 0
-      while (c < columns) {
-        update(r, c, apply(r, c) - B(r, c))
-        c = c + 1
-      }
-      r = r + 1
+    var v:Int = 0
+    while (v < values.length) {
+      values(v) = values(v) - B.values(v)
+      v = v + 1
     }
     this
   }
@@ -835,7 +827,8 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @return replace A by s*A
     */
   def times(s: Double): Mat[M, N] = {
-    var i:Int = 0; while (i < values.length) {
+    var i:Int = 0
+    while (i < values.length) {
       values(i) = values(i) * s
       i += 1
     }
