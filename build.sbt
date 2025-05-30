@@ -4,9 +4,9 @@ import laika.helium.config.IconLink
 import laika.helium.Helium
 import laika.format.Markdown
 import laika.config.SyntaxHighlighting
+import xerial.sbt.Sonatype.sonatypeCentralHost
 
 val globalScalaVersion = "3.3.6"
-
 ThisBuild / organization := "ai.dragonfly"
 ThisBuild / organizationName := "dragonfly.ai"
 ThisBuild / startYear := Some(2023)
@@ -14,6 +14,7 @@ ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List( tlGitHubDev("dragonfly-ai", "dragonfly.ai") )
 ThisBuild / scalaVersion := globalScalaVersion
 ThisBuild / scalacOptions := Seq("semantic-db")
+ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 //ThisBuild / authors := List( "Someone" )
 
 ThisBuild / tlFatalWarnings := false
