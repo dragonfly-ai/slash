@@ -49,6 +49,12 @@ case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
 
   def random(r: scala.util.Random = Random.defaultRandom):Vec[N] = r.between[N](min, MAX)
 
+
+  /**
+   * Determines if this VectorBounds intersects another VectorBounds.
+   * @param that another VectorBounds.
+   * @return true if this VectorBounds intersects that VectorBounds.
+   */
   def intersects(that: VectorBounds[N]): Boolean = {
     var overlaps: Boolean = true
     var i: Int = 0
@@ -57,6 +63,25 @@ case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
       i += 1
     }
     overlaps
+  }
+
+  /**
+   * Determines if the given sphere intersects this VectorBounds.
+   * @param v the center vector of the sphere.
+   * @param radiusSquared the radius of the sphere.
+   * @return true if this VectorBounds intersects the sphere.
+   */
+  def intersectsSphere(v: Vec[N], radiusSquared: Double): Boolean = {
+    var distSquared = 0.0
+
+    var i: Int = 0
+    while (i < min.dimension) {
+      if (v(i) < min(i)) distSquared += squareInPlace(v(i) - min(i))
+      else if (v(i) > MAX(i)) distSquared += squareInPlace(v(i) - MAX(i))
+      i = i + 1
+    }
+    
+    distSquared <= radiusSquared
   }
 
   def copy:VectorBounds[N] = VectorBounds[N](min.copy, MAX.copy)
