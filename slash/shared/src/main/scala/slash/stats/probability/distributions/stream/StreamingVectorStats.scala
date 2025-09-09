@@ -71,5 +71,5 @@ class StreamingVectorStats[N <: Int](using ValueOf[N]) {  // Why doesn't this ex
     Vec[N](maxValues)
   )
 
-  override def toString: String = s"StreamingVectorStats(\n\t$s0\n\t${Vec[N](s1).render()}\n\t${Vec[N](s2).render()}\n\tAverage: ${average().render()}\n\tVariance: ${variance.render()}\n\tStandard Deviation: ${standardDeviation.render()})"
+  override def toString: String = s"StreamingVectorStats(\n\ts0: $s0\n\ts1: ${Vec[N](s1).render()}\n\ts2: ${Vec[N](s2).render()}\n\tminValues: ${Vec[N](minValues).render()}\n\tmaxValues: ${Vec[N](maxValues).render()}\n\tAverage: ${average().render()}\n\tVariance: ${variance.render()}\n\tStandard Deviation: ${standardDeviation.render()})"
 }
