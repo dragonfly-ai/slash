@@ -323,7 +323,7 @@ Unfortunately, this means having to think about a concept that no other math lib
 
 Projects that rely on this Library:
 
-https://github.com/dragonfly-ai/bitfrost
+https://github.com/dragonfly-ai/uriel
 
 https://github.com/dragonfly-ai/spatial
 
