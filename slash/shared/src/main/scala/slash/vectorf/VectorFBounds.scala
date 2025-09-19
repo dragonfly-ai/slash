@@ -22,7 +22,7 @@ import slash.vectorf.vectorf.VecF
 case class VectorFBounds[N <: Int](min: VecF[N], MAX: VecF[N])(using ValueOf[N]) {
   lazy val dimension:Int = valueOf[N]
   lazy val center:VecF[N] = (min + MAX) / 2.0
-  lazy val boundingRadius:Float = Math.max(min.magnitude, MAX.magnitude)
+  lazy val boundingRadius:Double = Math.max(min.magnitude, MAX.magnitude)
 
   def contains(v: VecF[N]):Boolean = {
     var o:Boolean = true
