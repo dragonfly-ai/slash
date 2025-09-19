@@ -267,24 +267,24 @@ package object vectorf {
       inline def mean: Float = thisVector.sum / thisVector.dimension
 
       //It is assumed, that we consider a sample rather than a complete population
-      def variance: Float = {
+      def variance: Double = {
         // https://www.cuemath.com/sample-variance-formula/
         val μ = thisVector.mean
         thisVector.map(i => squareInPlace(i - μ)).sum / (thisVector.dimension - 1)
-      }.toFloat
+      }
 
       // It is assumed, that we consider a sample rather than a complete population
-      def stdDev: Float = {
+      def stdDev: Double = {
         // https://www.cuemath.com/data/standard-deviation/
         val mu = thisVector.mean
         val diffs_2 = thisVector.map( num => squareInPlace(num - mu) )
-        Math.sqrt( diffs_2.sum / (thisVector.dimension - 1 ) ).toFloat
+        Math.sqrt( diffs_2.sum / (thisVector.dimension - 1 ) )
       }
 
-      def covariance(thatVector : VecF[N] ):Float = {
+      def covariance(thatVector : VecF[N] ):Double = {
         val μThis = thisVector.mean
         val μThat = thatVector.mean
-        var cv:Float = 0
+        var cv:Double = 0
         var i:Int = 0; while (i < thisVector.dimension) {
           cv += (thisVector(i) - μThis) * (thatVector(i) - μThat)
           i += 1
@@ -292,92 +292,31 @@ package object vectorf {
         cv / (thisVector.dimension -1)
       }
 
-      def pearsonCorrelationCoefficient(thatVector: VecF[N]): Float = {
-        val n = thisVector.dimension
-        var i = 0
-
-        var sum_x = 0.0
-        var sum_y = 0.0
-        var sum_xy = 0.0
-        var sum_x2 = 0.0
-        var sum_y2 = 0.0
-
-        while (i < n) {
-          sum_x = sum_x + thisVector(i)
-          sum_y = sum_y + thatVector(i)
-          sum_xy = sum_xy + thisVector(i) * thatVector(i)
-          sum_x2 = sum_x2 + squareInPlace(thisVector(i))
-          sum_y2 = sum_y2 + squareInPlace(thatVector(i))
-          i = i + 1
-        }
-        (n * sum_xy - (sum_x * sum_y)) / Math.sqrt( (sum_x2 * n - squareInPlace(sum_x)) * (sum_y2 * n - squareInPlace(sum_y)) )
-      }.toFloat
-
-      def spearmansRankCorrelation(thatVector: VecF[N]) : Float = {
-        val theseRanks = thisVector.elementRanks
-        val thoseRanks = thatVector.elementRanks
-        theseRanks.pearsonCorrelationCoefficient(thoseRanks)
-      }
-
-
-      // An alias - pearson is the most commonly requested type of correlation
-      inline def corr(thatVector: VecF[N]): Float = pearsonCorrelationCoefficient(thatVector)
-
-      def elementRanks: VecF[N] = {
-        val indexed:NArray[(Float, Int)] = thisVector.zipWithIndex
-        indexed.sort(rankVariableSort)
-
-        val ranks : VecF[N] = new FloatArray(thisVector.dimension) // faster than zeros.
-        ranks(indexed.last._2) = thisVector.dimension
-        var currentValue:Float = indexed(0)._1
-        var r0:Int = 0
-        var rank:Int = 1
-        while (rank < thisVector.dimension) {
-          val temp: Float = indexed(rank)._1
-          val end:Int = {
-            if (temp != currentValue) rank
-            else if (rank == thisVector.dimension - 1) rank + 1
-            else -1
-          }
-          if (end > -1) {
-            val avg: Float = (1.0f + (end + r0)) / 2.0f
-            var i:Int = r0; while (i < end) {
-              ranks(indexed(i)._2) = avg
-              i += 1
-            }
-            r0 = rank
-            currentValue = temp
-          }
-          rank += 1
-        }
-        ranks
-      }
-
-      def normSquared: Float = {
+      def normSquared: Double = {
         var mag2 = 0.0
         var i = 0; while (i < dimension) {
           mag2 = mag2 + squareInPlace(thisVector(i))
           i = i + 1
         }
-        mag2.toFloat
+        mag2
       }
 
-      inline def norm: Float = Math.sqrt(normSquared).toFloat
+      inline def norm: Double = Math.sqrt(normSquared)
 
-      inline def magnitude: Float = norm
+      inline def magnitude: Double = norm
 
-      inline def magnitudeSquared: Float = normSquared
+      inline def magnitudeSquared: Double = normSquared
 
-      def euclideanDistanceSquaredTo(v0: VecF[N]): Float = {
+      def euclideanDistanceSquaredTo(v0: VecF[N]): Double = {
         var distance = 0.0
         var i = 0; while (i < dimension) {
           distance = distance + squareInPlace(thisVector(i) - v0(i))
           i = i + 1
         }
-        distance.toFloat
+        distance
       }
 
-      inline def euclideanDistanceTo(v0: VecF[N]): Float = Math.sqrt(euclideanDistanceSquaredTo(v0)).toFloat
+      inline def euclideanDistanceTo(v0: VecF[N]): Double = Math.sqrt(euclideanDistanceSquaredTo(v0))
 
       def + (scalar: Float): VecF[N] = {
         val vOut = copy
@@ -514,7 +453,7 @@ package object vectorf {
       }
 
       inline def normalize(): Unit = {
-        val n: Float = norm
+        val n: Float = norm.toFloat
         if (n > 0.0) divide(n)
         else throw VectorNormalizationException(thisVector)
       }
@@ -533,7 +472,7 @@ package object vectorf {
         case _ => render().toString()
       }
 
-      def render(format:VecFormat = VecFormat.Default, sb: StringBuilder = new StringBuilder() ): StringBuilder = {
+      def render(format:VecFFormat = VecFFormat.Default, sb: StringBuilder = new StringBuilder() ): StringBuilder = {
         import format.*
         sb.append(prefix(thisVector))
         val end:Int = dimension - 1
@@ -547,9 +486,9 @@ package object vectorf {
       }
 
       def csv: String = csv(new StringBuilder()).toString
-      def csv(sb: StringBuilder = new StringBuilder()): String = render(VecFormat.CSV, sb).toString
+      def csv(sb: StringBuilder = new StringBuilder()): String = render(VecFFormat.CSV, sb).toString
       def tsv: String = tsv(new StringBuilder()).toString
-      def tsv(sb: StringBuilder = new StringBuilder()): String = render(VecFormat.TSV, sb).toString
+      def tsv(sb: StringBuilder = new StringBuilder()): String = render(VecFFormat.TSV, sb).toString
     }
 
     extension (d: Float) {
@@ -560,34 +499,34 @@ package object vectorf {
 
   export VecF.*
 
-  trait VecFormat {
+  trait VecFFormat {
     def prefix[N <: Int](v:VecF[N]): String
     def delimiter(index:Int): String
     def suffix[N <: Int](v:VecF[N]): String
     def numberFormatter(value: Float): String = value.toString
   }
 
-  object VecFormat {
+  object VecFFormat {
 
-    object Default extends VecFormat {
+    object Default extends VecFFormat {
       override def prefix[N <: Int](v: VecF[N]): String = s"《${exalt(v.length)}↗〉"
       override def delimiter(i: Int): String = ", "
       override def suffix[N <: Int](v: VecF[N]): String = "〉"
     }
 
-    object Indexed extends VecFormat {
+    object Indexed extends VecFFormat {
       override def prefix[N <: Int](v: VecF[N]): String = s"《${exalt(v.length)}↗〉"
       override def delimiter(i: Int): String = s"${abase(i)} "
       override def suffix[N <: Int](v: VecF[N]): String = "〉"
     }
 
-    object CSV extends VecFormat {
+    object CSV extends VecFFormat {
       override def prefix[N <: Int](v: VecF[N]): String = ""
       override def delimiter(i: Int): String = ","
       override def suffix[N <: Int](v: VecF[N]): String = ""
     }
 
-    object TSV extends VecFormat {
+    object TSV extends VecFFormat {
       override def prefix[N <: Int](v: VecF[N]): String = ""
 
       override def delimiter(i: Int): String = "\t"
