@@ -36,8 +36,4 @@ v_ones
 
 v.mean
 
-v.corr(v_rand)
-
-v_rand.elementRanks
-
 ```
