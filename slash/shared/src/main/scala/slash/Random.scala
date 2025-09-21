@@ -58,4 +58,7 @@ object Random {
     inline def nextMatrix[M <: Int, N <: Int](maxNorm:Double = 1.0)(using ValueOf[M], ValueOf[N]): Mat[M, N] = Mat.random[M, N](0.0, maxNorm, r)
     inline def nextMatrix[M <: Int, N <: Int](minNorm:Double, normMAX:Double)(using ValueOf[M], ValueOf[N]): Mat[M, N] = Mat.random[M, N](minNorm, normMAX, r)
 
+    inline def nextMatrixF[M <: Int, N <: Int](maxNorm: Float = 1.0)(using ValueOf[M], ValueOf[N]): matrixf.MatF[M, N] = matrixf.MatF.random[M, N](0.0, maxNorm, r)
+    inline def nextMatrixF[M <: Int, N <: Int](minNorm: Float, normMAX: Float)(using ValueOf[M], ValueOf[N]): matrixf.MatF[M, N] = matrixf.MatF.random[M, N](minNorm, normMAX, r)
+
 }

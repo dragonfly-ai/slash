@@ -17,7 +17,7 @@
 package slash.matrix.decomposition
 
 import slash.matrix.*
-import slash.matrix.util.MatrixNotSymmetricPositiveDefinite
+import slash.exceptions.*
 
 object Cholesky {
 

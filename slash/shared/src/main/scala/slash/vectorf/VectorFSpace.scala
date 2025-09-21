@@ -18,12 +18,12 @@ package slash.vectorf
 
 import narr.NArray
 import vectorf.VecF
-import slash.vector.dimensionCheck
+
+import slash.*
 
 object VectorFSpace {
   def apply(dimension:Int):VectorFSpace[dimension.type] = new VectorFSpace[dimension.type]
 }
-
 
 class VectorFSpace[N0 <: Int](using dt: ValueOf[N0]) {
 

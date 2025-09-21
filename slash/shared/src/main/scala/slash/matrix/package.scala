@@ -17,8 +17,9 @@
 package slash
 
 import narr.*
-import slash.vector.{Vec, *}
-import slash.matrix.decomposition.{SV, *}
+
+import slash.vector.*
+import slash.matrix.decomposition.*
 
 import scala.compiletime.ops.int.*
 import scala.compiletime.ops.any.==

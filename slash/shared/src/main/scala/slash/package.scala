@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import narr.*
+
 package object slash {
 
   inline def squareInPlace(b:Byte): Byte = (b*b).toByte
@@ -252,5 +254,19 @@ package object slash {
     inline def >(x: BigInt): Boolean = bd > BigDecimal(x)
     inline def <=(x: BigInt): Boolean = bd <= BigDecimal(x)
     inline def >=(x: BigInt): Boolean = bd >= BigDecimal(x)
+  }
+
+  inline def dimensionCheck(supplied: Int, required: Int): Unit = {
+    if (supplied != required) throw slash.exceptions.UnsupportedVectorDimension(supplied, required)
+  }
+
+  inline def dimensionCheck(values: NArray[Double], requiredDimension: Int): NArray[Double] = {
+    dimensionCheck(values.length, requiredDimension)
+    values
+  }
+
+  inline def dimensionCheck(values: NArray[Float], requiredDimension: Int): NArray[Float] = {
+    dimensionCheck(values.length, requiredDimension)
+    values
   }
 }

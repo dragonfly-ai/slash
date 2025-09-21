@@ -16,14 +16,12 @@
 
 package slash.vectorf
 
-import slash.vector.dimensionCheck
-
-import slash.Random.nextVecF
-import slash.vectorf.*
 import narr.*
-import slash.{degreesToRadians, squareInPlace}
+
+import slash.*
 import slash.interval.*
 import slash.unicode.*
+import slash.Random.nextVecF
 
 import scala.language.implicitConversions
 import scala.compiletime.ops.any.==
@@ -80,7 +78,7 @@ package object vectorf {
       val dimension:Int = valueOf[N]
       dimensionCheck(d.size, dimension)
       d.size match {
-        case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
+        case dim if dim < 2 => throw slash.exceptions.UnsupportedVectorDimension(dim)
         case 2 => apply(d(0), d(1))
         case 3 => apply(d(0), d(1), d(2))
         case 4 => apply(d(0), d(1), d(2), d(3))
@@ -101,7 +99,7 @@ package object vectorf {
       for (v <- `[v₁v₂⋯vₙ]`.tail) {
         μ += v
       }
-      μ /= `[v₁v₂⋯vₙ]`.size
+      μ /= `[v₁v₂⋯vₙ]`.size.toFloat
       μ
     }
 
@@ -110,7 +108,7 @@ package object vectorf {
       for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
         μ += `[v₀v₁⋯v₍ₙ₋₁₎]`(i)
       }
-      μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length //.asInstanceOf[VecF[N]]
+      μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length.toFloat //.asInstanceOf[VecF[N]]
       μ
     }
 
@@ -138,7 +136,7 @@ package object vectorf {
     def fromTuple(t: (Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float)):VecF[21] = VecF.tabulate(i => DBL(t(i)))
     def fromTuple(t: (Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float)):VecF[22] = VecF.tabulate(i => DBL(t(i)))
 
-    private val rankVariableSort: Ordering[(Float, Int)] = Ordering.by(_._1)
+//    private val rankVariableSort: Ordering[(Float, Int)] = Ordering.by(_._1)
 
     extension[N <: Int] (thisVector: VecF[N])(using ValueOf[N], N >= 1 =:= true) {
       inline def x: Float = thisVector(0)
@@ -455,7 +453,7 @@ package object vectorf {
       inline def normalize(): Unit = {
         val n: Float = norm.toFloat
         if (n > 0.0) divide(n)
-        else throw VectorNormalizationException(thisVector)
+        else throw slash.exceptions.VectorNormalizationException(thisVector.render().toString())
       }
 
       def normalized: VecF[N] = {
@@ -536,22 +534,3 @@ package object vectorf {
   }
 
 }
-
-case class UnsupportedVectorDimension(givenDimension:Int, requiredDimension:Int = -1) extends Exception(
-  givenDimension match {
-    case gd:Int if gd < 2 => s"Vector dimensions must exceed 1.  Cannot create a vector of dimension: $givenDimension"
-    case _ => s"Expected Vector dimension: $requiredDimension, but observed: $givenDimension"
-  }
-)
-
-case class VectorNormalizationException[N <: Int](v:vectorf.VecF[N]) extends Exception({
-  import vectorf.*
-  import VecF.*
-  s"Can't normalize ${v.render()}"
-})
-
-case class ExtraDimensionalAccessException[N <: Int](v:vectorf.VecF[N], ci: Int) extends Exception({
-  import vectorf.*
-  import VecF.*
-  s"Index: $ci exceeds dimensionality of Euclidean object${v.dimension}: ${v.render()}"
-})

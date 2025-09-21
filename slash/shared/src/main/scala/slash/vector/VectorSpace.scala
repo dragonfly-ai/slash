@@ -16,6 +16,7 @@
 
 package slash.vector
 
+import slash.*
 import narr.NArray
 
 object VectorSpace {

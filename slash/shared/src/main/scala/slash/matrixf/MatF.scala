@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package slash.matrix
+package slash.matrixf
 
-import slash.*
 import narr.*
-import slash.vector.*
+import slash.*
+import vectorf.vectorf.VecF
 
 import scala.compiletime.ops.int.*
 import scala.compiletime.{constValue, error, summonFrom}
 import scala.math.hypot
 
 /**
-  * This library is fundamentally an adaptation of the Java Mat library, JaMa, by MathWorks Inc. and the National Institute of Standards and Technology.
+  * This library is fundamentally an adaptation of the Java MatF library, JaMa, by MathWorks Inc. and the National Institute of Standards and Technology.
   */
 
-object Mat {
+object MatF {
   /** Construct a matrix from a copy of an array.
    *
-   * @param values array of doubles.
+   * @param values array of Floats.
    * @throws IllegalArgumentException All rows must have the same length
    */
-  inline def copyFrom[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]): Mat[M, N] = apply(narr.copy[Double](values))
+  inline def copyFrom[M <: Int, N <: Int](values: NArray[Float])(using ValueOf[M], ValueOf[N]): MatF[M, N] = apply(narr.copy[Float](values))
 
   /** Construct a matrix of random values.
    */
-  inline def random[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = random[M, N](slash.Random.defaultRandom)
+  inline def random[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): MatF[M, N] = random[M, N](slash.Random.defaultRandom)
 
   /**
    * Generates an MxN matrix which consists of elements randomized between [-1.0, 1.0] inclusive.
@@ -47,8 +47,8 @@ object Mat {
    * @tparam N the number of columns
    * @return An MxN matrix with uniformly distributed random elements.
    */
-  inline def random[M <: Int, N <: Int](r:scala.util.Random)(using ValueOf[M], ValueOf[N]):Mat[M, N] = {
-    random(slash.interval.`[]`(-1.0, 1.0), r)
+  inline def random[M <: Int, N <: Int](r:scala.util.Random)(using ValueOf[M], ValueOf[N]):MatF[M, N] = {
+    random(slash.interval.`[]`(-1.0f, 1.0f), r)
   }
 
 
@@ -61,9 +61,9 @@ object Mat {
    * @return An MxN matrix with uniformly distributed random elements.
    */
   inline def random[M <: Int, N <: Int](
-    minNorm: Double,
-    normMAX: Double
-  )(using ValueOf[M], ValueOf[N]): Mat[M, N] = random[M, N](minNorm, normMAX, slash.Random.defaultRandom)
+    minNorm: Float,
+    normMAX: Float
+  )(using ValueOf[M], ValueOf[N]): MatF[M, N] = random[M, N](minNorm, normMAX, slash.Random.defaultRandom)
 
 
   /** Generate matrix with random elements
@@ -75,10 +75,10 @@ object Mat {
    * @return An MxN matrix with uniformly distributed random elements.
    */
   inline def random[M <: Int, N <: Int](
-    minNorm:Double,
-    normMAX:Double,
+    minNorm:Float,
+    normMAX:Float,
     r:scala.util.Random
-  )(using ValueOf[M], ValueOf[N]): Mat[M, N] = random[M, N](slash.interval.`[]`(minNorm, normMAX), r)
+  )(using ValueOf[M], ValueOf[N]): MatF[M, N] = random[M, N](slash.interval.`[]`(minNorm, normMAX), r)
 
   /** Generate matrix with random elements
    *
@@ -89,10 +89,10 @@ object Mat {
    * @return An MxN matrix with uniformly distributed random elements.
    */
   def random[M <: Int, N <: Int](
-    interval:slash.interval.Interval[Double],
+    interval:slash.interval.FloatInterval,
     r: scala.util.Random
-  )(using ValueOf[M], ValueOf[N]): Mat[M, N] = new Mat[M, N](
-    NArray.tabulate[Double]( valueOf[M] * valueOf[N] )( _ => interval.random(r) )
+  )(using ValueOf[M], ValueOf[N]): MatF[M, N] = new MatF[M, N](
+    NArray.tabulate[Float]( valueOf[M] * valueOf[N] )( _ => interval.random(r) )
   )
 
   /** Generate identity matrix
@@ -101,7 +101,7 @@ object Mat {
    * @tparam N the number of columns
    * @return An MxN matrix with ones on the diagonal and zeros elsewhere.
    */
-  def identity[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = diagonal[M, N](1.0)
+  def identity[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): MatF[M, N] = diagonal[M, N](1.0)
 
 
   /**
@@ -115,8 +115,8 @@ object Mat {
    * @return An MxN matrix with ones on the diagonal and zeros elsewhere.
    */
 
-  def diagonal[M <: Int, N <: Int](value:Double)(using ValueOf[M], ValueOf[N]): Mat[M, N] = {
-    val out:Mat[M, N] = zeros[M, N]
+  def diagonal[M <: Int, N <: Int](value:Float)(using ValueOf[M], ValueOf[N]): MatF[M, N] = {
+    val out:MatF[M, N] = zeros[M, N]
     val min:Int = Math.min(valueOf[M], valueOf[N])
     var i:Int = 0
     while (i < min) {
@@ -131,8 +131,8 @@ object Mat {
    * @param v a vector
    * @return
    */
-  def diagonal[D <: Int](v:Vec[D])(using ValueOf[D]): Mat[D, D] = {
-    val out:Mat[D, D] = zeros[D, D]
+  def diagonal[D <: Int](v:VecF[D])(using ValueOf[D]): MatF[D, D] = {
+    val out:MatF[D, D] = zeros[D, D]
     var i:Int = 0
     while (i < v.dimension) {
       out(i, i) = v(i)
@@ -141,12 +141,12 @@ object Mat {
     out
   }
 
-  def diagonal[M <: Int, N <: Int, D <: Int](v: Vec[D])(using ValueOf[M], ValueOf[N], ValueOf[D]): Mat[M, N] = {
+  def diagonal[M <: Int, N <: Int, D <: Int](v: VecF[D])(using ValueOf[M], ValueOf[N], ValueOf[D]): MatF[M, N] = {
 
     val rows:Int = valueOf[M]
     val columns:Int = valueOf[N]
 
-    val out: Mat[M, N] = zeros[M, N]
+    val out: MatF[M, N] = zeros[M, N]
 
     var i: Int = 0
     while (i < Math.min(valueOf[D], Math.min(rows, columns))) {
@@ -156,42 +156,14 @@ object Mat {
     out
   }
 
-  /** Construct a matrix from a 2-D array.
-   *
-   * @param arr2d Two-dimensional array of doubles.  arr2d(row)(column).
-   * @throws IllegalArgumentException All rows must have the same length
-   */
-
-  def apply[M <: Int, N <: Int](arr2d:NArray[Vec[N]])(using ValueOf[M], ValueOf[N]):Mat[M, N] = {
-    val columns:Int = valueOf[N]
-    var r:Int = 0; while (r < arr2d.length) {
-      if (arr2d(r).dimension != columns) throw new IllegalArgumentException("Cannot create a Mat from a Jagged Array.")
-      r += 1
-    }
-
-    val rows:Int = valueOf[M]
-    val values:NArray[Double] = new NArray[Double](rows * columns)
-    var i:Int = 0
-    r = 0; while (r < rows) {
-      var c:Int = 0; while (c < columns) {
-        values(i) = arr2d(r)(c)
-        i += 1
-        c += 1
-      }
-      r += 1
-    }
-    new Mat[M, N](values)
-  }
-
-
   /** Construct an MxN constant matrix.
    * @param value Fill the matrix with this scalar value.
    * @tparam M the number of rows
    * @tparam N the number of columns
    * @return an MxN constant matrix.
    */
-  def fill[M <: Int, N <: Int](value: Double)(using ValueOf[M], ValueOf[N]):Mat[M, N] = apply[M, N](
-    NArray.fill[Double](valueOf[M] * valueOf[N])(value)
+  def fill[M <: Int, N <: Int](value: Float)(using ValueOf[M], ValueOf[N]):MatF[M, N] = apply[M, N](
+    NArray.fill[Float](valueOf[M] * valueOf[N])(value)
   )
 
   /** Construct an MxN matrix of zeros.
@@ -199,24 +171,24 @@ object Mat {
    * @tparam M the number of rows
    * @tparam N the number of columns
    */
-  def zeros[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]):Mat[M, N] = fill[M, N](0.0)
+  def zeros[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]):MatF[M, N] = fill[M, N](0.0)
 
   /** Construct an MxN matrix of ones.
    *
    * @tparam M the number of rows
    * @tparam N the number of columns
    */
-  def ones[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = fill[M, N](1.0)
+  def ones[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): MatF[M, N] = fill[M, N](1.0)
 
 
   /** Construct a matrix from a one-dimensional packed array
    *
-   * @param values One-dimensional array of doubles, packed by rows.
+   * @param values One-dimensional array of Floats, packed by rows.
    * @tparam M the number of rows
    * @tparam N the number of columns
    * @throws IllegalArgumentException NArray length must equal M * N
    */
-  def apply[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]):Mat[M, N] = new Mat[M, N](values)
+  def apply[M <: Int, N <: Int](values: NArray[Float])(using ValueOf[M], ValueOf[N]):MatF[M, N] = new MatF[M, N](values)
 
   /**
    *
@@ -225,28 +197,75 @@ object Mat {
    * @tparam N the number of columns
    * @return an M x N matrix consisting of values.
    */
-  def apply[M <: Int, N <: Int](values: Double *)(using ValueOf[M], ValueOf[N]):Mat[M, N] = {
+  def apply[M <: Int, N <: Int](values: Float *)(using ValueOf[M], ValueOf[N]):MatF[M, N] = {
     dimensionCheck(values.size, valueOf[M] * valueOf[N])
-    new Mat[M, N](NArray[Double](values *))
+    new MatF[M, N](NArray[Float](values *))
   }
 
-  /** Construct a Mat from a tuple literal.
+  /** Construct a matrix from a 2-D array.
+   *
+   * @param arr2d Two-dimensional array of Floats.  arr2d(row)(column).
+   * @throws IllegalArgumentException All rows must have the same length
+   */
+
+  def apply[M <: Int, N <: Int](arr2d: NArray[VecF[N]])(using ValueOf[M], ValueOf[N]): MatF[M, N] = {
+    val columns: Int = valueOf[N]
+    var r: Int = 0;
+    while (r < arr2d.length) {
+      if (arr2d(r).dimension != columns) throw new IllegalArgumentException("Cannot create a MatF from a Jagged Array.")
+      r += 1
+    }
+
+    val rows: Int = valueOf[M]
+    val values: NArray[Float] = new NArray[Float](rows * columns)
+    var i: Int = 0
+    r = 0;
+    while (r < rows) {
+      var c: Int = 0;
+      while (c < columns) {
+        values(i) = arr2d(r)(c)
+        i += 1
+        c += 1
+      }
+      r += 1
+    }
+    new MatF[M, N](values)
+  }
+
+//  /** Construct a MatF from a String.
+//   * @param content a String with rows of delimited numeric columns.
+//   * @tparam M the number of rows
+//   * @tparam N the number of columns
+//   * @return an M x N matrix
+//   */
+//  inline def apply[M <: Int, N <: Int](inline content: String)(using ValueOf[M], ValueOf[N]): MatF[M, N] = {
+//    val matrix = Util.fromString(content)
+//    val (rows, cols) = (matrix.rows, matrix.columns)
+//    val (r, c) = (valueOf[M], valueOf[N])
+//    require(
+//      r == rows && c == cols,
+//      s"expecting $r x $c but found $rows x $cols"
+//    )
+//    matrix.asInstanceOf[MatF[M, N]]
+//  }
+
+  /** Construct a MatF from a tuple literal.
    *  `((a,b,c...),(d,e,f,...),...)`. << nested tuple fields define rows
    *  `(a,b,c...)`.                   << fields of single tuple define columns
    *
    *    if nested tuples share the same arity
-   *    tuple Numeric fields converted to type Double
-   *    non-numeric fields, if present converted to `Double.NaN`
+   *    tuple Numeric fields converted to type Float
+   *    non-numeric fields, if present converted to `Float.NaN`
    *
    * @throws IllegalArgumentException on non-numeric fields.
-   * @param tuparg Tuple of Doubles or Tuple of Tuple of Double
+   * @param tuparg Tuple of Floats or Tuple of Tuple of Float
    * @return an M x N matrix consisting of values.
    */
-  transparent inline def apply[M <: Int, N <: Int](tuparg: Tuple)(using ValueOf[M], ValueOf[N]): Mat[M,N] = {
+  transparent inline def apply[M <: Int, N <: Int](tuparg: Tuple)(using ValueOf[M], ValueOf[N]): MatF[M,N] = {
     val rows: Int = valueOf[M]
     val cols: Int = valueOf[N]
     val matsize1: Int = rows * cols
-    val values:NArray[Double] = new NArray[Double](matsize1)
+    val values:NArray[Float] = new NArray[Float](matsize1)
     var i:Int = 0
     var j:Int = 0
     def iterateRow(iter: Iterator[Any]): Unit = {
@@ -256,7 +275,7 @@ object Mat {
           iterateRow(nested.productIterator)
           require(j == cols, s"# j[$j] != cols[$cols]")
         case element: Number =>
-          values(i) = toDouble(element) // Process non-tuple elements
+          values(i) = toFloat(element) // Process non-tuple elements
           i += 1
           j += 1
         case x =>
@@ -264,25 +283,24 @@ object Mat {
       }
     }
     iterateRow(tuparg.productIterator)
-    new Mat[M,N](values)
+    new MatF[M,N](values)
   }
 
-
-  /** Construct a Mat from a sequence of 2 or more Tuple literals.
+  /** Construct a MatF from a sequence of 2 or more Tuple literals.
    *  `((a,b,c...),(d,e,f,...),...)`.
    *
    * Where:
    *    inner row tuples share the same arity
-   *    tuple Numeric fields converted to type Double
-   *    non-numeric fields, if present converted to `Double.NaN`
+   *    tuple Numeric fields converted to type Float
+   *    non-numeric fields, if present converted to `Float.NaN`
    * @param tuprows a series of tuples, each representing a row.
    * @return an M x N matrix consisting of values.
    */
-  transparent inline def fromTuples[M <: Int, N <: Int](tuprows: Tuple *)(using ValueOf[M], ValueOf[N]): Mat[M, N] = {
+  transparent inline def fromTuples[M <: Int, N <: Int](tuprows: Tuple *)(using ValueOf[M], ValueOf[N]): MatF[M, N] = {
     val rows: Int = valueOf[M]
     val cols: Int = valueOf[N]
     val matsize1: Int = rows * cols
-    val values:NArray[Double] = new NArray[Double](matsize1)
+    val values:NArray[Float] = new NArray[Float](matsize1)
     var i:Int = 0
     var j:Int = 0
     def iterateRow(iter: Iterator[Any]): Unit = {
@@ -292,7 +310,7 @@ object Mat {
           iterateRow(nested.productIterator)
           require(j == cols, s"j[$j] != cols[$cols]")
         case element: Number =>
-          values(i) = toDouble(element) // Process non-tuple elements
+          values(i) = toFloat(element) // Process non-tuple elements
           i += 1
           j += 1
         case x =>
@@ -300,32 +318,25 @@ object Mat {
       }
     }
     iterateRow(tuprows.iterator)
-    new Mat[M,N](values)
+    new MatF[M,N](values)
   }
 
-  /** Construct a Mat from a String.
-   * @param content a String with rows of delimited numeric columns.
+//  /** Construct a MatF from a String.
+//   * @param content a String with rows of delimited numeric columns.
+//   * @return an M x N matrix
+//   */
+//  inline def fromString(inline content: String) = {
+//    Util.fromString(content)
+//  }
+
+  /**
+   * @param m an instance of slash.matrix.Mat[M, N]
    * @tparam M the number of rows
    * @tparam N the number of columns
-   * @return an M x N matrix
+   * @return an M x N matrix; an instance of slash.matrixf.MatF[M, N]
    */
-  inline def apply[M <: Int, N <: Int](inline content: String)(using ValueOf[M], ValueOf[N]): Mat[M, N] = {
-    val matrix = Util.fromString(content)
-    val (rows, cols) = (matrix.rows, matrix.columns)
-    val (r, c) = (valueOf[M], valueOf[N])
-    require(
-      r == rows && c == cols,
-      s"expecting $r x $c but found $rows x $cols"
-    )
-    matrix.asInstanceOf[Mat[M, N]]
-  }
-
-  /** Construct a Mat from a String.
-   * @param content a String with rows of delimited numeric columns.
-   * @return an M x N matrix
-   */
-  inline def fromString(inline content: String) = {
-    Util.fromString(content)
+  def fromMat[M <: Int, N <: Int](m:slash.matrix.Mat[M, N])(using ValueOf[M], ValueOf[N]): MatF[M, N] = {
+    apply[M, N](NArray.tabulate[Float](valueOf[M] * valueOf[N])((i:Int) => m.values(i).toFloat))
   }
 
   type Number = Int | Float | Long | Double
@@ -353,12 +364,12 @@ object Mat {
     case 0 => 0
     case S[aMinus1] => B + Prod[aMinus1, B]
 
-  inline def toDouble(inline num: Number): Double = {
+  inline def toFloat(inline num: Number): Float = {
     num match {
-    case d: Double     => d
-    case d: Int        => d.toDouble
-    case d: Long       => d.toDouble
-    case d: Float      => d.toDouble
+    case d: Double     => d.toFloat
+    case d: Int        => d.toFloat
+    case d: Long       => d.toFloat
+    case d: Float      => d
     }
   }
 
@@ -367,20 +378,20 @@ object Mat {
   }
 
   // support left multiply by scalar
-  extension (d: Double) {
-    def *[M <: Int, N <: Int](m: Mat[M,N]): Mat[M,N] = m * d // same as right multiply
+  extension (d: Float) {
+    def *[M <: Int, N <: Int](m: MatF[M,N]): MatF[M,N] = m * d // same as right multiply
   }
 
   /*
    * usage:
-   *   val mat: Mat[4,5] = dmFix[4,5](mat) // <<-- whether mat is based on literals or MatrixSpace
+   *   val mat: MatF[4,5] = dmFix[4,5](mat) // <<-- whether mat is based on literals or MatrixSpace
    */
-  inline def dmFix[N <: Int, M <: Int](inline m: AnyRef)(using ValueOf[M], ValueOf[N]): Mat[M,N] = {
-    def mat = m.asInstanceOf[Mat[?,?]]
-    Mat[M,N](mat.values)
+  inline def dmFix[N <: Int, M <: Int](inline m: AnyRef)(using ValueOf[M], ValueOf[N]): MatF[M,N] = {
+    def mat = m.asInstanceOf[MatF[?,?]]
+    MatF[M,N](mat.values)
   }
 
-  inline def sameSpace[M <: Int, N <: Int, P <: Int, Q <: Int](mat1: Mat[M, N], mat2: Mat[P, Q]): Boolean = {
+  inline def sameSpace[M <: Int, N <: Int, P <: Int, Q <: Int](mat1: MatF[M, N], mat2: MatF[P, Q]): Boolean = {
     summonFrom {
       case ev1: (M =:= P) =>
         summonFrom {
@@ -392,7 +403,7 @@ object Mat {
   }
 }
 
-class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {
+class MatF[M <: Int, N <: Int](val values: NArray[Float])(using ValueOf[M], ValueOf[N]) {
   val rows: Int = valueOf[M]
   val columns: Int = valueOf[N]
   def dims = (rows,columns)
@@ -406,20 +417,20 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   /** Make a deep copy of a matrix
     */
-  def copy: Mat[M, N] = new Mat[M, N](copyValues)
+  def copy: MatF[M, N] = new MatF[M, N](copyValues)
 
   /** Copy the internal two-dimensional array.
     *
     * @return Two-dimensional array copy of matrix elements.
     */
-  inline def copyValues: NArray[Double] = narr.copy[Double](values)
+  inline def copyValues: NArray[Float] = narr.copy[Float](values)
 
   /** Make a one-dimensional column packed copy of the internal array.
     *
-    * @return Mat elements packed in a one-dimensional array by columns.
+    * @return MatF elements packed in a one-dimensional array by columns.
     */
-  def columnPackedArray: NArray[Double] = {
-    val vs: NArray[Double] = new NArray[Double](rows * columns)
+  def columnPackedArray: NArray[Float] = {
+    val vs: NArray[Float] = new NArray[Float](rows * columns)
     var i:Int = 0; while (i < rows) {
       var j:Int = 0; while (j < columns) {
         vs(i + j*rows) = apply(i,j)
@@ -432,33 +443,33 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   /** Make a one-dimensional row packed copy of the internal array.
     *
-    * @return Mat elements packed in a one-dimensional array by rows.
+    * @return MatF elements packed in a one-dimensional array by rows.
     */
-  inline def rowPackedArray: NArray[Double] = copyValues
+  inline def rowPackedArray: NArray[Float] = copyValues
 
   /**
    * @param row the row of the matrix to return as a vector.
-   * @return a copy of the specified matrix row in Vec[N] format.
+   * @return a copy of the specified matrix row in VecF[N] format.
    */
-  inline def rowVector(row:Int):Vec[N] = Vec.apply[N](
-    values.asInstanceOf[NArr[Double]].slice(row * columns, (row * columns) + columns).asInstanceOf[NArray[Double]]
+  inline def rowVector(row:Int):VecF[N] = VecF.apply[N](
+    values.asInstanceOf[NArr[Float]].slice(row * columns, (row * columns) + columns).asInstanceOf[NArray[Float]]
   )
 
   /**
    * @return a copy of this matrix in the form of an array of row vectors.
    */
-  def rowVectors: NArray[Vec[N]] = NArray.tabulate[Vec[N]](rows)( (row: Int) => rowVector(row) )
+  def rowVectors: NArray[VecF[N]] = NArray.tabulate[VecF[N]](rows)( (row: Int) => rowVector(row) )
 
   /**
    * @param column the column of the matrix to return as a vector.
-   * @return a copy of the specified matrix column in Vec[M] format.
+   * @return a copy of the specified matrix column in VecF[M] format.
    */
-  inline def columnVector(column:Int):Vec[M] = Vec.tabulate[M]( (r:Int) => apply(r, column) )
+  inline def columnVector(column:Int):VecF[M] = VecF.tabulate[M]( (r:Int) => apply(r, column) )
 
   /**
    * @return a copy of this matrix in the form of an array of column vectors.
    */
-  def columnVectors: NArray[Vec[M]] = transpose.rowVectors
+  def columnVectors: NArray[VecF[M]] = transpose.rowVectors
 
 
   /** Get row dimension.
@@ -480,7 +491,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @return A(i,j)
     * @throws ArrayIndexOutOfBoundsException
     */
-  inline def apply(r: Int, c: Int): Double = values(lindex(r, c))
+  inline def apply(r: Int, c: Int): Float = values(lindex(r, c))
 
   /** Set a single element.
    *
@@ -489,7 +500,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
    * @param value values(i,j).
    * @throws ArrayIndexOutOfBoundsException
    */
-  inline def update(r: Int, c: Int, value: Double): Unit = values(lindex(r, c)) = value
+  inline def update(r: Int, c: Int, value: Float): Unit = values(lindex(r, c)) = value
 
   /** Get a submatrix.
    *
@@ -500,7 +511,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
    * @return A(i0:i1,j0:j1)
    * @throws ArrayIndexOutOfBoundsException Submatrix indices
    */
-  def subMatrix[M1 <: Int, N1 <: Int](r0: Int, c0: Int)(using ValueOf[M1], ValueOf[N1]): Mat[M1, N1] = {
+  def subMatrix[M1 <: Int, N1 <: Int](r0: Int, c0: Int)(using ValueOf[M1], ValueOf[N1]): MatF[M1, N1] = {
 
     val subRows:Int = valueOf[M1]
     val subColumns:Int = valueOf[N1]
@@ -508,7 +519,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     val rEnd:Int = r0 + subRows
     val cEnd:Int = c0 + subColumns
 
-    val vs: NArray[Double] = new NArray[Double](subRows * subColumns)
+    val vs: NArray[Float] = new NArray[Float](subRows * subColumns)
     var i: Int = 0
     var r:Int = r0; while (r < rEnd) {
       var c: Int = c0; while (c < cEnd) {
@@ -518,7 +529,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
       }
       r += 1
     }
-    new Mat[M1, N1](vs)
+    new MatF[M1, N1](vs)
 
   }
 
@@ -531,8 +542,8 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     */
   def subMatrix[M1 <: Int, N1 <: Int](
     rowIndices: NArray[Int], columnIndices: NArray[Int]
-  )(using ValueOf[M1], ValueOf[N1]): Mat[M1, N1] = {
-    val vs:NArray[Double] = new NArray[Double](rowIndices.length * columnIndices.length)
+  )(using ValueOf[M1], ValueOf[N1]): MatF[M1, N1] = {
+    val vs:NArray[Float] = new NArray[Float](rowIndices.length * columnIndices.length)
     var i:Int = 0
     var ri:Int = 0; while (ri < rowIndices.length) {
       var ci: Int = 0; while (ci < columnIndices.length) {
@@ -542,7 +553,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
       }
       ri += 1
     }
-    new Mat[M1, N1](vs)
+    new MatF[M1, N1](vs)
   }
 
   /** Get a submatrix.
@@ -552,12 +563,12 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @return A(i0:i1,c(:))
     * @throws ArrayIndexOutOfBoundsException Submatrix indices
     */
-  def subMatrix[M1 <: Int, N1 <: Int](r0: Int, columnIndices: NArray[Int])(using ValueOf[M1], ValueOf[N1]): Mat[M1, N1] = {
+  def subMatrix[M1 <: Int, N1 <: Int](r0: Int, columnIndices: NArray[Int])(using ValueOf[M1], ValueOf[N1]): MatF[M1, N1] = {
     val subRows:Int = valueOf[M1]
     val subColumns:Int = valueOf[N1]
     val rEnd:Int = r0 + subRows
 
-    val vs: NArray[Double] = new NArray[Double](subRows * subColumns)
+    val vs: NArray[Float] = new NArray[Float](subRows * subColumns)
     var i: Int = 0
     var ri: Int = r0; while (ri < rEnd) {
       var ci: Int = 0; while (ci < columnIndices.length) {
@@ -568,7 +579,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
       }
       ri += 1
     }
-    new Mat[M1, N1](vs)
+    new MatF[M1, N1](vs)
   }
 
   /** Get a submatrix.
@@ -579,11 +590,11 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @return A(r(:),j0:j1)
     * @throws ArrayIndexOutOfBoundsException Submatrix indices
     */
-  def subMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], c0: Int)(using ValueOf[M1], ValueOf[N1]): Mat[M1, N1] = {
+  def subMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], c0: Int)(using ValueOf[M1], ValueOf[N1]): MatF[M1, N1] = {
     val subRows: Int = valueOf[M1]
     val subColumns: Int = valueOf[N1]
     val cEnd = c0 + subColumns
-    val vs: NArray[Double] = new NArray[Double](subRows * subColumns)
+    val vs: NArray[Float] = new NArray[Float](subRows * subColumns)
     var i: Int = 0
     var ri: Int = 0; while (ri < rowIndices.length) {
       var ci: Int = c0; while (ci < cEnd) {
@@ -593,7 +604,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
       }
       ri += 1
     }
-    new Mat[M1, N1](vs)
+    new MatF[M1, N1](vs)
   }
 
   /** Set a submatrix.
@@ -605,7 +616,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
    * @tparam M1 Row dimension of thatMatrix
    * @tparam N1 Column dimension of thatMatrix
    */
-  def setMatrix[M1 <: Int, N1 <: Int](r0: Int, c0: Int, thatMatrix: Mat[M1, N1])(using ValueOf[M1], ValueOf[N1]): Unit = {
+  def setMatrix[M1 <: Int, N1 <: Int](r0: Int, c0: Int, thatMatrix: MatF[M1, N1])(using ValueOf[M1], ValueOf[N1]): Unit = {
     val rEnd: Int = valueOf[M1] + r0
     val cEnd: Int = valueOf[N1] + c0
     var r:Int = r0
@@ -626,7 +637,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @param thatMatrix A(r(:),c(:))
     * @throws ArrayIndexOutOfBoundsException Submatrix indices
     */
-  def setMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], columnIndices: NArray[Int], thatMatrix: Mat[M1, N1]): Unit = {
+  def setMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], columnIndices: NArray[Int], thatMatrix: MatF[M1, N1]): Unit = {
     var i:Int = 0
     while (i < rowIndices.length) {
       var j:Int = 0; while (j < columnIndices.length) {
@@ -645,7 +656,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @param thatMatrix  A(r(:),j0:j1)
     * @throws ArrayIndexOutOfBoundsException Submatrix indices
     */
-  def setMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], c0: Int, thatMatrix: Mat[M1, N1])(using ValueOf[M1], ValueOf[N1]): Unit = {
+  def setMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], c0: Int, thatMatrix: MatF[M1, N1])(using ValueOf[M1], ValueOf[N1]): Unit = {
     val c1:Int = c0 + valueOf[N1]
     var r:Int = 0
     while (r < rowIndices.length) {
@@ -666,7 +677,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @param thatMatrix  A(i0:i1,c(:))
     * @throws ArrayIndexOutOfBoundsException Submatrix indices
     */
-  def setMatrix[M1 <: Int, N1 <: Int](r0: Int, columnIndices: NArray[Int], thatMatrix: Mat[M1, N1])(using ValueOf[M1], ValueOf[N1]): Unit = {
+  def setMatrix[M1 <: Int, N1 <: Int](r0: Int, columnIndices: NArray[Int], thatMatrix: MatF[M1, N1])(using ValueOf[M1], ValueOf[N1]): Unit = {
     val r1:Int = r0 + valueOf[M1]
     var r:Int = r0
     while (r < r1) {
@@ -679,11 +690,11 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     }
   }
 
-  /** Mat transpose.
+  /** MatF transpose.
     *
     * @return Mᵀ
     */
-  def transpose: Mat[N, M] = new Mat[N, M](columnPackedArray)
+  def transpose: MatF[N, M] = new MatF[N, M](columnPackedArray)
 
   /** One norm
     *
@@ -744,16 +755,16 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     f
   }
 
-  inline def + (B: Mat[M, N]): Mat[M, N] = copy.add(B)
+  inline def + (B: MatF[M, N]): MatF[M, N] = copy.add(B)
 
-  inline def += (B: Mat[M, N]): Mat[M, N] = add(B)
+  inline def += (B: MatF[M, N]): MatF[M, N] = add(B)
 
   /** A = A + B
     *
     * @param B another matrix
     * @return A + B
     */
-  def add(B: Mat[M, N]): Mat[M, N] = {
+  def add(B: MatF[M, N]): MatF[M, N] = {
     var v:Int = 0
     while (v < values.length) {
       values(v) = values(v) + B.values(v)
@@ -766,18 +777,18 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
    *
    * @return -A
    */
-  inline def unary_- : Mat[M, N] = * ( -1.0 )
+  inline def unary_- : MatF[M, N] = * ( -1.0f )
 
-  inline def - (B: Mat[M, N]): Mat[M, N] = copy.subtract(B)
+  inline def - (B: MatF[M, N]): MatF[M, N] = copy.subtract(B)
 
-  inline def -= (B: Mat[M, N]): Mat[M, N] = subtract(B)
+  inline def -= (B: MatF[M, N]): MatF[M, N] = subtract(B)
 
   /** A = A - B
     *
     * @param B another matrix
     * @return A - B
     */
-  def subtract(B: Mat[M, N]): Mat[M, N] = {
+  def subtract(B: MatF[M, N]): MatF[M, N] = {
     var v:Int = 0
     while (v < values.length) {
       values(v) = values(v) - B.values(v)
@@ -791,7 +802,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
   * @param d a scalar
   * @return A + d
   */
-  def addScalar(d: Double)(using ValueOf[N]): Mat[M,N] = {
+  def addScalar(d: Float)(using ValueOf[N]): MatF[M,N] = {
     var i:Int = 0
     while(i < values.length){
       values(i) += d
@@ -805,29 +816,29 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @param s scalar
     * @return A * s
     */
-  inline def * (s: Double): Mat[M, N] = copy.times(s)
+  inline def * (s: Float): MatF[M, N] = copy.times(s)
 
-  inline def *= (s:Double):Mat[M, N] = times(s)
+  inline def *= (s:Float):MatF[M, N] = times(s)
 
   /** Add a scalar to a matrix, C = A + s
     *
     * @param s scalar
     * @return A + s
     */
-  inline def + (s: Double): Mat[M, N] = copy.addScalar(s)
+  inline def + (s: Float): MatF[M, N] = copy.addScalar(s)
 
-  inline def += (s:Double):Mat[M, N] = addScalar(s)
+  inline def += (s:Float):MatF[M, N] = addScalar(s)
 
-  inline def - (s: Double): Mat[M, N] = copy.addScalar(-s)
+  inline def - (s: Float): MatF[M, N] = copy.addScalar(-s)
 
-  inline def -= (s: Double): Mat[M, N] = addScalar(-s)
+  inline def -= (s: Float): MatF[M, N] = addScalar(-s)
 
   /** Multiply a matrix by a scalar in place, A = s*A
     *
     * @param s scalar
     * @return replace A by s*A
     */
-  def times(s: Double): Mat[M, N] = {
+  def times(s: Float): MatF[M, N] = {
     var i:Int = 0
     while (i < values.length) {
       values(i) = values(i) * s
@@ -836,19 +847,19 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     this
   }
 
-  def * [V <: Int](thatMatrix: Mat[N, V])(using ValueOf[V]): Mat[M, V] = times(thatMatrix)
+  def * [V <: Int](thatMatrix: MatF[N, V])(using ValueOf[V]): MatF[M, V] = times(thatMatrix)
 
   /** Linear algebraic matrix multiplication, A * B
     *
     * @param b another matrix
-    * @return Mat product, A * B
-    * @throws IllegalArgumentException Mat inner dimensions must agree.
+    * @return MatF product, A * B
+    * @throws IllegalArgumentException MatF inner dimensions must agree.
     */
-  def times[V <: Int](b: Mat[N, V])(using ValueOf[V]): Mat[M, V] = {
+  def times[V <: Int](b: MatF[N, V])(using ValueOf[V]): MatF[M, V] = {
 
-    val X:Mat[M, V] = Mat.zeros[M, V]
+    val X:MatF[M, V] = MatF.zeros[M, V]
 
-    val Bcolj = new NArray[Double](columns)
+    val Bcolj = new NArray[Float](columns)
 
     var j:Int = 0
     while (j < b.columns) {
@@ -865,7 +876,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
           s += apply(i, k) * Bcolj(k)
           k = k + 1
         }
-        X(i, j) = s
+        X(i, j) = s.toFloat
         i = i + 1
       }
       j = j + 1
@@ -873,7 +884,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     X
   }
 
-  /** Mat trace.
+  /** MatF trace.
     *
     * @return sum of the diagonal elements.
     */
@@ -890,53 +901,53 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
   def dim: String = s"dim(${rows}x$columns)"
 
 
-  inline def concatenateRows[M1 <: Int](m: Mat[M1, N])(using ValueOf[M1], ValueOf[+[M, M1]]): Mat[+[M, M1], N] = {
-    val out:NArray[Double] = new NArray[Double](values.length + m.values.length)
-    narr.native.NArray.copyDoubleArray( values, 0, out, 0, values.length )
-    narr.native.NArray.copyDoubleArray( m.values, 0, out, values.length, m.values.length)
-    new Mat[+[M, M1], N](out)
+  inline def concatenateRows[M1 <: Int](m: MatF[M1, N])(using ValueOf[M1], ValueOf[+[M, M1]]): MatF[+[M, M1], N] = {
+    val out:NArray[Float] = new NArray[Float](values.length + m.values.length)
+    narr.native.NArray.copyFloatArray( values, 0, out, 0, values.length )
+    narr.native.NArray.copyFloatArray( m.values, 0, out, values.length, m.values.length)
+    new MatF[+[M, M1], N](out)
   }
 
-  inline def concatenateRows(m: Mat[? <: Int, ? <: Int]): NArray[Double] = {
-    val out: NArray[Double] = new NArray[Double](values.length + m.values.length)
-    narr.native.NArray.copyDoubleArray(values, 0, out, 0, values.length)
-    narr.native.NArray.copyDoubleArray(m.values, 0, out, values.length, m.values.length)
+  inline def concatenateRows(m: MatF[? <: Int, ? <: Int]): NArray[Float] = {
+    val out: NArray[Float] = new NArray[Float](values.length + m.values.length)
+    narr.native.NArray.copyFloatArray(values, 0, out, 0, values.length)
+    narr.native.NArray.copyFloatArray(m.values, 0, out, values.length, m.values.length)
     out
   }
 
-  inline def concatenateColumns[N1 <: Int](m: Mat[M,N1])(using ValueOf[N1], ValueOf[+[N,N1]]): Mat[M, +[N,N1]] = {
-    val out:NArray[Double] = new NArray[Double](values.length + m.values.length)
+  inline def concatenateColumns[N1 <: Int](m: MatF[M,N1])(using ValueOf[N1], ValueOf[+[N,N1]]): MatF[M, +[N,N1]] = {
+    val out:NArray[Float] = new NArray[Float](values.length + m.values.length)
     var r:Int = 0
     var i:Int = 0
     while (r < rows) {
-      narr.native.NArray.copyDoubleArray( values, r * columns, out, i, columns )
+      narr.native.NArray.copyFloatArray( values, r * columns, out, i, columns )
       i = i + columns
-      narr.native.NArray.copyDoubleArray( m.values, r * m.columns, out, i, m.columns )
+      narr.native.NArray.copyFloatArray( m.values, r * m.columns, out, i, m.columns )
       i = i + m.columns
       r = r + 1
     }
-    new Mat[M, +[N, N1]](out)
+    new MatF[M, +[N, N1]](out)
   }
 
-  inline def concatenateColumns(m: Mat[? <: Int, ? <: Int]): NArray[Double] = {
-    val out:NArray[Double] = new NArray[Double](values.length + m.values.length)
+  inline def concatenateColumns(m: MatF[? <: Int, ? <: Int]): NArray[Float] = {
+    val out:NArray[Float] = new NArray[Float](values.length + m.values.length)
     var r:Int = 0
     var i:Int = 0
     while (r < rows) {
-      narr.native.NArray.copyDoubleArray( values, r * columns, out, i, columns )
+      narr.native.NArray.copyFloatArray( values, r * columns, out, i, columns )
       i = i + columns
-      narr.native.NArray.copyDoubleArray( m.values, r * m.columns, out, i, m.columns )
+      narr.native.NArray.copyFloatArray( m.values, r * m.columns, out, i, m.columns )
       i = i + m.columns
       r = r + 1
     }
     out
   }
 
-  def asNativeArray2D: NArray[NArray[Double]] = rowVectors.asInstanceOf[NArray[NArray[Double]]]
+  def asNativeArray2D: NArray[NArray[Float]] = rowVectors.asInstanceOf[NArray[NArray[Float]]]
 
   def strictEquals(obj: Any): Boolean = {
     obj match {
-      case that: Mat[?, ?] =>
+      case that: MatF[?, ?] =>
         var i: Int = 0
         var same: Boolean = this.MxN == that.MxN && this.rows == that.rows
         while (i < this.MxN && same) {
@@ -953,31 +964,31 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
   }
 
   def render(
-    format: MatFormat = MatFormat.DEFAULT,
-    alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
-    sb: StringBuilder = new StringBuilder()
+              format: MatFFormat = MatFFormat.DEFAULT,
+              alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
+              sb: StringBuilder = new StringBuilder()
   ): StringBuilder = {
     format.render(this, alignment, sb)
   }
 
   override def toString: String = csv
 
-  def csv: String = csv(MatFormat.UNALIGNED, new StringBuilder()).toString
+  def csv: String = csv(MatFFormat.UNALIGNED, new StringBuilder()).toString
 
   def csv(
-    alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
-    sb: StringBuilder = new StringBuilder()
-  ): String = render(MatFormat.CSV, alignment, sb).toString
+           alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
+           sb: StringBuilder = new StringBuilder()
+  ): String = render(MatFFormat.CSV, alignment, sb).toString
 
-  def tsv: String = tsv(MatFormat.UNALIGNED, new StringBuilder()).toString
+  def tsv: String = tsv(MatFFormat.UNALIGNED, new StringBuilder()).toString
 
   def tsv(
-    alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
-    sb: StringBuilder = new StringBuilder()
-  ): String = render(MatFormat.TSV, alignment, sb).toString
+           alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
+           sb: StringBuilder = new StringBuilder()
+  ): String = render(MatFFormat.TSV, alignment, sb).toString
 
-  def upperTriangular: Mat[M,N] = {
-    val out:Mat[M, N] = copy
+  def upperTriangular: MatF[M,N] = {
+    val out:MatF[M, N] = copy
     var i = 0
     while(i < rows){
       var j = 0
@@ -990,8 +1001,8 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     out
   }
 
-  def lowerTriangular: Mat[M,N] = {
-    val out:Mat[M, N] = copy
+  def lowerTriangular: MatF[M,N] = {
+    val out:MatF[M, N] = copy
     var i = 0
     while(i < rows){
       var j = i+1
@@ -1004,9 +1015,9 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     out
   }
 
-  def diagonalVector(using ValueOf[Min[M,N]]): Vec[Min[M,N]] = {
+  def diagonalVector(using ValueOf[Min[M,N]]): VecF[Min[M,N]] = {
     val dim: Int = valueOf[M].min(valueOf[N])
-    val arr: Vec[Min[M,N]] = new DoubleArray(dim).asInstanceOf[Vec[Min[M,N]]]
+    val arr: VecF[Min[M,N]] = new FloatArray(dim).asInstanceOf[VecF[Min[M,N]]]
     var i = 0
     while(i < dim) {
       arr(i) = apply(i,i)
@@ -1025,28 +1036,28 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
   /** 
    *  Matrix column vector view.
    */
-  inline def apply(cons: ::.type, inline column:Int): MatCol = {
-    new MatCol(column)
+  inline def apply(cons: ::.type, inline column:Int): MatFCol = {
+    new MatFCol(column)
   }
 
   /**
    * Wrapper class to represent row on LHS or RHS
    */
   class MatRow(r: Int) {
-    inline def :=(inline vector: Vec[N]): Unit = {
+    inline def :=(inline vector: VecF[N]): Unit = {
       val start: Int = r * columns
-      val src = vector.asInstanceOf[NArray[Double]]
-      narr.native.NArray.copyDoubleArray(src, 0, values, start, columns)
+      val src = vector.asInstanceOf[NArray[Float]]
+      narr.native.NArray.copyFloatArray(src, 0, values, start, columns)
     }
     def show: String = rowVector(r).show
-    def asVec: Vec[N] = rowVector(r)
+    def asVec: VecF[N] = rowVector(r)
   }
 
   /**
    * Wrapper class to represent column on LHS or RHS
    */
-  class MatCol(c: Int) {
-    inline def :=(inline vector: Vec[M]): Unit = {
+  class MatFCol(c: Int) {
+    inline def := (inline vector: VecF[M]): Unit = {
       var row = 0
       while(row < rows) {
         values(row * columns + c) = vector(row)
@@ -1054,37 +1065,37 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
       }
     }
     def show: String = columnVector(c).show
-    def asVec: Vec[M] = columnVector(c)
+    def asVec: VecF[M] = columnVector(c)
   }
 
   import scala.language.implicitConversions
-  given matRowConversion: Conversion[MatRow, Vec[N]] with
-    def apply(rowSlice: MatRow): Vec[N] = rowSlice.asVec
+  given matFRowConversion: Conversion[MatRow, VecF[N]] with
+    def apply(rowSlice: MatRow): VecF[N] = rowSlice.asVec
 
-  given matColConversion: Conversion[MatCol, Vec[M]] with
-    def apply(colSlice: MatCol): Vec[M] = colSlice.asVec
+  given matFColConversion: Conversion[MatFCol, VecF[M]] with
+    def apply(colSlice: MatFCol): VecF[M] = colSlice.asVec
 
 }
 
-case class MatColumnMetrics(leftLength: NArray[Int], rightLength: NArray[Int], maxLength: NArray[Int])
+case class MatFColumnMetrics(leftLength: NArray[Int], rightLength: NArray[Int], maxLength: NArray[Int])
 
-trait MatFormat {
-  def prefix[M <: Int, N <: Int](m: Mat[M, N]): String
+trait MatFFormat {
+  def prefix[M <: Int, N <: Int](m: MatF[M, N]): String
 
-  def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String
+  def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String
 
-  def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String
+  def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String
 
-  def suffix[M <: Int, N <: Int](m: Mat[M, N]): String
+  def suffix[M <: Int, N <: Int](m: MatF[M, N]): String
 
-  def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String
+  def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String
 
-  def format(d: Double): String = d.toString
+  def format(d: Float): String = d.toString
 
   def render[M <: Int, N <: Int](
-    m: Mat[M, N],
-    alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
-    sb: StringBuilder = new StringBuilder()
+                                  m: MatF[M, N],
+                                  alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
+                                  sb: StringBuilder = new StringBuilder()
   ): StringBuilder = {
 
     val aligned:NArray[NArray[String]] = alignment(m, this)
@@ -1107,7 +1118,7 @@ trait MatFormat {
     sb.append(suffix(m))
   }
 
-  def columnMetrics(m: Mat[? <: Int, ? <: Int]): MatColumnMetrics = {
+  def columnMetrics(m: MatF[? <: Int, ? <: Int]): MatFColumnMetrics = {
     val leftLength: NArray[Int] = NArray.fill[Int](m.columns)(0)
     val rightLength: NArray[Int] = NArray.fill[Int](m.columns)(0)
     val maxLength: NArray[Int] = NArray.fill[Int](m.columns)(0)
@@ -1127,20 +1138,20 @@ trait MatFormat {
       }
       r = r + 1
     }
-    MatColumnMetrics(leftLength, rightLength, maxLength)
+    MatFColumnMetrics(leftLength, rightLength, maxLength)
   }
 }
 
-object MatFormat {
+object MatFFormat {
 
   import slash.unicode.*
 
-  val UNALIGNED: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m: Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
+  val UNALIGNED: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m: MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
     NArray.tabulate[NArray[String]](m.rows)((r: Int) => NArray.tabulate[String](m.columns)((c: Int) => fmt.format(m(r, c))))
   }
 
-  val ALIGN_LEFT: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
-    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+  val ALIGN_LEFT: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
+    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
     val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
       NArray.tabulate[String](m.columns)((c: Int) => {
         val value = m(r, c)
@@ -1152,8 +1163,8 @@ object MatFormat {
     out
   }
 
-  val ALIGN_RIGHT: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
-    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+  val ALIGN_RIGHT: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
+    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
     val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
       NArray.tabulate[String](m.columns)((c: Int) => {
         val value = m(r, c)
@@ -1165,8 +1176,8 @@ object MatFormat {
     out
   }
 
-  val ALIGN_CENTER: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
-    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+  val ALIGN_CENTER: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
+    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
     val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
       NArray.tabulate[String](m.columns)((c: Int) => {
         val value = m(r, c)
@@ -1181,8 +1192,8 @@ object MatFormat {
     out
   }
 
-  val ALIGN_ON_DECIMAL: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
-    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+  val ALIGN_ON_DECIMAL: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
+    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
     val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
       NArray.tabulate[String](m.columns)((c: Int) => {
         val value = m(r, c)
@@ -1195,8 +1206,8 @@ object MatFormat {
     out
   }
   
-//  val ALIGN_ON_MAGNITUDE: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]] = (m:Mat[? <: Int, ? <: Int], fmt: MatFormat) => {
-//    val mcms:MatColumnMetrics = fmt.columnMetrics(m)
+//  val ALIGN_ON_MAGNITUDE: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
+//    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
 //    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
 //      NArray.tabulate[String](m.columns)((c: Int) => {
 //        val value = m(r, c)
@@ -1224,54 +1235,54 @@ object MatFormat {
 //    out
 //  }
 
-  object DEFAULT extends MatFormat {
-    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = s"Mat[${m.rows}, ${m.columns}](\n"
+  object DEFAULT extends MatFFormat {
+    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = s"MatF[${m.rows}, ${m.columns}](\n"
 
-    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = {
+    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = {
       if (c == m.columns - 1) {
         if (r == m.rows - 1) "" else ","
       } else ", "
     }
 
-    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ")\n"
+    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ")\n"
 
-    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "  "
+    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "  "
 
-    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
   }
 
-  object TUPLE extends MatFormat {
-    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = s"Mat(\n"
+  object TUPLE extends MatFFormat {
+    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = s"MatF(\n"
 
-    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = {
+    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = {
       if (c == m.columns - 1) {
         if (r == m.rows - 1) ")" else "),"
       } else ", "
     }
 
-    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ")\n"
+    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ")\n"
 
-    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "  ("
+    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "  ("
 
-    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
   }
 
-  object TEXTBOOK extends MatFormat {
-    // Mat₍₃ₓ₅₎
-    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = s"Mat${abase(m.rows)}ₓ${abase(m.columns)}\n"
+  object TEXTBOOK extends MatFFormat {
+    // MatF₍₃ₓ₅₎
+    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = s"MatF${abase(m.rows)}ₓ${abase(m.columns)}\n"
 
-    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = " "
+    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = " "
 
-    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = "\n"
+    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = "\n"
 
-    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "│  "
+    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "│  "
 
-    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = " │\n"
+    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = " │\n"
 
     override def render[M <: Int, N <: Int](
-      m: Mat[M, N],
-      alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
-      sb: StringBuilder = new StringBuilder()
+                                             m: MatF[M, N],
+                                             alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
+                                             sb: StringBuilder = new StringBuilder()
     ): StringBuilder = {
 
       val aligned: NArray[NArray[String]] = alignment(m, this)
@@ -1320,12 +1331,12 @@ object MatFormat {
     }
   }
 
-  object INDEXED extends MatFormat {
-    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = s"Mat[${m.rows}x${m.columns}]\n"
+  object INDEXED extends MatFFormat {
+    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = s"MatF[${m.rows}x${m.columns}]\n"
 
-    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
 
-    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = {
+    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = {
       val maxRowDigits = m.rows.toString.length
       val maxColDigits = m.columns.toString.length
       var rs = abase(r + 1)
@@ -1335,40 +1346,40 @@ object MatFormat {
       s"$rs,$cs "
     }
 
-    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "│  "
+    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "│  "
 
-    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = "│"
+    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = "│"
   }
 
-  case class Delimited(delimeter: String) extends MatFormat {
-    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+  case class Delimited(delimeter: String) extends MatFFormat {
+    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
 
-    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
 
-    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = {
+    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = {
       if (c == m.columns - 1) "" else s"$delimeter "
     }
 
-    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
 
-    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
   }
 
-  lazy val CSV: MatFormat = Delimited(",")
+  lazy val CSV: MatFFormat = Delimited(",")
 
-  lazy val TSV: MatFormat = Delimited("\t")
+  lazy val TSV: MatFFormat = Delimited("\t")
 
 
-  object ASCII extends MatFormat {
-    override def prefix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+  object ASCII extends MatFFormat {
+    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
 
-    override def delimiter[M <: Int, N <: Int](m: Mat[M, N])(r: Int, c: Int): String = if (c == m.columns - 1) "" else ", "
+    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = if (c == m.columns - 1) "" else ", "
 
-    override def suffix[M <: Int, N <: Int](m: Mat[M, N]): String = ""
+    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
 
-    override def rowPrefix[M <: Int, N <: Int](m: Mat[M, N]): String = "| "
+    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "| "
 
-    override def rowSuffix[M <: Int, N <: Int](m: Mat[M, N]): String = " |"
+    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = " |"
   }
 
   def main(args: Array[String]): Unit = {
@@ -1377,28 +1388,27 @@ object MatFormat {
     import slash.Random.*
     val r: scala.util.Random = defaultRandom
 
-    val m = r.nextMatrix[10, 15](Short.MinValue.toDouble, Short.MaxValue.toDouble)
-    //val m = r.nextMatrix[10, 10](Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = Double.MinPositiveValue
-    m.values(r.nextInt(m.MxN)) = Math.random()
-    m.values(r.nextInt(m.MxN)) = Math.random()
-    m.values(r.nextInt(m.MxN)) = Math.random() / 9875379845.0
-    m.values(r.nextInt(m.MxN)) = Math.random() / 9875379845.0
-    m.values(r.nextInt(m.MxN)) = Math.random() / 9875379845.0
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = Double.MaxValue
+    val m:MatF[10, 15] = r.nextMatrixF[10, 15](Short.MinValue.toFloat, Short.MaxValue.toFloat)
+    m.values(r.nextInt(m.MxN)) = Float.MinPositiveValue
+    m.values(r.nextInt(m.MxN)) = r.nextFloat()
+    m.values(r.nextInt(m.MxN)) = r.nextFloat()
+    m.values(r.nextInt(m.MxN)) = r.nextFloat() / 9875379845.0f
+    m.values(r.nextInt(m.MxN)) = r.nextFloat() / 9875379845.0f
+    m.values(r.nextInt(m.MxN)) = r.nextFloat() / 9875379845.0f
+    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue, Float.MaxValue)
+    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue, Float.MaxValue)
+    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue, Float.MaxValue)
+    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue, Float.MaxValue)
+    m.values(r.nextInt(m.MxN)) = Float.MaxValue
 
 
 
-    val alignments:Array[(String, Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]])] = {
-      Array[(String, Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]])](
-        ("MatFormat.ALIGN_RIGHT", MatFormat.ALIGN_RIGHT),
-        ("MatFormat.ALIGN_LEFT", MatFormat.ALIGN_LEFT),
-        ("MatFormat.ALIGN_CENTER", MatFormat.ALIGN_CENTER),
-        ("MatFormat.ALIGN_ON_DECIMAL", MatFormat.ALIGN_ON_DECIMAL)
+    val alignments:Array[(String, Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]])] = {
+      Array[(String, Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]])](
+        ("MatFFormat.ALIGN_RIGHT", MatFFormat.ALIGN_RIGHT),
+        ("MatFFormat.ALIGN_LEFT", MatFFormat.ALIGN_LEFT),
+        ("MatFFormat.ALIGN_CENTER", MatFFormat.ALIGN_CENTER),
+        ("MatFFormat.ALIGN_ON_DECIMAL", MatFFormat.ALIGN_ON_DECIMAL)
       )
     }
 

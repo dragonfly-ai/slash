@@ -17,7 +17,6 @@
 package slash
 
 import slash.Random.nextVec
-import slash.vector.*
 import narr.*
 import slash.interval.*
 import slash.unicode.*
@@ -77,7 +76,7 @@ package object vector {
       val dimension:Int = valueOf[N]
       dimensionCheck(d.size, dimension)
       d.size match {
-        case dim if dim < 2 => throw UnsupportedVectorDimension(dim)
+        case dim if dim < 2 => throw slash.exceptions.UnsupportedVectorDimension(dim)
         case 2 => apply(d(0), d(1))
         case 3 => apply(d(0), d(1), d(2))
         case 4 => apply(d(0), d(1), d(2), d(3))
@@ -513,7 +512,7 @@ package object vector {
       inline def normalize(): Unit = {
         val n: Double = norm
         if (n > 0.0) divide(n)
-        else throw VectorNormalizationException(thisVector)
+        else throw slash.exceptions.VectorNormalizationException(thisVector.render().toString())
       }
 
       def normalized: Vec[N] = {
@@ -593,33 +592,4 @@ package object vector {
     }
   }
 
-  inline def dimensionCheck(supplied:Int, required: Int): Unit = {
-    if (supplied != required) throw UnsupportedVectorDimension(supplied, required)
-  }
-
-  inline def dimensionCheck(values:NArray[Double], requiredDimension: Int): NArray[Double] = {
-    dimensionCheck(values.length, requiredDimension)
-    values
-  }
-
 }
-
-case class UnsupportedVectorDimension(givenDimension:Int, requiredDimension:Int = -1) extends Exception(
-  givenDimension match {
-    case gd:Int if gd < 2 => s"Vector dimensions must exceed 1.  Cannot create a vector of dimension: $givenDimension"
-    case _ => s"Expected Vector dimension: $requiredDimension, but observed: $givenDimension"
-  }
-)
-
-
-case class VectorNormalizationException[N <: Int](v:Vec[N]) extends Exception({
-  import vector.*
-  import Vec.*
-  s"Can't normalize ${v.render()}"
-})
-
-case class ExtraDimensionalAccessException[N <: Int](v:Vec[N], ci: Int) extends Exception({
-  import vector.*
-  import Vec.*
-  s"Index: $ci exceeds dimensionality of Euclidean object${v.dimension}: ${v.render()}"
-})
