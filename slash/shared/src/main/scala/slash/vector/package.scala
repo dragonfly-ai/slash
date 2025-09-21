@@ -134,8 +134,6 @@ package object vector {
     def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[21] = Vec.tabulate(i => DBL(t(i)))
     def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[22] = Vec.tabulate(i => DBL(t(i)))
 
-    private val rankVariableSort: Ordering[(Double, Int)] = Ordering.by(_._1)
-
     extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 1 =:= true) {
       inline def x: Double = thisVector(0)
     }
@@ -286,67 +284,6 @@ package object vector {
           i += 1
         }
         cv / (thisVector.dimension -1)
-      }
-
-      def pearsonCorrelationCoefficient(thatVector: Vec[N]): Double = {
-        val n = thisVector.dimension
-        var i = 0
-
-        var sum_x = 0.0
-        var sum_y = 0.0
-        var sum_xy = 0.0
-        var sum_x2 = 0.0
-        var sum_y2 = 0.0
-
-        while (i < n) {
-          sum_x = sum_x + thisVector(i)
-          sum_y = sum_y + thatVector(i)
-          sum_xy = sum_xy + thisVector(i) * thatVector(i)
-          sum_x2 = sum_x2 + squareInPlace(thisVector(i))
-          sum_y2 = sum_y2 + squareInPlace(thatVector(i))
-          i = i + 1
-        }
-        (n * sum_xy - (sum_x * sum_y)) / Math.sqrt( (sum_x2 * n - squareInPlace(sum_x)) * (sum_y2 * n - squareInPlace(sum_y)) )
-      }
-
-      def spearmansRankCorrelation(thatVector: Vec[N]) : Double = {
-        val theseRanks = thisVector.elementRanks
-        val thoseRanks = thatVector.elementRanks
-        theseRanks.pearsonCorrelationCoefficient(thoseRanks)
-      }
-
-
-      // An alias - pearson is the most commonly requested type of correlation
-      inline def corr(thatVector: Vec[N]): Double = pearsonCorrelationCoefficient(thatVector)
-
-      def elementRanks: Vec[N] = {
-        val indexed:NArray[(Double, Int)] = thisVector.zipWithIndex
-        indexed.sort(rankVariableSort)
-
-        val ranks : Vec[N] = new DoubleArray(thisVector.dimension) // faster than zeros.
-        ranks(indexed.last._2) = thisVector.dimension
-        var currentValue:Double = indexed(0)._1
-        var r0:Int = 0
-        var rank:Int = 1
-        while (rank < thisVector.dimension) {
-          val temp: Double = indexed(rank)._1
-          val end:Int = {
-            if (temp != currentValue) rank
-            else if (rank == thisVector.dimension - 1) rank + 1
-            else -1
-          }
-          if (end > -1) {
-            val avg: Double = (1.0 + (end + r0)) / 2.0
-            var i:Int = r0; while (i < end) {
-              ranks(indexed(i)._2) = avg
-              i += 1
-            }
-            r0 = rank
-            currentValue = temp
-          }
-          rank += 1
-        }
-        ranks
       }
 
       def normSquared: Double = {

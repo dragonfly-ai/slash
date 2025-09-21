@@ -38,50 +38,5 @@ class MatAssignDerefTest extends munit.FunSuite {
     )
     assert(m.columnVector(2).show == expect.show)
   }
-  test("m(row,::) expression views the correct row"){
-    val expect = Vec(9, 10, 11, 12)
-    val m = Mat[3,4](
-       1,  2,  3,  4,
-       5,  6,  7,  8,
-       9, 10, 11, 12,
-    )
-    assert(m(2, ::).show == expect.show)
-  }
-  test("row overwrite m(x,::) modifies the correct row"){
-    val mat = Mat[3,4](
-       1,  2,  3,  4,
-       5,  6,  7,  8,
-       9, 10, 11, 12,
-    )
-    mat(0,::) := Vec[4](-1,-2,-3,-4)
-    val expect = Mat[3,4](
-      -1, -2, -3, -4,
-       5,  6,  7,  8,
-       9, 10, 11, 12,
-    )
-    assert(mat.strictEquals(expect))
-  }
-  test("m(::,col) expression views the correct column"){
-    val expect = Vec(2, 6, 10)
-    val m = Mat[3,4](
-       1,  2,  3,  4,
-       5,  6,  7,  8,
-       9, 10, 11, 12,
-    )
-    assert(m(::, 1).show == expect.show)
-  }
-  test("column overwrite m(::, x) modifies the correct column"){
-    val mat = Mat[3,4](
-       1,  2,  3,  4,
-       5,  6,  7,  8,
-       9, 10, 11, 12,
-    )
-    mat(::,1) := Vec[3](-1,-2,-3)
-    val expect = Mat[3,4](
-       1, -1,  3,  4,
-       5, -2,  7,  8,
-       9, -3, 11, 12,
-    )
-    assert(mat.strictEquals(expect))
-  }
+
 }

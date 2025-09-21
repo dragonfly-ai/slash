@@ -269,4 +269,5 @@ package object slash {
     dimensionCheck(values.length, requiredDimension)
     values
   }
+
 }

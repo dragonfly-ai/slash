@@ -103,7 +103,6 @@ object Mat {
    */
   def identity[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = diagonal[M, N](1.0)
 
-
   /**
    * Generate identity matrix scaled by value parameter.
    *
@@ -208,7 +207,6 @@ object Mat {
    */
   def ones[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = fill[M, N](1.0)
 
-
   /** Construct a matrix from a one-dimensional packed array
    *
    * @param values One-dimensional array of doubles, packed by rows.
@@ -230,172 +228,16 @@ object Mat {
     new Mat[M, N](NArray[Double](values *))
   }
 
-  /** Construct a Mat from a tuple literal.
-   *  `((a,b,c...),(d,e,f,...),...)`. << nested tuple fields define rows
-   *  `(a,b,c...)`.                   << fields of single tuple define columns
-   *
-   *    if nested tuples share the same arity
-   *    tuple Numeric fields converted to type Double
-   *    non-numeric fields, if present converted to `Double.NaN`
-   *
-   * @throws IllegalArgumentException on non-numeric fields.
-   * @param tuparg Tuple of Doubles or Tuple of Tuple of Double
-   * @return an M x N matrix consisting of values.
-   */
-  transparent inline def apply[M <: Int, N <: Int](tuparg: Tuple)(using ValueOf[M], ValueOf[N]): Mat[M,N] = {
-    val rows: Int = valueOf[M]
-    val cols: Int = valueOf[N]
-    val matsize1: Int = rows * cols
-    val values:NArray[Double] = new NArray[Double](matsize1)
-    var i:Int = 0
-    var j:Int = 0
-    def iterateRow(iter: Iterator[Any]): Unit = {
-      iter.foreach {
-        case nested: Product if nested.productArity > 0 => // Check if it's a nested tuple or product
-          j = 0
-          iterateRow(nested.productIterator)
-          require(j == cols, s"# j[$j] != cols[$cols]")
-        case element: Number =>
-          values(i) = toDouble(element) // Process non-tuple elements
-          i += 1
-          j += 1
-        case x =>
-          throw new IllegalArgumentException(s"non-numeric field [$x] [${x.getClass}]")
-      }
-    }
-    iterateRow(tuparg.productIterator)
-    new Mat[M,N](values)
-  }
-
-
-  /** Construct a Mat from a sequence of 2 or more Tuple literals.
-   *  `((a,b,c...),(d,e,f,...),...)`.
-   *
-   * Where:
-   *    inner row tuples share the same arity
-   *    tuple Numeric fields converted to type Double
-   *    non-numeric fields, if present converted to `Double.NaN`
-   * @param tuprows a series of tuples, each representing a row.
-   * @return an M x N matrix consisting of values.
-   */
-  transparent inline def fromTuples[M <: Int, N <: Int](tuprows: Tuple *)(using ValueOf[M], ValueOf[N]): Mat[M, N] = {
-    val rows: Int = valueOf[M]
-    val cols: Int = valueOf[N]
-    val matsize1: Int = rows * cols
-    val values:NArray[Double] = new NArray[Double](matsize1)
-    var i:Int = 0
-    var j:Int = 0
-    def iterateRow(iter: Iterator[Any]): Unit = {
-      iter.foreach {
-        case nested: Product if nested.productArity > 0 => // Check if it's a nested tuple or product
-          j = 0
-          iterateRow(nested.productIterator)
-          require(j == cols, s"j[$j] != cols[$cols]")
-        case element: Number =>
-          values(i) = toDouble(element) // Process non-tuple elements
-          i += 1
-          j += 1
-        case x =>
-          throw new IllegalArgumentException(s"non-numeric field [$x] [${x.getClass}]")
-      }
-    }
-    iterateRow(tuprows.iterator)
-    new Mat[M,N](values)
-  }
-
-  /** Construct a Mat from a String.
-   * @param content a String with rows of delimited numeric columns.
-   * @tparam M the number of rows
-   * @tparam N the number of columns
-   * @return an M x N matrix
-   */
-  inline def apply[M <: Int, N <: Int](inline content: String)(using ValueOf[M], ValueOf[N]): Mat[M, N] = {
-    val matrix = Util.fromString(content)
-    val (rows, cols) = (matrix.rows, matrix.columns)
-    val (r, c) = (valueOf[M], valueOf[N])
-    require(
-      r == rows && c == cols,
-      s"expecting $r x $c but found $rows x $cols"
-    )
-    matrix.asInstanceOf[Mat[M, N]]
-  }
-
-  /** Construct a Mat from a String.
-   * @param content a String with rows of delimited numeric columns.
-   * @return an M x N matrix
-   */
-  inline def fromString(inline content: String) = {
-    Util.fromString(content)
-  }
-
-  type Number = Int | Float | Long | Double
-
-  type IsSingleton[T] <: Boolean = T match
-    case Singleton => true // Matches singleton types
-    case _ => false        // Matches all other types
-
-  // recursive compile-time type functions
-  // S is the Int successor type, denoting N + 1 at the type level
-  type RowSize[T <: Tuple] <: Int = T match
-    case EmptyTuple => 0
-    case h *: t => S[RowSize[t]]
-
-  type ColSize[T <: Tuple] <: Int = T match
-    case EmptyTuple => 0
-    case h *: _ => TupleSize[h]
-
-  type TupleSize[T <: Tuple] <: Int = T match
-    case EmptyTuple => 0
-    case h *: t => S[TupleSize[t]]
-    case _ => 1 // non-tuple elements
-
-  type Prod[A <: Int, B <: Int] <: Int = A match
-    case 0 => 0
-    case S[aMinus1] => B + Prod[aMinus1, B]
-
-  inline def toDouble(inline num: Number): Double = {
-    num match {
-    case d: Double     => d
-    case d: Int        => d.toDouble
-    case d: Long       => d.toDouble
-    case d: Float      => d.toDouble
-    }
-  }
-
-  inline def dims[T <: Tuple](inline tup: T): (Int, Int) = {
-    (constValue[RowSize[T]], constValue[ColSize[T]])
-  }
-
   // support left multiply by scalar
   extension (d: Double) {
     def *[M <: Int, N <: Int](m: Mat[M,N]): Mat[M,N] = m * d // same as right multiply
   }
 
-  /*
-   * usage:
-   *   val mat: Mat[4,5] = dmFix[4,5](mat) // <<-- whether mat is based on literals or MatrixSpace
-   */
-  inline def dmFix[N <: Int, M <: Int](inline m: AnyRef)(using ValueOf[M], ValueOf[N]): Mat[M,N] = {
-    def mat = m.asInstanceOf[Mat[?,?]]
-    Mat[M,N](mat.values)
-  }
-
-  inline def sameSpace[M <: Int, N <: Int, P <: Int, Q <: Int](mat1: Mat[M, N], mat2: Mat[P, Q]): Boolean = {
-    summonFrom {
-      case ev1: (M =:= P) =>
-        summonFrom {
-          case ev2: (N =:= Q) => true
-          case _ => false
-        }
-      case _ => false
-    }
-  }
 }
 
 class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {
   val rows: Int = valueOf[M]
   val columns: Int = valueOf[N]
-  def dims = (rows,columns)
 
   val MxN: Int = rows * columns
   opaque type MN <: Int = M * N
@@ -889,7 +731,6 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   def dim: String = s"dim(${rows}x$columns)"
 
-
   inline def concatenateRows[M1 <: Int](m: Mat[M1, N])(using ValueOf[M1], ValueOf[+[M, M1]]): Mat[+[M, M1], N] = {
     val out:NArray[Double] = new NArray[Double](values.length + m.values.length)
     narr.native.NArray.copyDoubleArray( values, 0, out, 0, values.length )
@@ -1014,55 +855,6 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     }
     arr
   }
-
-  /** 
-   *  Matrix row vector view.
-   */
-  inline def apply(inline row:Int, cons: ::.type): MatRow = {
-    new MatRow(row)
-  }
-
-  /** 
-   *  Matrix column vector view.
-   */
-  inline def apply(cons: ::.type, inline column:Int): MatCol = {
-    new MatCol(column)
-  }
-
-  /**
-   * Wrapper class to represent row on LHS or RHS
-   */
-  class MatRow(r: Int) {
-    inline def :=(inline vector: Vec[N]): Unit = {
-      val start: Int = r * columns
-      val src = vector.asInstanceOf[NArray[Double]]
-      narr.native.NArray.copyDoubleArray(src, 0, values, start, columns)
-    }
-    def show: String = rowVector(r).show
-    def asVec: Vec[N] = rowVector(r)
-  }
-
-  /**
-   * Wrapper class to represent column on LHS or RHS
-   */
-  class MatCol(c: Int) {
-    inline def :=(inline vector: Vec[M]): Unit = {
-      var row = 0
-      while(row < rows) {
-        values(row * columns + c) = vector(row)
-        row += 1
-      }
-    }
-    def show: String = columnVector(c).show
-    def asVec: Vec[M] = columnVector(c)
-  }
-
-  import scala.language.implicitConversions
-  given matRowConversion: Conversion[MatRow, Vec[N]] with
-    def apply(rowSlice: MatRow): Vec[N] = rowSlice.asVec
-
-  given matColConversion: Conversion[MatCol, Vec[M]] with
-    def apply(colSlice: MatCol): Vec[M] = colSlice.asVec
 
 }
 

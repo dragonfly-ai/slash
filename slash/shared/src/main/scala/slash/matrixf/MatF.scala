@@ -232,103 +232,6 @@ object MatF {
     new MatF[M, N](values)
   }
 
-//  /** Construct a MatF from a String.
-//   * @param content a String with rows of delimited numeric columns.
-//   * @tparam M the number of rows
-//   * @tparam N the number of columns
-//   * @return an M x N matrix
-//   */
-//  inline def apply[M <: Int, N <: Int](inline content: String)(using ValueOf[M], ValueOf[N]): MatF[M, N] = {
-//    val matrix = Util.fromString(content)
-//    val (rows, cols) = (matrix.rows, matrix.columns)
-//    val (r, c) = (valueOf[M], valueOf[N])
-//    require(
-//      r == rows && c == cols,
-//      s"expecting $r x $c but found $rows x $cols"
-//    )
-//    matrix.asInstanceOf[MatF[M, N]]
-//  }
-
-  /** Construct a MatF from a tuple literal.
-   *  `((a,b,c...),(d,e,f,...),...)`. << nested tuple fields define rows
-   *  `(a,b,c...)`.                   << fields of single tuple define columns
-   *
-   *    if nested tuples share the same arity
-   *    tuple Numeric fields converted to type Float
-   *    non-numeric fields, if present converted to `Float.NaN`
-   *
-   * @throws IllegalArgumentException on non-numeric fields.
-   * @param tuparg Tuple of Floats or Tuple of Tuple of Float
-   * @return an M x N matrix consisting of values.
-   */
-  transparent inline def apply[M <: Int, N <: Int](tuparg: Tuple)(using ValueOf[M], ValueOf[N]): MatF[M,N] = {
-    val rows: Int = valueOf[M]
-    val cols: Int = valueOf[N]
-    val matsize1: Int = rows * cols
-    val values:NArray[Float] = new NArray[Float](matsize1)
-    var i:Int = 0
-    var j:Int = 0
-    def iterateRow(iter: Iterator[Any]): Unit = {
-      iter.foreach {
-        case nested: Product if nested.productArity > 0 => // Check if it's a nested tuple or product
-          j = 0
-          iterateRow(nested.productIterator)
-          require(j == cols, s"# j[$j] != cols[$cols]")
-        case element: Number =>
-          values(i) = toFloat(element) // Process non-tuple elements
-          i += 1
-          j += 1
-        case x =>
-          throw new IllegalArgumentException(s"non-numeric field [$x] [${x.getClass}]")
-      }
-    }
-    iterateRow(tuparg.productIterator)
-    new MatF[M,N](values)
-  }
-
-  /** Construct a MatF from a sequence of 2 or more Tuple literals.
-   *  `((a,b,c...),(d,e,f,...),...)`.
-   *
-   * Where:
-   *    inner row tuples share the same arity
-   *    tuple Numeric fields converted to type Float
-   *    non-numeric fields, if present converted to `Float.NaN`
-   * @param tuprows a series of tuples, each representing a row.
-   * @return an M x N matrix consisting of values.
-   */
-  transparent inline def fromTuples[M <: Int, N <: Int](tuprows: Tuple *)(using ValueOf[M], ValueOf[N]): MatF[M, N] = {
-    val rows: Int = valueOf[M]
-    val cols: Int = valueOf[N]
-    val matsize1: Int = rows * cols
-    val values:NArray[Float] = new NArray[Float](matsize1)
-    var i:Int = 0
-    var j:Int = 0
-    def iterateRow(iter: Iterator[Any]): Unit = {
-      iter.foreach {
-        case nested: Product if nested.productArity > 0 => // Check if it's a nested tuple or product
-          j = 0
-          iterateRow(nested.productIterator)
-          require(j == cols, s"j[$j] != cols[$cols]")
-        case element: Number =>
-          values(i) = toFloat(element) // Process non-tuple elements
-          i += 1
-          j += 1
-        case x =>
-          throw new IllegalArgumentException(s"non-numeric field [$x] [${x.getClass}]")
-      }
-    }
-    iterateRow(tuprows.iterator)
-    new MatF[M,N](values)
-  }
-
-//  /** Construct a MatF from a String.
-//   * @param content a String with rows of delimited numeric columns.
-//   * @return an M x N matrix
-//   */
-//  inline def fromString(inline content: String) = {
-//    Util.fromString(content)
-//  }
-
   /**
    * @param m an instance of slash.matrix.Mat[M, N]
    * @tparam M the number of rows
@@ -339,74 +242,16 @@ object MatF {
     apply[M, N](NArray.tabulate[Float](valueOf[M] * valueOf[N])((i:Int) => m.values(i).toFloat))
   }
 
-  type Number = Int | Float | Long | Double
-
-  type IsSingleton[T] <: Boolean = T match
-    case Singleton => true // Matches singleton types
-    case _ => false        // Matches all other types
-
-  // recursive compile-time type functions
-  // S is the Int successor type, denoting N + 1 at the type level
-  type RowSize[T <: Tuple] <: Int = T match
-    case EmptyTuple => 0
-    case h *: t => S[RowSize[t]]
-
-  type ColSize[T <: Tuple] <: Int = T match
-    case EmptyTuple => 0
-    case h *: _ => TupleSize[h]
-
-  type TupleSize[T <: Tuple] <: Int = T match
-    case EmptyTuple => 0
-    case h *: t => S[TupleSize[t]]
-    case _ => 1 // non-tuple elements
-
-  type Prod[A <: Int, B <: Int] <: Int = A match
-    case 0 => 0
-    case S[aMinus1] => B + Prod[aMinus1, B]
-
-  inline def toFloat(inline num: Number): Float = {
-    num match {
-    case d: Double     => d.toFloat
-    case d: Int        => d.toFloat
-    case d: Long       => d.toFloat
-    case d: Float      => d
-    }
-  }
-
-  inline def dims[T <: Tuple](inline tup: T): (Int, Int) = {
-    (constValue[RowSize[T]], constValue[ColSize[T]])
-  }
-
   // support left multiply by scalar
   extension (d: Float) {
     def *[M <: Int, N <: Int](m: MatF[M,N]): MatF[M,N] = m * d // same as right multiply
   }
 
-  /*
-   * usage:
-   *   val mat: MatF[4,5] = dmFix[4,5](mat) // <<-- whether mat is based on literals or MatrixSpace
-   */
-  inline def dmFix[N <: Int, M <: Int](inline m: AnyRef)(using ValueOf[M], ValueOf[N]): MatF[M,N] = {
-    def mat = m.asInstanceOf[MatF[?,?]]
-    MatF[M,N](mat.values)
-  }
-
-  inline def sameSpace[M <: Int, N <: Int, P <: Int, Q <: Int](mat1: MatF[M, N], mat2: MatF[P, Q]): Boolean = {
-    summonFrom {
-      case ev1: (M =:= P) =>
-        summonFrom {
-          case ev2: (N =:= Q) => true
-          case _ => false
-        }
-      case _ => false
-    }
-  }
 }
 
 class MatF[M <: Int, N <: Int](val values: NArray[Float])(using ValueOf[M], ValueOf[N]) {
   val rows: Int = valueOf[M]
   val columns: Int = valueOf[N]
-  def dims = (rows,columns)
 
   val MxN: Int = rows * columns
   opaque type MN <: Int = M * N
@@ -963,29 +808,32 @@ class MatF[M <: Int, N <: Int](val values: NArray[Float])(using ValueOf[M], Valu
     }
   }
 
+  import slash.matrix.MatFormat
+  import slash.matrix.Mat
+
   def render(
-              format: MatFFormat = MatFFormat.DEFAULT,
-              alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
-              sb: StringBuilder = new StringBuilder()
+    format: MatFormat = MatFormat.DEFAULT,
+    alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
+    sb: StringBuilder = new StringBuilder()
   ): StringBuilder = {
-    format.render(this, alignment, sb)
+    format.render(this.toMat, alignment, sb)
   }
 
   override def toString: String = csv
 
-  def csv: String = csv(MatFFormat.UNALIGNED, new StringBuilder()).toString
+  def csv: String = csv(MatFormat.UNALIGNED, new StringBuilder()).toString
 
   def csv(
-           alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
+           alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
            sb: StringBuilder = new StringBuilder()
-  ): String = render(MatFFormat.CSV, alignment, sb).toString
+  ): String = render(MatFormat.CSV, alignment, sb).toString
 
-  def tsv: String = tsv(MatFFormat.UNALIGNED, new StringBuilder()).toString
+  def tsv: String = tsv(MatFormat.UNALIGNED, new StringBuilder()).toString
 
   def tsv(
-           alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
+           alignment: Function2[Mat[? <: Int, ? <: Int], MatFormat, NArray[NArray[String]]],
            sb: StringBuilder = new StringBuilder()
-  ): String = render(MatFFormat.TSV, alignment, sb).toString
+  ): String = render(MatFormat.TSV, alignment, sb).toString
 
   def upperTriangular: MatF[M,N] = {
     val out:MatF[M, N] = copy
@@ -1024,416 +872,6 @@ class MatF[M <: Int, N <: Int](val values: NArray[Float])(using ValueOf[M], Valu
       i += 1
     }
     arr
-  }
-
-  /** 
-   *  Matrix row vector view.
-   */
-  inline def apply(inline row:Int, cons: ::.type): MatRow = {
-    new MatRow(row)
-  }
-
-  /** 
-   *  Matrix column vector view.
-   */
-  inline def apply(cons: ::.type, inline column:Int): MatFCol = {
-    new MatFCol(column)
-  }
-
-  /**
-   * Wrapper class to represent row on LHS or RHS
-   */
-  class MatRow(r: Int) {
-    inline def :=(inline vector: VecF[N]): Unit = {
-      val start: Int = r * columns
-      val src = vector.asInstanceOf[NArray[Float]]
-      narr.native.NArray.copyFloatArray(src, 0, values, start, columns)
-    }
-    def show: String = rowVector(r).show
-    def asVec: VecF[N] = rowVector(r)
-  }
-
-  /**
-   * Wrapper class to represent column on LHS or RHS
-   */
-  class MatFCol(c: Int) {
-    inline def := (inline vector: VecF[M]): Unit = {
-      var row = 0
-      while(row < rows) {
-        values(row * columns + c) = vector(row)
-        row += 1
-      }
-    }
-    def show: String = columnVector(c).show
-    def asVec: VecF[M] = columnVector(c)
-  }
-
-  import scala.language.implicitConversions
-  given matFRowConversion: Conversion[MatRow, VecF[N]] with
-    def apply(rowSlice: MatRow): VecF[N] = rowSlice.asVec
-
-  given matFColConversion: Conversion[MatFCol, VecF[M]] with
-    def apply(colSlice: MatFCol): VecF[M] = colSlice.asVec
-
-}
-
-case class MatFColumnMetrics(leftLength: NArray[Int], rightLength: NArray[Int], maxLength: NArray[Int])
-
-trait MatFFormat {
-  def prefix[M <: Int, N <: Int](m: MatF[M, N]): String
-
-  def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String
-
-  def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String
-
-  def suffix[M <: Int, N <: Int](m: MatF[M, N]): String
-
-  def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String
-
-  def format(d: Float): String = d.toString
-
-  def render[M <: Int, N <: Int](
-                                  m: MatF[M, N],
-                                  alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
-                                  sb: StringBuilder = new StringBuilder()
-  ): StringBuilder = {
-
-    val aligned:NArray[NArray[String]] = alignment(m, this)
-
-    val dlm = delimiter(m)
-    sb.append(prefix(m))
-
-    var r = 0
-    while (r < m.rows) {
-      sb.append(rowPrefix(m))
-      var c = 0
-      while (c < m.columns) {
-        sb.append(aligned(r)(c))
-        sb.append(dlm(r, c))
-        c = c + 1
-      }
-      sb.append(rowSuffix(m)).append("\n")
-      r = r + 1
-    }
-    sb.append(suffix(m))
-  }
-
-  def columnMetrics(m: MatF[? <: Int, ? <: Int]): MatFColumnMetrics = {
-    val leftLength: NArray[Int] = NArray.fill[Int](m.columns)(0)
-    val rightLength: NArray[Int] = NArray.fill[Int](m.columns)(0)
-    val maxLength: NArray[Int] = NArray.fill[Int](m.columns)(0)
-
-    var r = 0
-    while (r < m.rows) {
-      var c = 0
-      while (c < m.columns) {
-        val s = format(m(r, c))
-        val parts = s.split('.')
-
-        leftLength(c) = Math.max(leftLength(c), parts(0).length)
-        rightLength(c) = Math.max(rightLength(c), parts(1).length)
-        maxLength(c) = Math.max(maxLength(c), s.length)
-
-        c = c + 1
-      }
-      r = r + 1
-    }
-    MatFColumnMetrics(leftLength, rightLength, maxLength)
-  }
-}
-
-object MatFFormat {
-
-  import slash.unicode.*
-
-  val UNALIGNED: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m: MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
-    NArray.tabulate[NArray[String]](m.rows)((r: Int) => NArray.tabulate[String](m.columns)((c: Int) => fmt.format(m(r, c))))
-  }
-
-  val ALIGN_LEFT: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
-    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
-    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
-      NArray.tabulate[String](m.columns)((c: Int) => {
-        val value = m(r, c)
-        var s = fmt.format(value)
-        while (s.length < mcms.maxLength(c)) s = s + " "
-        s
-      })
-    })
-    out
-  }
-
-  val ALIGN_RIGHT: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
-    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
-    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
-      NArray.tabulate[String](m.columns)((c: Int) => {
-        val value = m(r, c)
-        var s = fmt.format(value)
-        while (s.length < mcms.maxLength(c)) s = " " + s
-        s
-      })
-    })
-    out
-  }
-
-  val ALIGN_CENTER: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
-    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
-    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
-      NArray.tabulate[String](m.columns)((c: Int) => {
-        val value = m(r, c)
-        var s = fmt.format(value)
-        while (s.length < mcms.maxLength(c)) {
-          s = " " + s
-          if (s.length < mcms.maxLength(c)) s = s + " "
-        }
-        s
-      })
-    })
-    out
-  }
-
-  val ALIGN_ON_DECIMAL: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
-    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
-    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
-      NArray.tabulate[String](m.columns)((c: Int) => {
-        val value = m(r, c)
-        val parts = fmt.format(value).split('.')
-        while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
-        while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
-        parts(0) + "." + parts(1)
-      })
-    })
-    out
-  }
-  
-//  val ALIGN_ON_MAGNITUDE: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]] = (m:MatF[? <: Int, ? <: Int], fmt: MatFFormat) => {
-//    val mcms:MatFColumnMetrics = fmt.columnMetrics(m)
-//    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](m.rows)( (r: Int) => {
-//      NArray.tabulate[String](m.columns)((c: Int) => {
-//        val value = m(r, c)
-//        var s = fmt.format(value)
-//        //        val xpnnt: Int = slash.native.getExponent(value)
-//        //        if (xpnnt > 0) {
-//        //          val parts = s.split('.')
-//        //          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
-//        //          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
-//        //          s = parts(0) + "." + parts(1)
-//        //        } else if (xpnnt < 0) {
-//        //          val parts = s.split('.')
-//        //          while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
-//        //          while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
-//        //          s = parts(0) + "." + parts(1)
-//        //        } else {
-//        val parts = s.split('.')
-//        while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
-//        while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
-//        s = parts(0) + "." + parts(1)
-//        //        }
-//        s
-//      })
-//    })
-//    out
-//  }
-
-  object DEFAULT extends MatFFormat {
-    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = s"MatF[${m.rows}, ${m.columns}](\n"
-
-    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = {
-      if (c == m.columns - 1) {
-        if (r == m.rows - 1) "" else ","
-      } else ", "
-    }
-
-    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ")\n"
-
-    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "  "
-
-    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
-  }
-
-  object TUPLE extends MatFFormat {
-    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = s"MatF(\n"
-
-    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = {
-      if (c == m.columns - 1) {
-        if (r == m.rows - 1) ")" else "),"
-      } else ", "
-    }
-
-    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ")\n"
-
-    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "  ("
-
-    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
-  }
-
-  object TEXTBOOK extends MatFFormat {
-    // MatF₍₃ₓ₅₎
-    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = s"MatF${abase(m.rows)}ₓ${abase(m.columns)}\n"
-
-    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = " "
-
-    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = "\n"
-
-    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "│  "
-
-    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = " │\n"
-
-    override def render[M <: Int, N <: Int](
-                                             m: MatF[M, N],
-                                             alignment: Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]],
-                                             sb: StringBuilder = new StringBuilder()
-    ): StringBuilder = {
-
-      val aligned: NArray[NArray[String]] = alignment(m, this)
-
-      val dlm = delimiter(m)
-      sb.append(prefix(m))
-
-      val firstRow: StringBuilder = new StringBuilder()
-      var i:Int = 0
-      while (i < m.columns) {
-        firstRow.append(aligned(0)(i))
-        firstRow.append(dlm(0, i))
-        i = i + 1
-      }
-
-      sb.append("┌ ")
-      i = 0
-      while (i < firstRow.length) {
-        sb.append(" ")
-        i = i + 1
-      }
-      sb.append("  ┐\n")
-
-      sb.append(rowPrefix(m)).append(s"$firstRow").append(rowSuffix(m))
-      var r = 1
-      while (r < m.rows) {
-        sb.append(rowPrefix(m))
-        var c = 0
-        while (c < m.columns) {
-          sb.append(aligned(r)(c))
-          sb.append(dlm(r, c))
-          c = c + 1
-        }
-        sb.append(rowSuffix(m))
-        r = r + 1
-      }
-      sb.append("└ ")
-
-      i = 0
-      while (i < firstRow.length) {
-        sb.append(" ")
-        i = i + 1
-      }
-      sb.append("  ┘")
-      sb.append(suffix(m))
-    }
-  }
-
-  object INDEXED extends MatFFormat {
-    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = s"MatF[${m.rows}x${m.columns}]\n"
-
-    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
-
-    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = {
-      val maxRowDigits = m.rows.toString.length
-      val maxColDigits = m.columns.toString.length
-      var rs = abase(r + 1)
-      while (rs.length < maxRowDigits) rs = "₀" + rs
-      var cs = abase(c + 1)
-      while (cs.length < maxColDigits) cs = "₀" + cs
-      s"$rs,$cs "
-    }
-
-    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "│  "
-
-    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = "│"
-  }
-
-  case class Delimited(delimeter: String) extends MatFFormat {
-    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
-
-    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
-
-    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = {
-      if (c == m.columns - 1) "" else s"$delimeter "
-    }
-
-    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
-
-    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
-  }
-
-  lazy val CSV: MatFFormat = Delimited(",")
-
-  lazy val TSV: MatFFormat = Delimited("\t")
-
-
-  object ASCII extends MatFFormat {
-    override def prefix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
-
-    override def delimiter[M <: Int, N <: Int](m: MatF[M, N])(r: Int, c: Int): String = if (c == m.columns - 1) "" else ", "
-
-    override def suffix[M <: Int, N <: Int](m: MatF[M, N]): String = ""
-
-    override def rowPrefix[M <: Int, N <: Int](m: MatF[M, N]): String = "| "
-
-    override def rowSuffix[M <: Int, N <: Int](m: MatF[M, N]): String = " |"
-  }
-
-  def main(args: Array[String]): Unit = {
-    println("Matrix Printing Demo")
-
-    import slash.Random.*
-    val r: scala.util.Random = defaultRandom
-
-    val m:MatF[10, 15] = r.nextMatrixF[10, 15](Short.MinValue.toFloat, Short.MaxValue.toFloat)
-    m.values(r.nextInt(m.MxN)) = Float.MinPositiveValue
-    m.values(r.nextInt(m.MxN)) = r.nextFloat()
-    m.values(r.nextInt(m.MxN)) = r.nextFloat()
-    m.values(r.nextInt(m.MxN)) = r.nextFloat() / 9875379845.0f
-    m.values(r.nextInt(m.MxN)) = r.nextFloat() / 9875379845.0f
-    m.values(r.nextInt(m.MxN)) = r.nextFloat() / 9875379845.0f
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue, Float.MaxValue)
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue, Float.MaxValue)
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue, Float.MaxValue)
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue, Float.MaxValue)
-    m.values(r.nextInt(m.MxN)) = Float.MaxValue
-
-
-
-    val alignments:Array[(String, Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]])] = {
-      Array[(String, Function2[MatF[? <: Int, ? <: Int], MatFFormat, NArray[NArray[String]]])](
-        ("MatFFormat.ALIGN_RIGHT", MatFFormat.ALIGN_RIGHT),
-        ("MatFFormat.ALIGN_LEFT", MatFFormat.ALIGN_LEFT),
-        ("MatFFormat.ALIGN_CENTER", MatFFormat.ALIGN_CENTER),
-        ("MatFFormat.ALIGN_ON_DECIMAL", MatFFormat.ALIGN_ON_DECIMAL)
-      )
-    }
-
-    println("Unaligned CSV:")
-    println(m.csv)
-    println("Unaligned TSV:")
-    println(m.tsv)
-
-    for (a <- alignments) {
-      println(s"\n/******** ${a._1} ********/\n")
-      println("DEFAULT:")
-      println(m.render(alignment = a._2))
-      println("TUPLE:")
-      println(m.render(TUPLE, a._2))
-      println("TEXTBOOK:")
-      println(m.render(TEXTBOOK, a._2))
-      println("CSV:")
-      println(m.csv(a._2))
-      println("TSV:")
-      println(m.tsv(a._2))
-      println("ASCII:")
-      println(m.render(ASCII, a._2))
-      println("INDEXED:")
-      println(m.render(INDEXED, a._2))
-    }
   }
 
 }
