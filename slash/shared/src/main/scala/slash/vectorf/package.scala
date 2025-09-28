@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package slash.vectorf
+package slash
 
 import narr.*
 
@@ -136,7 +136,7 @@ package object vectorf {
     def fromTuple(t: (Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float)):VecF[21] = VecF.tabulate(i => DBL(t(i)))
     def fromTuple(t: (Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float, Float)):VecF[22] = VecF.tabulate(i => DBL(t(i)))
 
-//    private val rankVariableSort: Ordering[(Float, Int)] = Ordering.by(_._1)
+    def fromVec[N <: Int](v:slash.vector.Vec[N]): VecF[N] = (NArray.tabulate[Float](v.dimension)(i => v(i).toFloat)).asInstanceOf[VecF[N]]
 
     extension[N <: Int] (thisVector: VecF[N])(using ValueOf[N], N >= 1 =:= true) {
       inline def x: Float = thisVector(0)
@@ -205,6 +205,7 @@ package object vectorf {
 
       inline def asNativeArray: NArray[Float] = thisVector.asInstanceOf[NArray[Float]]
 
+      inline def toVec: slash.vector.Vec[N] = slash.vector.Vec.fromVecF[N](thisVector)
 
       // clamp methods
 

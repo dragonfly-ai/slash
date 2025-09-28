@@ -17,7 +17,7 @@
 package slash.vectorf
 
 import slash.*
-import slash.vectorf.vectorf.VecF
+import VecF.*
 
 case class VectorFBounds[N <: Int](min: VecF[N], MAX: VecF[N])(using ValueOf[N]) {
   lazy val dimension:Int = valueOf[N]

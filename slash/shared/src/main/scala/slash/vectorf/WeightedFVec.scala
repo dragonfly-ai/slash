@@ -16,7 +16,7 @@
 
 package slash.vectorf
 
-import vectorf.VecF
+import VecF.*
 
 case class WeightedVecF[N <: Int](unweighted: VecF[N], private var w: Float = 0.0f) {
   def weight:Float = w

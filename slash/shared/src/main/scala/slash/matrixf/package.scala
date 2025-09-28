@@ -19,7 +19,7 @@ package slash
 import narr.*
 
 import slash.*
-import slash.vectorf.vectorf.*
+import slash.vectorf.*
 
 import scala.compiletime.ops.int.*
 import scala.compiletime.ops.any.==

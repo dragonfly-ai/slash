@@ -19,7 +19,7 @@ package slash
 import Constant.log2
 import slash.vector.*
 import Vec.*
-import slash.vectorf.vectorf.*
+import slash.vectorf.*
 import VecF.*
 import narr.*
 import slash.matrix.*

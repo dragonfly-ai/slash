@@ -18,7 +18,7 @@ package slash.matrixf
 
 import narr.*
 import slash.*
-import vectorf.vectorf.VecF
+import vectorf.VecF
 
 import scala.compiletime.ops.int.*
 import scala.compiletime.{constValue, error, summonFrom}

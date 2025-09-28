@@ -14,32 +14,20 @@
  * limitations under the License.
  */
 
-package slash.vectorf
-
 import narr.*
 import slash.*
+import slash.vector.*
+import slash.vectorf.*
 
-/**
- * Created by clifton on 1/10/17.
- */
+class ConversionTest extends munit.FunSuite {
 
-object VecF2 {
+  test(" VecF -> Vec -> VecF ") {
 
-  def rotateAllDegrees(vectors:NArray[VecF[2]], degrees: Double): NArray[VecF[2]] = {
-    rotateAll(vectors, degreesToRadians(degrees))
+    val vf0: VecF[3] = VecF.random[3](Float.MinValue, Float.MaxValue)
+    val v0: Vec[3] = vf0.toVec
+    val vf1: VecF[3] = v0.toVecF
+    assertEquals(vf0.x, vf1.x)
+
   }
-
-  def rotateAll(vectors:NArray[VecF[2]], radians: Double): NArray[VecF[2]] = {
-    val cos:Double = Math.cos(radians)
-    val sin:Double = Math.sin(radians)
-    var vi = 0
-    while (vi < vectors.length) {
-      val v2:VecF[2] = vectors(vi)
-      v2.rotate(cos, sin)
-      vi = vi + 1
-    }
-    vectors
-  }
-
 
 }

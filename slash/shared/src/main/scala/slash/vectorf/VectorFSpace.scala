@@ -16,10 +16,9 @@
 
 package slash.vectorf
 
-import narr.NArray
-import vectorf.VecF
-
 import slash.*
+import narr.NArray
+
 
 object VectorFSpace {
   def apply(dimension:Int):VectorFSpace[dimension.type] = new VectorFSpace[dimension.type]

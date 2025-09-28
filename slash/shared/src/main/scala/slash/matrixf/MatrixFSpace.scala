@@ -20,7 +20,6 @@ import narr.NArray
 import slash.Random
 import slash.Random.nextMatrixF
 import slash.vectorf.*
-import slash.vectorf.vectorf.*
 
 import scala.compiletime.ops.int.*
 

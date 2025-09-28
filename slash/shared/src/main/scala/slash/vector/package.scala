@@ -134,6 +134,8 @@ package object vector {
     def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[21] = Vec.tabulate(i => DBL(t(i)))
     def fromTuple(t: (Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)):Vec[22] = Vec.tabulate(i => DBL(t(i)))
 
+    def fromVecF[N <: Int](v:slash.vectorf.VecF[N]): Vec[N] = (NArray.tabulate[Double](v.dimension)(i => v(i).toDouble)).asInstanceOf[Vec[N]]
+
     extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 1 =:= true) {
       inline def x: Double = thisVector(0)
     }
@@ -201,6 +203,7 @@ package object vector {
 
       inline def asNativeArray: NArray[Double] = thisVector.asInstanceOf[NArray[Double]]
 
+      inline def toVecF: slash.vectorf.VecF[N] = slash.vectorf.VecF.fromVec[N](thisVector)
 
       // clamp methods
 

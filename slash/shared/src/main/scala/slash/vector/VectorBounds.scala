@@ -16,8 +16,8 @@
 
 package slash.vector
 
-import Vec.*
 import slash.*
+import Vec.*
 
 case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
   lazy val dimension:Int = valueOf[N]
