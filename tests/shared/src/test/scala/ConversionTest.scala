@@ -26,7 +26,10 @@ class ConversionTest extends munit.FunSuite {
     val vf0: VecF[3] = VecF.random[3](Float.MinValue, Float.MaxValue)
     val v0: Vec[3] = vf0.toVec
     val vf1: VecF[3] = v0.toVecF
+
     assertEquals(vf0.x, vf1.x)
+    assertEquals(vf0.y, vf1.y)
+    assertEquals(vf0.z, vf1.z)
 
   }
 
