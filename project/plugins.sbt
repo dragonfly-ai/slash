@@ -1,7 +1,7 @@
 val crossVer = "1.3.2"
 val scalaJSVersion = "1.20.1"
 val scalaNativeVersion = "0.5.8"
-val sbtTypelevelVersion = "0.8.0"
+val sbtTypelevelVersion = "0.8.1"
 
 addDependencyTreePlugin
 
