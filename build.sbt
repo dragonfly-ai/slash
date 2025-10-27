@@ -5,7 +5,7 @@ import laika.helium.Helium
 import laika.format.Markdown
 import laika.config.SyntaxHighlighting
 
-val globalScalaVersion = "3.3.6"
+val globalScalaVersion = "3.3.7"
 
 ThisBuild / organization := "ai.dragonfly"
 ThisBuild / organizationName := "dragonfly.ai"
@@ -132,5 +132,5 @@ lazy val tests = crossProject(
   .dependsOn(slash)
   .settings(
     name := "slash-tests",
-    libraryDependencies += "org.scalameta" %%% "munit" % "1.2.0" % Test
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.2.1" % Test
   )
