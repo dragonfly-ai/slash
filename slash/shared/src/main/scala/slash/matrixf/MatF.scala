@@ -692,6 +692,13 @@ class MatF[M <: Int, N <: Int](val values: NArray[Float])(using ValueOf[M], Valu
     this
   }
 
+  inline def * (v: VecF[N])(using ValueOf[N]): VecF[N] = times(v)
+
+  def times (v: VecF[N])(using ValueOf[N]): VecF[N] = {
+    val m: MatF[N, 1] = MatF[N, 1](v.asInstanceOf[NArray[Float]])
+    times(m).values.asInstanceOf[VecF[N]]
+  }
+
   def * [V <: Int](thatMatrix: MatF[N, V])(using ValueOf[V]): MatF[M, V] = times(thatMatrix)
 
   /** Linear algebraic matrix multiplication, A * B

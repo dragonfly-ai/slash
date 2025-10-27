@@ -26,6 +26,14 @@ class MatTest extends munit.FunSuite {
     7, 8, 9
   )
 
+  test(" matrix * vector  ") {
+    val v:Vec[3] = m0 * Vec[3](0, 0, 0)
+    assertVecEquals(v, Vec.zeros[3])
+
+    val v1:Vec[3] = m0 * Vec[3](1.0, 1.0, 1.0)
+    assertVecEquals(v1, Vec[3](6.0, 15.0, 24.0))
+  }
+
   //println(m0)
 
   val m:Mat[11, 7] = Mat.random[11, 7]

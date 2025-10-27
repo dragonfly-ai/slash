@@ -678,6 +678,13 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     this
   }
 
+  inline def * (v: Vec[N])(using ValueOf[N]): Vec[N] = times(v)
+
+  def times (v: Vec[N])(using ValueOf[N]): Vec[N] = {
+    val m: Mat[N, 1] = Mat[N, 1](v.asInstanceOf[NArray[Double]])
+    times(m).values.asInstanceOf[Vec[N]]
+  }
+
   def * [V <: Int](thatMatrix: Mat[N, V])(using ValueOf[V]): Mat[M, V] = times(thatMatrix)
 
   /** Linear algebraic matrix multiplication, A * B
