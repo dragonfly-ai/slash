@@ -18,8 +18,6 @@ import slash.matrix.*
 
 import slash.vector.VectorSpace
 
-import scala.compiletime.ops.int.+
-
 class MatConcatenateTest extends munit.FunSuite {
   test("concatenate rows of 2 matrices") {
     val mat1 = Mat[2,3](

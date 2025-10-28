@@ -681,8 +681,21 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
   inline def * (v: Vec[N])(using ValueOf[N]): Vec[N] = times(v)
 
   def times (v: Vec[N])(using ValueOf[N]): Vec[N] = {
-    val m: Mat[N, 1] = Mat[N, 1](v.asInstanceOf[NArray[Double]])
-    times(m).values.asInstanceOf[Vec[N]]
+    val a:NArray[Double] = NArray.ofSize[Double](v.dimension)
+    var i:Int = 0
+    var ai:Int = 0
+    while (i < values.length) {
+      var dotProduct = 0.0
+      var offset: Int = 0
+      while (offset < v.dimension) {
+        dotProduct = dotProduct + (values(i + offset) * v(offset))
+        offset = offset + 1
+      }
+      a(ai) = dotProduct
+      ai = ai + 1
+      i = i + v.dimension
+    }
+    a.asInstanceOf[Vec[N]]
   }
 
   def * [V <: Int](thatMatrix: Mat[N, V])(using ValueOf[V]): Mat[M, V] = times(thatMatrix)

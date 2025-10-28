@@ -19,7 +19,6 @@ package slash.stats.probability.distributions.stream
 import slash.stats.probability.distributions
 import slash.*
 import slash.interval.*
-import slash.interval.Interval.*
 import slash.accumulation.DiscreteAccumulator
 
 import scala.language.postfixOps

@@ -15,7 +15,6 @@
  */
 
 import slash.vector.*
-import Vec.*
 import slash.matrix.*
 
 class VectorExtensionsTest extends munit.FunSuite {

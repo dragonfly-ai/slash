@@ -17,8 +17,6 @@
 import slash.Random.defaultRandom as r
 import slash.matrix.*
 
-import scala.compiletime.ops.int.*
-
 class MatrixSpaceTest extends munit.FunSuite {
   test(" Runtime Dimensions Test ") {
     var runtimeRowDimension:Int = r.nextInt(42)

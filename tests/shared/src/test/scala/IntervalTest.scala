@@ -16,13 +16,12 @@
 
 import slash.*
 import slash.interval.*
-import slash.interval.Interval.*
 
 import scala.reflect.ClassTag
 
 class IntervalTest extends munit.FunSuite {
 
-  case class IntervalTester[DOMAIN:ClassTag](i:Interval[DOMAIN]) {
+  case class IntervalTester[DOMAIN](i:Interval[DOMAIN]) {
     def test():Unit = {
       if (i.leftClosed) assert(i.contains(i.min))
       else assert(!i.contains(i.min))

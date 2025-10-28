@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import narr.*
 import slash.*
 import slash.vector.*
 import slash.vectorf.*

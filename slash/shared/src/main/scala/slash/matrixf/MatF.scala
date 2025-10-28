@@ -695,8 +695,21 @@ class MatF[M <: Int, N <: Int](val values: NArray[Float])(using ValueOf[M], Valu
   inline def * (v: VecF[N])(using ValueOf[N]): VecF[N] = times(v)
 
   def times (v: VecF[N])(using ValueOf[N]): VecF[N] = {
-    val m: MatF[N, 1] = MatF[N, 1](v.asInstanceOf[NArray[Float]])
-    times(m).values.asInstanceOf[VecF[N]]
+    val a:NArray[Float] = NArray.ofSize[Float](v.dimension)
+    var i:Int = 0
+    var ai:Int = 0
+    while (i < values.length) {
+      var dotProduct = 0.0
+      var offset: Int = 0
+      while (offset < v.dimension) {
+        dotProduct = dotProduct + (values(i + offset) * v(offset))
+        offset = offset + 1
+      }
+      a(ai) = dotProduct.toFloat
+      ai = ai + 1
+      i = i + v.dimension
+    }
+    a.asInstanceOf[VecF[N]]
   }
 
   def * [V <: Int](thatMatrix: MatF[N, V])(using ValueOf[V]): MatF[M, V] = times(thatMatrix)
