@@ -28,7 +28,7 @@ class MatTest extends munit.FunSuite {
 
   val m1:Mat[3, 3] = Mat.identity[3,3]
 
-  test(" matrix * vector  ") {
+  test(" Mat * Vec ") {
     val v:Vec[3] = m0 * Vec[3](0, 0, 0)
     assertVecEquals(v, Vec.zeros[3])
 
@@ -36,6 +36,16 @@ class MatTest extends munit.FunSuite {
     assertVecEquals(v1, Vec[3](6.0, 15.0, 24.0))
 
     assertVecEquals(v1, m1 * v1)
+  }
+
+  test(" Mat * VecF ") {
+    val v: slash.vectorf.VecF[3] = m0 * slash.vectorf.VecF[3](0f, 0f, 0f)
+    assertVecFEquals(v, slash.vectorf.VecF.zeros[3])
+
+    val v1: slash.vectorf.VecF[3] = m0 * slash.vectorf.VecF[3](1f, 1f, 1f)
+    assertVecFEquals(v1, slash.vectorf.VecF[3](6f, 15f, 24f))
+
+    assertVecFEquals(v1, m1 * v1)
   }
 
   //println(m0)

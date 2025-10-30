@@ -678,6 +678,27 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     this
   }
 
+
+  inline def * (v: slash.vectorf.VecF[N])(using ValueOf[N]): slash.vectorf.VecF[N] = times(v)
+
+  def times (v: slash.vectorf.VecF[N])(using ValueOf[N]): slash.vectorf.VecF[N] = {
+    val a:NArray[Float] = NArray.ofSize[Float](v.dimension)
+    var i:Int = 0
+    var ai:Int = 0
+    while (i < values.length) {
+      var dotProduct = 0.0
+      var offset: Int = 0
+      while (offset < v.dimension) {
+        dotProduct = dotProduct + (values(i + offset) * v(offset))
+        offset = offset + 1
+      }
+      a(ai) = dotProduct.toFloat
+      ai = ai + 1
+      i = i + v.dimension
+    }
+    a.asInstanceOf[slash.vectorf.VecF[N]]
+  }
+
   inline def * (v: Vec[N])(using ValueOf[N]): Vec[N] = times(v)
 
   def times (v: Vec[N])(using ValueOf[N]): Vec[N] = {

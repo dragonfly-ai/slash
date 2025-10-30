@@ -26,6 +26,15 @@ inline def assertVecEquals[N <: Int](inline v1: Vec[N], inline v2: Vec[N])(impli
   }
 }
 
+
+inline def assertVecFEquals[N <: Int](inline v1: slash.vectorf.VecF[N], inline v2: slash.vectorf.VecF[N])(implicit loc: munit.Location): Unit = {
+  var i: Int = 0
+  while (i < v1.dimension) {
+    munit.Assertions.assertEquals(v1(i), v2(i))
+    i += 1
+  }
+}
+
 inline def assertMatrixEquals[M <: Int, N <: Int](inline m1: Mat[M, N], inline m2: Mat[M, N])(implicit loc: munit.Location): Unit = {
   munit.Assertions.assert(m1.strictEquals(m2))
 }
