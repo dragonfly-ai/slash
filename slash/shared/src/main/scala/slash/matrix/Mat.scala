@@ -756,6 +756,28 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     X
   }
 
+  def kronecker[V <: Int, W <: Int](b: Mat[V, W])(using ValueOf[V * M], ValueOf[W * N]): Mat[V * M, W * N] = {
+    val X: Mat[V * M, W * N] = Mat.zeros[V * M, W * N]
+
+    var i1: Int = 0; while (i1 < rows) {
+      val iBase = i1 * rows
+      var j1: Int = 0; while (j1 < columns) {
+        val jBase = j1 * columns
+        val k = apply(i1, j1)
+        var i2: Int = 0; while (i2 < b.rows) {
+          var j2: Int = 0; while (j2 < b.columns) {
+            X(iBase + i2, jBase + j2) = k * b(i2, j2)
+            j2 = j2 + 1
+          }
+          i2 = i2 + 1
+        }
+        j1 = j1 + 1
+      }
+      i1 = i1 + 1
+    }
+    X
+  }
+
   /** Mat trace.
     *
     * @return sum of the diagonal elements.
