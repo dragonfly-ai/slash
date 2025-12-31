@@ -63,4 +63,12 @@ class MatExtensionsTest extends munit.FunSuite {
     assert(m2.rows == 1 && m2.columns == 4, s"m.rows[${m2.rows}] != 1 || m.columns[${m2.columns}] != 4")
   }
 
+  test("kronecker product") {
+    val m1 = Mat[1,2](1, 2)
+    val m2 = Mat[2,2](1, 2, 3, 4)
+    val expected = Mat[2,4](1, 2, 2, 4, 3, 4, 6, 8)
+    val result = (m1.kronecker(m2))
+    assert(result.strictEquals(expected))
+  }
+
 }
