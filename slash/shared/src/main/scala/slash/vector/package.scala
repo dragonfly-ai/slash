@@ -415,6 +415,18 @@ package object vector {
         o
       }
 
+      def kronecker[M <: Int](v0: Vec[M])(using ValueOf[N * M]): Vec[N * M] = {
+        val o: Vec[N * M] = Vec.zeros[N * M]
+        var i = 0; while (i < dimension) {
+          var j = 0; while (j < v0.dimension) {
+            o(i * v0.dimension + j) = thisVector(i) * v0(j)
+            j = j + 1
+          }
+          i = i + 1
+        }
+        o
+      }
+
       def round(): Unit = {
         var i = 0; while (i < dimension) {
           thisVector(i) = Math.round(thisVector(i)).toDouble

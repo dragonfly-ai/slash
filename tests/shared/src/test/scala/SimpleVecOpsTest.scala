@@ -63,6 +63,13 @@ class SimpleVecOpsTest extends munit.FunSuite {
     assertVecEquals(v1 / 2.0, vResult)
   }
 
+  test("kronecker product") {
+    val v1 = Vec[3](0.0, 2.0, 1.0)
+    val v2 = Vec[2](1.5, 2.5)
+    val vResult = Vec[6](0.0, 0.0, 3.0, 5.0, 1.5, 2.5)
+    assertVecEquals(v1.kronecker(v2), vResult)
+  }
+
   test("clampedMin") {
     val v1 = Vec[3](1.5, 2.5, 3.5)
     val vResult = Vec[3](2.0, 2.5, 3.5)
