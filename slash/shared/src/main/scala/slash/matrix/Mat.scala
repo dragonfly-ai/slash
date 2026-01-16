@@ -756,6 +756,20 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     X
   }
 
+  /** Hadamard product (element wise multiplication) A * B
+    *
+    * @param B another matrix
+    * @return A * B (where * is the Hadamard Product)
+    */
+  def hadamard(B: Mat[M, N]): Mat[M, N] = {
+    var v:Int = 0
+    while (v < values.length) {
+      values(v) = values(v) * B.values(v)
+      v = v + 1
+    }
+    this
+  }
+
   def kronecker[V <: Int, W <: Int](b: Mat[V, W])(using ValueOf[V * M], ValueOf[W * N]): Mat[V * M, W * N] = {
     val X: Mat[V * M, W * N] = Mat.zeros[V * M, W * N]
 

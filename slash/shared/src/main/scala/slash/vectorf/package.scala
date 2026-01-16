@@ -417,6 +417,15 @@ package object vectorf {
         o
       }
 
+      def hadamard(v0: VecF[N]): VecF[N] = {
+        val o: VecF[N] = copy
+        var i = 0; while (i < dimension) {
+          thisVector(i) = thisVector(i) * v0(i)
+          i = i + 1
+        }
+        o
+      }
+
       def kronecker[M <: Int](v0: VecF[M])(using ValueOf[N * M]): VecF[N * M] = {
         val o: VecF[N * M] = VecF.zeros[N * M]
         var i = 0; while (i < dimension) {
