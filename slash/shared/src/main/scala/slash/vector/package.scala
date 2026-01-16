@@ -415,6 +415,15 @@ package object vector {
         o
       }
 
+      def reciprocal: Vec[N] = {
+        val o: Vec[N] = copy
+        var i = 0; while (i < dimension) {
+          thisVector(i) = 1.0 / thisVector(i)
+          i = i + 1
+        }
+        o
+      }
+
       def hadamard(v0: Vec[N]): Vec[N] = {
         val o: Vec[N] = copy
         var i = 0; while (i < dimension) {
