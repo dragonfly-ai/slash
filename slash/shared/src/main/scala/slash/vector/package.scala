@@ -415,12 +415,16 @@ package object vector {
         o
       }
 
-      def reciprocal: Vec[N] = {
-        val o: Vec[N] = copy
+      def reciprocate: Unit = {
         var i = 0; while (i < dimension) {
           thisVector(i) = 1.0 / thisVector(i)
           i = i + 1
         }
+      }
+
+      def reciprocal: Vec[N] = {
+        val o: Vec[N] = copy
+        o.reciprocate
         o
       }
 

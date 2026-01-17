@@ -417,6 +417,19 @@ package object vectorf {
         o
       }
 
+      def reciprocate: Unit = {
+        var i = 0; while (i < dimension) {
+          thisVector(i) = 1.0f / thisVector(i)
+          i = i + 1
+        }
+      }
+
+      def reciprocal: VecF[N] = {
+        val o: VecF[N] = copy
+        o.reciprocate
+        o
+      }
+
       def hadamard(v0: VecF[N]): VecF[N] = {
         val o: VecF[N] = copy
         var i = 0; while (i < dimension) {
