@@ -430,12 +430,16 @@ package object vectorf {
         o
       }
 
-      def hadamard(v0: VecF[N]): VecF[N] = {
-        val o: VecF[N] = copy
+      def pointwiseMultiply(v0: VecF[N]): Unit = {
         var i = 0; while (i < dimension) {
           thisVector(i) = thisVector(i) * v0(i)
           i = i + 1
         }
+      }
+
+      def pointwiseMultiplied(v0: VecF[N]): VecF[N] = {
+        val o: VecF[N] = copy
+        o.pointwiseMultiply(v0)
         o
       }
 
