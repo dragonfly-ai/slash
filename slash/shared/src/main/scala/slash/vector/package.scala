@@ -415,6 +415,32 @@ package object vector {
         o
       }
 
+      def reciprocate: Unit = {
+        var i = 0; while (i < dimension) {
+          thisVector(i) = 1.0 / thisVector(i)
+          i = i + 1
+        }
+      }
+
+      def reciprocal: Vec[N] = {
+        val o: Vec[N] = copy
+        o.reciprocate
+        o
+      }
+
+      def pointwiseMultiply(v0: Vec[N]): Unit = {
+        var i = 0; while (i < dimension) {
+          thisVector(i) = thisVector(i) * v0(i)
+          i = i + 1
+        }
+      }
+
+      def pointwiseMultiplied(v0: Vec[N]): Vec[N] = {
+        val o: Vec[N] = copy
+        o.pointwiseMultiply(v0)
+        o
+      }
+
       def kronecker[M <: Int](v0: Vec[M])(using ValueOf[N * M]): Vec[N * M] = {
         val o: Vec[N * M] = Vec.zeros[N * M]
         var i = 0; while (i < dimension) {

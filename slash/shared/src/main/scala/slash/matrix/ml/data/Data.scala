@@ -39,6 +39,19 @@ trait Data[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {
   def sampleStandardDeviation:Vec[N]
   def domainComponent(i:Int):Interval[Double]
   def domainBias:Vec[N] = sampleMean
+
+  def zScore(x: Vec[N]): Vec[N] = {
+    val o = (x - sampleMean)
+    o.pointwiseMultiply(sampleStandardDeviation.reciprocal)
+    o
+  }
+
+  def fromZScore(x: Vec[N]): Vec[N] = {
+    val o = x.copy
+    o.pointwiseMultiply(sampleStandardDeviation)
+    o += sampleMean
+    o
+  }
 }
 
 trait UnsupervisedData[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) extends Data[M, N] {
