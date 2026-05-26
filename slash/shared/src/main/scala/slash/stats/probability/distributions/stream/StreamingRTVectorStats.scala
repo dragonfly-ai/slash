@@ -16,18 +16,18 @@
 
 package slash.stats.probability.distributions.stream
 
-import slash.vector.{Vec, VectorBounds}
+import slash.vector.runtime.*
 
 /**
  * Created by c on 1/10/17.
  */
 
-class StreamingVectorStats[N <: Int](using ValueOf[N]) {  // Why doesn't this extend Sampleable?
-  private val internal = new util.StreamingNArrayStats(valueOf[N])
+class StreamingRTVectorStats(dimension:Int) {  // Why doesn't this extend Sampleable?
+  private val internal = new util.StreamingNArrayStats(dimension)
 
   def reset():Unit = internal.reset()
 
-  def apply(c: Vec[N], weight: Double = 1.0): StreamingVectorStats[N] = {
+  def apply(c: RTVec, weight: Double = 1.0): StreamingRTVectorStats = {
     internal.apply(c.asNativeArray, weight)
     this
   }
@@ -35,23 +35,24 @@ class StreamingVectorStats[N <: Int](using ValueOf[N]) {  // Why doesn't this ex
   inline def minValues(i:Int):Double = internal.minValues(i)
   inline def maxValues(i:Int):Double = internal.maxValues(i)
 
-  inline def average(): Vec[N] = internal.average().asInstanceOf[Vec[N]]
+  inline def average(): RTVec = internal.average().asInstanceOf[RTVec]
 
-  inline def variance: Vec[N] = internal.variance.asInstanceOf[Vec[N]]
+  inline def variance: RTVec = internal.variance.asInstanceOf[RTVec]
 
-  inline def standardDeviation: Vec[N] = internal.standardDeviation.asInstanceOf[Vec[N]]
+  inline def standardDeviation: RTVec = internal.standardDeviation.asInstanceOf[RTVec]
 
-  inline def bounds(): VectorBounds[N] = VectorBounds[N](
-    Vec[N](internal.minValues),
-    Vec[N](internal.maxValues)
+  inline def bounds(): RTVectorBounds = RTVectorBounds(
+    RTVec(internal.minValues),
+    RTVec(internal.maxValues)
   )
 
-  override def toString: String = s"StreamingVectorStats(" +
-    s"\n\ts0: ${internal.s0}\n\ts1: ${Vec[N](internal.s1).render()}" +
-    s"\n\ts2: ${Vec[N](internal.s2).render()}" +
-    s"\n\tminValues: ${Vec[N](internal.minValues).render()}" +
-    s"\n\tmaxValues: ${Vec[N](internal.maxValues).render()}" +
+  override def toString: String = s"StreamingRTVectorStats(" +
+    s"\n\ts0: ${internal.s0}\n\ts1: ${RTVec(internal.s1).render()}" +
+    s"\n\ts2: ${RTVec(internal.s2).render()}" +
+    s"\n\tminValues: ${RTVec(internal.minValues).render()}" +
+    s"\n\tmaxValues: ${RTVec(internal.maxValues).render()}" +
     s"\n\tAverage: ${average().render()}" +
     s"\n\tVariance: ${variance.render()}" +
     s"\n\tStandard Deviation: ${standardDeviation.render()})"
+
 }

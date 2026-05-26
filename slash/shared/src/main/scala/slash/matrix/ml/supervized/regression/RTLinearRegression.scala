@@ -17,23 +17,23 @@
 package slash.matrix.ml.supervized.regression
 
 import slash.matrix.*
-import slash.matrix.ml.data.SupervisedData
+import slash.matrix.ml.data.RTSupervisedData
 import slash.matrix.ml.supervized
 import slash.matrix.ml.supervized.regression
 
 import slash.stats.probability.distributions.EstimatedGaussian
-import slash.vector.*
+import slash.vector.runtime.*
 
-trait LinearRegression[M <: Int, N <: Int] {
+trait RTLinearRegression {
 
-  def estimateBeta(X:Mat[M, N], Y:Mat[M, 1]): Mat[N, 1]
+  def estimateBeta(X:RTMat, Y:RTMat): RTMat
 
-  def train(lrp:LinearRegressionProblem[M, N]): LinearRegressionModel[N] = {
+  def train(lrp:RTLinearRegressionProblem): RTLinearRegressionModel = {
     import lrp.*
 
-    val A:Mat[N, 1] = estimateBeta(X, Y)
+    val A:RTMat = estimateBeta(X, Y)
 
-    val errors:Mat[M, 1] = (X * A) - Y
+    val errors:RTMat = (X * A) - Y
 
     var err:Double = 0.0
     var `err²`: Double = 0.0
@@ -43,7 +43,7 @@ trait LinearRegression[M <: Int, N <: Int] {
       `err²` = `err²` + et
     }
 
-    regression.LinearRegressionModel[N](
+    regression.RTLinearRegressionModel(
       A, lrp.mean, lrp.bias,
       err/size,
       1.0 - (`err²` / (`EstGaussian(Y)`.sampleVariance * `EstGaussian(Y)`.ℕ.toDouble))
@@ -51,24 +51,26 @@ trait LinearRegression[M <: Int, N <: Int] {
   }
 }
 
-trait LinearRegressionProblem[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {
-  val sampleSize:Int = valueOf[M]
-  val dimension:Int = valueOf[N]
-  val X: Mat[M, N]
-  val Y: Mat[M, 1]
+trait RTLinearRegressionProblem {
+  val sampleSize:Int
+  val dimension:Int
+  val X: RTMat
+  val Y: RTMat
   val bias:Double
-  val mean:Vec[N]
+  val mean:RTVec
   val `EstGaussian(Y)`: EstimatedGaussian
   def size:Double = `EstGaussian(Y)`.ℕ.toDouble
 }
 
-object LinearRegressionProblem {
+object RTLinearRegressionProblem {
 
-  def apply[M <: Int, N <: Int](trainingData:SupervisedData[M, N])(using ValueOf[M], ValueOf[N]):LinearRegressionProblem[M, N] = {
-    new LinearRegressionProblem[M, N] {
-      override val X: Mat[M, N] = trainingData.X
-      override val Y: Mat[M, 1] = trainingData.Y
-      override val mean:Vec[N] = trainingData.sampleMean
+  def apply(trainingData:RTSupervisedData):RTLinearRegressionProblem = {
+    new RTLinearRegressionProblem {
+      override val sampleSize:Int = trainingData.sampleSize
+      override val dimension:Int = trainingData.dimension
+      override val X: RTMat = trainingData.X
+      override val Y: RTMat = trainingData.Y
+      override val mean:RTVec = trainingData.sampleMean
       override val bias:Double = trainingData.rangeBias
       override val `EstGaussian(Y)`: EstimatedGaussian = trainingData.labelStats
     }

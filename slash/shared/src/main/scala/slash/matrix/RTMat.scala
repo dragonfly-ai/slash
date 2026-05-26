@@ -16,23 +16,21 @@
 
 package slash.matrix
 
-import slash.*
 import narr.*
-import slash.vector.Vec
-
-import scala.compiletime.ops.int.*
+import slash.*
+import slash.vector.runtime.RTVec
 
 /**
   * This library is fundamentally an adaptation of the Java Mat library, JaMa, by MathWorks Inc. and the National Institute of Standards and Technology.
   */
 
-object Mat {
+object RTMat {
   /** Construct a matrix from a copy of an array.
    *
    * @param values array of doubles.
    * @throws IllegalArgumentException All rows must have the same length
    */
-  inline def copyFrom[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]): Mat[M, N] = apply(narr.copy[Double](values))
+  inline def copyFrom(m:Int, n:Int, values: NArray[Double]): RTMat = new RTMat(m, n, narr.copy[Double](values))
 
   /**
    * Generates an MxN matrix which consists of elements randomized between [-1.0, 1.0] inclusive.
@@ -40,7 +38,7 @@ object Mat {
    * @tparam N the number of columns
    * @return
    */
-  inline def random[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = random[M, N](slash.Random.defaultRandom)
+  inline def random(m:Int, n:Int): RTMat = random(m, n, slash.Random.defaultRandom)
 
   /**
    * Generates an MxN matrix which consists of elements randomized between [-1.0, 1.0] inclusive.
@@ -49,8 +47,8 @@ object Mat {
    * @tparam N the number of columns
    * @return An MxN matrix with uniformly distributed random elements.
    */
-  inline def random[M <: Int, N <: Int](r:scala.util.Random)(using ValueOf[M], ValueOf[N]):Mat[M, N] = {
-    random(slash.interval.`[]`(-1.0, 1.0), r)
+  inline def random(m:Int, n:Int, r:scala.util.Random):RTMat = {
+    random(m, n, slash.interval.`[]`(-1.0, 1.0), r)
   }
 
   /** Generate matrix with random elements
@@ -61,10 +59,12 @@ object Mat {
    * @tparam N the number of columns
    * @return An MxN matrix with uniformly distributed random elements.
    */
-  inline def random[M <: Int, N <: Int](
-    minNorm: Double,
-    normMAX: Double
-  )(using ValueOf[M], ValueOf[N]): Mat[M, N] = random[M, N](minNorm, normMAX, slash.Random.defaultRandom)
+  inline def random(
+    m:Int,
+    n:Int,
+    minNorm:Double,
+    normMAX:Double
+  ): RTMat = random(m, n, minNorm, normMAX, slash.Random.defaultRandom)
 
 
   /** Generate matrix with random elements
@@ -75,11 +75,13 @@ object Mat {
    * @tparam N the number of columns
    * @return An MxN matrix with uniformly distributed random elements.
    */
-  inline def random[M <: Int, N <: Int](
+  inline def random(
+    m:Int,
+    n:Int,
     minNorm:Double,
     normMAX:Double,
     r:scala.util.Random
-  )(using ValueOf[M], ValueOf[N]): Mat[M, N] = random[M, N](slash.interval.`[]`(minNorm, normMAX), r)
+  ): RTMat = random(m, n, slash.interval.`[]`(minNorm, normMAX), r)
 
   /** Generate matrix with random elements
    *
@@ -89,12 +91,12 @@ object Mat {
    * @tparam N the number of columns
    * @return An MxN matrix with uniformly distributed random elements.
    */
-  def random[M <: Int, N <: Int](
+  inline def random(
+    m:Int,
+    n:Int,
     interval:slash.interval.Interval[Double],
     r: scala.util.Random
-  )(using ValueOf[M], ValueOf[N]): Mat[M, N] = new Mat[M, N](
-    NArray.tabulate[Double]( valueOf[M] * valueOf[N] )( _ => interval.random(r) )
-  )
+  ): RTMat = new RTMat(m, n, NArray.tabulate[Double]( m * m )( _ => interval.random(r) ))
 
   /** Generate identity matrix
    *
@@ -102,7 +104,7 @@ object Mat {
    * @tparam N the number of columns
    * @return An MxN matrix with ones on the diagonal and zeros elsewhere.
    */
-  def identity[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = diagonal[M, N](1.0)
+  inline def identity(m:Int, n:Int): RTMat = diagonal(m, n, 1.0)
 
   /**
    * Generate identity matrix scaled by value parameter.
@@ -115,16 +117,14 @@ object Mat {
    * @return An MxN matrix with 'value' on the diagonal and zeros elsewhere.
    */
 
-  def diagonal[M <: Int, N <: Int](value:Double)(using ValueOf[M], ValueOf[N]): Mat[M, N] = Mat[M,N](
-    util.diagonal(valueOf[M], valueOf[N], value)
-  )
+  inline def diagonal(m:Int, n:Int, value:Double): RTMat = new RTMat(m, n, util.diagonal(m, m, value))
 
   /**
    * Generate a square matrix with the supplied vector along the diagonal.
    * @param v a vector
    * @return
    */
-  def diagonal[D <: Int](v:Vec[D])(using ValueOf[D]): Mat[D, D] = Mat[D, D](util.diagonal(v.asNativeArray))
+  inline def diagonal(v:RTVec): RTMat = new RTMat(v.dimension, v.dimension, util.diagonal(v.asNativeArray))
 
   /**
    * Create a rectangular matrix with the given vector along the diagonal.
@@ -134,18 +134,16 @@ object Mat {
    * @tparam D the dimension of the vector.  Must equal either M or N.
    * @return an MxN rectangular matrix with the given vector along the diagonal.
    */
-  def diagonal[M <: Int, N <: Int, D <: Int](v: Vec[D])(using ValueOf[M], ValueOf[N]): Mat[M, N] = Mat[M,N](
-    util.diagonal(valueOf[M], valueOf[N], v.asNativeArray)
-  )
+  inline def diagonal(m:Int, n:Int, v: RTVec): RTMat = new RTMat(m, n, util.diagonal(m, n, v.asNativeArray) )
 
   /** Construct a matrix from a 2-D array.
    *
    * @param arr2d Two-dimensional array of doubles.  arr2d(row)(column).
    */
 
-  def apply[M <: Int, N <: Int](arr2d:NArray[Vec[N]])(using ValueOf[M], ValueOf[N]):Mat[M, N] = apply[M,N](
-    util.flatten(arr2d.asInstanceOf[NArray[NArray[Double]]])
-  )
+  inline def apply(m:Int, n:Int, arr2d:NArray[RTVec]):RTMat = {
+    new RTMat(m, n, util.flatten(arr2d.asInstanceOf[NArray[NArray[Double]]]))
+  }
 
   /** Construct an MxN constant matrix.
    * @param value Fill the matrix with this scalar value.
@@ -153,25 +151,21 @@ object Mat {
    * @tparam N the number of columns
    * @return an MxN constant matrix.
    */
-  inline def fill[M <: Int, N <: Int](value: Double)(using ValueOf[M], ValueOf[N]):Mat[M, N] = apply[M, N](
-    util.fill(valueOf[M], valueOf[N], value)
-  )
+  inline def fill(m:Int, n:Int)(value: Double):RTMat = new RTMat(m, n, util.fill(m, n, value))
 
   /** Construct an MxN matrix of zeros.
    *
    * @tparam M the number of rows
    * @tparam N the number of columns
    */
-  inline def zeros[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]):Mat[M, N] = apply[M, N](util.zeros(valueOf[M], valueOf[N]))
+  inline def zeros(m:Int, n:Int):RTMat = new RTMat(m, n, util.zeros(m, n))
 
   /** Construct an MxN matrix of ones.
    *
    * @tparam M the number of rows
    * @tparam N the number of columns
    */
-  inline def ones[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M, N] = apply[M, N](
-    util.fill(valueOf[M], valueOf[N], 1.0)
-  )
+  inline def ones(m:Int, n:Int): RTMat = new RTMat(m, n, util.fill(m, n, 1.0))
 
   /** Construct a matrix from a one-dimensional packed array
    *
@@ -180,7 +174,7 @@ object Mat {
    * @tparam N the number of columns
    * @throws IllegalArgumentException NArray length must equal M * N
    */
-  def apply[M <: Int, N <: Int](values: NArray[Double])(using ValueOf[M], ValueOf[N]):Mat[M, N] = new Mat[M, N](values)
+  def apply(m:Int, n:Int, values: NArray[Double]):RTMat = new RTMat(m, n, values)
 
   /**
    *
@@ -189,24 +183,21 @@ object Mat {
    * @tparam N the number of columns
    * @return an M x N matrix consisting of values.
    */
-  def apply[M <: Int, N <: Int](values: Double *)(using ValueOf[M], ValueOf[N]):Mat[M, N] = {
-    dimensionCheck(values.size, valueOf[M] * valueOf[N])
-    new Mat[M, N](NArray[Double](values *))
+  def apply(m:Int, n:Int, values: Double *):RTMat = {
+    dimensionCheck(values.size, m * n)
+    new RTMat(m, n, NArray[Double](values *))
   }
 
   // support left multiply by scalar
   extension (d: Double) {
-    def *[M <: Int, N <: Int](m: Mat[M,N]): Mat[M,N] = m * d // same as right multiply
+    def * (rtm: RTMat): RTMat = rtm * d // same as right multiply
   }
 
 }
 
-class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], ValueOf[N]) {
-  val rows: Int = valueOf[M]
-  val columns: Int = valueOf[N]
+class RTMat(rows:Int, columns:Int, val values: NArray[Double]) {
 
   val MxN: Int = rows * columns
-  opaque type MN <: Int = M * N
 
   require(rows * columns == values.length, s"Product of $rows x $columns != ${values.length}")
 
@@ -214,7 +205,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   /** Make a deep copy of a matrix
     */
-  inline def copy: Mat[M, N] = new Mat[M, N](copyValues)
+  inline def copy: RTMat = new RTMat(rows, columns, copyValues)
 
   /** Copy the internal two-dimensional array.
     *
@@ -238,23 +229,23 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
    * @param row the row of the matrix to return as a vector.
    * @return a copy of the specified matrix row in Vec[N] format.
    */
-  inline def rowVector(row:Int):Vec[N] = Vec.apply[N](util.extractRow(columns, row, values))
+  inline def rowVector(row:Int):RTVec = RTVec.apply(util.extractRow(columns, row, values))
 
   /**
    * @return a copy of this matrix in the form of an array of row vectors.
    */
-  inline def rowVectors: NArray[Vec[N]] = util.as2DNArray(rows, columns, values).asInstanceOf[NArray[Vec[N]]]
+  inline def rowVectors: NArray[RTVec] = util.as2DNArray(rows, columns, values).asInstanceOf[NArray[RTVec]]
 
   /**
    * @param column the column of the matrix to return as a vector.
    * @return a copy of the specified matrix column in Vec[M] format.
    */
-  inline def columnVector(column:Int):Vec[M] =  util.extractColumn(rows, columns, column, values).asInstanceOf[Vec[M]]
+  inline def columnVector(column:Int):RTVec =  util.extractColumn(rows, columns, column, values).asInstanceOf[RTVec]
 
   /**
    * @return a copy of this matrix in the form of an array of column vectors.
    */
-  inline def columnVectors: NArray[Vec[M]] = transpose.rowVectors
+  inline def columnVectors: NArray[RTVec] = transpose.rowVectors
 
   /** Get row dimension.
     *
@@ -405,7 +396,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
    *
    * @return Mᵀ
    */
-  def transpose: Mat[N, M] = new Mat[N, M](columnPackedNArray)
+  def transpose: RTMat = new RTMat(columns, rows, columnPackedNArray)
 
   /**
    * One norm
@@ -426,41 +417,41 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     */
   def normFrobenius: Double = util.normFrobenius(values)
 
-  def + (B: Mat[M, N]): Mat[M, N] = {
+  def + (B: RTMat): RTMat = {
     val out = copy
     out.add(B)
     out
   }
 
-  inline def += (B: Mat[M, N]): Unit = add(B)
+  inline def += (B: RTMat): Unit = add(B)
 
   /** A = A + B
     *
     * @param B another matrix
     * @return A + B
     */
-  def add(B: Mat[M, N]): Unit = util.add(values, B.values)
+  def add(B: RTMat): Unit = util.add(values, B.values)
 
   /** Unary minus
    *
    * @return -A
    */
-  inline def unary_- : Mat[M, N] = * ( -1.0 )
+  inline def unary_- : RTMat = * ( -1.0 )
 
-  def - (B: Mat[M, N]): Mat[M, N] = {
+  def - (B: RTMat): RTMat = {
     val out = copy
     out.subtract(B)
     out
   }
 
-  inline def -= (B: Mat[M, N]): Unit = subtract(B)
+  inline def -= (B: RTMat): Unit = subtract(B)
 
   /** A = A - B
    *
    * @param B another matrix
    * @return A - B
    */
-  def subtract(B: Mat[M, N]): Unit = util.subtract(values, B.values)
+  def subtract(B: RTMat): Unit = util.subtract(values, B.values)
 
   /** A = A + d
    * add a scalar to every element of a matrix.
@@ -474,7 +465,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @param s scalar
     * @return A * s
     */
-  def * (s: Double): Mat[M, N] = {
+  def * (s: Double): RTMat = {
     val out = copy
     out.times(s)
     out
@@ -487,7 +478,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @param s scalar
     * @return A + s
     */
-  def + (s: Double): Mat[M, N] = {
+  def + (s: Double): RTMat = {
     val out = copy
     out.addScalar(s)
     out
@@ -495,7 +486,7 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   inline def += (s:Double): Unit = addScalar(s)
 
-  def - (s: Double): Mat[M, N] = {
+  def - (s: Double): RTMat = {
     val out = copy
     out.addScalar(-s)
     out
@@ -510,17 +501,21 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     */
   inline def times(s: Double): Unit = util.times(values, s)
 
-  inline def * (v: slash.vectorf.VecF[N]): slash.vectorf.VecF[N] = times(v)
+  //inline def * (v: slash.vectorf.VecF[N]): slash.vectorf.VecF[N] = times(v)
 
-  inline def times (v: slash.vectorf.VecF[N]): slash.vectorf.VecF[N] = {
-    util.times(values, v.asNativeArray).asInstanceOf[slash.vectorf.VecF[N]]
+//  inline def times (v: slash.vectorf.VecF[N]): slash.vectorf.VecF[N] = {
+//    util.times(values, v.asNativeArray).asInstanceOf[slash.vectorf.VecF[N]]
+//  }
+
+  inline def * (v: RTVec): RTVec = times(v)
+
+  inline def times (v: RTVec): RTVec = util.times(values, v.asNativeArray).asInstanceOf[RTVec]
+
+  inline def * (thatMatrix: RTMat): RTMat = {
+    dimensionCheck(rows, thatMatrix.rowDimension)
+    dimensionCheck(columns, thatMatrix.columnDimension)
+    times(thatMatrix)
   }
-
-  inline def * (v: Vec[N]): Vec[N] = times(v)
-
-  inline def times (v: Vec[N]): Vec[N] = util.times(values, v.asNativeArray).asInstanceOf[Vec[N]]
-
-  inline def * [V <: Int](thatMatrix: Mat[N, V])(using ValueOf[V]): Mat[M, V] = times(thatMatrix)
 
   /** Linear algebraic matrix multiplication, A * B
     *
@@ -528,8 +523,8 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @return Mat product, A * B
     * @throws IllegalArgumentException Mat inner dimensions must agree.
     */
-  inline def times[V <: Int](b: Mat[N, V])(using ValueOf[V]): Mat[M, V] = new Mat[M, V](
-    util.times(rows, columns, values, b.columns, b.values)
+  inline def times(b: RTMat): RTMat = new RTMat(
+    rows, b.columnDimension, util.times(rows, columns, values, b.columnDimension, b.values)
   )
 
   /** Pointwise multiplication (hadamard product) A * B
@@ -537,22 +532,24 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     * @param B another matrix
     * @return A * B (where * is the Hadamard Product)
     */
-  inline def pointwiseMultiply(B: Mat[M, N]): Unit = util.pointwiseMultiply(values, B.values)
+  inline def pointwiseMultiply(B: RTMat): Unit = util.pointwiseMultiply(values, B.values)
 
   /** Pointwise multiplication (hadamard product) A * B
     *
     * @param B another matrix
     * @return A * B (where * is the Hadamard Product)
     */
-  def pointwiseMultiplied(B: Mat[M, N]): Mat[M, N] = {
+  def pointwiseMultiplied(B: RTMat): RTMat = {
     val out = copy
     out.pointwiseMultiply(B)
     out
   }
 
-  inline def kronecker[V <: Int, W <: Int](b: Mat[V, W])(using ValueOf[V * M], ValueOf[W * N]): Mat[V * M, W * N] = {
-    new Mat[V * M, W * N](
-      util.kronecker(rows, columns, values, b.rows, b.columns, b.values)
+  inline def kronecker(b: RTMat): RTMat = {
+    new RTMat(
+      b.rowDimension * rows,
+      b.columnDimension * columns,
+      util.kronecker(rows, columns, values, b.rowDimension, b.columnDimension, b.values)
     )
   }
 
@@ -564,14 +561,14 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
 
   inline def dim: String = s"dim(${rows}x$columns)"
 
-  inline def concatenateRows[M1 <: Int](m: Mat[M1, N])(using ValueOf[+[M, M1]]): Mat[+[M, M1], N] = new Mat[+[M, M1], N](
-    util.concatenateRows(values, m.values)
+  inline def concatenateRows(m: RTMat): RTMat = new RTMat(
+    rows, columns + m.columnDimension, util.concatenateRows(values, m.values)
   )
 
   inline def concatenateRows(m: Mat[? <: Int, ? <: Int]): NArray[Double] = util.concatenateRows(values, m.values)
 
-  def concatenateColumns[N1 <: Int](m: Mat[M,N1])(using ValueOf[+[N,N1]]): Mat[M, +[N,N1]] = new Mat[M, +[N, N1]](
-    util.concatenateColumns(rows, columns, values, m.columns, m.values)
+  def concatenateColumns(m: RTMat): RTMat = new RTMat(
+    rows, columns + m.columnDimension, util.concatenateColumns(rows, columns, values, m.columnDimension, m.values)
   )
 
   inline def concatenateColumns(m: Mat[? <: Int, ? <: Int]): NArray[Double] = {
@@ -590,21 +587,115 @@ class Mat[M <: Int, N <: Int](val values: NArray[Double])(using ValueOf[M], Valu
     }
   }
 
-  inline def upperTriangular: Mat[M,N] = new Mat[M, N](
-    util.upperTriangular(rows, columns, values)
-  )
+  inline def upperTriangular: RTMat = new RTMat(rows, columns, util.upperTriangular(rows, columns, values))
 
-  inline def lowerTriangular: Mat[M,N] = new Mat[M, N](
-    util.lowerTriangular(rows, columns, values)
-  )
+  inline def lowerTriangular: RTMat = new RTMat(rows, columns, util.lowerTriangular(rows, columns, values))
 
-  inline def diagonalVector: Vec[Min[M,N]] = {
-    util.diagonalVector(rows, columns, values).asInstanceOf[Vec[Min[M,N]]]
+  inline def diagonalVector: RTVec = util.diagonalVector(rows, columns, values).asInstanceOf[RTVec]
+
+  def asVector: RTVec = values.asInstanceOf[RTVec]
+
+  inline def copyAsVector: RTVec = NArray.copy[Double](values).asInstanceOf[RTVec]
+
+  /** cast matrix as RTMat with dimensions r x c
+   *
+   * @param r new vertical dimension
+   * @param c new horizontal dimension
+   * @return same values, but recast to rXc
+   */
+  def reshape(r: Int, c: Int): RTMat = {
+    dimensionCheck(r + c, rows + columns)
+    new RTMat(r, c, values)
+  }
+
+  /** values as a Vector.
+   */
+  def flatten: slash.vector.runtime.RTVec = slash.vector.runtime.RTVec(values)
+
+  /**
+   * Extension Methods for Square Matrices.
+   */
+
+  private lazy val svd: decomposition.RTSV = decomposition.RTSV(this)
+  private lazy val lu: decomposition.RTLU = decomposition.RTLU(this)
+  private lazy val qr: decomposition.RTQR = decomposition.RTQR(this)
+
+  /**
+   * https://en.wikipedia.org/wiki/Invertible_matrix
+   *
+   * Computes the inverse of Square Mat m.
+   *
+   * @throws RuntimeException( "Mat is singular." )
+   * @return the inverse of matrix m
+   */
+  def inverse: RTMat = {
+    dimensionCheck(rows, columns)
+    solve(RTMat.identity(rows, columns))
+  }
+
+  /** Solve a * x = b
+   *
+   * @param b right hand side
+   * @return x = Mat[MN, V] such that a * x = b
+   */
+  def solve(b: RTMat): RTMat = {
+    if (rows == columns) lu.solve(b)
+    else qr.solve(b)
+  }
+
+  /** Mat determinant
+   * https://en.wikipedia.org/wiki/Determinant
+   * the determinant is nonzero if and only if the matrix is invertible and the linear map represented by the matrix is an isomorphism
+   *
+   * @return the determinant of this matrix.
+   */
+  def determinant: Double = lu.determinant
+
+  /** Solve b * m = I[N, N]
+   * m = Mat[M, N] with M > N and Rank = N, has a left inverse b = Mat[N, M] such that b * m = I[N, N]
+   *
+   * @return b = Mat[N, M] the Left Inverse of Mat m.
+   */
+  def leftInverse: RTMat = {
+    if (rows < columns) {
+      throw new RuntimeException("Matrix row dimension must equal or exceed column dimension to compute leftInverse.")
+    } else if (rank == columns) {
+      svd.V * svd.S_inverse * svd.U.transpose
+    } else throw new RuntimeException("Matrix must have full rank to compute leftInverse.")
+  }
+
+  /** Two norm
+   *
+   * @return maximum singular value.
+   */
+  def norm2: Double = svd.norm2
+
+  /** Mat rank
+   *
+   * @return effective numerical rank, obtained from SV.
+   */
+  def rank: Int = svd.rank
+
+  /** Mat condition (2 norm)
+   *
+   * @return ratio of largest to smallest singular value.
+   */
+  def cond: Double = svd.cond
+
+  /**
+   * m = Mat[M, N] with M < N and Rank = M, has a right inverse b = Mat[N, M] such that m * b = Identity[M, M]
+   *
+   * @return the Right Inverse of this RTMat.
+   */
+  lazy val rightInverse: RTMat = {
+    if (rows > columns) throw new RuntimeException("Matrix column dimension must exceed row dimension to compute rightInverse.")
+    else if (rank == rows) qr.solve(RTMat.identity(columns, columns))
+    else throw new RuntimeException("Matrix must have full row rank to compute rightInverse.")
   }
 
   def render(
     format: MatFormat = MatFormat.DEFAULT,
-    alignment: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]] = MatFormat.ALIGN_ON_DECIMAL,
+    alignment: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]],
     sb: StringBuilder = new StringBuilder()
   ): StringBuilder = {
     format.render(rows, columns, values, alignment, sb)

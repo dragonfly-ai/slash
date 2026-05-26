@@ -19,8 +19,6 @@ package slash.stats.probability.distributions
 import slash.*
 import slash.interval.Interval
 
-import scala.reflect.ClassTag
-
 trait SampledMass {
   def sampleMass:BigDecimal
   inline def ℕ:BigDecimal = sampleMass
@@ -38,16 +36,16 @@ trait SampledVariance {
   inline def `σ²`:Double = sampleVariance
 }
 
-trait SampledBounds[DOMAIN:ClassTag] {
+trait SampledBounds[DOMAIN] {
   def bounds: Interval[DOMAIN]
 }
 
-trait SampledBoundedMean[DOMAIN:ClassTag] extends SampledBounds[DOMAIN] with SampledMean with SampledMass
-trait SampledPointStatistics[DOMAIN:ClassTag] extends SampledVariance with SampledBoundedMean[DOMAIN]
+trait SampledBoundedMean[DOMAIN] extends SampledBounds[DOMAIN] with SampledMean with SampledMass
+trait SampledPointStatistics[DOMAIN] extends SampledVariance with SampledBoundedMean[DOMAIN]
 
 case class SampleMean(override val sampleMean: Double) extends SampledMean
 case class SampleVariance(override val sampleVariance: Double) extends SampledVariance
-case class SampleBounds[DOMAIN:ClassTag](override val bounds:Interval[DOMAIN]) extends SampledBounds[DOMAIN]
+case class SampleBounds[DOMAIN](override val bounds:Interval[DOMAIN]) extends SampledBounds[DOMAIN]
 
 case class SampleMeanAndVariance (
   override val sampleMean:Double,
@@ -55,7 +53,7 @@ case class SampleMeanAndVariance (
   override val sampleMass:BigDecimal
 ) extends SampledMass with SampledMean with SampledVariance
 
-case class SampleBoundedMean[DOMAIN:ClassTag](
+case class SampleBoundedMean[DOMAIN](
   override val sampleMean: Double,
   override val bounds: Interval[DOMAIN],
   override val sampleMass:BigDecimal
@@ -70,7 +68,7 @@ case class SampleBoundedMean[DOMAIN:ClassTag](
 
 type SampleBoundedMeanAndVariance = SamplePointStatistics.type
 
-case class SamplePointStatistics[DOMAIN:ClassTag](
+case class SamplePointStatistics[DOMAIN](
   override val sampleMean: Double,
   override val sampleVariance: Double,
   override val bounds: Interval[DOMAIN],

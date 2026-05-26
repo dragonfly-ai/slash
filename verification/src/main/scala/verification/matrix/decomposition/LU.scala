@@ -18,6 +18,7 @@ object LU extends Verification {
     println(s"\tComparing Determinants: ${jluSquare.det()} vs ${sluSquare.determinant} error = ${Math.abs(jluSquare.det() - sluSquare.determinant)}")
     println(s"\tComparing L : ${Verification.matrixCompare(jluSquare.getL, sluSquare.L)}")
     println(s"\tComparing U : ${Verification.matrixCompare(jluSquare.getU, sluSquare.U)}")
+    println(s"\tComparing solve : ${Verification.matrixCompare(jluSquare.solve(solveJaMa), sluSquare.solve(solveMa))}")
 
 //    val jluWide: LUDecomposition = new LUDecomposition(wideJaMa)
 //    val mluWide: matrix.decomposition.LU[11, 19] = matrix.decomposition.LU[11, 19](wideMa)

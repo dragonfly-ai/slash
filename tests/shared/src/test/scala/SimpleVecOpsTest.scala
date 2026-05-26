@@ -21,6 +21,20 @@ import narr.*
 
 class SimpleVecOpsTest extends munit.FunSuite {
 
+  test("vector instantiators") {
+    val zs:Vec[42] = Vec.zeros[42]
+    zs.asNativeArray.foreach((z:Double) => assertEquals(z, 0.0) )
+    val os:Vec[42] = Vec.ones[42]
+    os.asNativeArray.foreach((o:Double) => assertEquals(o, 1.0))
+  }
+
+  test("vector components") {
+    val v1 = Vec[4](1.5, 2.5, 3.5, 4.5)
+    assertEquals(v1.x, 1.5)
+    assertEquals(v1.y, 2.5)
+    assertEquals(v1.z, 3.5)
+    assertEquals(v1.w, 4.5)
+  }
   test("vector addition") {
     val v1 = Vec[2](1.5, 2.5)
     val v2 = Vec[2](2.5, 3.5)
@@ -61,6 +75,14 @@ class SimpleVecOpsTest extends munit.FunSuite {
     val v1 = Vec[3](1.5, 2.5, 3.5)
     val vResult = Vec[3](0.75, 1.25, 1.75)
     assertVecEquals(v1 / 2.0, vResult)
+  }
+
+  test("vector cross") {
+    val v1 = Vec[3](1.0, 0.0, 0.0)
+    val v2 = Vec[3](0.0, 1.0, 0.0)
+    println(v1.cross(v2).show)
+    val vResult = Vec[3](0.0, 0.0, 1.0)
+    assertVecEquals(v1.cross(v2), vResult)
   }
 
   test("kronecker product") {

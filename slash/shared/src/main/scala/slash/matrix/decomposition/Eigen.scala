@@ -19,170 +19,196 @@ package slash.matrix.decomposition
 import slash.vector.*
 import slash.matrix.*
 import narr.*
+import slash.matrix.util.lindex
+import slash.vector.runtime.RTVec
 
 import scala.math.hypot
 
-object Eigen {
+object EigenSolver {
 
   // Symmetric Householder reduction to tridiagonal form.
 
-  private def tred2[N <: Int](Q: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
+  //private def tred2[N <: Int](Q: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
+
+  def tred2(n:Int, Q: NArray[Double]): (NArray[Double], NArray[Double], NArray[Double]) = {
     //  This is derived from the Algol procedures tred2 by
     //  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
     //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
     //  Fortran subroutine in EISPACK.
 
-    val n:Int = valueOf[N]
+    val lambda: NArray[Double] = new NArray[Double](n)
+    val lmbdi: NArray[Double] = new NArray[Double](n)
 
-    val λ: Vec[N] = Vec.fill[N](0.0)
-    val λi: Vec[N] = Vec.fill[N](0.0)
-
-    var j0:Int = 0; while (j0 < n) {
-      λ(j0) = Q(n - 1, j0)
+    var j0:Int = 0
+    while (j0 < n) {
+      lambda(j0) = Q(lindex(n - 1, j0, n))
       j0 += 1
     }
 
     // Householder reduction to tridiagonal form.
 
-    var i:Int = n - 1; while ( i > 0) { // Scale to avoid under/overflow.
+    var i:Int = n - 1
+    while ( i > 0) { // Scale to avoid under/overflow.
       var scale = 0.0
       var h = 0.0
-      var s:Int = 0; while (s < i) {
-        scale = scale + Math.abs(λ(s))
+      var s:Int = 0
+      while (s < i) {
+        scale = scale + Math.abs(lambda(s))
         s += 1
       }
 
       if (scale == 0.0) {
-        λi(i) = λ(i - 1)
-        var j:Int = 0; while (j < i) {
-          λ(j) = Q(i - 1, j)
-          Q(i, j) = 0.0
-          Q(j, i) = 0.0
+        lmbdi(i) = lambda(i - 1)
+        var j:Int = 0
+        while (j < i) {
+          lambda(j) = Q(lindex(i - 1, j, n))
+          Q(lindex(i, j, n)) = 0.0
+          Q(lindex(j, i, n)) = 0.0
           j += 1
         }
       } else { // Generate Householder vector.
-        var k:Int = 0; while (k < i) {
-          λ(k) = λ(k) / scale
-          h += λ(k) * λ(k)
+        var k:Int = 0
+        while (k < i) {
+          lambda(k) = lambda(k) / scale
+          h += lambda(k) * lambda(k)
           k += 1
         }
-        var f = λ(i - 1)
+        var f = lambda(i - 1)
         var g = Math.sqrt(h)
         if (f > 0) g = -g
-        λi(i) = scale * g
+        lmbdi(i) = scale * g
         h = h - f * g
-        λ(i - 1) = f - g
+        lambda(i - 1) = f - g
 
-        var j:Int = 0; while (j < i) {
-          λi(j) = 0.0
+        var j:Int = 0
+        while (j < i) {
+          lmbdi(j) = 0.0
           j += 1
         }
 
         // Apply similarity transformation to remaining columns.
-        j = 0; while (j < i) { // recycling j
-          f = λ(j)
-          Q(j, i) = f
-          g = λi(j) + Q(j, j) * f
-          k = j + 1; while (k <= i - 1) { // recycling k
-            g += Q(k, j) * λ(k)
-            λi(k) = λi(k) + (Q(k, j) * f)
+        j = 0
+        while (j < i) { // recycling j
+          f = lambda(j)
+          Q(lindex(j, i, n)) = f
+          g = lmbdi(j) + Q(lindex(j, j, n)) * f
+          k = j + 1
+          while (k <= i - 1) { // recycling k
+            g += Q(lindex(k, j, n)) * lambda(k)
+            lmbdi(k) = lmbdi(k) + (Q(lindex(k, j, n)) * f)
             k += 1
           }
-          λi(j) = g
+          lmbdi(j) = g
           j += 1
         }
         f = 0.0
-        j = 0; while (j < i) {  // recycling j
-          λi(j) = λi(j) / h
-          f += λi(j) * λ(j)
+        j = 0
+        while (j < i) {  // recycling j
+          lmbdi(j) = lmbdi(j) / h
+          f += lmbdi(j) * lambda(j)
           j += 1
         }
         val hh = f / (h + h)
-        j = 0; while (j < i) {  // recycling j
-          λi(j) = λi(j) - (hh * λ(j))
+        j = 0
+        while (j < i) {  // recycling j
+          lmbdi(j) = lmbdi(j) - (hh * lambda(j))
           j += 1
         }
-        j = 0; while (j < i) {  // recycling j
-          f = λ(j)
-          g = λi(j)
-          k = j; while (k <= i - 1) { // recycling k
-            Q(k, j) = Q(k, j) - (f * λi(k) + g * λ(k))
+        j = 0
+        while (j < i) {  // recycling j
+          f = lambda(j)
+          g = lmbdi(j)
+          k = j
+          while (k <= i - 1) { // recycling k
+            Q(lindex(k, j, n)) = Q(lindex(k, j, n)) - (f * lmbdi(k) + g * lambda(k))
             k += 1
           }
-          λ(j) = Q(i - 1, j)
-          Q(i, j) = 0.0
+          lambda(j) = Q(lindex(i - 1, j, n))
+          Q(lindex(i, j, n)) = 0.0
           j += 1
         }
       }
-      λ(i) = h
+      lambda(i) = h
       i -= 1
     }
 
     // Accumulate transformations.
-    i = 0; while (i < n - 1) { // recycling i
-      Q(n - 1, i) = Q(i, i)
-      Q(i, i) = 1.0
-      val h = λ(i + 1)
+    i = 0
+    while (i < n - 1) { // recycling i
+      Q(lindex(n - 1, i, n)) = Q(lindex(i, i, n))
+      Q(lindex(i, i, n)) = 1.0
+      val h = lambda(i + 1)
       if (h != 0.0) {
-        var k:Int = 0; while (k <= i) {
-          λ(k) = Q(k, i + 1) / h
+        var k:Int = 0
+        while (k <= i) {
+          lambda(k) = Q(lindex(k, i + 1, n)) / h
           i += 1
         }
-        var j:Int = 0; while (j <= i) {
+        var j:Int = 0
+        while (j <= i) {
           var g = 0.0
-          k = 0; while (k <= i) { // recycling k
-            g += Q(k, i + 1) * Q(k, j)
+          k = 0
+          while (k <= i) { // recycling k
+            g += Q(lindex(k, i + 1, n)) * Q(lindex(k, j, n))
             k += 1
           }
-          k = 0; while (k <= i) { // recycling k
-            Q(k, j) = Q(k, j) - (g * λ(k))
+          k = 0
+          while (k <= i) { // recycling k
+            Q(lindex(k, j, n)) = Q(lindex(k, j, n)) - (g * lambda(k))
             k += 1
           }
           j += 1
         }
       }
-      var k:Int = 0; while (k <= i) {
-        Q(k, i + 1) = 0.0
+      var k:Int = 0
+      while (k <= i) {
+        Q(lindex(k, i + 1, n)) = 0.0
         k += 1
       }
       i += 1
     }
-    var j:Int =0; while (j < n) {
-      λ(j) = Q(n - 1, j)
-      Q(n - 1, j) = 0.0
+    var j:Int =0
+    while (j < n) {
+      lambda(j) = Q(lindex(n - 1, j, n))
+      Q(lindex(n - 1, j, n)) = 0.0
       j += 1
     }
-    Q(n - 1, n - 1) = 1.0
-    λi(0) = 0.0
+    Q(lindex(n - 1, n - 1, n)) = 1.0
+    lmbdi(0) = 0.0
 
-    tql2[N](Q, λ, λi)
+    //tql2[N](Q, lambda, lmbdi)
+    tql2(Q, lambda, lmbdi)
   }
 
   // Symmetric tridiagonal QL algorithm.
 
-  private def tql2[N <: Int](Q: Mat[N, N], λ: Vec[N], λi: Vec[N])(using ValueOf[N]): Eigen[N] = {
+//  private def tql2[N <: Int](Q: Mat[N, N], lambda: Vec[N], lmbdi: Vec[N])(using ValueOf[N]): Eigen[N] = {
+
+  private def tql2(Q:NArray[Double], lambda:NArray[Double], lmbdi:NArray[Double]): (NArray[Double], NArray[Double], NArray[Double]) = {
     //  This is derived from the Algol procedures tql2, by
     //  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
     //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
     //  Fortran subroutine in EISPACK.
 
-    val n:Int = valueOf[N]
+    val n:Int = lambda.length
 
-    var i0:Int = 1; while (i0 < n) {
-      λi(i0 - 1) = λi(i0)
+    var i0:Int = 1
+    while (i0 < n) {
+      lmbdi(i0 - 1) = lmbdi(i0)
       i0 += 1
     }
-    λi(n - 1) = 0.0
+    lmbdi(n - 1) = 0.0
 
     var f = 0.0
     var tst1 = 0.0
     val eps = Math.pow(2.0, -52.0)
 
-    var l:Int = 0; while (l < n) { // Find small subdiagonal element
-      tst1 = Math.max(tst1, Math.abs(λ(l)) + Math.abs(λi(l)))
+    var l:Int = 0
+    while (l < n) { // Find small subdiagonal element
+      tst1 = Math.max(tst1, Math.abs(lambda(l)) + Math.abs(lmbdi(l)))
       var m = l
 
-      while (m < n && Math.abs(λi(m)) > eps * tst1) m += 1
+      while (m < n && Math.abs(lmbdi(m)) > eps * tst1) m += 1
 
       // If m == l, d[l] is an eigenvalue,
       // otherwise, iterate.
@@ -193,112 +219,122 @@ object Eigen {
           iter = iter + 1 // (Could check iteration count here.)
 
           // Compute implicit shift
-          var g = λ(l)
-          var p = (λ(l + 1) - g) / (2.0 * λi(l))
+          var g = lambda(l)
+          var p = (lambda(l + 1) - g) / (2.0 * lmbdi(l))
           var r = hypot(p, 1.0)
           if (p < 0) r = -r
-          λ(l) = λi(l) / (p + r)
-          λ(l + 1) = λi(l) * (p + r)
-          val dl1 = λ(l + 1)
-          var h = g - λ(l)
-          var i:Int = l + 2; while (i < n) {
-            λ(i) = λ(i) - h
+          lambda(l) = lmbdi(l) / (p + r)
+          lambda(l + 1) = lmbdi(l) * (p + r)
+          val dl1 = lambda(l + 1)
+          var h = g - lambda(l)
+          var i:Int = l + 2
+          while (i < n) {
+            lambda(i) = lambda(i) - h
             i += 1
           }
           f = f + h
           // Implicit QL transformation.
-          p = λ(m)
+          p = lambda(m)
           var c = 1.0
           var c2 = c
           var c3 = c
-          val el1 = λi(l + 1)
+          val el1 = lmbdi(l + 1)
           var s = 0.0
           var s2 = 0.0
-          i = m - 1; while (i >= l) {
+          i = m - 1
+          while (i >= l) {
             c3 = c2
             c2 = c
             s2 = s
-            g = c * λi(i)
+            g = c * lmbdi(i)
             h = c * p
-            r = hypot(p, λi(i))
-            λi(i + 1) = s * r
-            s = λi(i) / r
+            r = hypot(p, lmbdi(i))
+            lmbdi(i + 1) = s * r
+            s = lmbdi(i) / r
             c = p / r
-            p = c * λ(i) - s * g
-            λ(i + 1) = h + s * (c * g + s * λ(i))
+            p = c * lambda(i) - s * g
+            lambda(i + 1) = h + s * (c * g + s * lambda(i))
             // Accumulate transformation.
-            var k:Int = 0; while (k < n) {
-              h = Q(k, i + 1)
-              Q(k, i + 1) = s * Q(k, i) + c * h
-              Q(k, i) = c * Q(k, i) - s * h
+            var k:Int = 0
+            while (k < n) {
+              h = Q(lindex(k, i + 1, n))
+              Q(lindex(k, i + 1, n)) = s * Q(lindex(k, i, n)) + c * h
+              Q(lindex(k, i, n)) = c * Q(lindex(k, i, n)) - s * h
               k += 1
             }
             i -= 1
           }
-          p = -s * s2 * c3 * el1 * λi(l) / dl1
-          λi(l) = s * p
-          λ(l) = c * p
+          p = -s * s2 * c3 * el1 * lmbdi(l) / dl1
+          lmbdi(l) = s * p
+          lambda(l) = c * p
           // Check for convergence.
-          continue = Math.abs(λi(l)) > eps * tst1
+          continue = Math.abs(lmbdi(l)) > eps * tst1
         }
       }
-      λ(l) = λ(l) + f
-      λi(l) = 0.0
+      lambda(l) = lambda(l) + f
+      lmbdi(l) = 0.0
       l += 1
     }
 
     // Sort eigenvalues and corresponding vectors.
 
-    var i:Int = 0; while (i < n - 1) {
+    var i:Int = 0
+    while (i < n - 1) {
       var k = i
-      var p = λ(i)
-      var j:Int = i + 1; while (j < n) {
-        if (λ(j) < p) {
+      var p = lambda(i)
+      var j:Int = i + 1
+      while (j < n) {
+        if (lambda(j) < p) {
           k = j
-          p = λ(j)
+          p = lambda(j)
         }
         j += 1
       }
       if (k != i) {
-        λ(k) = λ(i)
-        λ(i) = p
-        j = 0; while (j < n) { // recycling j
-          p = Q(j, i)
-          Q(j, i) = Q(j, k)
-          Q(j, k) = p
+        lambda(k) = lambda(i)
+        lambda(i) = p
+        j = 0
+        while (j < n) { // recycling j
+          p = Q(lindex(j, i, n))
+          Q(lindex(j, i, n)) = Q(lindex(j, k, n))
+          Q(lindex(j, k, n)) = p
           j += 1
         }
       }
       i += 1
     }
 
-    new Eigen[N](Q, λ, λi)
+    //new Eigen[N](Q, lambda, lmbdi)
+    (Q, lambda, lmbdi)
   }
 
-  private def orthes[N <: Int](Q: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
+//  private def orthes[N <: Int](Q: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
+
+  def orthes(n:Int, Q: NArray[Double]): (NArray[Double], NArray[Double], NArray[Double]) = {
     //  This is derived from the Algol procedures orthes and ortran,
     //  by Martin and Wilkinson, Handbook for Auto. Comp.,
     //  Vol.ii-Linear Algebra, and the corresponding
     //  Fortran subroutines in EISPACK.
 
-    val n:Int = valueOf[N]
+    val H: NArray[Double] = NArray.copy[Double](Q)
 
-    val H: Mat[N, N] = Q.copy
-
-    val ort: NArray[Double] = NArray.fill[Double](n)(0.0)
+    val ort: NArray[Double] = new NArray[Double](n)
 
     val high = n - 1
 
-    var m:Int = 1; while (m < high) { // Scale column.
+    var m:Int = 1
+    while (m < high) { // Scale column.
       var scale = 0.0
-      var s:Int = m; while (s <= high) {
-        scale = scale + Math.abs(H(s, m - 1))
+      var s:Int = m
+      while (s <= high) {
+        scale = scale + Math.abs(H(lindex(s, m - 1, n)))
         s += 1
       }
       if (scale != 0.0) { // Compute Householder transformation.
         var h = 0.0
-        var i0:Int = high; while (i0 >= m) {
-          ort(i0) = H(i0, m - 1) / scale
+        var i0:Int = high
+        while (i0 >= m) {
+          ort(i0) = H(lindex(i0, m - 1, n)) / scale
           h += ort(i0) * ort(i0)
           i0 -= 1
         }
@@ -308,65 +344,78 @@ object Eigen {
         ort(m) = ort(m) - g
         // Apply Householder similarity transformation
         // H = (I-u*u'/h)*H*(I-u*u')/h)
-        var j0:Int = m; while (j0 < n) {
+        var j0:Int = m
+        while (j0 < n) {
           var f = 0.0
-          var i:Int = high; while (i >= m) {
-            f += ort(i) * H(i, j0)
+          var i:Int = high
+          while (i >= m) {
+            f += ort(i) * H(lindex(i, j0, n))
             i -= 1
           }
           f = f / h
-          i = m; while (i <= high) { // recycling i
-            H(i, j0) = H(i, j0) - (f * ort(i))
+          i = m
+          while (i <= high) { // recycling i
+            H(lindex(i, j0, n)) = H(lindex(i, j0, n)) - (f * ort(i))
             i += 1
           }
           j0 += 1
         }
 
-        var i:Int = 0; while (i <= high) {
+        var i:Int = 0
+        while (i <= high) {
           var f = 0.0
-          var j:Int = high; while (j >= m) {
-            f += ort(j) * H(i, j)
+          var j:Int = high
+          while (j >= m) {
+            f += ort(j) * H(lindex(i, j, n))
             j -= 1
           }
           f = f / h
-          j = m; while (j <= high) { // recycling j
-            H(i, j) = H(i, j) - (f * ort(j))
+          j = m
+          while (j <= high) { // recycling j
+            H(lindex(i, j, n)) = H(lindex(i, j, n)) - (f * ort(j))
             j += 1
           }
           i += 1
         }
         ort(m) = scale * ort(m)
-        H(m, m - 1) = scale * g
+        H(lindex(m, m - 1, n)) = scale * g
       }
       m += 1
     }
 
     // Accumulate transformations (Algol's ortran).
 
-    var i0:Int = 0; while (i0 < n) {
-      var j:Int = 0; while (j < n) {
-        Q(i0, j) = if (i0 == j) 1.0 else 0.0
+    var i0:Int = 0
+    while (i0 < n) {
+      var j:Int = 0
+      while (j < n) {
+        Q(lindex(i0, j, n)) = if (i0 == j) 1.0 else 0.0
         j += 1
       }
       i0 += 1
     }
 
-    var m0:Int = high - 1; while (m0 > 0) {
-      if (H(m0, m0 - 1) != 0.0) {
-        var i1:Int = m0 + 1; while (i1 <= high) {
-          ort(i1) = H(i1, m0 - 1)
+    var m0:Int = high - 1
+    while (m0 > 0) {
+      if (H(lindex(m0, m0 - 1, n)) != 0.0) {
+        var i1:Int = m0 + 1
+        while (i1 <= high) {
+          ort(i1) = H(lindex(i1, m0 - 1, n))
           i1 += 1
         }
-        var j:Int = m0; while (j <= high) {
+        var j:Int = m0
+        while (j <= high) {
           var g = 0.0
-          var i:Int = m0; while (i <= high) {
-            g += ort(i) * Q(i, j)
+          var i:Int = m0
+          while (i <= high) {
+            g += ort(i) * Q(lindex(i, j, n))
             i += 1
           }
           // Double division avoids possible underflow
-          g = (g / ort(m0)) / H(m0, m0 - 1)
-          i = m0; while (i <= high) { // recycling i
-            Q(i, j) = Q(i, j) + (g * ort(i))
+          g = (g / ort(m0)) / H(lindex(m0, m0 - 1, n))
+          i = m0
+          while (i <= high) { // recycling i
+            Q(lindex(i, j, n)) = Q(lindex(i, j, n)) + (g * ort(i))
             i += 1
           }
           j += 1
@@ -376,14 +425,16 @@ object Eigen {
     }
 
     // Reduce Hessenberg to real Schur form.
-    hqr2[N](Q, H)
+    //hqr2[N](Q, H)
+    hqr2(n, Q, H)
   }
 
 
   // Nonsymmetric reduction from Hessenberg to real Schur form.
 
-  private def hqr2[N <: Int](Q: Mat[N, N], H: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
-    val nn: Int = valueOf[N]
+//  private def hqr2[N <: Int](Q: Mat[N, N], H: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
+
+  private def hqr2[N <: Int](nn:Int, Q: NArray[Double], H: NArray[Double]): (NArray[Double], NArray[Double], NArray[Double]) = {
 
     //  This is derived from the Algol procedure hqr2,
     //  by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -391,8 +442,8 @@ object Eigen {
     //  Fortran subroutine in EISPACK.
     // Initialize
 
-    val λ: Vec[N] = Vec.fill[N](0.0)
-    val λi: Vec[N] = Vec.fill[N](0.0)
+    val lambda: NArray[Double] = new NArray[Double](nn)
+    val lmbdi: NArray[Double] = new NArray[Double](nn)
 
     var ni: Int = nn - 1
     val low: Int = 0
@@ -408,7 +459,6 @@ object Eigen {
     var w = 0.0
     var x = 0.0
     var y = 0.0
-
 
     def cdiv(xr: Double, xi: Double, yr: Double, yi: Double): (Double, Double) = {
       var r = 0.0
@@ -433,13 +483,15 @@ object Eigen {
     // Store roots isolated by balanc and compute matrix norm
 
     var norm = 0.0
-    var i:Int = 0; while (i < nn) {
+    var i:Int = 0
+    while (i < nn) {
       if (i < low | i > high) {
-        λ(i) = H(i, i)
-        λi(i) = 0.0
+        lambda(i) = H(lindex(i, i, nn))
+        lmbdi(i) = 0.0
       }
-      var j:Int = Math.max(i - 1, 0); while (j < nn) {
-        norm = norm + Math.abs(H(i, j))
+      var j:Int = Math.max(i - 1, 0)
+      while (j < nn) {
+        norm = norm + Math.abs(H(lindex(i, j, nn)))
         j += 1
       }
       i += 1
@@ -453,39 +505,39 @@ object Eigen {
       var l = ni
       var continue: Boolean = true
       while (l > low && continue) {
-        s = Math.abs(H(l - 1, l - 1)) + Math.abs(H(l, l))
+        s = Math.abs(H(lindex(l - 1, l - 1, nn))) + Math.abs(H(lindex(l, l, nn)))
         if (s == 0.0) s = norm
-        if (Math.abs(H(l, l - 1)) < eps * s) continue = false
+        if (Math.abs(H(lindex(l, l - 1, nn))) < eps * s) continue = false
         else l -= 1
       }
 
       // Check for convergence
       // One root found
       if (l == ni) {
-        H(ni, ni) = H(ni, ni) + exshift
-        λ(ni) = H(ni, ni)
-        λi(ni) = 0.0
+        H(lindex(ni, ni, nn)) = H(lindex(ni, ni, nn)) + exshift
+        lambda(ni) = H(lindex(ni, ni, nn))
+        lmbdi(ni) = 0.0
         ni -= 1
         iter = 0
         // Two roots found
       } else if (l == ni - 1) {
-        w = H(ni, ni - 1) * H(ni - 1, ni)
-        p = (H(ni - 1, ni - 1) - H(ni, ni)) / 2.0
+        w = H(lindex(ni, ni - 1, nn)) * H(lindex(ni - 1, ni, nn))
+        p = (H(lindex(ni - 1, ni - 1, nn)) - H(lindex(ni, ni, nn))) / 2.0
         q = p * p + w
         z = Math.sqrt(Math.abs(q))
-        H(ni, ni) = H(ni, ni) + exshift
-        H(ni - 1, ni - 1) = H(ni - 1, ni - 1) + exshift
-        x = H(ni, ni)
+        H(lindex(ni, ni, nn)) = H(lindex(ni, ni, nn)) + exshift
+        H(lindex(ni - 1, ni - 1, nn)) = H(lindex(ni - 1, ni - 1, nn)) + exshift
+        x = H(lindex(ni, ni, nn))
         // Real pair
         if (q >= 0) {
           if (p >= 0) z = p + z
           else z = p - z
-          λ(ni - 1) = x + z
-          λ(ni) = λ(ni - 1)
-          if (z != 0.0) λ(ni) = x - w / z
-          λi(ni - 1) = 0.0
-          λi(ni) = 0.0
-          x = H(ni, ni - 1)
+          lambda(ni - 1) = x + z
+          lambda(ni) = lambda(ni - 1)
+          if (z != 0.0) lambda(ni) = x - w / z
+          lmbdi(ni - 1) = 0.0
+          lmbdi(ni) = 0.0
+          x = H(lindex(ni, ni - 1, nn))
           s = Math.abs(x) + Math.abs(z)
           p = x / s
           q = z / s
@@ -493,32 +545,35 @@ object Eigen {
           p = p / r
           q = q / r
           // Row modification
-          var j0:Int = ni - 1; while (j0 < nn) {
-            z = H(ni - 1, j0)
-            H(ni - 1, j0) = q * z + p * H(ni, j0)
-            H(ni, j0) = q * H(ni, j0) - p * z
+          var j0:Int = ni - 1
+          while (j0 < nn) {
+            z = H(lindex(ni - 1, j0, nn))
+            H(lindex(ni - 1, j0, nn)) = q * z + p * H(lindex(ni, j0, nn))
+            H(lindex(ni, j0, nn)) = q * H(lindex(ni, j0, nn)) - p * z
             j0 += 1
           }
           // Column modification
-          var i0:Int = 0; while (i0 <= ni) {
-            z = H(i0, ni - 1)
-            H(i0, ni - 1) = q * z + p * H(i0, ni)
-            H(i0, ni) = q * H(i0, ni) - p * z
+          var i0:Int = 0
+          while (i0 <= ni) {
+            z = H(lindex(i0, ni - 1, nn))
+            H(lindex(i0, ni - 1, nn)) = q * z + p * H(lindex(i0, ni, nn))
+            H(lindex(i0, ni, nn)) = q * H(lindex(i0, ni, nn)) - p * z
             i0 += 1
           }
           // Accumulate transformations
-          i0 = low; while (i0 <= high) { // recycling i0
-            z = Q(i0, ni - 1)
-            Q(i0, ni - 1) = q * z + p * Q(i0, ni)
-            Q(i0, ni) = q * Q(i0, ni) - p * z
+          i0 = low
+          while (i0 <= high) { // recycling i0
+            z = Q(lindex(i0, ni - 1, nn))
+            Q(lindex(i0, ni - 1, nn)) = q * z + p * Q(lindex(i0, ni, nn))
+            Q(lindex(i0, ni, nn)) = q * Q(lindex(i0, ni, nn)) - p * z
             i0 += 1
           }
           // Complex pair
         } else {
-          λ(ni - 1) = x + p
-          λ(ni) = x + p
-          λi(ni - 1) = z
-          λi(ni) = -z
+          lambda(ni - 1) = x + p
+          lambda(ni) = x + p
+          lmbdi(ni - 1) = z
+          lmbdi(ni) = -z
         }
         ni = ni - 2
         iter = 0
@@ -526,21 +581,22 @@ object Eigen {
       } else {
         // Form shift
 
-        x = H(ni, ni)
+        x = H(lindex(ni, ni, nn))
         y = 0.0
         w = 0.0
         if (l < ni) {
-          y = H(ni - 1, ni - 1)
-          w = H(ni, ni - 1) * H(ni - 1, ni)
+          y = H(lindex(ni - 1, ni - 1, nn))
+          w = H(lindex(ni, ni - 1, nn)) * H(lindex(ni - 1, ni, nn))
         }
         // Wilkinson's original ad hoc shift
         if (iter == 10) {
           exshift += x
-          var i:Int = low; while (i <= ni) {
-            H(i, i) = H(i, i) - x
+          var i:Int = low
+          while (i <= ni) {
+            H(lindex(i, i, nn)) = H(lindex(i, i, nn)) - x
             i += 1
           }
-          s = Math.abs(H(ni, ni - 1)) + Math.abs(H(ni - 1, ni - 2))
+          s = Math.abs(H(lindex(ni, ni - 1, nn))) + Math.abs(H(lindex(ni - 1, ni - 2, nn)))
           y = 0.75 * s
           x = y
           w = -0.4375 * s * s
@@ -555,8 +611,9 @@ object Eigen {
             s = Math.sqrt(s)
             if (y < x) s = -s
             s = x - w / ((y - x) / 2.0 + s)
-            var i:Int = low; while (i <= ni) {
-              H(i, i) = H(i, i) - s
+            var i:Int = low
+            while (i <= ni) {
+              H(lindex(i, i, nn)) = H(lindex(i, i, nn)) - s
               i += 1
             }
             exshift += s
@@ -571,38 +628,40 @@ object Eigen {
         var m: Int = ni - 2
         continue = true
         while (m >= l && continue) {
-          z = H(m, m)
+          z = H(lindex(m, m, nn))
           r = x - z
           s = y - z
-          p = (r * s - w) / H(m + 1, m) + H(m, m + 1)
-          q = H(m + 1, m + 1) - z - r - s
-          r = H(m + 2, m + 1)
+          p = (r * s - w) / H(lindex(m + 1, m, nn)) + H(lindex(m, m + 1, nn))
+          q = H(lindex(m + 1, m + 1, nn)) - z - r - s
+          r = H(lindex(m + 2, m + 1, nn))
           s = Math.abs(p) + Math.abs(q) + Math.abs(r)
           p = p / s
           q = q / s
           r = r / s
-          if (m == l || Math.abs(H(m, m - 1)) * (Math.abs(q) + Math.abs(r)) < eps * (Math.abs(p) * (Math.abs(H(m - 1, m - 1)) + Math.abs(z) + Math.abs(H(m + 1, m + 1))))) {
+          if (m == l || Math.abs(H(lindex(m, m - 1, nn))) * (Math.abs(q) + Math.abs(r)) < eps * (Math.abs(p) * (Math.abs(H(lindex(m - 1, m - 1, nn))) + Math.abs(z) + Math.abs(H(lindex(m + 1, m + 1, nn)))))) {
             continue = false
           } else m -= 1
         }
 
-        var i:Int = m + 2; while (i <= ni) {
-          H(i, i - 2) = 0.0
+        var i:Int = m + 2
+        while (i <= ni) {
+          H(lindex(i, i - 2, nn)) = 0.0
           if (i > m + 2) {
-            H(i, i - 3) = 0.0
+            H(lindex(i, i - 3, nn)) = 0.0
           }
           i += 1
         }
 
         // Double QR step involving rows l:ni and columns m:ni
 
-        var k:Int = m; while (k < ni) {
+        var k:Int = m
+        while (k < ni) {
           continue = true
           val notLast: Boolean = k != ni - 1
           if (k != m) {
-            p = H(k, k - 1)
-            q = H(k + 1, k - 1)
-            r = if (notLast) H(k + 2, k - 1) else 0.0
+            p = H(lindex(k, k - 1, nn))
+            q = H(lindex(k + 1, k - 1, nn))
+            r = if (notLast) H(lindex(k + 2, k - 1, nn)) else 0.0
             x = Math.abs(p) + Math.abs(q) + Math.abs(r)
 
             if (x == 0.0) {
@@ -621,10 +680,10 @@ object Eigen {
             }
             if (s != 0) {
               if (k != m) {
-                H(k, k - 1) = -s * x
+                H(lindex(k, k - 1, nn)) = -s * x
               } else {
                 if (l != m) {
-                  H(k, k - 1) = -(H(k, k - 1))
+                  H(lindex(k, k - 1, nn)) = -(H(lindex(k, k - 1, nn)))
                 }
               }
               p = p + s
@@ -635,38 +694,41 @@ object Eigen {
               r = r / p
 
               // Row modification
-              var j:Int = k; while (j < nn) {
-                p = H(k, j) + q * H(k + 1, j)
+              var j:Int = k
+              while (j < nn) {
+                p = H(lindex(k, j, nn)) + q * H(lindex(k + 1, j, nn))
                 if (notLast) {
-                  p = p + r * H(k + 2, j)
-                  H(k + 2, j) = H(k + 2, j) - p * z
+                  p = p + r * H(lindex(k + 2, j, nn))
+                  H(lindex(k + 2, j, nn)) = H(lindex(k + 2, j, nn)) - p * z
                 }
-                H(k, j) = H(k, j) - p * x
-                H(k + 1, j) = H(k + 1, j) - p * y
+                H(lindex(k, j, nn)) = H(lindex(k, j, nn)) - p * x
+                H(lindex(k + 1, j, nn)) = H(lindex(k + 1, j, nn)) - p * y
                 j += 1
               }
 
               // Column modification
-              var i1:Int = 0; while (i1 <= Math.min(ni, k + 3)) {
-                p = x * H(i1, k) + y * H(i1, k + 1)
+              var i1:Int = 0
+              while (i1 <= Math.min(ni, k + 3)) {
+                p = x * H(lindex(i1, k, nn)) + y * H(lindex(i1, k + 1, nn))
                 if (notLast) {
-                  p = p + z * H(i1, k + 2)
-                  H(i1, k + 2) = H(i1, k + 2) - p * r
+                  p = p + z * H(lindex(i1, k + 2, nn))
+                  H(lindex(i1, k + 2, nn)) = H(lindex(i1, k + 2, nn)) - p * r
                 }
-                H(i1, k) = H(i1, k) - p
-                H(i1, k + 1) = H(i1, k + 1) - p * q
+                H(lindex(i1, k, nn)) = H(lindex(i1, k, nn)) - p
+                H(lindex(i1, k + 1, nn)) = H(lindex(i1, k + 1, nn)) - p * q
                 i1 += 1
               }
 
               // Accumulate transformations
-              i1 = low; while (i1 <= high) {
-                p = x * Q(i1, k) + y * Q(i1, k + 1)
+              i1 = low
+              while (i1 <= high) {
+                p = x * Q(lindex(i1, k, nn)) + y * Q(lindex(i1, k + 1, nn))
                 if (notLast) {
-                  p = p + z * Q(i1, k + 2)
-                  Q(i1, k + 2) = Q(i1, k + 2) - p * r
+                  p = p + z * Q(lindex(i1, k + 2, nn))
+                  Q(lindex(i1, k + 2, nn)) = Q(lindex(i1, k + 2, nn)) - p * r
                 }
-                Q(i1, k) = Q(i1, k) - p
-                Q(i1, k + 1) = Q(i1, k + 1) - p * q
+                Q(lindex(i1, k, nn)) = Q(lindex(i1, k, nn)) - p
+                Q(lindex(i1, k + 1, nn)) = Q(lindex(i1, k + 1, nn)) - p * q
                 i1 += 1
               }
             } // (s != 0)
@@ -678,46 +740,51 @@ object Eigen {
 
     // Backsubstitute to find vectors of upper triangular form
 
-    if (norm == 0.0) return new Eigen[N](Q, λ, λi)
+//    if (norm == 0.0) return new Eigen[N](Q, lambda, lmbdi)
+
+    if (norm == 0.0) return (Q, lambda, lmbdi)
 
     ni = nn - 1
     while (ni >= 0) {
-      p = λ(ni)
-      q = λi(ni)
+      p = lambda(ni)
+      q = lmbdi(ni)
       // Real vector
       if (q == 0) {
         var l = ni
-        H(ni, ni) = 1.0
-        var i0:Int = ni - 1; while (i0 > -1) {
-          w = H(i0, i0) - p
+        H(lindex(ni, ni, nn)) = 1.0
+        var i0:Int = ni - 1
+        while (i0 > -1) {
+          w = H(lindex(i0, i0, nn)) - p
           r = 0.0
-          var j:Int = l; while (j <= ni) {
-            r = r + H(i0, j) * H(j, ni)
+          var j:Int = l
+          while (j <= ni) {
+            r = r + H(lindex(i0, j, nn)) * H(lindex(j, ni, nn))
             j += 1
           }
-          if (λi(i0) < 0.0) {
+          if (lmbdi(i0) < 0.0) {
             z = w
             s = r
           } else {
             l = i0
-            if (λi(i0) == 0.0) {
-              if (w != 0.0) H(i0, ni) = -r / w
-              else H(i0, ni) = -r / (eps * norm)
+            if (lmbdi(i0) == 0.0) {
+              if (w != 0.0) H(lindex(i0, ni, nn)) = -r / w
+              else H(lindex(i0, ni, nn)) = -r / (eps * norm)
               // Solve real equations
             } else {
-              x = H(i0, i0 + 1)
-              y = H(i0 + 1, i0)
-              q = (λ(i0) - p) * (λ(i0) - p) + λi(i0) * λi(i0)
+              x = H(lindex(i0, i0 + 1, nn))
+              y = H(lindex(i0 + 1, i0, nn))
+              q = (lambda(i0) - p) * (lambda(i0) - p) + lmbdi(i0) * lmbdi(i0)
               t = (x * s - z * r) / q
-              H(i0, ni) = t
-              if (Math.abs(x) > Math.abs(z)) H(i0 + 1, ni) = (-r - w * t) / x
-              else H(i0 + 1, ni) = (-s - y * t) / z
+              H(lindex(i0, ni, nn)) = t
+              if (Math.abs(x) > Math.abs(z)) H(lindex(i0 + 1, ni, nn)) = (-r - w * t) / x
+              else H(lindex(i0 + 1, ni, nn)) = (-s - y * t) / z
             }
             // Overflow control
-            t = Math.abs(H(i0, ni))
+            t = Math.abs(H(lindex(i0, ni, nn)))
             if ((eps * t) * t > 1) {
-              var j0:Int = i0; while (j0 <= ni) {
-                H(j0, ni) = H(j0, ni) / t
+              var j0:Int = i0
+              while (j0 <= ni) {
+                H(lindex(j0, ni, nn)) = H(lindex(j0, ni, nn)) / t
                 j0 += 1
               }
             }
@@ -728,64 +795,67 @@ object Eigen {
       } else if (q < 0) {
         var l = ni - 1
         // Last vector component imaginary so matrix is triangular
-        if (Math.abs(H(ni, ni - 1)) > Math.abs(H(ni - 1, ni))) {
-          H(ni - 1, ni - 1) = q / H(ni, ni - 1)
-          H(ni - 1, ni) = -(H(ni, ni) - p) / H(ni, ni - 1)
+        if (Math.abs(H(lindex(ni, ni - 1, nn))) > Math.abs(H(lindex(ni - 1, ni, nn)))) {
+          H(lindex(ni - 1, ni - 1, nn)) = q / H(lindex(ni, ni - 1, nn))
+          H(lindex(ni - 1, ni, nn)) = -(H(lindex(ni, ni, nn)) - p) / H(lindex(ni, ni - 1, nn))
         } else {
-          val temp = cdiv(0.0, -H(ni - 1, ni), H(ni - 1, ni - 1) - p, q)
-          H(ni - 1, ni - 1) = temp._1
-          H(ni - 1, ni) = temp._2
+          val temp = cdiv(0.0, -H(lindex(ni - 1, ni, nn)), H(lindex(ni - 1, ni - 1, nn)) - p, q)
+          H(lindex(ni - 1, ni - 1, nn)) = temp._1
+          H(lindex(ni - 1, ni, nn)) = temp._2
         }
 
-        H(ni, ni - 1) = 0.0
-        H(ni, ni) = 1.0
+        H(lindex(ni, ni - 1, nn)) = 0.0
+        H(lindex(ni, ni, nn)) = 1.0
 
-        var i2:Int = ni - 2; while (i2 > -1) {
+        var i2:Int = ni - 2
+        while (i2 > -1) {
           var ra = .0
           var sa = .0
           var vr = .0
           var vi = .0
           ra = 0.0
           sa = 0.0
-          var j:Int = l; while (j <= ni) {
-            ra = ra + H(i2, j) * H(j, ni - 1)
-            sa = sa + H(i2, j) * H(j, ni)
+          var j:Int = l
+          while (j <= ni) {
+            ra = ra + H(lindex(i2, j, nn)) * H(lindex(j, ni - 1, nn))
+            sa = sa + H(lindex(i2, j, nn)) * H(lindex(j, ni, nn))
             j += 1
           }
-          w = H(i2, i2) - p
-          if (λi(i2) < 0.0) {
+          w = H(lindex(i2, i2, nn)) - p
+          if (lmbdi(i2) < 0.0) {
             z = w
             r = ra
             s = sa
           } else {
             l = i2
-            if (λi(i2) == 0) {
+            if (lmbdi(i2) == 0) {
               val temp = cdiv(-ra, -sa, w, q)
-              H(i2, ni - 1) = temp._1
-              H(i2, ni) = temp._2
+              H(lindex(i2, ni - 1, nn)) = temp._1
+              H(lindex(i2, ni, nn)) = temp._2
             } else { // Solve complex equations
-              x = H(i2, i2 + 1)
-              y = H(i2 + 1, i2)
-              vr = (λ(i2) - p) * (λ(i2) - p) + λi(i2) * λi(i2) - q * q
-              vi = (λ(i2) - p) * 2.0 * q
+              x = H(lindex(i2, i2 + 1, nn))
+              y = H(lindex(i2 + 1, i2, nn))
+              vr = (lambda(i2) - p) * (lambda(i2) - p) + lmbdi(i2) * lmbdi(i2) - q * q
+              vi = (lambda(i2) - p) * 2.0 * q
               if (vr == 0.0 & vi == 0.0) vr = eps * norm * (Math.abs(w) + Math.abs(q) + Math.abs(x) + Math.abs(y) + Math.abs(z))
               val temp = cdiv(x * r - z * ra + q * sa, x * s - z * sa - q * ra, vr, vi)
-              H(i2, ni - 1) = temp._1
-              H(i2, ni) = temp._2
+              H(lindex(i2, ni - 1, nn)) = temp._1
+              H(lindex(i2, ni, nn)) = temp._2
               if (Math.abs(x) > (Math.abs(z) + Math.abs(q))) {
-                H(i2 + 1, ni - 1) = (-ra - w * H(i2, ni - 1) + q * H(i2, ni)) / x
-                H(i2 + 1, ni) = (-sa - w * H(i2, ni) - q * H(i2, ni - 1)) / x
+                H(lindex(i2 + 1, ni - 1, nn)) = (-ra - w * H(lindex(i2, ni - 1, nn)) + q * H(lindex(i2, ni, nn))) / x
+                H(lindex(i2 + 1, ni, nn)) = (-sa - w * H(lindex(i2, ni, nn)) - q * H(lindex(i2, ni - 1, nn))) / x
               } else {
-                val temp = cdiv(-r - y * H(i2, ni - 1), -s - y * H(i2, ni), z, q)
-                H(i2 + 1, ni - 1) = temp._1
-                H(i2 + 1, ni) = temp._2
+                val temp = cdiv(-r - y * H(lindex(i2, ni - 1, nn)), -s - y * H(lindex(i2, ni, nn)), z, q)
+                H(lindex(i2 + 1, ni - 1, nn)) = temp._1
+                H(lindex(i2 + 1, ni, nn)) = temp._2
               }
             }
-            t = Math.max(Math.abs(H(i2, ni - 1)), Math.abs(H(i2, ni)))
+            t = Math.max(Math.abs(H(lindex(i2, ni - 1, nn))), Math.abs(H(lindex(i2, ni, nn))))
             if ((eps * t) * t > 1) {
-              var j7:Int = i2; while (j7 <= ni) {
-                H(j7, ni - 1) = H(j7, ni - 1) / t
-                H(j7, ni) = H(j7, ni) / t
+              var j7:Int = i2
+              while (j7 <= ni) {
+                H(lindex(j7, ni - 1, nn)) = H(lindex(j7, ni - 1, nn)) / t
+                H(lindex(j7, ni, nn)) = H(lindex(j7, ni, nn)) / t
                 j7 += 1
               }
             }
@@ -797,10 +867,12 @@ object Eigen {
       ni -= 1
     }
     // Vectors of isolated roots
-    var i9:Int = 0; while (i9 < nn) {
+    var i9:Int = 0
+    while (i9 < nn) {
       if (i9 < low | i9 > high) {
-        var j5:Int = i9; while (j5 < nn) {
-          Q(i9, j5) = H(i9, j5)
+        var j5:Int = i9
+        while (j5 < nn) {
+          Q(lindex(i9, j5, nn)) = H(lindex(i9, j5, nn))
           j5 += 1
         }
       }
@@ -809,52 +881,69 @@ object Eigen {
 
     // Back transformation to get eigenvectors of original matrix
 
-    var j8:Int = nn - 1; while (j8 >= low) {
-      var i7:Int = low; while (i7 <= high) {
+    var j8:Int = nn - 1
+    while (j8 >= low) {
+      var i7:Int = low
+      while (i7 <= high) {
         z = 0.0
-        var k:Int = low; while (k <= Math.min(j8, high)) {
-          z = z + Q(i7, k) * H(k, j8)
+        var k:Int = low
+        while (k <= Math.min(j8, high)) {
+          z = z + Q(lindex(i7, k, nn)) * H(lindex(k, j8, nn))
           k += 1
         }
-        Q(i7, j8) = z
+        Q(lindex(i7, j8, nn)) = z
         i7 += 1
       }
       j8 -= 1
     }
 
-
-    new Eigen[N](Q, λ, λi)
+//    new Eigen[N](Q, lambda, lmbdi)
+    (Q, lambda, lmbdi)
   }
+
+  def symetric(n:Int, values:NArray[Double]): Boolean = {
+
+    var isSymmetric:Boolean = true
+    // verify symmetry.
+    var r: Int = 0
+    while (r < n) {
+      var c: Int = r
+      while (c < n) {
+        if (isSymmetric) isSymmetric = values(lindex(r, c, n)) == values(lindex(c, r, n))
+        c += 1
+      }
+      r += 1
+    }
+    isSymmetric
+  }
+
+  def blockDiagonalEigenvalueMatrix(lambda: NArray[Double], lmbdi: NArray[Double]): NArray[Double] = {
+    val X = slash.matrix.util.diagonal(lambda)
+    var i: Int = 0
+    while (i < lambda.length) {
+      //X(i, i) = lambda(i)
+      if (lmbdi(i) > 0) X(lindex(i, i + 1, lambda.length)) = lmbdi(i)
+      else if (lmbdi(i) < 0) X(lindex(i, i - 1, lambda.length)) = lmbdi(i)
+      i += 1
+    }
+    X
+  }
+}
+
+object Eigen {
 
   def apply[N <: Int](A:Mat[N, N])(using ValueOf[N]): Eigen[N] = {
 
     val n = valueOf[N]
 
-    var isSymmetric = true
+    val q = NArray.copy[Double](A.values)
 
-    val Q:Mat[N, N] = {
-      val values: NArray[Double] = new NArray[Double](slash.squareInPlace(n))
-      var i: Int = 0
-      var r: Int = 0;
-      while (r < n) {
-        var c: Int = 0;
-        while (c < n) {
-          values(i) = {
-            if (isSymmetric) isSymmetric = A(r, c) == A(c, r)
-            A(r, c)
-          }
-          i += 1
-          c += 1
-        }
-        r += 1
-      }
-      Mat[N, N](values)
+    val temp = {
+      if (EigenSolver.symetric(n, A.values)) EigenSolver.tred2(n, q) // Tridiagonalize
+      else EigenSolver.orthes(n, q) // Reduce to Hessenberg form
     }
 
-
-    if (isSymmetric) tred2[N](Q)  // Tridiagonalize
-    else orthes[N](Q)  // Reduce to Hessenberg form
-
+    new Eigen[N](new Mat[N,N](temp._1), Vec[N](temp._2), Vec[N](temp._3))
   }
 
 }
@@ -875,7 +964,7 @@ object Eigen {
  * A = V*D*inverse(V) depends upon V.cond().
  * */
 
-class Eigen[N <: Int] private(val Q:Mat[N, N], val λ:Vec[N], val λi:Vec[N])(using ValueOf[N]) {
+class Eigen[N <: Int] private(val Q:Mat[N, N], val lambda:Vec[N], val lmbdi:Vec[N])(using ValueOf[N]) {
 
   val n:Int = valueOf[N]
 
@@ -883,27 +972,76 @@ class Eigen[N <: Int] private(val Q:Mat[N, N], val λ:Vec[N], val λi:Vec[N])(us
    *
    * @return real(diag(D))
    */
-  def realEigenvalues: Vec[N] = λ
+  def realEigenvalues: Vec[N] = lambda
 
   /** Return the imaginary parts of the eigenvalues
    *
    * @return imag(diag(D))
    */
-  def imaginaryEigenvalues: Vec[N] = λi
+  def imaginaryEigenvalues: Vec[N] = lmbdi
 
-  inline def D: Mat[N, N] = Λ
+  inline def D: Mat[N, N] = blockDiagonalEigenvalueMatrix
+
   /** Return the block diagonal eigenvalue matrix
    *
    * @return Λ
    */
-  def Λ: Mat[N, N] = {
-    val X = Mat.diagonal[N](λ)
-    var i:Int = 0; while (i < n) {
-      //X(i, i) = λ(i)
-      if (λi(i) > 0) X(i, i + 1) = λi(i)
-      else if (λi(i) < 0) X(i, i - 1) = λi(i)
-      i += 1
+  def blockDiagonalEigenvalueMatrix: Mat[N, N] = new Mat[N, N](
+    EigenSolver.blockDiagonalEigenvalueMatrix(
+      lambda.asNativeArray,
+      lmbdi.asNativeArray
+    )
+  )
+
+}
+
+object RTEigen {
+
+  def apply(A:RTMat): RTEigen = {
+    slash.dimensionCheck(A.rowDimension, A.columnDimension)
+
+    val n = A.columnDimension
+
+    val q = NArray.copy[Double](A.values)
+
+    val temp = {
+      if (EigenSolver.symetric(n, A.values)) EigenSolver.tred2(n, q) // Tridiagonalize
+      else EigenSolver.orthes(n, q) // Reduce to Hessenberg form
     }
-    X
+
+    new RTEigen(new RTMat(n, n, temp._1), RTVec(temp._2), RTVec(temp._3))
   }
+
+}
+
+class RTEigen private(val Q:RTMat, val lambda:RTVec, val lmbdi:RTVec) {
+
+  val n:Int = Q.rowDimension
+
+  /** Return the real parts of the eigenvalues
+   *
+   * @return real(diag(D))
+   */
+  def realEigenvalues: RTVec = lambda
+
+  /** Return the imaginary parts of the eigenvalues
+   *
+   * @return imag(diag(D))
+   */
+  def imaginaryEigenvalues: RTVec = lmbdi
+
+  inline def D: RTMat = blockDiagonalEigenvalueMatrix
+
+  /** Return the block diagonal eigenvalue matrix
+   *
+   * @return Λ
+   */
+  def blockDiagonalEigenvalueMatrix: RTMat = new RTMat(
+    n,
+    n,
+    EigenSolver.blockDiagonalEigenvalueMatrix(
+      lambda.asNativeArray,
+      lmbdi.asNativeArray
+    )
+  )
 }

@@ -35,13 +35,13 @@ object SV extends Verification {
         s"\tJaMa Comparing M to USVᵀ: ${
           Verification.matrixCompare(
             m,
-            jsvd.getU.times(jsvd.getS.times(jsvd.getV.transpose())
+            jsvd.getU.times(jsvd.getS.times(jsvd.getV.transpose()))
           )
         }"
       )
 
       println(
-        s"\tdragonfly Comparing M to USVᵀ: ${
+        s"\tslash Comparing M to USVᵀ: ${
           Verification.arrayCompare(
             m.values,
             msvd.U.times(msvd.S).times(msvd.V.transpose).values

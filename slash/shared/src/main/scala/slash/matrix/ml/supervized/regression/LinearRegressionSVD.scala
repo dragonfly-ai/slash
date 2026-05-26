@@ -17,7 +17,7 @@
 package slash.matrix.ml.supervized.regression
 
 import slash.matrix.*
-import slash.matrix.decomposition.SV
+import slash.matrix.decomposition.{SV, RTSV}
 
 import scala.compiletime.ops.int.*
 
@@ -30,5 +30,16 @@ class LinearRegressionSVD[M <: Int, N <: Int](using ValueOf[M], ValueOf[N], M >=
     svd.V.times(svd.S_inverse.times(svd.U.transpose)).times(Y)
   }
 
+}
+
+
+class RTLinearRegressionSVD extends RTLinearRegression {
+
+  override def estimateBeta(X: RTMat, Y: RTMat): RTMat = {
+    // Â = VS⁻ⁱUᵀ * Y
+    val svd: RTSV = RTSV(X)
+    //svd.getV() * (svd.getS_Inverse() * svd.getU().transpose) * Y
+    svd.V.times(svd.S_inverse.times(svd.U.transpose)).times(Y)
+  }
 
 }

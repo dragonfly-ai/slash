@@ -49,7 +49,6 @@ case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
 
   def random(r: scala.util.Random = Random.defaultRandom):Vec[N] = r.between[N](min, MAX)
 
-
   /**
    * Determines if this VectorBounds intersects another VectorBounds.
    * @param that another VectorBounds.

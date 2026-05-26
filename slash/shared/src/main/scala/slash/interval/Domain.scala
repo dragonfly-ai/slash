@@ -16,9 +16,6 @@
 
 package slash.interval
 
-import Interval.*
-
-
 object Domain {
 
   val ℕ_Int: Domain[Int] = Domain[Int](`[]`(1, Int.MaxValue))

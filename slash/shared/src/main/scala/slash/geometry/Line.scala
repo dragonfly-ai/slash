@@ -17,7 +17,6 @@
 package slash.geometry
 
 import slash.vector.*
-import slash.vector.Vec2.*
 
 object Line {
 

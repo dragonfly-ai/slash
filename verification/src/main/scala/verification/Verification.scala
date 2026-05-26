@@ -59,11 +59,11 @@ object Verification {
 
   }
 
-  def matrixCompare[M <: Int, N <: Int](jm: Jama.Matrix, sm: slash.matrix.Mat[M, N])(using ValueOf[M], ValueOf[N]): MatrixComparison = {
+  def matrixCompare[M <: Int, N <: Int](jm: Jama.Matrix, sm: slash.matrix.Mat[M, N]): MatrixComparison = {
     matrixCompare[M, N](sm, jm)
   }
 
-    def matrixCompare[M <: Int, N <: Int](sm: slash.matrix.Mat[M, N], jm: Jama.Matrix)(using ValueOf[M], ValueOf[N]): MatrixComparison = {
+    def matrixCompare[M <: Int, N <: Int](sm: slash.matrix.Mat[M, N], jm: Jama.Matrix): MatrixComparison = {
 
     if (sm.rows == jm.getRowDimension && sm.columns == jm.getColumnDimension) {
 
@@ -116,6 +116,10 @@ trait Verification {
     (_: Int) => NArray.tabulate[Double](12)((_: Int) => Math.random())
   )
 
+  val solveValues:NArray[NArray[Double]] = NArray.tabulate[NArray[Double]](11)(
+    (_: Int) => NArray.tabulate[Double](3)((_: Int) => Math.random())
+  )
+
   val squareJaMa: Jama.Matrix = new Jama.Matrix(squareValues)
   val squareMa: slash.matrix.Mat[11, 11] = slash.matrix.Mat[11, 11](squareJaMa.getRowPackedCopy)
 
@@ -124,6 +128,9 @@ trait Verification {
 
   val tallJaMa: Jama.Matrix = new Jama.Matrix(tallValues)
   val tallMa: slash.matrix.Mat[21, 12] = slash.matrix.Mat[21, 12](tallJaMa.getRowPackedCopy)
+
+  val solveJaMa: Jama.Matrix = new Jama.Matrix(solveValues)
+  val solveMa: slash.matrix.Mat[11, 3] = slash.matrix.Mat[11, 3](solveJaMa.getRowPackedCopy)
 
   def name:String
   def run: Unit

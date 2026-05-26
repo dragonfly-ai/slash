@@ -18,6 +18,7 @@ package slash.matrix.ml.supervized.regression
 
 import slash.matrix.*
 import slash.vector.*
+import slash.vector.runtime.RTVec
 
 /**
  * @param A
@@ -29,12 +30,29 @@ import slash.vector.*
 
 
 case class LinearRegressionModel[N <: Int](A: Mat[N, 1], mean: Vec[N], bias: Double, standardError: Double, `R²`: Double) {
+
   val a: Vec[N] = A.copy.values.asInstanceOf[Vec[N]]
 
   def apply(x: Vec[N]): Double = (a dot (x - mean)) + bias
-  //  def apply(X:Mat):Mat = {
-  //    X.times(A)
-  //  }
+
+  override def toString: String = s"LinearRegressionModel(\n\t\tA = ${A.dim},\n\t\tmean = ${mean.render()},\n\t\tbias = $bias,\n\t\tstandardError = $standardError,\n\t\tR² = ${`R²`}\n\t)"
+}
+
+
+/**
+ * @param A
+ * @param mean
+ * @param bias
+ * @param standardError
+ * @param `R²` Coefficient of determination =
+ */
+
+
+case class RTLinearRegressionModel(A: RTMat, mean: RTVec, bias: Double, standardError: Double, `R²`: Double) {
+
+  val a: RTVec = A.copy.values.asInstanceOf[RTVec]
+
+  def apply(x: RTVec): Double = (a dot (x - mean)) + bias
 
   override def toString: String = s"LinearRegressionModel(\n\t\tA = ${A.dim},\n\t\tmean = ${mean.render()},\n\t\tbias = $bias,\n\t\tstandardError = $standardError,\n\t\tR² = ${`R²`}\n\t)"
 }

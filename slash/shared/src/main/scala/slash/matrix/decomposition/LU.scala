@@ -18,16 +18,16 @@ package slash.matrix.decomposition
 
 import slash.matrix.*
 import narr.*
+import slash.matrix.util.lindex
+import slash.{dimensionCheck, squareInPlace}
 
-object LU {
+object LUSolver {
 
-  def apply[M <: Int, N <: Int](A:Mat[M, N])(using ValueOf[M], ValueOf[N]):LU[M, N] = {
+  def computeLU(m:Int, n:Int, values:NArray[Double]):(NArray[Double], NArray[Int], Double) = {
 
-    val m:Int = valueOf[M]
-    val n:Int = valueOf[N]
     val minDim:Int = Math.min(m, n)
 
-    val lu:Mat[M, N] = A.copy
+    val lu:NArray[Double] = NArray.copy[Double](values)
     val piv:NArray[Int] = NArray.tabulate[Int](m)((i:Int) => i)
 
     var pivsign:Double = 1.0
@@ -38,7 +38,7 @@ object LU {
 
     var j:Int = 0; while (j < n) { // Make a copy of the j-th column to localize references.
       var i:Int = 0; while (i < m) {
-        LUcolj(i) = lu(i, j)
+        LUcolj(i) = lu(lindex(i, j, n))
         i += 1
       }
       // Apply previous transformations.
@@ -47,11 +47,11 @@ object LU {
         val kmax = Math.min(i, j)
         var s = 0.0
         var k:Int = 0; while (k < kmax) {
-          s += lu(i, k) * LUcolj(k)
+          s += lu(lindex(i, k, n)) * LUcolj(k)
           k += 1
         }
         LUcolj(i) = LUcolj(i) - s
-        lu(i, j) = LUcolj(i)
+        lu(lindex(i, j, n)) = LUcolj(i)
         i += 1
       }
       // Find pivot and exchange if necessary.
@@ -62,9 +62,9 @@ object LU {
       }
       if (p != j) {
         var k0:Int = 0; while (k0 < n) {
-          val t = lu(p, k0)
-          lu(p, k0) = lu(j, k0)
-          lu(j, k0) = t
+          val t = lu(lindex(p, k0, n))
+          lu(lindex(p, k0, n)) = lu(lindex(j, k0, n))
+          lu(lindex(j, k0, n)) = t
           k0 += 1
         }
         val k = piv(p)
@@ -74,15 +74,125 @@ object LU {
       }
       //println(s"j = $j and minDim = $minDim")
       // Compute multipliers.
-      if (j < minDim && lu(j, j) != 0.0) {
+      if (j < minDim && lu(lindex(j, j, n)) != 0.0) {
         var i0:Int = j + 1; while (i0 < m) {
-          lu(i0, j) = lu(i0, j) / lu(j, j)
+          lu(lindex(i0, j, n)) = lu(lindex(i0, j, n)) / lu(lindex(j, j, n))
           i0 += 1
         }
       }
       j += 1
     }
-    new LU[M, N](lu, piv, pivsign)
+    //new LU[M, N]
+    (lu, piv, pivsign)
+  }
+
+  def singular(n: Int, values:NArray[Double]): Boolean = {
+    var j: Int = 0
+    while (j < n) {
+      if (values(lindex(j, j, n)) == 0.0) return true
+      j += 1
+    }
+    false
+  }
+
+  def computeL(m:Int, n:Int, lu:NArray[Double]):NArray[Double] = {
+    val out:NArray[Double] = new NArray[Double](m * n)
+    var i:Int = 0
+    var r:Int = 0; while (r < m) {
+      var c: Int = 0; while (c < n) {
+        out(i) = {
+          if (r > c) lu(lindex(r, c, n))
+          else if (r == c) 1.0
+          else 0.0
+        }
+        i += 1
+        c += 1
+      }
+      r += 1
+    }
+    //Mat[M, N](values)
+    out
+  }
+
+  def computeU(n:Int, lu:NArray[Double]):NArray[Double] = {
+    val out: NArray[Double] = new NArray[Double](squareInPlace(n))
+    var i: Int = 0
+    var r: Int = 0
+    while (r < n) {
+      var c: Int = 0
+      while (c < n) {
+        out(i) = if (r > c) 0.0 else lu(lindex(r, c, n))
+        i += 1
+        c += 1
+      }
+      r += 1
+    }
+    out
+  }
+
+  // assumes a square matrix.
+  def determinant(pivsign:Double, n:Int, lu:NArray[Double]):Double = {
+    var d:Double = pivsign
+
+    var j:Int = 0
+    while (j < n) {
+      d *= lu(lindex(j, j, n))
+      j += 1
+    }
+
+    d
+  }
+
+//  def solve[V <: Int](B: Mat[M, V])(using ValueOf[V]): Mat[N, V] = {
+  def solve(columns:Int, lu:NArray[Double], bColumns:Int, B:NArray[Double], piv:NArray[Int]): NArray[Double] = {
+
+    // Copy right hand side with pivoting
+    val nx: Int = bColumns
+    //val X: Mat[N, V] = B.subMatrix[N, V](piv, 0)
+    val X: NArray[Double] = util.subMatrix(bColumns, B, bColumns, piv, 0)
+
+    // Solve L*Y = B(piv,:)
+    var k: Int = 0;
+    while (k < columns) {
+      var i: Int = k + 1;
+      while (i < columns) {
+        var j: Int = 0;
+        while (j < nx) {
+          X(lindex(i, j, bColumns)) = X(lindex(i, j, bColumns)) - (X(lindex(k, j, bColumns)) * lu(lindex(i, k, columns)))
+          j += 1
+        }
+        i += 1
+      }
+      k += 1
+    }
+    // Solve U*X = Y;
+    k = columns - 1;
+    while (k > -1) { // recycling k
+      var j: Int = 0;
+      while (j < nx) {
+        X(lindex(k, j, bColumns)) = X(lindex(k, j, bColumns)) / lu(lindex(k, k, columns))
+        j += 1
+      }
+      var i: Int = 0;
+      while (i < k) {
+        var j1: Int = 0;
+        while (j1 < nx) {
+          X(lindex(i, j1, bColumns)) = X(lindex(i, j1, bColumns)) - (X(lindex(k, j1, bColumns)) * lu(lindex(i, k, columns)))
+          j1 += 1
+        }
+        i += 1
+      }
+      k -= 1
+    }
+    X
+  }
+}
+
+object LU {
+
+  def apply[M <: Int, N <: Int](A:Mat[M, N])(using ValueOf[M], ValueOf[N]):LU[M, N] = {
+    val temp = LUSolver.computeLU(A.rows, A.columns, A.values)
+    new LU[M, N](new Mat[M,N](temp._1), temp._2, temp._3)
   }
 
 }
@@ -124,62 +234,25 @@ class LU[M <: Int, N <: Int] private (
     *
     * @return true if U, and hence A, is nonsingular.
     */
-  def isSingular: Boolean = {
-    var j:Int = 0; while (j < n) {
-      if (LU(j, j) == 0.0) return true
-      j += 1
-    }
-    false
-  }
+  lazy val singular: Boolean = LUSolver.singular(n, LU.values)
 
   /** Return lower triangular factor
     *
     * @return L
     */
-  lazy val L: Mat[M, N] = {
-    val values:NArray[Double] = new NArray[Double](m * n)
-    var i:Int = 0
-    var r:Int = 0; while (r < m) {
-      var c: Int = 0; while (c < n) {
-        values(i) = {
-          if (r > c) LU(r, c)
-          else if (r == c) 1.0
-          else 0.0
-        }
-        i += 1
-        c += 1
-      }
-      r += 1
-    }
-    Mat[M, N](values)
-  }
+  lazy val L: Mat[M, N] = new Mat[M,N](LUSolver.computeL(m, n, LU.values))
 
   /** Return upper triangular factor
     *
     * @return U
     */
-  def U: Mat[N, N] = {
-    val values: NArray[Double] = new NArray[Double](slash.squareInPlace(n))
-    var i: Int = 0
-    var r: Int = 0
-    while (r < n) {
-      var c: Int = 0
-      while (c < n) {
-        values(i) = if (r > c) 0.0 else LU(r, c)
-        i += 1
-        c += 1
-      }
-      r += 1
-    }
-    Mat[N, N](values)
-  }
+  lazy val U: Mat[N, N] = new Mat[N,N](LUSolver.computeU(n, LU.values))
 
   /** Return pivot permutation vector
     *
-    * @return piv
+    * @return a copy of the piv NArray.
     */
-  def pivot: NArray[Int] = NArray.tabulate[Int](m)((i:Int) => piv(i))
-
+  def pivot: NArray[Int] = NArray.copy[Int](piv) //NArray.tabulate[Int](m)((i:Int) => piv(i))
 
   /** Return pivot permutation vector as a one-dimensional double array
     *
@@ -194,15 +267,7 @@ class LU[M <: Int, N <: Int] private (
     */
   def determinant: Double = {
     if (m != n) throw new IllegalArgumentException("Mat must be square.")
-
-    var d:Double = pivsign
-
-    var j:Int = 0; while (j < n) {
-      d *= LU(j, j)
-      j += 1
-    }
-
-    d
+    LUSolver.determinant(pivsign, n, LU.values)
   }
 
   /** Solve A*X = B
@@ -213,38 +278,83 @@ class LU[M <: Int, N <: Int] private (
     * @throws RuntimeException  Mat is singular.
     */
   def solve[V <: Int](B: Mat[M, V])(using ValueOf[V]): Mat[N, V] = {
-    if ( this.isSingular ) throw new RuntimeException( "Mat is singular." )
+    if ( this.singular ) throw new RuntimeException( "Mat is singular." )
+    new Mat[N,V](
+      LUSolver.solve(n, LU.values, valueOf[V], B.values, piv: NArray[Int])
+    )
+  }
+}
 
-    // Copy right hand side with pivoting
-    val nx:Int = B.columns
-    val X:Mat[N, V] = B.subMatrix[N, V](piv, 0)
+object RTLU {
 
-    // Solve L*Y = B(piv,:)
-    var k:Int = 0; while (k < n) {
-      var i:Int = k + 1; while (i < n) {
-        var j:Int = 0; while (j < nx) {
-          X(i, j) = X(i, j) - (X(k, j) * LU(i, k))
-          j += 1
-        }
-        i += 1
-      }
-      k += 1
-    }
-    // Solve U*X = Y;
-    k = n - 1; while (k > -1) { // recycling k
-      var j:Int = 0; while (j < nx) {
-        X(k, j) = X(k, j) / LU(k, k)
-        j += 1
-      }
-      var i:Int = 0; while (i < k) {
-        var j1:Int = 0; while (j1 < nx) {
-          X(i, j1) = X(i, j1) - (X(k, j1) * LU(i, k))
-          j1 += 1
-        }
-        i += 1
-      }
-      k -= 1
-    }
-    X
+  def apply(A:RTMat):RTLU = {
+    val temp = LUSolver.computeLU(A.rowDimension, A.columnDimension, A.values)
+    new RTLU(new RTMat(A.rowDimension, A.columnDimension, temp._1), temp._2, temp._3)
+  }
+
+}
+
+// Use a "left-looking", dot-product, Crout/Doolittle algorithm.
+class RTLU private (val LU:RTMat, piv:NArray[Int], pivsign:Double) {
+
+  val m:Int = LU.rowDimension
+  val n:Int = LU.columnDimension
+
+  /** Is the matrix nonsingular?
+   *
+   * @return true if U, and hence A, is nonsingular.
+   */
+  lazy val singular: Boolean = LUSolver.singular(n, LU.values)
+
+  /** Return lower triangular factor
+   *
+   * @return L
+   */
+  lazy val L: RTMat = new RTMat(m, n, LUSolver.computeL(m, n, LU.values))
+
+  /** Return upper triangular factor
+   *
+   * @return U
+   */
+  lazy val U: RTMat = new RTMat(n, n, LUSolver.computeU(n, LU.values))
+
+  /** Return pivot permutation vector
+   *
+   * @return a copy of the piv NArray.
+   */
+  def pivot: NArray[Int] = NArray.copy[Int](piv) //NArray.tabulate[Int](m)((i:Int) => piv(i))
+
+
+  /** Return pivot permutation vector as a one-dimensional double array
+   *
+   * @return (double) piv
+   */
+  def doubleValuedPivot(): NArray[Double] = NArray.tabulate[Double](m)((i:Int) => piv(i).toDouble)
+
+  /** Determinant
+   *
+   * @return det(A)
+   * @throws IllegalArgumentException  Mat must be square
+   */
+  def determinant: Double = {
+    if (m != n) throw new IllegalArgumentException("Mat must be square.")
+    LUSolver.determinant(pivsign, n, LU.values)
+  }
+
+  /** Solve A*X = B
+   *
+   * @param  B A Mat with as many rows as A and as many columns as B.
+   * @return X so that L*U*X = B(piv,:)
+   * @throws IllegalArgumentException Mat row dimensions must agree.
+   * @throws RuntimeException  Mat is singular.
+   */
+  def solve(B: RTMat): RTMat = {
+    if ( this.singular ) throw new RuntimeException( "Mat is singular." )
+    dimensionCheck(m, B.rowDimension)
+    new RTMat(
+      n,
+      B.columnDimension,
+      LUSolver.solve(n, LU.values, B.columnDimension, B.values, piv: NArray[Int])
+    )
   }
 }

@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package slash.stats
-
+import slash.stats.kernel.GaussianKernel
+import slash.stats.probability.distributions.Gaussian
 import slash.vector.*
+import slash.vector.runtime.RTVec
 
-trait LabeledVec[N <: Int] {
-  def label: Double
-  def vector: Vec[N]
-  def y:Double = label
-  def x: Vec[N] = vector
-}
+class KernelTest extends munit.FunSuite {
 
-case class SimpleLabeledVector[N <: Int](override val label: Double, override val vector: Vec[N]) extends LabeledVec[N] {
-  override def toString: String = s"SimpleLabeledVec[${vector.dimension}]($label, ${vector.render()})"
+  test("GaussianKernel") {
 
-}
+    val gk:GaussianKernel = GaussianKernel(9.0, Gaussian(0.0, 9.0))
 
-case class ContextualLabeledVector[N <: Int, T](override val label: Double, override val vector:Vec[N], context:T) extends LabeledVec[N] {
-  override def toString: String = s"ContextualLabeledVec[${vector.dimension}]($label, ${vector.render()})"
+    var i:Int = 0
+    while (i < 1000) {
+      assertEquals(gk.weight(Vec.random[3](9.0, 100.0)), 0.0)
+      assertNotEquals(gk.weight(Vec.random[3](0.0, 3.0)), 0.0)
+      assertEquals(gk.rtWeight(RTVec.random(3, 9.0, 100.0)), 0.0)
+      assertNotEquals(gk.rtWeight(RTVec.random(3, 0.0, 3.0)), 0.0)
+      i = i + 1
+    }
+  }
+
 }

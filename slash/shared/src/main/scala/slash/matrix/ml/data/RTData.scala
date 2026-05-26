@@ -19,33 +19,32 @@ package slash.matrix.ml.data
 import narr.*
 import slash.*
 import interval.*
-import vector.{Vec, *}
-import stats.{LabeledVec, SimpleLabeledVector}
+import vector.runtime.{RTVec, *}
+import stats.{LabeledRTVec, SimpleLabeledRTVector}
 import stats.probability.distributions.{EstimatedGaussian, stream}
-import stream.StreamingVectorStats
 import matrix.*
 
 import scala.language.{existentials, implicitConversions}
 
-trait Data[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {
-  val sampleSize:Int = valueOf[M]
-  val dimension:Int = valueOf[N]
-  def X:Mat[M, N]
+trait RTData {
+  def sampleSize:Int
+  def dimension:Int
+  def X:RTMat
   //def asVectors:Set[Vector]
-  def example(i:Int):Vec[N]
-  def sampleMean:Vec[N]
-  def sampleVariance:Vec[N]
-  def sampleStandardDeviation:Vec[N]
+  def example(i:Int):RTVec
+  def sampleMean:RTVec
+  def sampleVariance:RTVec
+  def sampleStandardDeviation:RTVec
   def domainComponent(i:Int):Interval[Double]
-  def domainBias:Vec[N] = sampleMean
+  def domainBias:RTVec = sampleMean
 
-  def zScore(x: Vec[N]): Vec[N] = {
+  def zScore(x: RTVec): RTVec = {
     val o = (x - sampleMean)
     o.pointwiseMultiply(sampleStandardDeviation.reciprocal)
     o
   }
 
-  def fromZScore(x: Vec[N]): Vec[N] = {
+  def fromZScore(x: RTVec): RTVec = {
     val o = x.copy
     o.pointwiseMultiply(sampleStandardDeviation)
     o += sampleMean
@@ -53,74 +52,83 @@ trait Data[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) {
   }
 }
 
-trait UnsupervisedData[M <: Int, N <: Int] extends Data[M, N] {
+trait RTUnsupervisedData extends RTData {
 
 }
 
-object StaticUnsupervisedData {
-  inline def apply[M <: Int, N <: Int](examples:NArray[Vec[N]])(using ValueOf[M], ValueOf[N]):StaticUnsupervisedData[M, N] = {
-    new StaticUnsupervisedData[M, N](examples)
+object RTStaticUnsupervisedData {
+  inline def apply(sampleSize:Int, dimension:Int, examples:NArray[RTVec]):RTStaticUnsupervisedData = {
+    new RTStaticUnsupervisedData(sampleSize, dimension, examples)
   }
 }
 
-class StaticUnsupervisedData[M <: Int, N <: Int](examples:NArray[Vec[N]])(using ValueOf[M], ValueOf[N]) extends UnsupervisedData[M, N] {
+class RTStaticUnsupervisedData(val sampleSize:Int, val dimension:Int, examples:NArray[RTVec]) extends RTUnsupervisedData {
 
-  private val Xar:NArray[Vec[N]] = NArray.ofSize[Vec[N]](sampleSize)
+  dimensionCheck(sampleSize, examples.length)
+  dimensionCheck(dimension, examples(0).dimension)
+
+  private val Xar:NArray[RTVec] = NArray.ofSize[RTVec](sampleSize)
 
   // Compute sample point statistics and populate Xar and X
-  val temp:(Vec[N], Vec[N], Vec[N], NArray[Interval[Double]]) = {
-    val sampleVectorStats: StreamingVectorStats[N] = new stream.StreamingVectorStats[N]
+  val temp:(RTVec, RTVec, RTVec, NArray[Interval[Double]]) = {
+    val sampleVectorStats: stream.StreamingRTVectorStats = new stream.StreamingRTVectorStats(dimension)
 
-    var i:Int = 0; while (i < sampleSize) {
+    var i:Int = 0
+    while (i < sampleSize) {
       sampleVectorStats(examples(i))
       i += 1
     }
 
-    val sampleMean:Vec[N] = sampleVectorStats.average()
+    val sampleMean:RTVec = sampleVectorStats.average()
 
-    i = 0; while (i < sampleSize) {
+    i = 0
+    while (i < sampleSize) {
       Xar(i) = examples(i) - sampleMean
       i += 1
     }
 
     val intervals:NArray[Interval[Double]] = NArray.ofSize[Interval[Double]](dimension)
-    i = 0; while (i < dimension) {
+    i = 0
+    while (i < dimension) {
       intervals(i) = `[]`(sampleVectorStats.minValues(i), sampleVectorStats.maxValues(i))
       i += 1
     }
     (sampleMean, sampleVectorStats.variance, sampleVectorStats.standardDeviation, intervals)
   }
   //(sampleMean:Vector, sampleVariance:Vector, sampleStandardDeviation:Vector, intervals:NArray[Interval[Double]]): Vector
-  override val sampleMean:Vec[N] = temp._1
-  override val sampleVariance:Vec[N] = temp._2
-  override val sampleStandardDeviation:Vec[N] = temp._3
+  override val sampleMean:RTVec = temp._1
+  override val sampleVariance:RTVec = temp._2
+  override val sampleStandardDeviation:RTVec = temp._3
   val intervals:NArray[Interval[Double]] = temp._4
 
   override def domainComponent(i: Int):Interval[Double] = intervals(i)
 
-  override val X: Mat[M, N] = Mat[M, N](Xar)
+  override val X: RTMat = RTMat(sampleSize, dimension, Xar)
 
-  override def example(i: Int): Vec[N] = Xar(i) + sampleMean
+  override def example(i: Int): RTVec = Xar(i) + sampleMean
 
 }
 
-trait SupervisedData[M <: Int, N <: Int] extends Data[M, N] {
-  def y:Vec[M]
-  def Y: Mat[M, 1]
-  def labeledExample(i:Int):LabeledVec[N]
+trait RTSupervisedData extends RTData {
+  def y: RTVec
+  def Y: RTMat
+  def labeledExample(i:Int):LabeledRTVec
   def labelStats:EstimatedGaussian
   def rangeBias:Double = labelStats.sampleMean
 }
 
-class StaticSupervisedData[M <: Int, N <: Int](labeledExamples:NArray[LabeledVec[N]])(using ValueOf[M], ValueOf[N]) extends SupervisedData[M, N] {
+class RTStaticSupervisedData(val sampleSize:Int, val dimension:Int, labeledExamples:NArray[LabeledRTVec]) extends RTSupervisedData {
 
-  private val Xar:NArray[Vec[N]] = NArray.ofSize[Vec[N]](sampleSize)
+  dimensionCheck(sampleSize, labeledExamples.length)
+  dimensionCheck(dimension, labeledExamples(0).vector.dimension)
+
+  private val Xar:NArray[RTVec] = NArray.ofSize[RTVec](sampleSize)
   private val Yar:NArray[Double] = NArray.ofSize[Double](sampleSize)
 
   // Compute the average Vector
   val temp = {
     val labelStatsEstimator = stream.Gaussian()
-    val sampleVectorStats:stream.StreamingVectorStats[N] = new stream.StreamingVectorStats[N]
+    val sampleVectorStats:stream.StreamingRTVectorStats = new stream.StreamingRTVectorStats(dimension)
 
     var i:Int = 0
     while (i < sampleSize) {
@@ -129,7 +137,7 @@ class StaticSupervisedData[M <: Int, N <: Int](labeledExamples:NArray[LabeledVec
       i += 1
     }
 
-    val sampleMean:Vec[N] = sampleVectorStats.average()
+    val sampleMean:RTVec = sampleVectorStats.average()
     val labelStats:EstimatedGaussian = labelStatsEstimator.estimate
 
     i = 0; while (i < sampleSize) {
@@ -147,20 +155,20 @@ class StaticSupervisedData[M <: Int, N <: Int](labeledExamples:NArray[LabeledVec
   }
 
   override val labelStats:EstimatedGaussian = temp._1
-  override val sampleMean:Vec[N] = temp._2
-  override val sampleVariance:Vec[N] = temp._3
-  override val sampleStandardDeviation:Vec[N] = temp._4
+  override val sampleMean:RTVec = temp._2
+  override val sampleVariance:RTVec = temp._3
+  override val sampleStandardDeviation:RTVec = temp._4
 
   val intervals: NArray[Interval[Double]] = temp._5
 
-  override val y: Vec[M] = Vec[M](Yar)
+  override val y: RTVec = RTVec(Yar)
 
-  override val X: Mat[M, N] = Mat(Xar)
-  override val Y: Mat[M, 1] = y.asColumnMatrix
+  override val X: RTMat = RTMat(sampleSize, dimension, Xar)
+  override val Y: RTMat = y.asColumnMatrix
 
-  def example(i: Int): Vec[N] = Xar(i) + sampleMean
+  def example(i: Int): RTVec = Xar(i) + sampleMean
 
-  def labeledExample(i: Int): LabeledVec[N] = SimpleLabeledVector(Yar(i) + labelStats.sampleMean, example(i))
+  def labeledExample(i: Int): LabeledRTVec = SimpleLabeledRTVector(Yar(i) + labelStats.sampleMean, example(i))
 
   def domainComponent(i: Int): Interval[Double] = intervals(i)
 

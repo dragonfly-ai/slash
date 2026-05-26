@@ -39,9 +39,9 @@ package object vectorf {
       a
     }
 
-    inline def zeros[N <: Int](using ValueOf[N]): VecF[N] = new FloatArray(valueOf[N]).asInstanceOf[VecF[N]]
+    inline def zeros[N <: Int]: VecF[N] = new FloatArray(valueOf[N]).asInstanceOf[VecF[N]]
 
-    inline def ones[N <: Int](using ValueOf[N]): VecF[N] = fill[N](1.0)
+    inline def ones[N <: Int]: VecF[N] = fill[N](1.0)
 
     inline def random[N <: Int]: VecF[N] = random(0.0, 1.0, slash.Random.defaultRandom)
 
@@ -138,26 +138,26 @@ package object vectorf {
 
     def fromVec[N <: Int](v:slash.vector.Vec[N]): VecF[N] = (NArray.tabulate[Float](v.dimension)(i => v(i).toFloat)).asInstanceOf[VecF[N]]
 
-    extension[N <: Int] (thisVector: VecF[N])(using ValueOf[N], N >= 1 =:= true) {
+    extension[N <: Int] (thisVector: VecF[N])(using N >= 1 =:= true) {
       inline def x: Float = thisVector(0)
     }
 
-    extension[N <: Int] (thisVector: VecF[N])(using ValueOf[N], N >= 2 =:= true) {
+    extension[N <: Int] (thisVector: VecF[N])(using N >= 2 =:= true) {
       inline def y: Float = thisVector(1)
     }
 
-    extension[N <: Int] (thisVector: VecF[N])(using ValueOf[N], N >= 3 =:= true) {
+    extension[N <: Int] (thisVector: VecF[N])(using N >= 3 =:= true) {
       inline def z: Float = thisVector(2)
     }
 
-    extension[N <: Int] (thisVector: VecF[N])(using ValueOf[N], N >= 4 =:= true) {
+    extension[N <: Int] (thisVector: VecF[N])(using N >= 4 =:= true) {
       inline def w: Float = thisVector(3)
     }
 
     /**
      * VecF[2] extension methods:
      */
-    extension[N <: Int] (thisVector: VecF[N])(using ValueOf[N], N == 2 =:= true) {
+    extension[N <: Int] (thisVector: VecF[N])(using N == 2 =:= true) {
       inline def rotate(cosTheta: Double, sinTheta: Double): Unit = {
         val x1 = thisVector(0) * cosTheta - thisVector(1) * sinTheta
         thisVector(1) = (thisVector(0) * sinTheta + thisVector(1) * cosTheta).toFloat
@@ -182,7 +182,7 @@ package object vectorf {
     /**
      * VecF[3] extension methods:
      */
-    extension[N <: Int] (thisVector: VecF[N])(using ValueOf[N], N == 3 =:= true) {
+    extension[N <: Int] (thisVector: VecF[N])(using N == 3 =:= true) {
       inline def ⨯(thatVector: VecF[3]): VecF[3] = cross(thatVector)
 
       inline def cross(thatVector: VecF[3]): VecF[3] = VecF[3](

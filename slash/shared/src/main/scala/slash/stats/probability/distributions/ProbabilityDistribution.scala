@@ -16,12 +16,9 @@
 
 package slash.stats.probability.distributions
 
-import scala.reflect.ClassTag
-
-
 // ℕ population size symbol for future reference.
 
-trait ProbabilityDistribution[DOMAIN:ClassTag] extends Sampleable[DOMAIN] {
+trait ProbabilityDistribution[DOMAIN] extends Sampleable[DOMAIN] {
   /**
    * Probability Densidy Function: PDF
    * Computes the probability of drawing sample x from this distribution.
@@ -43,7 +40,7 @@ trait ProbabilityDistribution[DOMAIN:ClassTag] extends Sampleable[DOMAIN] {
 }
 
 
-trait ParametricProbabilityDistribution[DOMAIN:ClassTag] extends ProbabilityDistribution[DOMAIN] {
+trait ParametricProbabilityDistribution[DOMAIN] extends ProbabilityDistribution[DOMAIN] {
   def μ: Double
   def mean: Double = μ
 
