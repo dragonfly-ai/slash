@@ -107,7 +107,7 @@
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">slash</span><span>.</span><span class="identifier">vector</span><span>.*
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">v1</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">2</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>)
-</span><span class="comment">// v1: Vec[2] = Array(1.5, 2.5)
+</span><span class="comment">// v1: Vec[2] = Array(1.5, 2.0)
 </span><span class="identifier">v1</span><span> + </span><span class="number-literal">2.0</span><span>
 </span><span class="comment">// res0: Vec[2] = Array(3.5, 4.5)
 </span><span class="identifier">v1</span><span> - </span><span class="number-literal">2.0</span><span>
@@ -148,7 +148,7 @@
 </span><span class="identifier">v1</span><span>.</span><span class="identifier">clampedMin</span><span>(</span><span class="number-literal">2.0</span><span>).</span><span class="identifier">show</span><span>
 </span><span class="comment">// res13: String = &quot;《²↗〉2.0ᵢ 2.5ⱼ〉&quot;
 </span><span class="identifier">v1</span><span>.</span><span class="identifier">clampedMAX</span><span>(</span><span class="number-literal">2.0</span><span>).</span><span class="identifier">show</span><span>
-</span><span class="comment">// res14: String = &quot;《²↗〉1.5ᵢ 2.0ⱼ〉&quot;
+</span><span class="comment">// res14: String = &quot;《²↗〉1.5ᵢ 2.5ⱼ〉&quot;
 </span><span>
 </span><span class="keyword">val</span><span> </span><span class="identifier">v2</span><span> = </span><span class="type-name">Vec</span><span>[</span><span class="number-literal">3</span><span>](</span><span class="number-literal">1.5</span><span>, </span><span class="number-literal">2.5</span><span>, </span><span class="number-literal">3.5</span><span>)
 </span><span class="comment">// v2: Vec[3] = Array(1.5, 2.5, 3.5)
