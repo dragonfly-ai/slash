@@ -30,6 +30,12 @@ ThisBuild / nativeConfig ~= {
     .withGC(scala.scalanative.build.GC.commix)
 }
 
+ThisBuild / githubWorkflowBuildPreamble += WorkflowStep.Use(
+  UseRef.Public("egor-tensin", "setup-clang", "v2"),
+  params = Map("version" -> "16", "platform" -> "x64"),
+  name = Some("Clang Setup")
+)
+
 lazy val slash = crossProject(
   JSPlatform,
   JVMPlatform,
