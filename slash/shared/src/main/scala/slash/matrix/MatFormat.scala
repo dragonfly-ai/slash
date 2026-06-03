@@ -19,56 +19,54 @@ package slash.matrix
 import narr.*
 
 trait MatFormat {
-  def prefix(rows:Int, columns:Int, matValues:NArray[Double]): String
+  def prefix(matValues:MatrixData): String
 
-  def rowPrefix(rows:Int, columns:Int, matValues:NArray[Double]): String
+  def rowPrefix(matValues:MatrixData): String
 
-  def delimiter(rows:Int, columns:Int, matValues:NArray[Double])(r: Int, c: Int): String
+  def delimiter(matValues:MatrixData)(r: Int, c: Int): String
 
-  def suffix(rows:Int, columns:Int, matValues:NArray[Double]): String
+  def suffix(matValues:MatrixData): String
 
-  def rowSuffix(rows:Int, columns:Int, matValues:NArray[Double]): String
+  def rowSuffix(matValues:MatrixData): String
 
   def format(d: Double): String = d.toString
 
   def render(
-    rows:Int,
-    columns:Int,
-    matValues: NArray[Double],
-    alignment: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]],
+    matValues:MatrixData,
+    alignment: Function2[MatrixData, MatFormat, NArray[NArray[String]]],
     sb: StringBuilder = new StringBuilder()
   ): StringBuilder = {
 
-    val aligned:NArray[NArray[String]] = alignment(rows, columns, matValues, this)
+    val aligned:NArray[NArray[String]] = alignment(matValues, this)
 
-    val dlm = delimiter(rows, columns, matValues)
-    sb.append(prefix(rows, columns, matValues))
+    val dlm = delimiter(matValues)
+    sb.append(prefix(matValues))
 
     var r = 0
-    while (r < rows) {
-      sb.append(rowPrefix(rows, columns, matValues))
+    while (r < matValues.rowDimension) {
+      sb.append(rowPrefix(matValues))
       var c = 0
-      while (c < columns) {
+      while (c < matValues.columnDimension) {
         sb.append(aligned(r)(c))
         sb.append(dlm(r, c))
         c = c + 1
       }
-      sb.append(rowSuffix(rows, columns, matValues)).append("\n")
+      sb.append(rowSuffix(matValues)).append("\n")
       r = r + 1
     }
-    sb.append(suffix(rows, columns, matValues))
+    sb.append(suffix(matValues))
   }
 
-  def columnMetrics(rows:Int, columns:Int, matValues:NArray[Double]): MatColumnMetrics = {
-    val leftLength: NArray[Int] = NArray.fill[Int](columns)(0)
-    val rightLength: NArray[Int] = NArray.fill[Int](columns)(0)
-    val maxLength: NArray[Int] = NArray.fill[Int](columns)(0)
+  def columnMetrics(matValues:MatrixData): MatColumnMetrics = {
+    val leftLength: NArray[Int] = NArray.fill[Int](matValues.columnDimension)(0)
+    val rightLength: NArray[Int] = NArray.fill[Int](matValues.columnDimension)(0)
+    val maxLength: NArray[Int] = NArray.fill[Int](matValues.columnDimension)(0)
 
     var r = 0
-    while (r < rows) {
+    while (r < matValues.rowDimension) {
       var c = 0
-      while (c < columns) {
-        val s = format(matValues(util.lindex(r, c, columns)))
+      while (c < matValues.columnDimension) {
+        val s = format(matValues(r, c))
         val parts = s.split('.')
 
         leftLength(c) = Math.max(leftLength(c), parts(0).length)
@@ -87,19 +85,19 @@ object MatFormat {
 
   import slash.unicode.*
 
-  val UNALIGNED: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]] = (rows, columns, matValues: NArray[Double], fmt: MatFormat) => {
-    NArray.tabulate[NArray[String]](rows)(
-      (r: Int) => NArray.tabulate[String](columns)(
-        (c: Int) => fmt.format(matValues(util.lindex(r, c, columns)))
+  val UNALIGNED: Function2[MatrixData, MatFormat, NArray[NArray[String]]] = (matValues: MatrixData, fmt: MatFormat) => {
+    NArray.tabulate[NArray[String]](matValues.rowDimension)(
+      (r: Int) => NArray.tabulate[String](matValues.columnDimension)(
+        (c: Int) => fmt.format(matValues(r, c))
       )
     )
   }
 
-  val ALIGN_LEFT: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]] = (rows, columns, matValues: NArray[Double], fmt: MatFormat) => {
-    val mcms:MatColumnMetrics = fmt.columnMetrics(rows, columns, matValues)
-    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](rows)( (r: Int) => {
-      NArray.tabulate[String](columns)((c: Int) => {
-        val value = matValues(util.lindex(r, c, columns))
+  val ALIGN_LEFT: Function2[MatrixData, MatFormat, NArray[NArray[String]]] = (matValues: MatrixData, fmt: MatFormat) => {
+    val mcms:MatColumnMetrics = fmt.columnMetrics(matValues)
+    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](matValues.rowDimension)( (r: Int) => {
+      NArray.tabulate[String](matValues.columnDimension)((c: Int) => {
+        val value = matValues(r, c)
         var s = fmt.format(value)
         while (s.length < mcms.maxLength(c)) s = s + " "
         s
@@ -108,11 +106,11 @@ object MatFormat {
     out
   }
 
-  val ALIGN_RIGHT: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]] = (rows, columns, matValues: NArray[Double], fmt: MatFormat) => {
-    val mcms:MatColumnMetrics = fmt.columnMetrics(rows, columns, matValues)
-    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](rows)( (r: Int) => {
-      NArray.tabulate[String](columns)((c: Int) => {
-        val value = matValues(util.lindex(r, c, columns))
+  val ALIGN_RIGHT: Function2[MatrixData, MatFormat, NArray[NArray[String]]] = (matValues: MatrixData, fmt: MatFormat) => {
+    val mcms:MatColumnMetrics = fmt.columnMetrics(matValues)
+    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](matValues.rowDimension)( (r: Int) => {
+      NArray.tabulate[String](matValues.columnDimension)((c: Int) => {
+        val value = matValues(r, c)
         var s = fmt.format(value)
         while (s.length < mcms.maxLength(c)) s = " " + s
         s
@@ -121,11 +119,11 @@ object MatFormat {
     out
   }
 
-  val ALIGN_CENTER: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]] = (rows, columns, matValues: NArray[Double], fmt: MatFormat) => {
-    val mcms:MatColumnMetrics = fmt.columnMetrics(rows, columns, matValues)
-    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](rows)( (r: Int) => {
-      NArray.tabulate[String](columns)((c: Int) => {
-        val value = matValues(util.lindex(r, c, columns))
+  val ALIGN_CENTER: Function2[MatrixData, MatFormat, NArray[NArray[String]]] = (matValues: MatrixData, fmt: MatFormat) => {
+    val mcms:MatColumnMetrics = fmt.columnMetrics(matValues)
+    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](matValues.rowDimension)( (r: Int) => {
+      NArray.tabulate[String](matValues.columnDimension)((c: Int) => {
+        val value = matValues(r, c)
         var s = fmt.format(value)
         while (s.length < mcms.maxLength(c)) {
           s = " " + s
@@ -137,11 +135,11 @@ object MatFormat {
     out
   }
 
-  val ALIGN_ON_DECIMAL: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]] = (rows, columns, matValues: NArray[Double], fmt: MatFormat) => {
-    val mcms:MatColumnMetrics = fmt.columnMetrics(rows, columns, matValues)
-    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](rows)( (r: Int) => {
-      NArray.tabulate[String](columns)((c: Int) => {
-        val value = matValues(util.lindex(r, c, columns))
+  val ALIGN_ON_DECIMAL: Function2[MatrixData, MatFormat, NArray[NArray[String]]] = (matValues: MatrixData, fmt: MatFormat) => {
+    val mcms:MatColumnMetrics = fmt.columnMetrics(matValues)
+    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](matValues.rowDimension)( (r: Int) => {
+      NArray.tabulate[String](matValues.columnDimension)((c: Int) => {
+        val value = matValues(r, c)
         val parts = fmt.format(value).split('.')
         while (parts(0).length < mcms.leftLength(c)) parts(0) = " " + parts(0)
         while (parts(1).length < mcms.rightLength(c)) parts(1) = parts(1) + " "
@@ -151,10 +149,10 @@ object MatFormat {
     out
   }
 
-  //  val ALIGN_ON_MAGNITUDE: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]] = (rows, columns, matValues: NArray[Double], fmt: MatFormat) => {
-  //    val mcms:MatColumnMetrics = fmt.columnMetrics(rows, columns, matValues)
-  //    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](rows)( (r: Int) => {
-  //      NArray.tabulate[String](columns)((c: Int) => {
+  //  val ALIGN_ON_MAGNITUDE: Function2[MatrixData, MatFormat, NArray[NArray[String]]] = (matValues: MatrixData, fmt: MatFormat) => {
+  //    val mcms:MatColumnMetrics = fmt.columnMetrics(matValues)
+  //    val out:NArray[NArray[String]] = NArray.tabulate[NArray[String]](matValues.rowDimension)( (r: Int) => {
+  //      NArray.tabulate[String](matValues.columnDimension)((c: Int) => {
   //        val value = m(r, c)
   //        var s = fmt.format(value)
   //        //        val xpnnt: Int = slash.native.getExponent(value)
@@ -181,65 +179,63 @@ object MatFormat {
   //  }
 
   object DEFAULT extends MatFormat {
-    override def prefix(rows:Int, columns:Int, matValues:NArray[Double]): String = s"Mat[${rows}, ${columns}](\n"
+    override def prefix(matValues:MatrixData): String = s"Mat[${matValues.rowDimension}, ${matValues.columnDimension}](\n"
 
-    override def delimiter(rows:Int, columns:Int, matValues:NArray[Double])(r: Int, c: Int): String = {
-      if (c == columns - 1) {
-        if (r == rows - 1) "" else ","
+    override def delimiter(matValues:MatrixData)(r: Int, c: Int): String = {
+      if (c == matValues.columnDimension - 1) {
+        if (r == matValues.rowDimension - 1) "" else ","
       } else ", "
     }
 
-    override def suffix(rows:Int, columns:Int, matValues:NArray[Double]): String = ")\n"
+    override def suffix(matValues:MatrixData): String = ")\n"
 
-    override def rowPrefix(rows:Int, columns:Int, matValues:NArray[Double]): String = "  "
+    override def rowPrefix(matValues:MatrixData): String = "  "
 
-    override def rowSuffix(rows:Int, columns:Int, matValues:NArray[Double]): String = ""
+    override def rowSuffix(matValues:MatrixData): String = ""
   }
 
   object TUPLE extends MatFormat {
-    override def prefix(rows:Int, columns:Int, matValues:NArray[Double]): String = s"Mat(\n"
+    override def prefix(matValues:MatrixData): String = s"Mat(\n"
 
-    override def delimiter(rows:Int, columns:Int, matValues:NArray[Double])(r: Int, c: Int): String = {
-      if (c == columns - 1) {
-        if (r == rows - 1) ")" else "),"
+    override def delimiter(matValues:MatrixData)(r: Int, c: Int): String = {
+      if (c == matValues.columnDimension - 1) {
+        if (r == matValues.rowDimension - 1) ")" else "),"
       } else ", "
     }
 
-    override def suffix(rows:Int, columns:Int, matValues:NArray[Double]): String = ")\n"
+    override def suffix(matValues:MatrixData): String = ")\n"
 
-    override def rowPrefix(rows:Int, columns:Int, matValues:NArray[Double]): String = "  ("
+    override def rowPrefix(matValues:MatrixData): String = "  ("
 
-    override def rowSuffix(rows:Int, columns:Int, matValues:NArray[Double]): String = ""
+    override def rowSuffix(matValues:MatrixData): String = ""
   }
 
   object TEXTBOOK extends MatFormat {
     // Mat₍₃ₓ₅₎
-    override def prefix(rows:Int, columns:Int, matValues:NArray[Double]): String = s"Mat${abase(rows)}ₓ${abase(columns)}\n"
+    override def prefix(matValues:MatrixData): String = s"Mat${abase(matValues.rowDimension)}ₓ${abase(matValues.columnDimension)}\n"
 
-    override def delimiter(rows:Int, columns:Int, matValues:NArray[Double])(r: Int, c: Int): String = " "
+    override def delimiter(matValues:MatrixData)(r: Int, c: Int): String = " "
 
-    override def suffix(rows:Int, columns:Int, matValues:NArray[Double]): String = "\n"
+    override def suffix(matValues:MatrixData): String = "\n"
 
-    override def rowPrefix(rows:Int, columns:Int, matValues:NArray[Double]): String = "│  "
+    override def rowPrefix(matValues:MatrixData): String = "│  "
 
-    override def rowSuffix(rows:Int, columns:Int, matValues:NArray[Double]): String = " │\n"
+    override def rowSuffix(matValues:MatrixData): String = " │\n"
 
     override def render(
-      rows:Int,
-      columns:Int,
-      matValues: NArray[Double],
-      alignment: Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]],
+      matValues: MatrixData,
+      alignment: Function2[MatrixData, MatFormat, NArray[NArray[String]]],
       sb: StringBuilder = new StringBuilder()
     ): StringBuilder = {
 
-      val aligned: NArray[NArray[String]] = alignment(rows, columns, matValues, this)
+      val aligned: NArray[NArray[String]] = alignment(matValues, this)
 
-      val dlm = delimiter(rows, columns, matValues)
-      sb.append(prefix(rows, columns, matValues))
+      val dlm = delimiter(matValues)
+      sb.append(prefix(matValues))
 
       val firstRow: StringBuilder = new StringBuilder()
       var i:Int = 0
-      while (i < columns) {
+      while (i < matValues.columnDimension) {
         firstRow.append(aligned(0)(i))
         firstRow.append(dlm(0, i))
         i = i + 1
@@ -253,17 +249,17 @@ object MatFormat {
       }
       sb.append("  ┐\n")
 
-      sb.append(rowPrefix(rows, columns, matValues)).append(s"$firstRow").append(rowSuffix(rows, columns, matValues))
+      sb.append(rowPrefix(matValues)).append(s"$firstRow").append(rowSuffix(matValues))
       var r = 1
-      while (r < rows) {
-        sb.append(rowPrefix(rows, columns, matValues))
+      while (r < matValues.rowDimension) {
+        sb.append(rowPrefix(matValues))
         var c = 0
-        while (c < columns) {
+        while (c < matValues.columnDimension) {
           sb.append(aligned(r)(c))
           sb.append(dlm(r, c))
           c = c + 1
         }
-        sb.append(rowSuffix(rows, columns, matValues))
+        sb.append(rowSuffix(matValues))
         r = r + 1
       }
       sb.append("└ ")
@@ -274,18 +270,18 @@ object MatFormat {
         i = i + 1
       }
       sb.append("  ┘")
-      sb.append(suffix(rows, columns, matValues))
+      sb.append(suffix(matValues))
     }
   }
 
   object INDEXED extends MatFormat {
-    override def prefix(rows:Int, columns:Int, matValues:NArray[Double]): String = s"Mat[${rows}x$columns]\n"
+    override def prefix(matValues:MatrixData): String = s"Mat[${matValues.rowDimension}x${matValues.columnDimension}]\n"
 
-    override def suffix(rows:Int, columns:Int, matValues:NArray[Double]): String = ""
+    override def suffix(matValues:MatrixData): String = ""
 
-    override def delimiter(rows:Int, columns:Int, matValues:NArray[Double])(r: Int, c: Int): String = {
-      val maxRowDigits = rows.toString.length
-      val maxColDigits = columns.toString.length
+    override def delimiter(matValues:MatrixData)(r: Int, c: Int): String = {
+      val maxRowDigits = matValues.rowDimension.toString.length
+      val maxColDigits = matValues.columnDimension.toString.length
       var rs = abase(r + 1)
       while (rs.length < maxRowDigits) rs = "₀" + rs
       var cs = abase(c + 1)
@@ -293,23 +289,23 @@ object MatFormat {
       s"$rs,$cs "
     }
 
-    override def rowPrefix(rows:Int, columns:Int, matValues:NArray[Double]): String = "│  "
+    override def rowPrefix(matValues:MatrixData): String = "│  "
 
-    override def rowSuffix(rows:Int, columns:Int, matValues:NArray[Double]): String = "│"
+    override def rowSuffix(matValues:MatrixData): String = "│"
   }
 
   case class Delimited(delimeter: String) extends MatFormat {
-    override def prefix(rows:Int, columns:Int, matValues:NArray[Double]): String = ""
+    override def prefix(matValues:MatrixData): String = ""
 
-    override def suffix(rows:Int, columns:Int, matValues:NArray[Double]): String = ""
+    override def suffix(matValues:MatrixData): String = ""
 
-    override def delimiter(rows:Int, columns:Int, matValues:NArray[Double])(r: Int, c: Int): String = {
-      if (c == columns - 1) "" else s"$delimeter "
+    override def delimiter(matValues:MatrixData)(r: Int, c: Int): String = {
+      if (c == matValues.columnDimension - 1) "" else s"$delimeter "
     }
 
-    override def rowPrefix(rows:Int, columns:Int, matValues:NArray[Double]): String = ""
+    override def rowPrefix(matValues:MatrixData): String = ""
 
-    override def rowSuffix(rows:Int, columns:Int, matValues:NArray[Double]): String = ""
+    override def rowSuffix(matValues:MatrixData): String = ""
   }
 
   lazy val CSV: MatFormat = Delimited(",")
@@ -318,15 +314,15 @@ object MatFormat {
 
 
   object ASCII extends MatFormat {
-    override def prefix(rows:Int, columns:Int, matValues:NArray[Double]): String = ""
+    override def prefix(matValues:MatrixData): String = ""
 
-    override def delimiter(rows:Int, columns:Int, matValues:NArray[Double])(r: Int, c: Int): String = if (c == columns - 1) "" else ", "
+    override def delimiter(matValues:MatrixData)(r: Int, c: Int): String = if (c == matValues.columnDimension - 1) "" else ", "
 
-    override def suffix(rows:Int, columns:Int, matValues:NArray[Double]): String = ""
+    override def suffix(matValues:MatrixData): String = ""
 
-    override def rowPrefix(rows:Int, columns:Int, matValues:NArray[Double]): String = "| "
+    override def rowPrefix(matValues:MatrixData): String = "| "
 
-    override def rowSuffix(rows:Int, columns:Int, matValues:NArray[Double]): String = " |"
+    override def rowSuffix(matValues:MatrixData): String = " |"
   }
 
   def main(args: Array[String]): Unit = {
@@ -337,22 +333,20 @@ object MatFormat {
 
     val m = r.nextMatrix[10, 15](Short.MinValue.toDouble, Short.MaxValue.toDouble)
     //val m = r.nextMatrix[10, 10](Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = Double.MinPositiveValue
-    m.values(r.nextInt(m.MxN)) = Math.random()
-    m.values(r.nextInt(m.MxN)) = Math.random()
-    m.values(r.nextInt(m.MxN)) = Math.random() / 9875379845.0
-    m.values(r.nextInt(m.MxN)) = Math.random() / 9875379845.0
-    m.values(r.nextInt(m.MxN)) = Math.random() / 9875379845.0
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
-    m.values(r.nextInt(m.MxN)) = Double.MaxValue
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = Double.MinPositiveValue
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = Math.random()
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = Math.random()
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = Math.random() / 9875379845.0
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = Math.random() / 9875379845.0
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = Math.random() / 9875379845.0
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = r.between(Float.MinValue.toDouble, Float.MaxValue.toDouble)
+    m.values(r.nextInt(m.rowDimension), r.nextInt(m.columnDimension)) = Double.MaxValue
 
-
-
-    val alignments:Array[(String, Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]])] = {
-      Array[(String, Function4[Int, Int, NArray[Double], MatFormat, NArray[NArray[String]]])](
+    val alignments:Array[(String, Function2[MatrixData, MatFormat, NArray[NArray[String]]])] = {
+      Array[(String, Function2[MatrixData, MatFormat, NArray[NArray[String]]])](
         ("MatFormat.ALIGN_RIGHT", MatFormat.ALIGN_RIGHT),
         ("MatFormat.ALIGN_LEFT", MatFormat.ALIGN_LEFT),
         ("MatFormat.ALIGN_CENTER", MatFormat.ALIGN_CENTER),

@@ -35,8 +35,6 @@ object RTPCA {
 
     // arrange the matrix of centered points
     val Xc: RTMat = RTMat(
-      data.sampleSize,
-      data.dimension,
       NArray.tabulate[RTVec](data.sampleSize)(
         (row:Int) => data.example(row) - data.sampleMean
       )
@@ -58,7 +56,7 @@ case class RTPCA(svd: RTSV, mean: RTVec) {
   lazy val Uᵀ:RTMat = svd.U.transpose
 
   inline def getReducer(k:Int): RTDimensionalityReducerPCA = {
-    RTDimensionalityReducerPCA(RTMat(dimension, k, Uᵀ.rowVectors.take(k)), mean)
+    RTDimensionalityReducerPCA(RTMat(Uᵀ.rowVectors.take(k)), mean)
   }
 
   lazy val basisPairs: Seq[RTBasisPair] = {

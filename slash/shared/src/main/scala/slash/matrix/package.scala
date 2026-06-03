@@ -18,6 +18,7 @@ package slash
 
 import slash.vector.*
 import slash.matrix.decomposition.*
+import slash.exceptions.CannotLinearizeMatrixData
 
 import scala.compiletime.ops.int.*
 import scala.compiletime.ops.any.==
@@ -46,17 +47,19 @@ package object matrix {
    */
   extension[M <: Int, N <: Int](a: Mat[M, N]) {
 
-    /** cast matrix as Mat[R,C]
-    *
-    * @param R new vertical dimension
-    * @param C new horizontal dimension
-    * @return same values, but recast to RxC
-    */
-    def reshape[R <: Int, C <: Int](using ValueOf[R], ValueOf[C]): Mat[R,C] = new Mat[R,C](a.values)
+//    /** cast matrix as Mat[R,C]
+//    *
+//    * @param R new vertical dimension
+//    * @param C new horizontal dimension
+//    * @return same values, but recast to RxC
+//    */
+//    def reshape[R <: Int, C <: Int](using ValueOf[R], ValueOf[C]): Mat[R,C] = Mat[R,C](a.values)
 
     /** values as a Vector.
+     * @throws CannotLinearizeMatrixData
      */
-    def flatten: Vec[M*N] = a.values.asInstanceOf[Vec[M*N]]
+    def flatten: Vec[M*N] = a.values.flatten.asInstanceOf[Vec[M * N]]
+
   }
 
   /**
@@ -149,8 +152,14 @@ package object matrix {
   }
 
   extension[M <: Int, N <: Int](m: Mat[M, N])(using (M == 1 || N == 1) =:= true) {
-    def asVector: Vec[M*N] = m.values.asInstanceOf[Vec[M*N]]
-    inline def copyAsVector[MN <: Int](using MN == (M * N) =:= true): Vec[MN] = narr.copy[Double](m.values).asInstanceOf[Vec[MN]]
+    def asVector: Vec[M*N] = {
+      if (m.values.linearizeable) m.values.rowPackedNArray.asInstanceOf[Vec[M*N]]
+      else throw CannotLinearizeMatrixData(m.rows, m.columns)
+    }
+    inline def copyAsVector[MN <: Int](using MN == (M * N) =:= true): Vec[MN] = {
+      if (m.values.linearizeable) m.values.rowPackedNArray.asInstanceOf[Vec[MN]]
+      else throw CannotLinearizeMatrixData(m.rows, m.columns)
+    }
   }
 
   /*
@@ -159,7 +168,8 @@ package object matrix {
   extension(m: Mat[? <: Int,? <: Int]) {
     def cast[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M,N] = {
       assert(valueOf[M] == m.rows && valueOf[N] == m.columns)
-      Mat[M,N](m.values)
+      //Mat[M,N](m.values)
+      m.asInstanceOf[Mat[M,N]]
     }
   }
 

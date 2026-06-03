@@ -19,7 +19,6 @@ package slash.matrix.decomposition
 import slash.vector.*
 import slash.matrix.*
 import narr.*
-import slash.matrix.util.lindex
 import slash.vector.runtime.RTVec
 
 import scala.math.hypot
@@ -28,9 +27,9 @@ object EigenSolver {
 
   // Symmetric Householder reduction to tridiagonal form.
 
-  //private def tred2[N <: Int](Q: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
+  def tred2(Q:MatrixData): (MatrixData, NArray[Double], NArray[Double]) = {
+    val n:Int = Q.rowDimension
 
-  def tred2(n:Int, Q: NArray[Double]): (NArray[Double], NArray[Double], NArray[Double]) = {
     //  This is derived from the Algol procedures tred2 by
     //  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
     //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
@@ -41,7 +40,7 @@ object EigenSolver {
 
     var j0:Int = 0
     while (j0 < n) {
-      lambda(j0) = Q(lindex(n - 1, j0, n))
+      lambda(j0) = Q(n - 1, j0)
       j0 += 1
     }
 
@@ -61,9 +60,9 @@ object EigenSolver {
         lmbdi(i) = lambda(i - 1)
         var j:Int = 0
         while (j < i) {
-          lambda(j) = Q(lindex(i - 1, j, n))
-          Q(lindex(i, j, n)) = 0.0
-          Q(lindex(j, i, n)) = 0.0
+          lambda(j) = Q(i - 1, j)
+          Q(i, j) = 0.0
+          Q(j, i) = 0.0
           j += 1
         }
       } else { // Generate Householder vector.
@@ -90,12 +89,12 @@ object EigenSolver {
         j = 0
         while (j < i) { // recycling j
           f = lambda(j)
-          Q(lindex(j, i, n)) = f
-          g = lmbdi(j) + Q(lindex(j, j, n)) * f
+          Q(j, i) = f
+          g = lmbdi(j) + Q(j, j) * f
           k = j + 1
           while (k <= i - 1) { // recycling k
-            g += Q(lindex(k, j, n)) * lambda(k)
-            lmbdi(k) = lmbdi(k) + (Q(lindex(k, j, n)) * f)
+            g += Q(k, j) * lambda(k)
+            lmbdi(k) = lmbdi(k) + (Q(k, j) * f)
             k += 1
           }
           lmbdi(j) = g
@@ -120,11 +119,11 @@ object EigenSolver {
           g = lmbdi(j)
           k = j
           while (k <= i - 1) { // recycling k
-            Q(lindex(k, j, n)) = Q(lindex(k, j, n)) - (f * lmbdi(k) + g * lambda(k))
+            Q(k, j) = Q(k, j) - (f * lmbdi(k) + g * lambda(k))
             k += 1
           }
-          lambda(j) = Q(lindex(i - 1, j, n))
-          Q(lindex(i, j, n)) = 0.0
+          lambda(j) = Q(i - 1, j)
+          Q(i, j) = 0.0
           j += 1
         }
       }
@@ -135,13 +134,13 @@ object EigenSolver {
     // Accumulate transformations.
     i = 0
     while (i < n - 1) { // recycling i
-      Q(lindex(n - 1, i, n)) = Q(lindex(i, i, n))
-      Q(lindex(i, i, n)) = 1.0
+      Q(n - 1, i) = Q(i, i)
+      Q(i, i) = 1.0
       val h = lambda(i + 1)
       if (h != 0.0) {
         var k:Int = 0
         while (k <= i) {
-          lambda(k) = Q(lindex(k, i + 1, n)) / h
+          lambda(k) = Q(k, i + 1) / h
           i += 1
         }
         var j:Int = 0
@@ -149,12 +148,12 @@ object EigenSolver {
           var g = 0.0
           k = 0
           while (k <= i) { // recycling k
-            g += Q(lindex(k, i + 1, n)) * Q(lindex(k, j, n))
+            g += Q(k, i + 1) * Q(k, j)
             k += 1
           }
           k = 0
           while (k <= i) { // recycling k
-            Q(lindex(k, j, n)) = Q(lindex(k, j, n)) - (g * lambda(k))
+            Q(k, j) = Q(k, j) - (g * lambda(k))
             k += 1
           }
           j += 1
@@ -162,18 +161,18 @@ object EigenSolver {
       }
       var k:Int = 0
       while (k <= i) {
-        Q(lindex(k, i + 1, n)) = 0.0
+        Q(k, i + 1) = 0.0
         k += 1
       }
       i += 1
     }
     var j:Int =0
     while (j < n) {
-      lambda(j) = Q(lindex(n - 1, j, n))
-      Q(lindex(n - 1, j, n)) = 0.0
+      lambda(j) = Q(n - 1, j)
+      Q(n - 1, j) = 0.0
       j += 1
     }
-    Q(lindex(n - 1, n - 1, n)) = 1.0
+    Q(n - 1, n - 1) = 1.0
     lmbdi(0) = 0.0
 
     //tql2[N](Q, lambda, lmbdi)
@@ -184,7 +183,7 @@ object EigenSolver {
 
 //  private def tql2[N <: Int](Q: Mat[N, N], lambda: Vec[N], lmbdi: Vec[N])(using ValueOf[N]): Eigen[N] = {
 
-  private def tql2(Q:NArray[Double], lambda:NArray[Double], lmbdi:NArray[Double]): (NArray[Double], NArray[Double], NArray[Double]) = {
+  private def tql2(Q:MatrixData, lambda:NArray[Double], lmbdi:NArray[Double]): (MatrixData, NArray[Double], NArray[Double]) = {
     //  This is derived from the Algol procedures tql2, by
     //  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
     //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
@@ -257,9 +256,9 @@ object EigenSolver {
             // Accumulate transformation.
             var k:Int = 0
             while (k < n) {
-              h = Q(lindex(k, i + 1, n))
-              Q(lindex(k, i + 1, n)) = s * Q(lindex(k, i, n)) + c * h
-              Q(lindex(k, i, n)) = c * Q(lindex(k, i, n)) - s * h
+              h = Q(k, i + 1)
+              Q(k, i + 1) = s * Q(k, i) + c * h
+              Q(k, i) = c * Q(k, i) - s * h
               k += 1
             }
             i -= 1
@@ -295,9 +294,9 @@ object EigenSolver {
         lambda(i) = p
         j = 0
         while (j < n) { // recycling j
-          p = Q(lindex(j, i, n))
-          Q(lindex(j, i, n)) = Q(lindex(j, k, n))
-          Q(lindex(j, k, n)) = p
+          p = Q(j, i)
+          Q(j, i) = Q(j, k)
+          Q(j, k) = p
           j += 1
         }
       }
@@ -310,13 +309,16 @@ object EigenSolver {
 
 //  private def orthes[N <: Int](Q: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
 
-  def orthes(n:Int, Q: NArray[Double]): (NArray[Double], NArray[Double], NArray[Double]) = {
+  def orthes(Q: MatrixData): (MatrixData, NArray[Double], NArray[Double]) = {
+
+    val n:Int = Q.rowDimension
+
     //  This is derived from the Algol procedures orthes and ortran,
     //  by Martin and Wilkinson, Handbook for Auto. Comp.,
     //  Vol.ii-Linear Algebra, and the corresponding
     //  Fortran subroutines in EISPACK.
 
-    val H: NArray[Double] = NArray.copy[Double](Q)
+    val H: MatrixData = Q.copy
 
     val ort: NArray[Double] = new NArray[Double](n)
 
@@ -327,14 +329,14 @@ object EigenSolver {
       var scale = 0.0
       var s:Int = m
       while (s <= high) {
-        scale = scale + Math.abs(H(lindex(s, m - 1, n)))
+        scale = scale + Math.abs(H(s, m - 1))
         s += 1
       }
       if (scale != 0.0) { // Compute Householder transformation.
         var h = 0.0
         var i0:Int = high
         while (i0 >= m) {
-          ort(i0) = H(lindex(i0, m - 1, n)) / scale
+          ort(i0) = H(i0, m - 1) / scale
           h += ort(i0) * ort(i0)
           i0 -= 1
         }
@@ -349,13 +351,13 @@ object EigenSolver {
           var f = 0.0
           var i:Int = high
           while (i >= m) {
-            f += ort(i) * H(lindex(i, j0, n))
+            f += ort(i) * H(i, j0)
             i -= 1
           }
           f = f / h
           i = m
           while (i <= high) { // recycling i
-            H(lindex(i, j0, n)) = H(lindex(i, j0, n)) - (f * ort(i))
+            H(i, j0) = H(i, j0) - (f * ort(i))
             i += 1
           }
           j0 += 1
@@ -366,19 +368,19 @@ object EigenSolver {
           var f = 0.0
           var j:Int = high
           while (j >= m) {
-            f += ort(j) * H(lindex(i, j, n))
+            f += ort(j) * H(i, j)
             j -= 1
           }
           f = f / h
           j = m
           while (j <= high) { // recycling j
-            H(lindex(i, j, n)) = H(lindex(i, j, n)) - (f * ort(j))
+            H(i, j) = H(i, j) - (f * ort(j))
             j += 1
           }
           i += 1
         }
         ort(m) = scale * ort(m)
-        H(lindex(m, m - 1, n)) = scale * g
+        H(m, m - 1) = scale * g
       }
       m += 1
     }
@@ -389,7 +391,7 @@ object EigenSolver {
     while (i0 < n) {
       var j:Int = 0
       while (j < n) {
-        Q(lindex(i0, j, n)) = if (i0 == j) 1.0 else 0.0
+        Q(i0, j) = if (i0 == j) 1.0 else 0.0
         j += 1
       }
       i0 += 1
@@ -397,10 +399,10 @@ object EigenSolver {
 
     var m0:Int = high - 1
     while (m0 > 0) {
-      if (H(lindex(m0, m0 - 1, n)) != 0.0) {
+      if (H(m0, m0 - 1) != 0.0) {
         var i1:Int = m0 + 1
         while (i1 <= high) {
-          ort(i1) = H(lindex(i1, m0 - 1, n))
+          ort(i1) = H(i1, m0 - 1)
           i1 += 1
         }
         var j:Int = m0
@@ -408,14 +410,14 @@ object EigenSolver {
           var g = 0.0
           var i:Int = m0
           while (i <= high) {
-            g += ort(i) * Q(lindex(i, j, n))
+            g += ort(i) * Q(i, j)
             i += 1
           }
           // Double division avoids possible underflow
-          g = (g / ort(m0)) / H(lindex(m0, m0 - 1, n))
+          g = (g / ort(m0)) / H(m0, m0 - 1)
           i = m0
           while (i <= high) { // recycling i
-            Q(lindex(i, j, n)) = Q(lindex(i, j, n)) + (g * ort(i))
+            Q(i, j) = Q(i, j) + (g * ort(i))
             i += 1
           }
           j += 1
@@ -426,7 +428,7 @@ object EigenSolver {
 
     // Reduce Hessenberg to real Schur form.
     //hqr2[N](Q, H)
-    hqr2(n, Q, H)
+    hqr2(Q, H)
   }
 
 
@@ -434,13 +436,15 @@ object EigenSolver {
 
 //  private def hqr2[N <: Int](Q: Mat[N, N], H: Mat[N, N])(using ValueOf[N]): Eigen[N] = {
 
-  private def hqr2[N <: Int](nn:Int, Q: NArray[Double], H: NArray[Double]): (NArray[Double], NArray[Double], NArray[Double]) = {
+  private def hqr2[N <: Int](Q: MatrixData, H: MatrixData): (MatrixData, NArray[Double], NArray[Double]) = {
 
     //  This is derived from the Algol procedure hqr2,
     //  by Martin and Wilkinson, Handbook for Auto. Comp.,
     //  Vol.ii-Linear Algebra, and the corresponding
     //  Fortran subroutine in EISPACK.
     // Initialize
+
+    val nn:Int = Q.rowDimension
 
     val lambda: NArray[Double] = new NArray[Double](nn)
     val lmbdi: NArray[Double] = new NArray[Double](nn)
@@ -486,12 +490,12 @@ object EigenSolver {
     var i:Int = 0
     while (i < nn) {
       if (i < low | i > high) {
-        lambda(i) = H(lindex(i, i, nn))
+        lambda(i) = H(i, i)
         lmbdi(i) = 0.0
       }
       var j:Int = Math.max(i - 1, 0)
       while (j < nn) {
-        norm = norm + Math.abs(H(lindex(i, j, nn)))
+        norm = norm + Math.abs(H(i, j))
         j += 1
       }
       i += 1
@@ -505,29 +509,29 @@ object EigenSolver {
       var l = ni
       var continue: Boolean = true
       while (l > low && continue) {
-        s = Math.abs(H(lindex(l - 1, l - 1, nn))) + Math.abs(H(lindex(l, l, nn)))
+        s = Math.abs(H(l - 1, l - 1)) + Math.abs(H(l, l))
         if (s == 0.0) s = norm
-        if (Math.abs(H(lindex(l, l - 1, nn))) < eps * s) continue = false
+        if (Math.abs(H(l, l - 1)) < eps * s) continue = false
         else l -= 1
       }
 
       // Check for convergence
       // One root found
       if (l == ni) {
-        H(lindex(ni, ni, nn)) = H(lindex(ni, ni, nn)) + exshift
-        lambda(ni) = H(lindex(ni, ni, nn))
+        H(ni, ni) = H(ni, ni) + exshift
+        lambda(ni) = H(ni, ni)
         lmbdi(ni) = 0.0
         ni -= 1
         iter = 0
         // Two roots found
       } else if (l == ni - 1) {
-        w = H(lindex(ni, ni - 1, nn)) * H(lindex(ni - 1, ni, nn))
-        p = (H(lindex(ni - 1, ni - 1, nn)) - H(lindex(ni, ni, nn))) / 2.0
+        w = H(ni, ni - 1) * H(ni - 1, ni)
+        p = (H(ni - 1, ni - 1) - H(ni, ni)) / 2.0
         q = p * p + w
         z = Math.sqrt(Math.abs(q))
-        H(lindex(ni, ni, nn)) = H(lindex(ni, ni, nn)) + exshift
-        H(lindex(ni - 1, ni - 1, nn)) = H(lindex(ni - 1, ni - 1, nn)) + exshift
-        x = H(lindex(ni, ni, nn))
+        H(ni, ni) = H(ni, ni) + exshift
+        H(ni - 1, ni - 1) = H(ni - 1, ni - 1) + exshift
+        x = H(ni, ni)
         // Real pair
         if (q >= 0) {
           if (p >= 0) z = p + z
@@ -537,7 +541,7 @@ object EigenSolver {
           if (z != 0.0) lambda(ni) = x - w / z
           lmbdi(ni - 1) = 0.0
           lmbdi(ni) = 0.0
-          x = H(lindex(ni, ni - 1, nn))
+          x = H(ni, ni - 1)
           s = Math.abs(x) + Math.abs(z)
           p = x / s
           q = z / s
@@ -547,25 +551,25 @@ object EigenSolver {
           // Row modification
           var j0:Int = ni - 1
           while (j0 < nn) {
-            z = H(lindex(ni - 1, j0, nn))
-            H(lindex(ni - 1, j0, nn)) = q * z + p * H(lindex(ni, j0, nn))
-            H(lindex(ni, j0, nn)) = q * H(lindex(ni, j0, nn)) - p * z
+            z = H(ni - 1, j0)
+            H(ni - 1, j0) = q * z + p * H(ni, j0)
+            H(ni, j0) = q * H(ni, j0) - p * z
             j0 += 1
           }
           // Column modification
           var i0:Int = 0
           while (i0 <= ni) {
-            z = H(lindex(i0, ni - 1, nn))
-            H(lindex(i0, ni - 1, nn)) = q * z + p * H(lindex(i0, ni, nn))
-            H(lindex(i0, ni, nn)) = q * H(lindex(i0, ni, nn)) - p * z
+            z = H(i0, ni - 1)
+            H(i0, ni - 1) = q * z + p * H(i0, ni)
+            H(i0, ni) = q * H(i0, ni) - p * z
             i0 += 1
           }
           // Accumulate transformations
           i0 = low
           while (i0 <= high) { // recycling i0
-            z = Q(lindex(i0, ni - 1, nn))
-            Q(lindex(i0, ni - 1, nn)) = q * z + p * Q(lindex(i0, ni, nn))
-            Q(lindex(i0, ni, nn)) = q * Q(lindex(i0, ni, nn)) - p * z
+            z = Q(i0, ni - 1)
+            Q(i0, ni - 1) = q * z + p * Q(i0, ni)
+            Q(i0, ni) = q * Q(i0, ni) - p * z
             i0 += 1
           }
           // Complex pair
@@ -581,22 +585,22 @@ object EigenSolver {
       } else {
         // Form shift
 
-        x = H(lindex(ni, ni, nn))
+        x = H(ni, ni)
         y = 0.0
         w = 0.0
         if (l < ni) {
-          y = H(lindex(ni - 1, ni - 1, nn))
-          w = H(lindex(ni, ni - 1, nn)) * H(lindex(ni - 1, ni, nn))
+          y = H(ni - 1, ni - 1)
+          w = H(ni, ni - 1) * H(ni - 1, ni)
         }
         // Wilkinson's original ad hoc shift
         if (iter == 10) {
           exshift += x
           var i:Int = low
           while (i <= ni) {
-            H(lindex(i, i, nn)) = H(lindex(i, i, nn)) - x
+            H(i, i) = H(i, i) - x
             i += 1
           }
-          s = Math.abs(H(lindex(ni, ni - 1, nn))) + Math.abs(H(lindex(ni - 1, ni - 2, nn)))
+          s = Math.abs(H(ni, ni - 1)) + Math.abs(H(ni - 1, ni - 2))
           y = 0.75 * s
           x = y
           w = -0.4375 * s * s
@@ -613,7 +617,7 @@ object EigenSolver {
             s = x - w / ((y - x) / 2.0 + s)
             var i:Int = low
             while (i <= ni) {
-              H(lindex(i, i, nn)) = H(lindex(i, i, nn)) - s
+              H(i, i) = H(i, i) - s
               i += 1
             }
             exshift += s
@@ -628,26 +632,26 @@ object EigenSolver {
         var m: Int = ni - 2
         continue = true
         while (m >= l && continue) {
-          z = H(lindex(m, m, nn))
+          z = H(m, m)
           r = x - z
           s = y - z
-          p = (r * s - w) / H(lindex(m + 1, m, nn)) + H(lindex(m, m + 1, nn))
-          q = H(lindex(m + 1, m + 1, nn)) - z - r - s
-          r = H(lindex(m + 2, m + 1, nn))
+          p = (r * s - w) / H(m + 1, m) + H(m, m + 1)
+          q = H(m + 1, m + 1) - z - r - s
+          r = H(m + 2, m + 1)
           s = Math.abs(p) + Math.abs(q) + Math.abs(r)
           p = p / s
           q = q / s
           r = r / s
-          if (m == l || Math.abs(H(lindex(m, m - 1, nn))) * (Math.abs(q) + Math.abs(r)) < eps * (Math.abs(p) * (Math.abs(H(lindex(m - 1, m - 1, nn))) + Math.abs(z) + Math.abs(H(lindex(m + 1, m + 1, nn)))))) {
+          if (m == l || Math.abs(H(m, m - 1)) * (Math.abs(q) + Math.abs(r)) < eps * (Math.abs(p) * (Math.abs(H(m - 1, m - 1)) + Math.abs(z) + Math.abs(H(m + 1, m + 1))))) {
             continue = false
           } else m -= 1
         }
 
         var i:Int = m + 2
         while (i <= ni) {
-          H(lindex(i, i - 2, nn)) = 0.0
+          H(i, i - 2) = 0.0
           if (i > m + 2) {
-            H(lindex(i, i - 3, nn)) = 0.0
+            H(i, i - 3) = 0.0
           }
           i += 1
         }
@@ -659,9 +663,9 @@ object EigenSolver {
           continue = true
           val notLast: Boolean = k != ni - 1
           if (k != m) {
-            p = H(lindex(k, k - 1, nn))
-            q = H(lindex(k + 1, k - 1, nn))
-            r = if (notLast) H(lindex(k + 2, k - 1, nn)) else 0.0
+            p = H(k, k - 1)
+            q = H(k + 1, k - 1)
+            r = if (notLast) H(k + 2, k - 1) else 0.0
             x = Math.abs(p) + Math.abs(q) + Math.abs(r)
 
             if (x == 0.0) {
@@ -680,10 +684,10 @@ object EigenSolver {
             }
             if (s != 0) {
               if (k != m) {
-                H(lindex(k, k - 1, nn)) = -s * x
+                H(k, k - 1) = -s * x
               } else {
                 if (l != m) {
-                  H(lindex(k, k - 1, nn)) = -(H(lindex(k, k - 1, nn)))
+                  H(k, k - 1) = -(H(k, k - 1))
                 }
               }
               p = p + s
@@ -696,39 +700,39 @@ object EigenSolver {
               // Row modification
               var j:Int = k
               while (j < nn) {
-                p = H(lindex(k, j, nn)) + q * H(lindex(k + 1, j, nn))
+                p = H(k, j) + q * H(k + 1, j)
                 if (notLast) {
-                  p = p + r * H(lindex(k + 2, j, nn))
-                  H(lindex(k + 2, j, nn)) = H(lindex(k + 2, j, nn)) - p * z
+                  p = p + r * H(k + 2, j)
+                  H(k + 2, j) = H(k + 2, j) - p * z
                 }
-                H(lindex(k, j, nn)) = H(lindex(k, j, nn)) - p * x
-                H(lindex(k + 1, j, nn)) = H(lindex(k + 1, j, nn)) - p * y
+                H(k, j) = H(k, j) - p * x
+                H(k + 1, j) = H(k + 1, j) - p * y
                 j += 1
               }
 
               // Column modification
               var i1:Int = 0
               while (i1 <= Math.min(ni, k + 3)) {
-                p = x * H(lindex(i1, k, nn)) + y * H(lindex(i1, k + 1, nn))
+                p = x * H(i1, k) + y * H(i1, k + 1)
                 if (notLast) {
-                  p = p + z * H(lindex(i1, k + 2, nn))
-                  H(lindex(i1, k + 2, nn)) = H(lindex(i1, k + 2, nn)) - p * r
+                  p = p + z * H(i1, k + 2)
+                  H(i1, k + 2) = H(i1, k + 2) - p * r
                 }
-                H(lindex(i1, k, nn)) = H(lindex(i1, k, nn)) - p
-                H(lindex(i1, k + 1, nn)) = H(lindex(i1, k + 1, nn)) - p * q
+                H(i1, k) = H(i1, k) - p
+                H(i1, k + 1) = H(i1, k + 1) - p * q
                 i1 += 1
               }
 
               // Accumulate transformations
               i1 = low
               while (i1 <= high) {
-                p = x * Q(lindex(i1, k, nn)) + y * Q(lindex(i1, k + 1, nn))
+                p = x * Q(i1, k) + y * Q(i1, k + 1)
                 if (notLast) {
-                  p = p + z * Q(lindex(i1, k + 2, nn))
-                  Q(lindex(i1, k + 2, nn)) = Q(lindex(i1, k + 2, nn)) - p * r
+                  p = p + z * Q(i1, k + 2)
+                  Q(i1, k + 2) = Q(i1, k + 2) - p * r
                 }
-                Q(lindex(i1, k, nn)) = Q(lindex(i1, k, nn)) - p
-                Q(lindex(i1, k + 1, nn)) = Q(lindex(i1, k + 1, nn)) - p * q
+                Q(i1, k) = Q(i1, k) - p
+                Q(i1, k + 1) = Q(i1, k + 1) - p * q
                 i1 += 1
               }
             } // (s != 0)
@@ -751,14 +755,14 @@ object EigenSolver {
       // Real vector
       if (q == 0) {
         var l = ni
-        H(lindex(ni, ni, nn)) = 1.0
+        H(ni, ni) = 1.0
         var i0:Int = ni - 1
         while (i0 > -1) {
-          w = H(lindex(i0, i0, nn)) - p
+          w = H(i0, i0) - p
           r = 0.0
           var j:Int = l
           while (j <= ni) {
-            r = r + H(lindex(i0, j, nn)) * H(lindex(j, ni, nn))
+            r = r + H(i0, j) * H(j, ni)
             j += 1
           }
           if (lmbdi(i0) < 0.0) {
@@ -767,24 +771,24 @@ object EigenSolver {
           } else {
             l = i0
             if (lmbdi(i0) == 0.0) {
-              if (w != 0.0) H(lindex(i0, ni, nn)) = -r / w
-              else H(lindex(i0, ni, nn)) = -r / (eps * norm)
+              if (w != 0.0) H(i0, ni) = -r / w
+              else H(i0, ni) = -r / (eps * norm)
               // Solve real equations
             } else {
-              x = H(lindex(i0, i0 + 1, nn))
-              y = H(lindex(i0 + 1, i0, nn))
+              x = H(i0, i0 + 1)
+              y = H(i0 + 1, i0)
               q = (lambda(i0) - p) * (lambda(i0) - p) + lmbdi(i0) * lmbdi(i0)
               t = (x * s - z * r) / q
-              H(lindex(i0, ni, nn)) = t
-              if (Math.abs(x) > Math.abs(z)) H(lindex(i0 + 1, ni, nn)) = (-r - w * t) / x
-              else H(lindex(i0 + 1, ni, nn)) = (-s - y * t) / z
+              H(i0, ni) = t
+              if (Math.abs(x) > Math.abs(z)) H(i0 + 1, ni) = (-r - w * t) / x
+              else H(i0 + 1, ni) = (-s - y * t) / z
             }
             // Overflow control
-            t = Math.abs(H(lindex(i0, ni, nn)))
+            t = Math.abs(H(i0, ni))
             if ((eps * t) * t > 1) {
               var j0:Int = i0
               while (j0 <= ni) {
-                H(lindex(j0, ni, nn)) = H(lindex(j0, ni, nn)) / t
+                H(j0, ni) = H(j0, ni) / t
                 j0 += 1
               }
             }
@@ -795,17 +799,17 @@ object EigenSolver {
       } else if (q < 0) {
         var l = ni - 1
         // Last vector component imaginary so matrix is triangular
-        if (Math.abs(H(lindex(ni, ni - 1, nn))) > Math.abs(H(lindex(ni - 1, ni, nn)))) {
-          H(lindex(ni - 1, ni - 1, nn)) = q / H(lindex(ni, ni - 1, nn))
-          H(lindex(ni - 1, ni, nn)) = -(H(lindex(ni, ni, nn)) - p) / H(lindex(ni, ni - 1, nn))
+        if (Math.abs(H(ni, ni - 1)) > Math.abs(H(ni - 1, ni))) {
+          H(ni - 1, ni - 1) = q / H(ni, ni - 1)
+          H(ni - 1, ni) = -(H(ni, ni) - p) / H(ni, ni - 1)
         } else {
-          val temp = cdiv(0.0, -H(lindex(ni - 1, ni, nn)), H(lindex(ni - 1, ni - 1, nn)) - p, q)
-          H(lindex(ni - 1, ni - 1, nn)) = temp._1
-          H(lindex(ni - 1, ni, nn)) = temp._2
+          val temp = cdiv(0.0, -H(ni - 1, ni), H(ni - 1, ni - 1) - p, q)
+          H(ni - 1, ni - 1) = temp._1
+          H(ni - 1, ni) = temp._2
         }
 
-        H(lindex(ni, ni - 1, nn)) = 0.0
-        H(lindex(ni, ni, nn)) = 1.0
+        H(ni, ni - 1) = 0.0
+        H(ni, ni) = 1.0
 
         var i2:Int = ni - 2
         while (i2 > -1) {
@@ -817,11 +821,11 @@ object EigenSolver {
           sa = 0.0
           var j:Int = l
           while (j <= ni) {
-            ra = ra + H(lindex(i2, j, nn)) * H(lindex(j, ni - 1, nn))
-            sa = sa + H(lindex(i2, j, nn)) * H(lindex(j, ni, nn))
+            ra = ra + H(i2, j) * H(j, ni - 1)
+            sa = sa + H(i2, j) * H(j, ni)
             j += 1
           }
-          w = H(lindex(i2, i2, nn)) - p
+          w = H(i2, i2) - p
           if (lmbdi(i2) < 0.0) {
             z = w
             r = ra
@@ -830,32 +834,32 @@ object EigenSolver {
             l = i2
             if (lmbdi(i2) == 0) {
               val temp = cdiv(-ra, -sa, w, q)
-              H(lindex(i2, ni - 1, nn)) = temp._1
-              H(lindex(i2, ni, nn)) = temp._2
+              H(i2, ni - 1) = temp._1
+              H(i2, ni) = temp._2
             } else { // Solve complex equations
-              x = H(lindex(i2, i2 + 1, nn))
-              y = H(lindex(i2 + 1, i2, nn))
+              x = H(i2, i2 + 1)
+              y = H(i2 + 1, i2)
               vr = (lambda(i2) - p) * (lambda(i2) - p) + lmbdi(i2) * lmbdi(i2) - q * q
               vi = (lambda(i2) - p) * 2.0 * q
               if (vr == 0.0 & vi == 0.0) vr = eps * norm * (Math.abs(w) + Math.abs(q) + Math.abs(x) + Math.abs(y) + Math.abs(z))
               val temp = cdiv(x * r - z * ra + q * sa, x * s - z * sa - q * ra, vr, vi)
-              H(lindex(i2, ni - 1, nn)) = temp._1
-              H(lindex(i2, ni, nn)) = temp._2
+              H(i2, ni - 1) = temp._1
+              H(i2, ni) = temp._2
               if (Math.abs(x) > (Math.abs(z) + Math.abs(q))) {
-                H(lindex(i2 + 1, ni - 1, nn)) = (-ra - w * H(lindex(i2, ni - 1, nn)) + q * H(lindex(i2, ni, nn))) / x
-                H(lindex(i2 + 1, ni, nn)) = (-sa - w * H(lindex(i2, ni, nn)) - q * H(lindex(i2, ni - 1, nn))) / x
+                H(i2 + 1, ni - 1) = (-ra - w * H(i2, ni - 1) + q * H(i2, ni)) / x
+                H(i2 + 1, ni) = (-sa - w * H(i2, ni) - q * H(i2, ni - 1)) / x
               } else {
-                val temp = cdiv(-r - y * H(lindex(i2, ni - 1, nn)), -s - y * H(lindex(i2, ni, nn)), z, q)
-                H(lindex(i2 + 1, ni - 1, nn)) = temp._1
-                H(lindex(i2 + 1, ni, nn)) = temp._2
+                val temp = cdiv(-r - y * H(i2, ni - 1), -s - y * H(i2, ni), z, q)
+                H(i2 + 1, ni - 1) = temp._1
+                H(i2 + 1, ni) = temp._2
               }
             }
-            t = Math.max(Math.abs(H(lindex(i2, ni - 1, nn))), Math.abs(H(lindex(i2, ni, nn))))
+            t = Math.max(Math.abs(H(i2, ni - 1)), Math.abs(H(i2, ni)))
             if ((eps * t) * t > 1) {
               var j7:Int = i2
               while (j7 <= ni) {
-                H(lindex(j7, ni - 1, nn)) = H(lindex(j7, ni - 1, nn)) / t
-                H(lindex(j7, ni, nn)) = H(lindex(j7, ni, nn)) / t
+                H(j7, ni - 1) = H(j7, ni - 1) / t
+                H(j7, ni) = H(j7, ni) / t
                 j7 += 1
               }
             }
@@ -872,7 +876,7 @@ object EigenSolver {
       if (i9 < low | i9 > high) {
         var j5:Int = i9
         while (j5 < nn) {
-          Q(lindex(i9, j5, nn)) = H(lindex(i9, j5, nn))
+          Q(i9, j5) = H(i9, j5)
           j5 += 1
         }
       }
@@ -888,10 +892,10 @@ object EigenSolver {
         z = 0.0
         var k:Int = low
         while (k <= Math.min(j8, high)) {
-          z = z + Q(lindex(i7, k, nn)) * H(lindex(k, j8, nn))
+          z = z + Q(i7, k) * H(k, j8)
           k += 1
         }
-        Q(lindex(i7, j8, nn)) = z
+        Q(i7, j8) = z
         i7 += 1
       }
       j8 -= 1
@@ -901,7 +905,9 @@ object EigenSolver {
     (Q, lambda, lmbdi)
   }
 
-  def symetric(n:Int, values:NArray[Double]): Boolean = {
+  def symetric(values:MatrixData): Boolean = {
+
+    val n:Int = values.rowDimension
 
     var isSymmetric:Boolean = true
     // verify symmetry.
@@ -909,7 +915,7 @@ object EigenSolver {
     while (r < n) {
       var c: Int = r
       while (c < n) {
-        if (isSymmetric) isSymmetric = values(lindex(r, c, n)) == values(lindex(c, r, n))
+        if (isSymmetric) isSymmetric = values(r, c) == values(c, r)
         c += 1
       }
       r += 1
@@ -917,13 +923,13 @@ object EigenSolver {
     isSymmetric
   }
 
-  def blockDiagonalEigenvalueMatrix(lambda: NArray[Double], lmbdi: NArray[Double]): NArray[Double] = {
+  def blockDiagonalEigenvalueMatrix(lambda: NArray[Double], lmbdi: NArray[Double]): MatrixData = {
     val X = slash.matrix.util.diagonal(lambda)
     var i: Int = 0
     while (i < lambda.length) {
       //X(i, i) = lambda(i)
-      if (lmbdi(i) > 0) X(lindex(i, i + 1, lambda.length)) = lmbdi(i)
-      else if (lmbdi(i) < 0) X(lindex(i, i - 1, lambda.length)) = lmbdi(i)
+      if (lmbdi(i) > 0) X(i, i + 1) = lmbdi(i)
+      else if (lmbdi(i) < 0) X(i, i - 1) = lmbdi(i)
       i += 1
     }
     X
@@ -936,14 +942,14 @@ object Eigen {
 
     val n = valueOf[N]
 
-    val q = NArray.copy[Double](A.values)
+    val q = A.values.copy
 
     val temp = {
-      if (EigenSolver.symetric(n, A.values)) EigenSolver.tred2(n, q) // Tridiagonalize
-      else EigenSolver.orthes(n, q) // Reduce to Hessenberg form
+      if (EigenSolver.symetric(A.values)) EigenSolver.tred2(q) // Tridiagonalize
+      else EigenSolver.orthes(q) // Reduce to Hessenberg form
     }
 
-    new Eigen[N](new Mat[N,N](temp._1), Vec[N](temp._2), Vec[N](temp._3))
+    new Eigen[N](Mat[N,N](temp._1), Vec[N](temp._2), Vec[N](temp._3))
   }
 
 }
@@ -986,7 +992,7 @@ class Eigen[N <: Int] private(val Q:Mat[N, N], val lambda:Vec[N], val lmbdi:Vec[
    *
    * @return Λ
    */
-  def blockDiagonalEigenvalueMatrix: Mat[N, N] = new Mat[N, N](
+  def blockDiagonalEigenvalueMatrix: Mat[N, N] = Mat[N, N](
     EigenSolver.blockDiagonalEigenvalueMatrix(
       lambda.asNativeArray,
       lmbdi.asNativeArray
@@ -1002,14 +1008,14 @@ object RTEigen {
 
     val n = A.columnDimension
 
-    val q = NArray.copy[Double](A.values)
+    val q = A.values.copy
 
     val temp = {
-      if (EigenSolver.symetric(n, A.values)) EigenSolver.tred2(n, q) // Tridiagonalize
-      else EigenSolver.orthes(n, q) // Reduce to Hessenberg form
+      if (EigenSolver.symetric(A.values)) EigenSolver.tred2(q) // Tridiagonalize
+      else EigenSolver.orthes(q) // Reduce to Hessenberg form
     }
 
-    new RTEigen(new RTMat(n, n, temp._1), RTVec(temp._2), RTVec(temp._3))
+    new RTEigen(RTMat(temp._1), RTVec(temp._2), RTVec(temp._3))
   }
 
 }
@@ -1036,9 +1042,7 @@ class RTEigen private(val Q:RTMat, val lambda:RTVec, val lmbdi:RTVec) {
    *
    * @return Λ
    */
-  def blockDiagonalEigenvalueMatrix: RTMat = new RTMat(
-    n,
-    n,
+  def blockDiagonalEigenvalueMatrix: RTMat = RTMat(
     EigenSolver.blockDiagonalEigenvalueMatrix(
       lambda.asNativeArray,
       lmbdi.asNativeArray

@@ -21,7 +21,6 @@ import slash.vector.*
 import slash.matrix.*
 
 import scala.math.hypot
-import slash.matrix.util.lindex
 import slash.vector.runtime.RTVec
 
 import scala.compiletime.ops.int.*
@@ -53,17 +52,20 @@ object SVSolver {
   //  }
 
 //  def apply[M <: Int, N <: Int](mtrx: Mat[M, N])(using ValueOf[M], ValueOf[N], M >= N =:= true): SV[M, N] = {
-  def apply(rows:Int, columns:Int, mtrx: NArray[Double]): (NArray[Double], NArray[Double], NArray[Double]) = {
+  def apply(mtrx:MatrixData): (MatrixData, MatrixData, NArray[Double]) = {
+
+    val rows:Int = mtrx.rowDimension
+    val columns:Int = mtrx.columnDimension
 
     // Derived from LINPACK code.
     // Initialize.
-    val A: NArray[Double] = NArray.copy[Double](mtrx)
+    val A: MatrixData = mtrx.copy
 
     val minDim: Int = Math.min(rows, columns)
 
     val s: NArray[Double] = new NArray[Double](columns) //Vec.zeros[N]
-    val U: NArray[Double] = new NArray[Double](rows * columns) //Mat[M, N] = Mat.zeros[M, N]
-    val V: NArray[Double] = new NArray[Double](columns * columns) //Mat[N, N] = Mat.zeros[N, N]
+    val U: MatrixData = MatrixData(rows, columns) //Mat[M, N] = Mat.zeros[M, N]
+    val V: MatrixData = MatrixData(columns, columns) //Mat[N, N] = Mat.zeros[N, N]
     val e: NArray[Double] = new NArray[Double](rows)
 
     val work: NArray[Double] = new NArray[Double](rows)
@@ -85,19 +87,19 @@ object SVSolver {
         s(k0) = 0.0
         var i: Int = k0;
         while (i < rows) {
-          s(k0) = hypot(s(k0), A(lindex(i, k0, columns)))
+          s(k0) = hypot(s(k0), A(i, k0))
           i += 1
         }
         if (s(k0) != 0.0) {
-          if (A(lindex(k0, k0, columns)) < 0.0) {
+          if (A(k0, k0) < 0.0) {
             s(k0) = -s(k0)
           }
           var i0 = k0;
           while (i0 < rows) {
-            A(lindex(i0, k0, columns)) /= s(k0)
+            A(i0, k0) /= s(k0)
             i0 += 1
           }
-          A(lindex(k0, k0, columns)) += 1.0
+          A(k0, k0) += 1.0
         }
         s(k0) = -s(k0)
       }
@@ -109,13 +111,13 @@ object SVSolver {
           var t = 0.0
           var i: Int = k0;
           while (i < rows) {
-            t += A(lindex(i, k0, columns)) * A(lindex(i, j0, columns))
+            t += A(i, k0) * A(i, j0)
             i += 1
           }
-          t = -t / A(lindex(k0, k0, columns))
+          t = -t / A(k0, k0)
           i = k0;
           while (i < rows) {
-            A(lindex(i, j0, columns)) += t * A(lindex(i, k0, columns))
+            A(i, j0) += t * A(i, k0)
             i += 1
           }
         }
@@ -123,14 +125,14 @@ object SVSolver {
         // Place the k-th row of A into e for the
         // subsequent calculation of the row transformation.
 
-        e(j0) = A(lindex(k0, j0, columns))
+        e(j0) = A(k0, j0)
 
         j0 += 1
       }
       if (k0 < nct) { // Place the transformation in U for subsequent back multiplication.
         var i: Int = k0;
         while (i < rows) {
-          U(lindex(i, k0, columns)) = A(lindex(i, k0, columns))
+          U(i, k0) = A(i, k0)
           i += 1
         }
       }
@@ -170,7 +172,7 @@ object SVSolver {
           while (j0 < columns) {
             var i2: Int = k0 + 1;
             while (i2 < rows) {
-              work(i2) = work(i2) + e(j0) * A(lindex(i2, j0, columns))
+              work(i2) = work(i2) + e(j0) * A(i2, j0)
               i2 += 1
             }
             j0 += 1
@@ -180,7 +182,7 @@ object SVSolver {
             val t = -e(j0) / e(k0 + 1)
             var i2: Int = k0 + 1;
             while (i2 < rows) {
-              A(lindex(i2, j0, columns)) += t * work(i2)
+              A(i2, j0) += t * work(i2)
               i2 += 1
             }
             j0 += 1
@@ -191,7 +193,7 @@ object SVSolver {
 
         i = k0 + 1;
         while (i < columns) { // recycling i
-          V(lindex(i, k0, columns)) = e(i)
+          V(i, k0) = e(i)
           i += 1
         }
 
@@ -203,13 +205,13 @@ object SVSolver {
 
     var p = Math.min(columns, rows + 1)
     if (nct < columns) {
-      s(nct) = A(lindex(nct, nct, columns))
+      s(nct) = A(nct, nct)
     }
     if (rows < p) {
       s(p - 1) = 0.0
     }
     if (nrt + 1 < p) {
-      e(nrt) = A(lindex(nrt, p - 1, columns))
+      e(nrt) = A(nrt, p - 1)
     }
 
     e(p - 1) = 0.0
@@ -220,10 +222,10 @@ object SVSolver {
     while (j < minDim) {
       var i: Int = 0;
       while (i < rows) {
-        U(lindex(i, j, columns)) = 0.0
+        U(i, j) = 0.0
         i += 1
       }
-      U(lindex(j, j, columns)) = 1.0
+      U(j, j) = 1.0
       j += 1
     }
 
@@ -235,35 +237,35 @@ object SVSolver {
           var t = 0.0
           var i: Int = k;
           while (i < rows) {
-            t += U(lindex(i, k, columns)) * U(lindex(i, j0, columns))
+            t += U(i, k) * U(i, j0)
             i += 1
           }
-          t = -t / U(lindex(k, k, columns))
+          t = -t / U(k, k)
           i = k;
           while (i < rows) { // recycling i
-            U(lindex(i, j0, columns)) += t * U(lindex(i, k, columns))
+            U(i, j0) += t * U(i, k)
             i += 1
           }
           j0 += 1
         }
         var i: Int = k;
         while (i < rows) {
-          U(lindex(i, k, columns)) = -U(lindex(i, k, columns))
+          U(i, k) = -U(i, k)
           i += 1
         }
-        U(lindex(k, k, columns)) = 1.0 + U(lindex(k, k, columns))
+        U(k, k) = 1.0 + U(k, k)
         i = 0;
         while (i < k - 1) { // recycling i
-          U(lindex(i, k, columns)) = 0.0
+          U(i, k) = 0.0
           i += 1
         }
       } else {
         var i: Int = 0;
         while (i < rows) {
-          U(lindex(i, k, columns)) = 0.0
+          U(i, k) = 0.0
           i += 1
         }
-        U(lindex(k, k, columns)) = 1.0
+        U(k, k) = 1.0
       }
       k -= 1
     }
@@ -277,13 +279,13 @@ object SVSolver {
           var t = 0.0
           var i: Int = k + 1;
           while (i < columns) {
-            t += V(lindex(i, k, columns)) * V(lindex(i, j, columns))
+            t += V(i, k) * V(i, j)
             i += 1
           }
-          t = -t / V(lindex(k + 1, k, columns))
+          t = -t / V(k + 1, k)
           i = k + 1;
           while (i < columns) { // recycling i
-            V(lindex(i, j, columns)) += t * V(lindex(i, k, columns))
+            V(i, j) += t * V(i, k)
             i += 1
           }
           j += 1
@@ -291,10 +293,10 @@ object SVSolver {
       }
       var i: Int = 0;
       while (i < columns) {
-        V(lindex(i, k, columns)) = 0.0
+        V(i, k) = 0.0
         i += 1
       }
-      V(lindex(k, k, columns)) = 1.0
+      V(k, k) = 1.0
       k -= 1
     }
 
@@ -382,9 +384,9 @@ object SVSolver {
             }
             var i: Int = 0;
             while (i < columns) {
-              t = cs * V(lindex(i, j, columns)) + sn * V(lindex(i, p - 1, columns))
-              V(lindex(i, p - 1, columns)) = -sn * V(lindex(i, j, columns)) + cs * V(lindex(i, p - 1, columns))
-              V(lindex(i, j, columns)) = t
+              t = cs * V(i, j) + sn * V(i, p - 1)
+              V(i, p - 1) = -sn * V(i, j) + cs * V(i, p - 1)
+              V(i, j) = t
               i += 1
             }
             j -= 1
@@ -405,9 +407,9 @@ object SVSolver {
             e(j) = cs * e(j)
             var i: Int = 0;
             while (i < rows) {
-              t = cs * U(lindex(i, j, columns)) + sn * U(lindex(i, k - 1, columns))
-              U(lindex(i, k - 1, columns)) = -sn * U(lindex(i, j, columns)) + cs * U(lindex(i, k - 1, columns))
-              U(lindex(i, j, columns)) = t
+              t = cs * U(i, j) + sn * U(i, k - 1)
+              U(i, k - 1) = -sn * U(i, j) + cs * U(i, k - 1)
+              U(i, j) = t
               i += 1
             }
             j += 1
@@ -454,9 +456,9 @@ object SVSolver {
             s(j + 1) = cs * s(j + 1)
             var i: Int = 0;
             while (i < columns) {
-              t = cs * V(lindex(i, j, columns)) + sn * V(lindex(i, j + 1, columns))
-              V(lindex(i, j + 1, columns)) = -sn * V(lindex(i, j, columns)) + cs * V(lindex(i, j + 1, columns))
-              V(lindex(i, j, columns)) = t
+              t = cs * V(i, j) + sn * V(i, j + 1)
+              V(i, j + 1) = -sn * V(i, j) + cs * V(i, j + 1)
+              V(i, j) = t
               i += 1
             }
             t = hypot(f, g)
@@ -470,9 +472,9 @@ object SVSolver {
             if (j < rows - 1) {
               var i: Int = 0;
               while (i < rows) {
-                t = cs * U(lindex(i, j, columns)) + sn * U(lindex(i, j + 1, columns))
-                U(lindex(i, j + 1, columns)) = -sn * U(lindex(i, j, columns)) + cs * U(lindex(i, j + 1, columns))
-                U(lindex(i, j, columns)) = t
+                t = cs * U(i, j) + sn * U(i, j + 1)
+                U(i, j + 1) = -sn * U(i, j) + cs * U(i, j + 1)
+                U(i, j) = t
                 i += 1
               }
             }
@@ -489,7 +491,7 @@ object SVSolver {
             s(k) = if (s(k) < 0.0) -s(k) else 0.0
             var i: Int = 0;
             while (i <= pp) {
-              V(lindex(i, k, columns)) = -V(lindex(i, k, columns))
+              V(i, k) = -V(i, k)
               i += 1
             }
           }
@@ -506,18 +508,18 @@ object SVSolver {
               if (k < columns - 1) {
                 var i: Int = 0;
                 while (i < columns) {
-                  t = V(lindex(i, k + 1, columns))
-                  V(lindex(i, k + 1, columns)) = V(lindex(i, k, columns))
-                  V(lindex(i, k, columns)) = t
+                  t = V(i, k + 1)
+                  V(i, k + 1) = V(i, k)
+                  V(i, k) = t
                   i += 1
                 }
               }
               if (k < rows - 1) {
                 var i: Int = 0;
                 while (i < rows) {
-                  t = U(lindex(i, k + 1, columns))
-                  U(lindex(i, k + 1, columns)) = U(lindex(i, k, columns))
-                  U(lindex(i, k, columns)) = t
+                  t = U(i, k + 1)
+                  U(i, k + 1) = U(i, k)
+                  U(i, k) = t
                   i += 1
                 }
               }
@@ -532,7 +534,6 @@ object SVSolver {
     //new SV[M, N](U, V, s)
     (U, V, s)
   }
-
 
   /** Effective numerical matrix rank
    *
@@ -552,7 +553,7 @@ object SVSolver {
     r
   }
 
-  def sInverse(singularValues:NArray[Double]):NArray[Double] = {
+  def sInverse(singularValues:NArray[Double]):MatrixData = {
     val out = NArray.copy[Double](singularValues)
     var i:Int = 0
     while (i < out.length) {
@@ -566,9 +567,9 @@ object SVSolver {
 object SV {
 
   def apply[M <: Int, N <: Int](mtrx:Mat[M, N])(using ValueOf[M], ValueOf[N], M >= N =:= true):SV[M, N] = {
-    val temp: (NArray[Double], NArray[Double], NArray[Double]) = SVSolver(valueOf[M], valueOf[N], mtrx.values)
+    val temp: (MatrixData, MatrixData, NArray[Double]) = SVSolver(mtrx.values)
     //new SV[M, N](U, V, s)
-    new SV[M, N](new Mat[M,N](temp._1), new Mat[N,N](temp._2), Vec[N](temp._3))
+    new SV[M, N](Mat[M,N](temp._1), Mat[N,N](temp._2), Vec[N](temp._3))
   }
 }
 
@@ -651,14 +652,13 @@ object RTSV {
       s"Mat has fewer rows than columns: ${A.rowDimension} x ${A.columnDimension}."
     )
 
-    val temp: (NArray[Double], NArray[Double], NArray[Double]) = SVSolver(A.rowDimension, A.columnDimension, A.values)
+    val temp: (MatrixData, MatrixData, NArray[Double]) = SVSolver(A.values)
     //new SV[M, N](U, V, s)
     new RTSV(
-      A.rowDimension,
-      A.columnDimension,
-      new RTMat(A.rowDimension, A.columnDimension, temp._1),
-      new RTMat(A.columnDimension, A.columnDimension, temp._2),
-      RTVec(temp._3))
+      RTMat(temp._1),
+      RTMat(temp._2),
+      RTVec(temp._3)
+    )
   }
 }
 
@@ -693,8 +693,12 @@ object RTSV {
  */
 
 class RTSV private(
-  val rows:Int, val columns:Int, val U:RTMat, val V:RTMat, val singularValues:RTVec
+  val U:RTMat, val V:RTMat, val singularValues:RTVec
 ) {
+
+  val rows:Int = U.rowDimension
+  val columns:Int = U.columnDimension
+
   require(rows >= columns , s"Matrix must have at least as many rows as columns, but encountered: $rows x $columns")
 
   /** Return the diagonal matrix of singular values

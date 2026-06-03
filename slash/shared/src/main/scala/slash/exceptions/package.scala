@@ -40,4 +40,8 @@ package object exceptions {
   case class MatrixNotSymmetricPositiveDefinite(rows:Int, columns:Int) extends Exception(
     s"Matrix is not symmetric positive definite: Mat[${rows}x$columns]."
   )
+
+  case class CannotLinearizeMatrixData(rows:Int, columns:Int)extends Exception(
+    s"Number of elements exceeds maximum array size: $rows x $columns > ${narr.NArrayBuilder.MAX_NArraySize}."
+  )
 }

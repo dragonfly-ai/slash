@@ -18,16 +18,17 @@ package slash.matrix.decomposition
 
 import slash.matrix.*
 import narr.*
-import slash.matrix.util.lindex
-import slash.{dimensionCheck, squareInPlace}
+import slash.dimensionCheck
 
 object LUSolver {
 
-  def computeLU(m:Int, n:Int, values:NArray[Double]):(NArray[Double], NArray[Int], Double) = {
+  def computeLU(values:MatrixData):(MatrixData, NArray[Int], Double) = {
 
+    val m:Int = values.rowDimension
+    val n:Int = values.columnDimension
     val minDim:Int = Math.min(m, n)
 
-    val lu:NArray[Double] = NArray.copy[Double](values)
+    val lu:MatrixData = values.copy
     val piv:NArray[Int] = NArray.tabulate[Int](m)((i:Int) => i)
 
     var pivsign:Double = 1.0
@@ -36,9 +37,11 @@ object LUSolver {
 
     // Outer loop.
 
-    var j:Int = 0; while (j < n) { // Make a copy of the j-th column to localize references.
-      var i:Int = 0; while (i < m) {
-        LUcolj(i) = lu(lindex(i, j, n))
+    var j:Int = 0
+    while (j < n) { // Make a copy of the j-th column to localize references.
+      var i:Int = 0
+      while (i < m) {
+        LUcolj(i) = lu(i, j)
         i += 1
       }
       // Apply previous transformations.
@@ -47,11 +50,11 @@ object LUSolver {
         val kmax = Math.min(i, j)
         var s = 0.0
         var k:Int = 0; while (k < kmax) {
-          s += lu(lindex(i, k, n)) * LUcolj(k)
+          s += lu(i, k) * LUcolj(k)
           k += 1
         }
         LUcolj(i) = LUcolj(i) - s
-        lu(lindex(i, j, n)) = LUcolj(i)
+        lu(i, j) = LUcolj(i)
         i += 1
       }
       // Find pivot and exchange if necessary.
@@ -62,9 +65,9 @@ object LUSolver {
       }
       if (p != j) {
         var k0:Int = 0; while (k0 < n) {
-          val t = lu(lindex(p, k0, n))
-          lu(lindex(p, k0, n)) = lu(lindex(j, k0, n))
-          lu(lindex(j, k0, n)) = t
+          val t = lu(p, k0)
+          lu(p, k0) = lu(j, k0)
+          lu(j, k0) = t
           k0 += 1
         }
         val k = piv(p)
@@ -74,9 +77,9 @@ object LUSolver {
       }
       //println(s"j = $j and minDim = $minDim")
       // Compute multipliers.
-      if (j < minDim && lu(lindex(j, j, n)) != 0.0) {
+      if (j < minDim && lu(j, j) != 0.0) {
         var i0:Int = j + 1; while (i0 < m) {
-          lu(lindex(i0, j, n)) = lu(lindex(i0, j, n)) / lu(lindex(j, j, n))
+          lu(i0, j) = lu(i0, j) / lu(j, j)
           i0 += 1
         }
       }
@@ -86,26 +89,27 @@ object LUSolver {
     (lu, piv, pivsign)
   }
 
-  def singular(n: Int, values:NArray[Double]): Boolean = {
+  def singular(values:MatrixData): Boolean = {
+    val n: Int = values.rowDimension
     var j: Int = 0
     while (j < n) {
-      if (values(lindex(j, j, n)) == 0.0) return true
+      if (values(j, j) == 0.0) return true
       j += 1
     }
     false
   }
 
-  def computeL(m:Int, n:Int, lu:NArray[Double]):NArray[Double] = {
-    val out:NArray[Double] = new NArray[Double](m * n)
-    var i:Int = 0
-    var r:Int = 0; while (r < m) {
-      var c: Int = 0; while (c < n) {
-        out(i) = {
-          if (r > c) lu(lindex(r, c, n))
+  def computeL(lu:MatrixData):MatrixData = {
+    val out:MatrixData = MatrixData(lu.rowDimension, lu.columnDimension)
+    var r:Int = 0
+    while (r < lu.rowDimension) {
+      var c: Int = 0
+      while (c < lu.columnDimension) {
+        out(r, c) = {
+          if (r > c) lu(r, c)
           else if (r == c) 1.0
           else 0.0
         }
-        i += 1
         c += 1
       }
       r += 1
@@ -114,15 +118,14 @@ object LUSolver {
     out
   }
 
-  def computeU(n:Int, lu:NArray[Double]):NArray[Double] = {
-    val out: NArray[Double] = new NArray[Double](squareInPlace(n))
-    var i: Int = 0
+  def computeU(lu:MatrixData):MatrixData = {
+    val n:Int = lu.rowDimension
+    val out: MatrixData = MatrixData(n, n)
     var r: Int = 0
     while (r < n) {
       var c: Int = 0
       while (c < n) {
-        out(i) = if (r > c) 0.0 else lu(lindex(r, c, n))
-        i += 1
+        out(r, c) = if (r > c) 0.0 else lu(r, c)
         c += 1
       }
       r += 1
@@ -131,12 +134,13 @@ object LUSolver {
   }
 
   // assumes a square matrix.
-  def determinant(pivsign:Double, n:Int, lu:NArray[Double]):Double = {
+  def determinant(pivsign:Double, lu:MatrixData):Double = {
+    val n:Int = lu.rowDimension
     var d:Double = pivsign
 
     var j:Int = 0
     while (j < n) {
-      d *= lu(lindex(j, j, n))
+      d *= lu(j, j)
       j += 1
     }
 
@@ -144,21 +148,21 @@ object LUSolver {
   }
 
 //  def solve[V <: Int](B: Mat[M, V])(using ValueOf[V]): Mat[N, V] = {
-  def solve(columns:Int, lu:NArray[Double], bColumns:Int, B:NArray[Double], piv:NArray[Int]): NArray[Double] = {
+  def solve(lu:MatrixData, B:MatrixData, piv:NArray[Int]): MatrixData = {
 
     // Copy right hand side with pivoting
-    val nx: Int = bColumns
+    val nx: Int = B.columnDimension
     //val X: Mat[N, V] = B.subMatrix[N, V](piv, 0)
-    val X: NArray[Double] = util.subMatrix(bColumns, B, bColumns, piv, 0)
+    val X: MatrixData = util.subMatrix(B, piv, B.columnDimension, 0)
 
     // Solve L*Y = B(piv,:)
-    var k: Int = 0;
-    while (k < columns) {
-      var i: Int = k + 1;
-      while (i < columns) {
-        var j: Int = 0;
+    var k: Int = 0
+    while (k < lu.columnDimension) {
+      var i: Int = k + 1
+      while (i < lu.columnDimension) {
+        var j: Int = 0
         while (j < nx) {
-          X(lindex(i, j, bColumns)) = X(lindex(i, j, bColumns)) - (X(lindex(k, j, bColumns)) * lu(lindex(i, k, columns)))
+          X(i, j) = X(i, j) - (X(k, j) * lu(i, k))
           j += 1
         }
         i += 1
@@ -166,18 +170,18 @@ object LUSolver {
       k += 1
     }
     // Solve U*X = Y;
-    k = columns - 1;
+    k = lu.columnDimension - 1;
     while (k > -1) { // recycling k
       var j: Int = 0;
       while (j < nx) {
-        X(lindex(k, j, bColumns)) = X(lindex(k, j, bColumns)) / lu(lindex(k, k, columns))
+        X(k, j) = X(k, j) / lu(k, k)
         j += 1
       }
-      var i: Int = 0;
+      var i: Int = 0
       while (i < k) {
-        var j1: Int = 0;
+        var j1: Int = 0
         while (j1 < nx) {
-          X(lindex(i, j1, bColumns)) = X(lindex(i, j1, bColumns)) - (X(lindex(k, j1, bColumns)) * lu(lindex(i, k, columns)))
+          X(i, j1) = X(i, j1) - (X(k, j1) * lu(i, k))
           j1 += 1
         }
         i += 1
@@ -191,8 +195,8 @@ object LUSolver {
 object LU {
 
   def apply[M <: Int, N <: Int](A:Mat[M, N])(using ValueOf[M], ValueOf[N]):LU[M, N] = {
-    val temp = LUSolver.computeLU(A.rows, A.columns, A.values)
-    new LU[M, N](new Mat[M,N](temp._1), temp._2, temp._3)
+    val temp = LUSolver.computeLU(A.values)
+    new LU[M, N](Mat[M,N](temp._1), temp._2, temp._3)
   }
 
 }
@@ -234,19 +238,19 @@ class LU[M <: Int, N <: Int] private (
     *
     * @return true if U, and hence A, is nonsingular.
     */
-  lazy val singular: Boolean = LUSolver.singular(n, LU.values)
+  lazy val singular: Boolean = LUSolver.singular(LU.values)
 
   /** Return lower triangular factor
     *
     * @return L
     */
-  lazy val L: Mat[M, N] = new Mat[M,N](LUSolver.computeL(m, n, LU.values))
+  lazy val L: Mat[M, N] = Mat[M,N](LUSolver.computeL(LU.values))
 
   /** Return upper triangular factor
     *
     * @return U
     */
-  lazy val U: Mat[N, N] = new Mat[N,N](LUSolver.computeU(n, LU.values))
+  lazy val U: Mat[N, N] = Mat[N,N](LUSolver.computeU(LU.values))
 
   /** Return pivot permutation vector
     *
@@ -267,7 +271,7 @@ class LU[M <: Int, N <: Int] private (
     */
   def determinant: Double = {
     if (m != n) throw new IllegalArgumentException("Mat must be square.")
-    LUSolver.determinant(pivsign, n, LU.values)
+    LUSolver.determinant(pivsign, LU.values)
   }
 
   /** Solve A*X = B
@@ -279,8 +283,8 @@ class LU[M <: Int, N <: Int] private (
     */
   def solve[V <: Int](B: Mat[M, V])(using ValueOf[V]): Mat[N, V] = {
     if ( this.singular ) throw new RuntimeException( "Mat is singular." )
-    new Mat[N,V](
-      LUSolver.solve(n, LU.values, valueOf[V], B.values, piv: NArray[Int])
+    Mat[N,V](
+      LUSolver.solve(LU.values, B.values, piv: NArray[Int])
     )
   }
 }
@@ -288,8 +292,8 @@ class LU[M <: Int, N <: Int] private (
 object RTLU {
 
   def apply(A:RTMat):RTLU = {
-    val temp = LUSolver.computeLU(A.rowDimension, A.columnDimension, A.values)
-    new RTLU(new RTMat(A.rowDimension, A.columnDimension, temp._1), temp._2, temp._3)
+    val temp = LUSolver.computeLU(A.values)
+    new RTLU(RTMat(temp._1), temp._2, temp._3)
   }
 
 }
@@ -304,19 +308,19 @@ class RTLU private (val LU:RTMat, piv:NArray[Int], pivsign:Double) {
    *
    * @return true if U, and hence A, is nonsingular.
    */
-  lazy val singular: Boolean = LUSolver.singular(n, LU.values)
+  lazy val singular: Boolean = LUSolver.singular(LU.values)
 
   /** Return lower triangular factor
    *
    * @return L
    */
-  lazy val L: RTMat = new RTMat(m, n, LUSolver.computeL(m, n, LU.values))
+  lazy val L: RTMat = RTMat(LUSolver.computeL(LU.values))
 
   /** Return upper triangular factor
    *
    * @return U
    */
-  lazy val U: RTMat = new RTMat(n, n, LUSolver.computeU(n, LU.values))
+  lazy val U: RTMat = RTMat(LUSolver.computeU(LU.values))
 
   /** Return pivot permutation vector
    *
@@ -338,7 +342,7 @@ class RTLU private (val LU:RTMat, piv:NArray[Int], pivsign:Double) {
    */
   def determinant: Double = {
     if (m != n) throw new IllegalArgumentException("Mat must be square.")
-    LUSolver.determinant(pivsign, n, LU.values)
+    LUSolver.determinant(pivsign, LU.values)
   }
 
   /** Solve A*X = B
@@ -351,10 +355,6 @@ class RTLU private (val LU:RTMat, piv:NArray[Int], pivsign:Double) {
   def solve(B: RTMat): RTMat = {
     if ( this.singular ) throw new RuntimeException( "Mat is singular." )
     dimensionCheck(m, B.rowDimension)
-    new RTMat(
-      n,
-      B.columnDimension,
-      LUSolver.solve(n, LU.values, B.columnDimension, B.values, piv: NArray[Int])
-    )
+    RTMat(LUSolver.solve(LU.values, B.values, piv: NArray[Int]))
   }
 }

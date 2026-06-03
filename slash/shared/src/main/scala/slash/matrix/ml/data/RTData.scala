@@ -39,7 +39,7 @@ trait RTData {
   def domainBias:RTVec = sampleMean
 
   def zScore(x: RTVec): RTVec = {
-    val o = (x - sampleMean)
+    val o = x - sampleMean
     o.pointwiseMultiply(sampleStandardDeviation.reciprocal)
     o
   }
@@ -103,7 +103,7 @@ class RTStaticUnsupervisedData(val sampleSize:Int, val dimension:Int, examples:N
 
   override def domainComponent(i: Int):Interval[Double] = intervals(i)
 
-  override val X: RTMat = RTMat(sampleSize, dimension, Xar)
+  override val X: RTMat = RTMat(Xar)
 
   override def example(i: Int): RTVec = Xar(i) + sampleMean
 
@@ -126,7 +126,7 @@ class RTStaticSupervisedData(val sampleSize:Int, val dimension:Int, labeledExamp
   private val Yar:NArray[Double] = NArray.ofSize[Double](sampleSize)
 
   // Compute the average Vector
-  val temp = {
+  private val temp = {
     val labelStatsEstimator = stream.Gaussian()
     val sampleVectorStats:stream.StreamingRTVectorStats = new stream.StreamingRTVectorStats(dimension)
 
@@ -163,7 +163,7 @@ class RTStaticSupervisedData(val sampleSize:Int, val dimension:Int, labeledExamp
 
   override val y: RTVec = RTVec(Yar)
 
-  override val X: RTMat = RTMat(sampleSize, dimension, Xar)
+  override val X: RTMat = RTMat(Xar)
   override val Y: RTMat = y.asColumnMatrix
 
   def example(i: Int): RTVec = Xar(i) + sampleMean

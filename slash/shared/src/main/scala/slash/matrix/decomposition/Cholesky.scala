@@ -16,18 +16,16 @@
 
 package slash.matrix.decomposition
 
-import narr.*
-import slash.{dimensionCheck, squareInPlace}
+import slash.dimensionCheck
 import slash.matrix.*
 import slash.exceptions.*
-import slash.matrix.util.lindex
 
 object CholeskySolver {
 
-  def computeL(n:Int, m:NArray[Double]):NArray[Double] = {
+  def computeL(n:Int, m:MatrixData):MatrixData = {
     // Initialize.
-    val A = NArray.copy[Double](m)
-    val L = new NArray[Double](squareInPlace(n))
+    val A = m.copy
+    val L = MatrixData(n, n)
     var isspd:Boolean = true
     // Main loop.
     var j:Int = 0; while (j < n) {
@@ -38,21 +36,21 @@ object CholeskySolver {
         var s = 0.0
         var i:Int = 0; while (i < k) {
           //s += Lrowk(i) * Lrowj(i)
-          s += L(lindex(k, i, n)) * L(lindex(j, i, n))
+          s += L(k, i) * L(j, i)
           i += 1
         }
-        s = (A(lindex(j, k, n)) - s) / L(lindex(k, k, n))
+        s = (A(j, k) - s) / L(k, k)
         //Lrowj(k) = s
-        L(lindex(j, k, n)) = s
+        L(j, k) = s
         d = d + s * s
-        isspd = isspd & (A(lindex(k, j, n)) == A(lindex(j, k, n)))
+        isspd = isspd & (A(k, j) == A(j, k))
         k += 1
       }
-      d = A(lindex(j, j, n)) - d
+      d = A(j, j) - d
       isspd = isspd & (d > 0.0)
-      L(lindex(j, j, n)) = Math.sqrt(Math.max(d, 0.0))
+      L(j, j) = Math.sqrt(Math.max(d, 0.0))
       k = j + 1; while (k < n) { // recycling k
-        L(lindex(j, k, n)) = 0.0
+        L(j, k) = 0.0
         k += 1
       }
       j += 1
@@ -69,10 +67,10 @@ object CholeskySolver {
    * @throws IllegalArgumentException Mat row dimensions must agree.
    * @throws RuntimeException         Mat is not symmetric positive definite.
    */
-  def solve(mn:Int, lValues:NArray[Double], bColumns:Int, bValues: NArray[Double]): NArray[Double] = {
+  def solve(mn:Int, lValues:MatrixData, bColumns:Int, bValues: MatrixData): MatrixData = {
 
     // Copy right hand side.
-    val X: NArray[Double] = NArray.copy[Double](bValues)
+    val X: MatrixData = bValues.copy
     val nx: Int = bColumns
     // Solve L*Y = B;
     var k: Int = 0;
@@ -81,10 +79,10 @@ object CholeskySolver {
       while (j < nx) {
         var i: Int = 0;
         while (i < k) {
-          X(lindex(k, j, bColumns)) = X(lindex(k, j, bColumns)) - X(lindex(i, j, bColumns)) * lValues(lindex(k, i, mn))
+          X(k, j) = X(k, j) - X(i, j) * lValues(k, i)
           i += 1
         }
-        X(lindex(k, j, bColumns)) = X(lindex(k, j, bColumns)) / lValues(lindex(k, k, mn))
+        X(k, j) = X(k, j) / lValues(k, k)
         j += 1
       }
       k += 1
@@ -96,10 +94,10 @@ object CholeskySolver {
       while (j < nx) {
         var i: Int = k + 1;
         while (i < mn) {
-          X(lindex(k, j, bColumns)) = X(lindex(k, j, bColumns)) - X(lindex(i, j, bColumns)) * lValues(lindex(i, k, mn))
+          X(k, j) = X(k, j) - X(i, j) * lValues(i, k)
           i += 1
         }
-        X(lindex(k, j, bColumns)) = X(lindex(k, j, bColumns)) / lValues(lindex(k, k, mn))
+        X(k, j) = X(k, j) / lValues(k, k)
         j += 1
       }
       k -= 1
@@ -123,7 +121,7 @@ object Cholesky {
    */
 
   def apply[N <: Int](m:Mat[N, N])(using ValueOf[N]):Cholesky[N] = new Cholesky[N](
-    new Mat[N,N](
+    Mat[N,N](
       CholeskySolver.computeL(valueOf[N], m.values)
     )
   )
@@ -132,9 +130,7 @@ object Cholesky {
 object RTCholesky {
 
   def apply(m: RTMat): RTCholesky = new RTCholesky(
-    new RTMat(
-      m.rowDimension,
-      m.columnDimension,
+    RTMat(
       CholeskySolver.computeL(m.rowDimension, m.values)
     )
   )
@@ -147,9 +143,7 @@ class RTCholesky private (val L: RTMat) {
 
   def solve(B: RTMat): RTMat = {
     dimensionCheck(mn, B.rowDimension)
-    new RTMat(
-      mn, B.columnDimension, CholeskySolver.solve(mn, L.values, B.columnDimension, B.values)
-    )
+    RTMat(CholeskySolver.solve(mn, L.values, B.columnDimension, B.values))
   }
 }
 
@@ -164,7 +158,7 @@ class Cholesky[N <: Int] private (val L: Mat[N, N])(using ValueOf[N]) {
    * @throws IllegalArgumentException  Mat row dimensions must agree.
    * @throws RuntimeException  Mat is not symmetric positive definite.
    */
-  def solve[V <: Int](B: Mat[N, V])(using ValueOf[V]): Mat[N, V] = new Mat[N, V](
+  def solve[V <: Int](B: Mat[N, V])(using ValueOf[V]): Mat[N, V] = Mat[N, V](
     CholeskySolver.solve(mn, L.values, B.columnDimension, B.values )
   )
 }
