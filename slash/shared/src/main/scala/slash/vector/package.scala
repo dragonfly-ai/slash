@@ -16,7 +16,6 @@
 
 package slash
 
-import slash.Random.nextVec
 import narr.*
 import slash.interval.*
 import slash.unicode.*
@@ -37,26 +36,26 @@ package object vector {
       a
     }
 
-    inline def zeros[N <: Int](using ValueOf[N]): Vec[N] = new DoubleArray(valueOf[N]).asInstanceOf[Vec[N]]
+    inline def zeros[N <: Int]: Vec[N] = util.zeros(valueOf[N])
 
-    inline def ones[N <: Int](using ValueOf[N]): Vec[N] = fill[N](1.0)
+    inline def ones[N <: Int]: Vec[N] = util.ones(valueOf[N])
 
-    inline def random[N <: Int]: Vec[N] = random(0.0, 1.0, slash.Random.defaultRandom)
+    inline def random[N <: Int]: Vec[N] = util.random(valueOf[N])
 
-    inline def random[N <: Int](MAX: Double):Vec[N] = random(0.0, MAX, slash.Random.defaultRandom)
+    inline def random[N <: Int](MAX: Double):Vec[N] = util.random(valueOf[N], MAX)
 
-    inline def random[N <: Int](min: Double, MAX: Double):Vec[N] = random(min, MAX, slash.Random.defaultRandom)
+    inline def random[N <: Int](min: Double, MAX: Double):Vec[N] = util.random(valueOf[N], min, MAX)
 
     inline def random[N <: Int](
       min:Double,
       MAX:Double,
       r:scala.util.Random
-    ): Vec[N] = r.nextVec[N](min, MAX)
+    ): Vec[N] = util.random(valueOf[N], min, MAX, r)
 
     def random[N <: Int](
       interval: slash.interval.Interval[Double],
       r: scala.util.Random
-    )(using ValueOf[N]): Vec[N] = Vec.tabulate[N](_ => interval.random(r))
+    )(using ValueOf[N]): Vec[N] = util.random(valueOf[N], interval, r)
 
 
     inline def apply(x: Double, y: Double): Vec[2] = NArray[Double](x, y)
@@ -92,23 +91,17 @@ package object vector {
 
     def blend[N <: Int](alpha: Double, v0: Vec[N], v1: Vec[N]): Vec[N] = (v0 * alpha) + (v1 * (1.0 - alpha))
 
-    def mean[N <: Int](`[v₁v₂⋯vₙ]`: Vec[N]*): Vec[N] = {
-      val μ: Vec[N] = `[v₁v₂⋯vₙ]`.head.copy
-      for (v <- `[v₁v₂⋯vₙ]`.tail) {
-        μ += v
-      }
-      μ /= `[v₁v₂⋯vₙ]`.size
-      μ
-    }
+    def mean[N <: Int](vs: Vec[N]*): Vec[N] = util.mean(vs: _*)
 
-    def mean[N <: Int](`[v₀v₁⋯v₍ₙ₋₁₎]`: NArray[Vec[N]]): Vec[N] = {
-      val μ: Vec[N] = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).copy
-      for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
-        μ += `[v₀v₁⋯v₍ₙ₋₁₎]`(i)
-      }
-      μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length //.asInstanceOf[Vec[N]]
-      μ
-    }
+    def mean[N <: Int](vs: NArray[Vec[N]]): Vec[N] = util.mean(vs)
+//    {
+//      val μ: Vec[N] = `[v₀v₁⋯v₍ₙ₋₁₎]`(0).copy
+//      for (i <- 1 to `[v₀v₁⋯v₍ₙ₋₁₎]`.length) {
+//        μ += `[v₀v₁⋯v₍ₙ₋₁₎]`(i)
+//      }
+//      μ /= `[v₀v₁⋯v₍ₙ₋₁₎]`.length //.asInstanceOf[Vec[N]]
+//      μ
+//    }
 
     private inline def DBL(a:Any):Double = a.asInstanceOf[Double]
 
@@ -136,26 +129,26 @@ package object vector {
 
     def fromVecF[N <: Int](v:slash.vectorf.VecF[N]): Vec[N] = (NArray.tabulate[Double](v.dimension)(i => v(i).toDouble)).asInstanceOf[Vec[N]]
 
-    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 1 =:= true) {
+    extension[N <: Int] (thisVector: Vec[N])(using N >= 1 =:= true) {
       inline def x: Double = thisVector(0)
     }
 
-    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 2 =:= true) {
+    extension[N <: Int] (thisVector: Vec[N])(using N >= 2 =:= true) {
       inline def y: Double = thisVector(1)
     }
 
-    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 3 =:= true) {
+    extension[N <: Int] (thisVector: Vec[N])(using N >= 3 =:= true) {
       inline def z: Double = thisVector(2)
     }
 
-    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N >= 4 =:= true) {
+    extension[N <: Int] (thisVector: Vec[N])(using N >= 4 =:= true) {
       inline def w: Double = thisVector(3)
     }
 
     /**
      * Vec[2] extension methods:
      */
-    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N == 2 =:= true) {
+    extension[N <: Int] (thisVector: Vec[N])(using N == 2 =:= true) {
       inline def rotate(cosTheta: Double, sinTheta: Double): Unit = {
         val x1 = thisVector(0) * cosTheta - thisVector(1) * sinTheta
         thisVector(1) = thisVector(0) * sinTheta + thisVector(1) * cosTheta
@@ -180,7 +173,7 @@ package object vector {
     /**
      * Vec[3] extension methods:
      */
-    extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N], N == 3 =:= true) {
+    extension[N <: Int] (thisVector: Vec[N])(using N == 3 =:= true) {
       inline def ⨯(thatVector: Vec[3]): Vec[3] = cross(thatVector)
 
       inline def cross(thatVector: Vec[3]): Vec[3] = Vec[3](
@@ -207,297 +200,109 @@ package object vector {
 
       // clamp methods
 
-      def clamp(lt: Double, gt: Double): Unit = {
-        if (gt < lt) throw Exception(s"Invoked Vec[${thisVector.dimension}].clamp(lt = $lt, gt = $gt) but gt < lt.")
-        var i = 0; while (i < thisVector.dimension) {
-          if (thisVector(i) < lt) thisVector(i) = lt
-          else if (thisVector(i) > gt) thisVector(i) = gt
-          i = i + 1
-        }
-      }
+      inline def clamp(lt: Double, gt: Double): Unit = util.clamp(thisVector, lt, gt)
 
-      inline def clamp(i:Interval[Double]): Unit = clamp(i.set_min, i.set_MAX)
+      inline def clamp(i:Interval[Double]): Unit = util.clamp(thisVector, i)
 
-      inline def clamped(lt: Double, gt: Double):Vec[N] = {
-        val o:Vec[N] = copy
-        o.clamp(lt, gt)
-        o
-      }
+      inline def clamped(lt: Double, gt: Double):Vec[N] = util.clamped(thisVector, lt, gt)
 
       inline def clamped(i:Interval[Double]): Vec[N] = clamped(i.set_min, i.set_MAX)
 
-      def min(lt: Double): Unit = {
-        var i = 0; while (i < thisVector.dimension) {
-          if (thisVector(i) < lt) thisVector(i) = lt
-          i = i + 1
-        }
-      }
+      inline def min(lt: Double): Unit = util.min(thisVector, lt)
 
-      def MAX(gt: Double): Unit = {
-        var i = 0; while (i < thisVector.dimension) {
-          if (thisVector(i) > gt) thisVector(i) = gt
-          i = i + 1
-        }
-      }
+      inline def MAX(gt: Double): Unit = util.MAX(thisVector, gt)
 
-      inline def clampedMin(lt: Double): Vec[N] = {
-        val o:Vec[N] = copy
-        o.min(lt)
-        o
-      }
-      inline def clampedMAX(gt: Double): Vec[N] = {
-        val o: Vec[N] = copy
-        o.MAX(gt)
-        o
-      }
+      inline def clampedMin(lt: Double): Vec[N] = util.clampedMin(thisVector, lt)
 
+      inline def clampedMAX(gt: Double): Vec[N] = util.clampedMAX(thisVector, gt)
 
-      def sum: Double = {
-        var sum = 0.0
-        var i = 0; while (i < thisVector.dimension) {
-          sum = sum + thisVector(i)
-          i = i + 1
-        }
-        sum
-      }
+      inline def sum: Double = util.sum(thisVector)
 
-      inline def mean: Double = thisVector.sum / thisVector.dimension
+      inline def mean: Double = util.mean(thisVector)
 
       //It is assumed, that we consider a sample rather than a complete population
-      def variance: Double = {
-        // https://www.cuemath.com/sample-variance-formula/
-        val μ = thisVector.mean
-        thisVector.map(i => squareInPlace(i - μ)).sum / (thisVector.dimension - 1)
-      }
+      inline def variance: Double = util.variance(thisVector)
 
       // It is assumed, that we consider a sample rather than a complete population
-      def stdDev: Double = {
-        // https://www.cuemath.com/data/standard-deviation/
-        val mu = thisVector.mean
-        val diffs_2 = thisVector.map( num => squareInPlace(num - mu) )
-        Math.sqrt( diffs_2.sum / (thisVector.dimension - 1 ) )
-      }
+      inline def stdDev: Double = util.stdDev(thisVector)
 
-      def covariance(thatVector : Vec[N] ):Double = {
-        val μThis = thisVector.mean
-        val μThat = thatVector.mean
-        var cv:Double = 0
-        var i:Int = 0; while (i < thisVector.dimension) {
-          cv += (thisVector(i) - μThis) * (thatVector(i) - μThat)
-          i += 1
-        }
-        cv / (thisVector.dimension -1)
-      }
+      inline def covariance(thatVector : Vec[N] ):Double = util.covariance(thisVector, thatVector)
 
-      def normSquared: Double = {
-        var mag2 = 0.0
-        var i = 0; while (i < dimension) {
-          mag2 = mag2 + squareInPlace(thisVector(i))
-          i = i + 1
-        }
-        mag2
-      }
+      inline def normSquared: Double = util.normSquared(thisVector)
 
-      inline def norm: Double = Math.sqrt(normSquared)
+      inline def norm: Double = util.norm(thisVector)
 
-      inline def magnitude: Double = norm
+      inline def magnitude: Double = util.norm(thisVector)
 
-      inline def magnitudeSquared: Double = normSquared
+      inline def magnitudeSquared: Double = util.normSquared(thisVector)
 
-      def euclideanDistanceSquaredTo(v0: Vec[N]): Double = {
-        var distance = 0.0
-        var i = 0; while (i < dimension) {
-          distance = distance + squareInPlace(thisVector(i) - v0(i))
-          i = i + 1
-        }
-        distance
-      }
+      inline def euclideanDistanceSquaredTo(thatVector: Vec[N]): Double = util.euclideanDistanceSquaredBetween(thisVector, thatVector)
 
-      inline def euclideanDistanceTo(v0: Vec[N]): Double = Math.sqrt(euclideanDistanceSquaredTo(v0))
+      inline def euclideanDistanceTo(thatVector: Vec[N]): Double = util.euclideanDistanceBetween(thisVector, thatVector)
 
-      def + (scalar: Double): Vec[N] = {
-        val vOut = copy
-        var i = 0; while (i < dimension) {
-          vOut(i) = vOut(i) + scalar
-          i = i + 1
-        }
-        vOut
-      }
+      inline def + (scalar: Double): Vec[N] = util.scalarCopyAndAdd(thisVector, scalar)
 
-      inline def +=(scalar: Double): Unit = {
-        var i = 0; while (i < dimension) {
-          thisVector(i) = thisVector(i) + scalar
-          i = i + 1
-        }
-      }
+      inline def +=(scalar: Double): Unit = util.scalarAddInPlace(thisVector, scalar)
 
-      def + (v0: Vec[N]): Vec[N] = {
-        val o:Vec[N] = copy
-        o.add(v0)
-        o
-      }
+      inline def + (thatVector: Vec[N]): Vec[N] = util.vectorCopyAndAdd(thisVector, thatVector)
 
-      inline def += (v0: Vec[N]): Unit = add(v0)
+      inline def += (thatVector: Vec[N]): Unit = util.vectorAddInPlace(thisVector, thatVector)
 
-      def add(v0: Vec[N]): Unit = {
-        var i = 0; while (i < dimension) {
-          thisVector(i) = thisVector(i) + v0(i)
-          i = i + 1
-        }
-      }
+      inline def add(thatVector: Vec[N]): Unit = util.vectorAddInPlace(thisVector, thatVector)
 
       inline def unary_- : Vec[N] = thisVector * ( -1.0 )
 
-      def - (scalar: Double): Vec[N] = {
-        val vOut = copy
-        var i = 0;while (i < dimension) {
-          vOut(i) = vOut(i) - scalar
-          i = i + 1
-        }
-        vOut
-      }
+      inline def - (scalar: Double): Vec[N] = util.scalarCopyAndSubtract(thisVector, scalar)
 
-      inline def -=(scalar: Double): Unit = {
-        var i = 0; while (i < dimension) {
-          thisVector(i) = thisVector(i) - scalar
-          i = i + 1
-        }
-      }
+      inline def -=(scalar: Double): Unit = util.scalarSubtractInPlace(thisVector, scalar)
 
-      def -(v0: Vec[N]): Vec[N] = {
-        val o: Vec[N] = copy
-        o.subtract(v0)
-        o
-      }
+      inline def -(thatVector: Vec[N]): Vec[N] = util.vectorCopyAndSubtract(thisVector, thatVector)
 
-      inline def -= (v0: Vec[N]): Unit = subtract(v0)
+      inline def -= (thatVector: Vec[N]): Unit = util.vectorSubtractInPlace(thisVector, thatVector)
 
-      def subtract(v0: Vec[N]): Unit = {
-        var i = 0; while (i < dimension) {
-          thisVector(i) = thisVector(i) - v0(i)
-          i = i + 1
-        }
-      }
+      inline def subtract(thatVector: Vec[N]): Unit = util.vectorSubtractInPlace(thisVector, thatVector)
 
-      def dot(v0: Vec[N]): Double = {
-        var product = 0.0
-        var i = 0; while (i < dimension) {
-          product = product + thisVector(i) * v0(i)
-          i = i + 1
-        }
-        product
-      }
+      inline def dot(thatVector: Vec[N]): Double = util.dot(thisVector, thatVector)
 
-      inline def * (scalar: Double): Vec[N] = scaled(scalar)
+      inline def * (scalar: Double): Vec[N] = util.scaled(thisVector, scalar)
+      inline def *= (scalar: Double): Unit = util.scaleInPlace(thisVector, scalar)
 
-      inline def *= (scalar: Double): Unit = scale(scalar)
-      def scale(scalar: Double): Unit = {
-        var i = 0; while (i < dimension) {
-          thisVector(i) = thisVector(i) * scalar
-          i = i + 1
-        }
-      }
+      inline def scale(scalar: Double): Unit = util.scaleInPlace(thisVector, scalar)
 
-      def scaled(scalar: Double): Vec[N] = {
-        val o: Vec[N] = copy
-        o.scale(scalar)
-        o
-      }
+      inline def scaled(scalar: Double): Vec[N] = util.scaled(thisVector, scalar)
 
-      inline def / (divisor: Double): Vec[N] = divided(divisor)
-      inline def /= (divisor: Double): Unit = divide(divisor)
+      inline def / (divisor: Double): Vec[N] = util.divided(thisVector, divisor)
+      inline def /= (divisor: Double): Unit = util.divideInPlace(thisVector, divisor)
 
-      inline def divide(divisor: Double): Unit = scale(1.0 / divisor)
+      inline def divide(divisor: Double): Unit = util.divideInPlace(thisVector, divisor)
 
-      def divided(divisor: Double): Vec[N] = {
-        val o: Vec[N] = copy
-        o.divide(divisor)
-        o
-      }
+      inline def divided(divisor: Double): Vec[N] = util.divided(thisVector, divisor)
 
-      def reciprocate: Unit = {
-        var i = 0; while (i < dimension) {
-          thisVector(i) = 1.0 / thisVector(i)
-          i = i + 1
-        }
-      }
+      inline def reciprocate(): Unit = util.reciprocate(thisVector)
 
-      def reciprocal: Vec[N] = {
-        val o: Vec[N] = copy
-        o.reciprocate
-        o
-      }
+      inline def reciprocal: Vec[N] = util.reciprocal(thisVector)
 
-      def pointwiseMultiply(v0: Vec[N]): Unit = {
-        var i = 0; while (i < dimension) {
-          thisVector(i) = thisVector(i) * v0(i)
-          i = i + 1
-        }
-      }
+      inline def pointwiseMultiply(thatVector: Vec[N]): Unit = util.pointwiseMultiply(thisVector, thatVector)
 
-      def pointwiseMultiplied(v0: Vec[N]): Vec[N] = {
-        val o: Vec[N] = copy
-        o.pointwiseMultiply(v0)
-        o
-      }
+      inline def pointwiseMultiplied(thatVector: Vec[N]): Vec[N] = util.pointwiseMultiplied(thisVector, thatVector)
 
-      def kronecker[M <: Int](v0: Vec[M])(using ValueOf[N * M]): Vec[N * M] = {
-        val o: Vec[N * M] = Vec.zeros[N * M]
-        var i = 0; while (i < dimension) {
-          var j = 0; while (j < v0.dimension) {
-            o(i * v0.dimension + j) = thisVector(i) * v0(j)
-            j = j + 1
-          }
-          i = i + 1
-        }
-        o
-      }
+      inline def kronecker[M <: Int](thatVector: Vec[M]): Vec[N * M] = util.kronecker(thisVector, thatVector)
 
-      def round(): Unit = {
-        var i = 0; while (i < dimension) {
-          thisVector(i) = Math.round(thisVector(i)).toDouble
-          i = i + 1
-        }
-      }
+      inline def round(): Unit = util.round(thisVector)
 
-      inline def rounded: Vec[N] = {
-        val o: Vec[N] = copy
-        o.round()
-        o
-      }
+      inline def rounded: Vec[N] = util.rounded(thisVector)
 
-      inline def discretize(): Unit = round()
+      inline def discretize(): Unit = util.round(thisVector)
 
-      def discretize(r: Double): Unit = {
-        var i = 0; while (i < dimension) {
-          thisVector(i) = r * Math.round(thisVector(i) / r).toDouble
-          i = i + 1
-        }
-      }
+      inline def discretize(r: Double): Unit = util.discretize(thisVector, r)
 
-      def discritized: Vec[N] = {
-        val o: Vec[N] = copy
-        o.round()
-        o
-      }
+      inline def discritized: Vec[N] = util.discritized(thisVector)
 
-      def discritized(r: Double): Vec[N] = {
-        val o: Vec[N] = copy
-        o.discretize(r)
-        o
-      }
+      inline def discritized(r: Double): Vec[N] = util.discritized(thisVector, r)
 
-      inline def normalize(): Unit = {
-        val n: Double = norm
-        if (n > 0.0) divide(n)
-        else throw slash.exceptions.VectorNormalizationException(thisVector.render().toString())
-      }
+      inline def normalize(): Unit = util.normalize(thisVector)
 
-      def normalized: Vec[N] = {
-        val o: Vec[N] = copy
-        o.normalize()
-        o
-      }
+      inline def normalized: Vec[N] = util.normalized(thisVector)
 
       // ₂⃗ ²↗ ↗²
       def show: String = thisVector.dimension match {

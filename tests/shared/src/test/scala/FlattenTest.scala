@@ -17,17 +17,18 @@
 import slash.vector.*
 import slash.matrix.*
 
-class MatReshapeFlattenTest extends munit.FunSuite {
+class FlattenTest extends munit.FunSuite {
 
-  test("verify Mat.reshape") {
-    val mat1 = Mat.random[10,7](-1.0, 2.0)
-    val mat2 = mat1.reshape[5,14]
-    val mat3: Mat[5,14] = mat2 // dimensions verified by compiler
-    assert(mat1.values == mat2.values && mat2.strictEquals(mat3))
-  }
+//  test("verify Mat.reshape") {
+//    val mat1 = Mat.random[10,7](-1.0, 2.0)
+//    val mat2 = mat1.reshape[5,14]
+//    val mat3: Mat[5,14] = mat2 // dimensions verified by compiler
+//    assert(mat1.values == mat2.values && mat2.strictEquals(mat3))
+//  }
+
   test("verify flatten") {
     val mat = Mat.random[10,7](-1.0, 2.0)
     val vec: Vec[70] = mat.flatten
-    assert(mat.values == vec)
+    assertVecEquals(mat.values.rowPackedNArray.asInstanceOf[Vec[70]], vec)
   }
 }

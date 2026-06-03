@@ -18,8 +18,6 @@ package slash.interval
 
 import slash.{nextDown, nextUp}
 import slash.stats.probability.distributions.Sampleable
-
-import scala.reflect.ClassTag
 import scala.util.Random
 
 object Interval {
@@ -41,8 +39,20 @@ case class LongInterval private (override val code:Int, override val min:Long, o
   override def median: Long = (MAX - min) >> 1
   override def mean: Double = (set_MAX + set_min) / 2.0
 
-  override def contains(x: Long): Boolean = x <= MAX && x >= min
-  override def rangeContains(x:Double): Boolean = x <= MAX.toDouble && x >= min.toDouble
+  override def contains(x: Long): Boolean = code match {
+    case Interval.CLOSED => min <= x && x <= MAX
+    case Interval.LEFT_CLOSED => min <= x && x < MAX
+    case Interval.RIGHT_CLOSED => min < x && x <= MAX
+    case Interval.OPEN => min < x && x < MAX
+  }
+
+  override def rangeContains(x:Double): Boolean = code match {
+    case Interval.CLOSED => min.toDouble <= x && x <= MAX.toDouble
+    case Interval.LEFT_CLOSED => min.toDouble <= x && x < MAX.toDouble
+    case Interval.RIGHT_CLOSED => min.toDouble < x && x <= MAX.toDouble
+    case Interval.OPEN => min.toDouble < x && x < MAX.toDouble
+  }
+
   override def random(r0: Random): Long = r0.between(min, MAX + 1)
 }
 
@@ -59,23 +69,39 @@ case class IntInterval private (override val code:Int, override val min:Int, ove
   override def median: Int = (MAX - min) >> 1
   override def mean: Double = (set_MAX + set_min) / 2.0
 
-  override inline def contains(x: Int): Boolean = x <= MAX && x >= min
-  override def rangeContains(x:Double): Boolean = x <= MAX.toDouble && x >= min.toDouble
+  override inline def contains(x: Int): Boolean = code match {
+    case Interval.CLOSED => min <= x && x <= MAX
+    case Interval.LEFT_CLOSED => min <= x && x < MAX
+    case Interval.RIGHT_CLOSED => min < x && x <= MAX
+    case Interval.OPEN => min < x && x < MAX
+  }
+
+  override def rangeContains(x:Double): Boolean = code match {
+    case Interval.CLOSED => min.toDouble <= x && x <= MAX.toDouble
+    case Interval.LEFT_CLOSED => min.toDouble <= x && x < MAX.toDouble
+    case Interval.RIGHT_CLOSED => min.toDouble < x && x <= MAX.toDouble
+    case Interval.OPEN => min.toDouble < x && x < MAX.toDouble
+  }
 
   override inline def random(r0: Random): Int = r0.between(min, MAX + 1)
 }
 
-object ContinuousInterval {
-  def apply(code:Int, min:Double, MAX:Double):ContinuousInterval = {
+object DoubleInterval {
+  def apply(code:Int, min:Double, MAX:Double):DoubleInterval = {
     if (MAX < min) throw Exception(s"Invalid sampleRange: [min = $min, MAX = $MAX] MAX is less than min.")
-    else new ContinuousInterval(code, min, MAX)
+    else new DoubleInterval(code, min, MAX)
   }
 }
 
-case class ContinuousInterval private (override val code:Int, override val min:Double, override val MAX:Double) extends Interval[Double] {
+case class DoubleInterval private(override val code:Int, override val min:Double, override val MAX:Double) extends Interval[Double] {
   override def norm: Double = MAX - min
   override def mean: Double = (MAX - min) / 2.0
-  override inline def contains(x: Double): Boolean = x <= MAX && x >= min
+  override inline def contains(x: Double): Boolean = code match {
+    case Interval.CLOSED => min <= x && x <= MAX
+    case Interval.LEFT_CLOSED => min <= x && x < MAX
+    case Interval.RIGHT_CLOSED => min < x && x <= MAX
+    case Interval.OPEN => min < x && x < MAX
+  }
   override inline def rangeContains(x:Double):Boolean = contains(x)
   override def random(r0: Random): Double = r0.between(min, if (MAX < Double.MaxValue) MAX.nextUp else MAX)
 }
@@ -91,17 +117,27 @@ object FloatInterval {
 case class FloatInterval private (override val code:Int, override val min:Float, override val MAX:Float) extends Interval[Float] {
   override def norm: Float = MAX - min
   override def mean: Double = (MAX - min) / 2.0
-  override inline def contains(x: Float): Boolean = x <= MAX && x >= min
-  override inline def rangeContains(x:Double):Boolean = x <= MAX.toDouble && x >= min.toDouble
+  override inline def contains(x: Float): Boolean = code match {
+    case Interval.CLOSED => min <= x && x <= MAX
+    case Interval.LEFT_CLOSED => min <= x && x < MAX
+    case Interval.RIGHT_CLOSED => min < x && x <= MAX
+    case Interval.OPEN => min < x && x < MAX
+  }
+  override inline def rangeContains(x:Double):Boolean = code match {
+    case Interval.CLOSED => min.toDouble <= x && x <= MAX.toDouble
+    case Interval.LEFT_CLOSED => min.toDouble <= x && x < MAX.toDouble
+    case Interval.RIGHT_CLOSED => min.toDouble < x && x <= MAX.toDouble
+    case Interval.OPEN => min.toDouble < x && x < MAX.toDouble
+  }
   override def random(r0: Random): Float = r0.between(min, MAX.nextUp)
 }
 
-trait DiscreteInterval[DOMAIN <: Int | Long : ClassTag] extends Interval[DOMAIN] {
+trait DiscreteInterval[DOMAIN <: Int | Long] extends Interval[DOMAIN] {
   def median: DOMAIN
 }
 
 
-trait Interval[DOMAIN:ClassTag] extends Sampleable[DOMAIN] {
+trait Interval[DOMAIN] extends Sampleable[DOMAIN] {
 
   val code:Int
 
@@ -128,6 +164,6 @@ trait Interval[DOMAIN:ClassTag] extends Sampleable[DOMAIN] {
 
   override def random(r0:scala.util.Random = defaultRandom): DOMAIN// = Interval.randomFrom(this).asInstanceOf[DOMAIN]
 
-  override def toString:String = s"${if(leftClosed) "[" else "("} $min, $MAX ${if(rightClosed) "]" else ")" }${ClassTag[DOMAIN]}"
+  override def toString:String = s"${if(leftClosed) "[" else "("} $min, $MAX ${if(rightClosed) "]" else ")" }" //${[DOMAIN]}"
 
 }

@@ -19,42 +19,49 @@ package slash.matrix.decomposition
 import slash.vector.*
 import slash.matrix.*
 import narr.*
+import slash.dimensionCheck
+import slash.vector.runtime.RTVec
 
 import scala.math.hypot
 //import slash.matrix.decomposition.SV.hypot
 
-object QR {
-
-  def apply[M <: Int, N <: Int](M: Mat[M, N])(using ValueOf[M], ValueOf[N]): QR[M, N] = {
+object QRSolver {
+  def apply(M: MatrixData): (MatrixData, NArray[Double]) = {
+    val rows:Int = M.rowDimension
+    val columns:Int = M.columnDimension
     // Initialize.
-    val qr:Mat[M, N] = M.copy
-    val rows:Int = M.rows
-    val columns:Int = M.columns
-    val Rdiag:Vec[N] = Vec.fill[N](0.0)
+    val qr: MatrixData = M.copy
+    val Rdiag: NArray[Double] = new NArray[Double](columns)
 
     // Main loop.
-    var k:Int = 0; while (k < columns) { // Compute 2-norm of k-th column without under/overflow.
-      var nrm:Double = 0.0
-      var i:Int = k; while (i < rows) {
+    var k: Int = 0
+    while (k < columns) { // Compute 2-norm of k-th column without under/overflow.
+      var nrm: Double = 0.0
+      var i: Int = k
+      while (i < rows) {
         nrm = hypot(nrm, qr(i, k))
         i += 1
       }
       if (nrm != 0.0) { // Form k-th Householder vector.
         if (qr(k, k) < 0) nrm = -nrm
-        i = k; while (i < rows) {  // recycling
+        i = k;
+        while (i < rows) { // recycling
           qr(i, k) /= nrm
           i += 1
         }
         qr(k, k) += 1.0
         // Apply transformation to remaining columns.
-        var j:Int = k + 1; while (j < columns) {
+        var j: Int = k + 1;
+        while (j < columns) {
           var s = 0.0
-          var i0:Int = k; while (i0 < rows) {
+          var i0: Int = k;
+          while (i0 < rows) {
             s += qr(i0, k) * qr(i0, j)
             i0 += 1
           }
           s = -s / qr(k, k)
-          var i1:Int = k; while (i1 < rows) {
+          var i1: Int = k;
+          while (i1 < rows) {
             qr(i1, j) += s * qr(i1, k)
             i1 += 1
           }
@@ -64,7 +71,178 @@ object QR {
       Rdiag(k) = -nrm
       k += 1
     }
-    new QR(qr, Rdiag)
+//    new QR(qr, Rdiag)
+    (qr, Rdiag)
+  }
+
+  /** Is the matrix full rank?
+   *
+   * @return true if R, and hence A, has full rank.
+   */
+  def fullRank(Rdiag:NArray[Double]): Boolean = {
+    var i: Int = 0
+    while (i < Rdiag.length && Rdiag(i) != 0.0) i += 1
+    i == Rdiag.length
+  }
+
+  /** Return the Householder vectors
+   *
+   * @return Lower trapezoidal matrix whose columns define the reflections
+   */
+  def H(qr:MatrixData): MatrixData = {
+    val rows:Int = qr.rowDimension
+    val columns:Int = qr.columnDimension
+    val out: MatrixData = MatrixData(rows, columns)
+    var r: Int = 0
+    while (r < rows) {
+      var c: Int = 0
+      while (c < columns) {
+        out(r, c) = if (r >= c) qr(r, c) else 0.0
+        c += 1
+      }
+      r += 1
+    }
+    out
+  }
+
+
+  /** Return the upper triangular factor
+   *
+   * @return R
+   */
+  def R(qr:MatrixData, Rdiag:NArray[Double]): MatrixData = {
+    val dim:Int = qr.columnDimension
+    val out: MatrixData = MatrixData(dim, dim)
+    var r: Int = 0
+    while (r < dim) {
+      var c: Int = 0
+      while (c < dim) {
+        out(r, c) = {
+          if (r < c) qr(r, c)
+          else if (r == c) Rdiag(r)
+          else 0.0
+        }
+        c += 1
+      }
+      r += 1
+    }
+    out
+  }
+
+  def Q(QR:MatrixData): MatrixData = {
+
+    val rows: Int = QR.rowDimension
+    val columns: Int = QR.columnDimension
+
+    val X = MatrixData(rows, columns)
+    var k:Int = columns - 1
+    while (k > -1) {
+      var i:Int = 0
+      while (i < rows) {
+        X(i, k) = 0.0
+        i += 1
+      }
+      X(k, k) = 1.0
+      var j:Int = k
+      while (j < columns) {
+        if (QR(k, k) != 0) {
+          var s = 0.0
+          i = k
+          while (i < rows) {  // recycling i
+            s += QR(i, k) * X(i, j)
+            i += 1
+          }
+          s = -s / QR(k, k)
+          i = k
+          while (i < rows) {  // recycling i
+            X(i, j) += s * QR(i, k)
+            i += 1
+          }
+        }
+        j += 1
+      }
+      k -= 1
+    }
+    X
+  }
+
+
+  /** Least squares solution of A*X = B
+   *
+   * @param B A Mat with as many rows as A and any number of columns.
+   * @return X that minimizes the two norm of Q*R*X-B.
+   * @throws IllegalArgumentException  Mat row dimensions must agree.
+   * @throws RuntimeException  Mat is rank deficient.
+   */
+//  def solve[V <: Int](B: Mat[M, V])(using ValueOf[V]): Mat[N, V] = {
+  def solve(QR:MatrixData, Rdiag:NArray[Double], B: MatrixData): MatrixData = {
+
+    val rows:Int = QR.rowDimension
+    val columns:Int = QR.columnDimension
+
+    val bColumns:Int = B.columnDimension
+
+    val out:MatrixData = B.copy
+    // Copy right hand side
+    val nx = bColumns
+
+    // Compute Y = transpose(Q)*B
+    var k:Int = 0
+    while (k < columns) {
+      var j:Int = 0
+      while (j < nx) {
+        var s:Double = 0.0
+        var i:Int = k
+        while (i < rows) {
+          s += QR(i, k) * out(i, j)
+          i += 1
+        }
+        s = -s / QR(k, k)
+        i = k
+        while (i < rows) { // recycling i
+          out(i, j) += s * QR(i, k)
+          i += 1
+        }
+        j += 1
+      }
+      k += 1
+    }
+
+    // Solve R*thatMatrix = Y;
+    k = columns - 1
+    while (k > -1) { // recycling k
+      var j:Int = 0
+      while (j < nx) {
+        out(k, j) /= Rdiag(k)
+        j += 1
+      }
+      var i:Int = 0
+      while (i < k) {
+        j = 0
+        while (j < nx) {
+          out(i, j) -= out(k, j) * QR(i, k)
+          j += 1
+        }
+        i += 1
+      }
+      k -= 1
+    }
+    //println(s"slash.matrix.util.subMatrix($columns, ${out.length}, 0, 0, $columns, $bColumns)")
+    if (rows == columns) out
+    else {
+      //println(s"subMatrix($columns, ${out.length}, 0, 0, $columns, $bColumns)")
+      slash.matrix.util.subMatrix(out, 0, 0, columns, bColumns)
+    }
+    //B.subMatrix[N, V](0, 0)
+  }
+
+}
+
+object QR {
+
+  def apply[M <: Int, N <: Int](M: Mat[M, N])(using ValueOf[M], ValueOf[N]): QR[M, N] = {
+    val temp:(MatrixData, NArray[Double]) = QRSolver(M.values)
+    new QR(Mat[M, N](temp._1), Vec[N](temp._2))
   }
 
 }
@@ -105,87 +283,25 @@ class QR[M <: Int, N <: Int] private (
     *
     * @return true if R, and hence A, has full rank.
     */
-  def isFullRank: Boolean = {
-    var i:Int = 0
-    while (i < columns && Rdiag(i) != 0.0) i += 1
-    i == columns
-  }
+  lazy val fullRank: Boolean = QRSolver.fullRank(Rdiag.asNativeArray)
 
   /** Return the Householder vectors
     *
     * @return Lower trapezoidal matrix whose columns define the reflections
     */
-  def H: Mat[M, N] = {
-    val values: NArray[Double] = new NArray[Double](rows * columns)
-    var i: Int = 0
-    var r: Int = 0
-    while (r < rows) {
-      var c: Int = 0
-      while (c < columns) {
-        values(i) = if (r >= c) QR(r, c) else 0.0
-        i += 1
-        c += 1
-      }
-      r += 1
-    }
-    Mat[M, N](values)
-  }
+  lazy val H: Mat[M, N] = Mat[M, N](QRSolver.H(QR.values))
 
   /** Return the upper triangular factor
     *
     * @return R
     */
-  def R: Mat[N, N] = {
-    val values: NArray[Double] = new NArray[Double](slash.squareInPlace(columns))
-    var i: Int = 0
-    var r: Int = 0
-    while (r < columns) {
-      var c: Int = 0
-      while (c < columns) {
-        values(i) = {
-          if (r < c) QR(r, c)
-          else if (r == c) Rdiag(r)
-          else 0.0
-        }
-        i += 1
-        c += 1
-      }
-      r += 1
-    }
-    Mat[N, N](values)
-  }
+  lazy val R: Mat[N, N] = Mat[N, N](QRSolver.R(QR.values, Rdiag.asNativeArray))
 
   /** Generate and return the (economy-sized) orthogonal factor
     *
     * @return Q
     */
-  def Q: Mat[M, N] = {
-    val X = Mat.zeros[M, N]
-    var k:Int = columns - 1; while (k > -1) {
-      var i:Int = 0; while (i < rows) {
-        X(i, k) = 0.0
-        i += 1
-      }
-      X(k, k) = 1.0
-      var j:Int = k; while (j < columns) {
-        if (QR(k, k) != 0) {
-          var s = 0.0
-          i = k; while (i < rows) {  // recycling i
-            s += QR(i, k) * X(i, j)
-            i += 1
-          }
-          s = -s / QR(k, k)
-          i = k; while (i < rows) {  // recycling i
-            X(i, j) += s * QR(i, k)
-            i += 1
-          }
-        }
-        j += 1
-      }
-      k -= 1
-    }
-    X
-  }
+  lazy val Q: Mat[M, N] = Mat[M, N](QRSolver.Q(QR.values))
 
   /** Least squares solution of A*X = B
     *
@@ -195,46 +311,76 @@ class QR[M <: Int, N <: Int] private (
     * @throws RuntimeException  Mat is rank deficient.
     */
   def solve[V <: Int](B: Mat[M, V])(using ValueOf[V]): Mat[N, V] = {
-    if (!this.isFullRank) throw new RuntimeException("Mat is rank deficient.")
+    if (fullRank) {
+      Mat[N, V](QRSolver.solve(QR.values, Rdiag.asNativeArray, B.values))
+    } else throw new RuntimeException("Mat is rank deficient.")
+  }
+}
 
-    // Copy right hand side
-    val nx = B.columns
 
-    // Compute Y = transpose(Q)*B
-    var k:Int = 0; while (k < columns) {
-      var j:Int = 0; while (j < nx) {
-        var s:Double = 0.0
-        var i:Int = k; while (i < rows) {
-          s += QR(i, k) * B(i, j)
-          i += 1
-        }
-        s = -s / QR(k, k)
-        i = k; while (i < rows) { // recycling i
-          B(i, j) += s * QR(i, k)
-          i += 1
-        }
-        j += 1
-      }
-      k += 1
-    }
+object RTQR {
 
-    // Solve R*thatMatrix = Y;
-    k = columns - 1; while (k > -1) { // recycling k
-      var j:Int = 0; while (j < nx) {
-        B(k, j) /= Rdiag(k)
-        j += 1
-      }
-      var i:Int = 0; while (i < k) {
-        j = 0; while (j < nx) {
-          B(i, j) -= B(k, j) * QR(i, k)
-          j += 1
-        }
-        i += 1
-      }
-      k -= 1
-    }
+  def apply(M: RTMat): RTQR = {
+    val temp:(MatrixData, NArray[Double]) = QRSolver(M.values)
+    new RTQR(RTMat(temp._1), RTVec(temp._2))
+  }
 
-    B.subMatrix[N, V](0, 0)
+}
+
+/**
+ * QR Decomposition, computed by Householder reflections.
+ * Structure to access R and the Householder vectors and compute Q.
+ *
+ * @param QR
+ * @param Rdiag
+ * @param x$3
+ * @param x$4
+ * @tparam M
+ * @tparam N
+ */
+
+class RTQR private (val QR: RTMat, val Rdiag: RTVec){
+
+  dimensionCheck(QR.columnDimension, Rdiag.dimension)
+
+  val rows:Int = QR.rowDimension
+  val columns:Int = QR.columnDimension
+
+  /** Is the matrix full rank?
+   *
+   * @return true if R, and hence A, has full rank.
+   */
+  lazy val fullRank: Boolean = QRSolver.fullRank(Rdiag.asNativeArray)
+
+  /** Return the Householder vectors
+   *
+   * @return Lower trapezoidal matrix whose columns define the reflections
+   */
+  lazy val H: RTMat = RTMat(QRSolver.H(QR.values))
+
+  /** Return the upper triangular factor
+   *
+   * @return R [NxN]
+   */
+  lazy val R: RTMat = RTMat(QRSolver.R(QR.values, Rdiag.asNativeArray))
+
+  /** Generate and return the (economy-sized) orthogonal factor
+   *
+   * @return Q
+   */
+  lazy val Q: RTMat = RTMat(QRSolver.Q(QR.values))
+
+  /** Least squares solution of A*X = B
+   *
+   * @param B A Mat with as many rows as A and any number of columns.
+   * @return X that minimizes the two norm of Q*R*X-B.
+   * @throws IllegalArgumentException  Mat row dimensions must agree.
+   * @throws RuntimeException  Mat is rank deficient.
+   */
+  def solve(B: RTMat): RTMat = {
+    dimensionCheck(columns, B.rowDimension)
+    if (fullRank) RTMat(QRSolver.solve(QR.values, Rdiag.asNativeArray, B.values))
+    else throw new RuntimeException("Mat is rank deficient.")
   }
 
 }

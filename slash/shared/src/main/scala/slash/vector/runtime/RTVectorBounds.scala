@@ -14,26 +14,31 @@
  * limitations under the License.
  */
 
-package slash.vector
+package slash.vector.runtime
 
 import slash.*
-import Vec.*
 
-case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
-  lazy val dimension:Int = valueOf[N]
-  lazy val center:Vec[N] = (min + MAX) / 2.0
+case class RTVectorBounds(min: RTVec, MAX: RTVec) {
+
+  require(min.dimension == MAX.dimension, s"min and MAX vectors of RTVectorBounds must have equal dimensions.")
+
+  lazy val dimension:Int = min.dimension
+  lazy val center:RTVec = (min + MAX) / 2.0
   lazy val boundingRadius:Double = Math.max(min.magnitude, MAX.magnitude)
 
-  def contains(v: Vec[N]):Boolean = {
+  def contains(v: RTVec):Boolean = {
+    dimensionCheck(dimension, v.dimension)
     var o:Boolean = true
-    var i:Int = 0; while(o && i < min.dimension) {
+    var i:Int = 0
+    while(o && i < min.dimension) {
       o = min(i) <= v(i) && v(i) <= MAX(i)
       i += 1
     }
     o
   }
 
-  def minEuclidianDistanceSquaredTo(v: Vec[N]): Double = {
+  def minEuclidianDistanceSquaredTo(v: RTVec): Double = {
+    dimensionCheck(dimension, v.dimension)
     var sumOfSquares:Double = 0
     var i: Int = 0
     while (i < min.dimension) {
@@ -43,18 +48,18 @@ case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
     sumOfSquares
   }
 
-  def minEuclidianDistanceTo(v: Vec[N]): Double = Math.sqrt(minEuclidianDistanceSquaredTo(v))
+  def minEuclidianDistanceTo(v: RTVec): Double = Math.sqrt(minEuclidianDistanceSquaredTo(v))
 
   import slash.Random.*
 
-  def random(r: scala.util.Random = Random.defaultRandom):Vec[N] = r.between[N](min, MAX)
+  def random(r: scala.util.Random = Random.defaultRandom):RTVec = r.between(min, MAX)
 
   /**
-   * Determines if this VectorBounds intersects another VectorBounds.
-   * @param that another VectorBounds.
-   * @return true if this VectorBounds intersects that VectorBounds.
+   * Determines if this RTVectorBounds intersects another RTVectorBounds.
+   * @param that another RTVectorBounds.
+   * @return true if this RTVectorBounds intersects that RTVectorBounds.
    */
-  def intersects(that: VectorBounds[N]): Boolean = {
+  def intersects(that: RTVectorBounds): Boolean = {
     var overlaps: Boolean = true
     var i: Int = 0
     while (overlaps && i < min.dimension) {
@@ -65,12 +70,12 @@ case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
   }
 
   /**
-   * Determines if the given sphere intersects this VectorBounds.
+   * Determines if the given sphere intersects this RTVectorBounds.
    * @param v the center vector of the sphere.
    * @param radiusSquared the radius of the sphere.
-   * @return true if this VectorBounds intersects the sphere.
+   * @return true if this RTVectorBounds intersects the sphere.
    */
-  def intersectsSphere(v: Vec[N], radiusSquared: Double): Boolean = {
+  def intersectsSphere(v: RTVec, radiusSquared: Double): Boolean = {
     var distSquared = 0.0
 
     var i: Int = 0
@@ -79,22 +84,13 @@ case class VectorBounds[N <: Int](min: Vec[N], MAX: Vec[N])(using ValueOf[N]) {
       else if (v(i) > MAX(i)) distSquared += squareInPlace(v(i) - MAX(i))
       i = i + 1
     }
-    
+
     distSquared <= radiusSquared
   }
 
-  def copy:VectorBounds[N] = VectorBounds[N](min.copy, MAX.copy)
+  def copy:RTVectorBounds = RTVectorBounds(min.copy, MAX.copy)
 
-  override def toString: String = s"VectorBounds[$dimension](\n  ${min.show},\n  ${MAX.show}\n)"
+  override def toString: String = s"RTVectorBounds(\n dimension = $dimension\n  ${min.show},\n  ${MAX.show}\n)"
 
-  // Grok 2.0 suggests adding these methods:
-
-  /*
-maxDistanceTo(Vector point)
-intersects(VectorBounds other)
-intersectsLine(Vector start, Vector end)
-union(VectorBounds other)
-intersection(VectorBounds other)
-   */
 
 }

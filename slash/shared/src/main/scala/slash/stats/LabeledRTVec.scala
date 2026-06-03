@@ -16,20 +16,20 @@
 
 package slash.stats
 
-import slash.vector.*
+import slash.vector.runtime.*
 
-trait LabeledVec[N <: Int] {
+trait LabeledRTVec {
   def label: Double
-  def vector: Vec[N]
+  def vector: RTVec
   def y:Double = label
-  def x: Vec[N] = vector
+  def x: RTVec = vector
 }
 
-case class SimpleLabeledVector[N <: Int](override val label: Double, override val vector: Vec[N]) extends LabeledVec[N] {
+case class SimpleLabeledRTVector(override val label: Double, override val vector: RTVec) extends LabeledRTVec {
   override def toString: String = s"SimpleLabeledVec[${vector.dimension}]($label, ${vector.render()})"
 
 }
 
-case class ContextualLabeledVector[N <: Int, T](override val label: Double, override val vector:Vec[N], context:T) extends LabeledVec[N] {
-  override def toString: String = s"ContextualLabeledVec[${vector.dimension}]($label, ${vector.render()})"
+case class ContextualLabeledRTVector[T](override val label: Double, override val vector:RTVec, context:T) extends LabeledRTVec {
+  override def toString: String = s"ContextualLabeledRTVector[${vector.dimension}]($label, ${vector.render()})"
 }

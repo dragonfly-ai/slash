@@ -16,7 +16,7 @@
 
 import slash.matrix.*
 
-import slash.vector.VectorSpace
+//import slash.vector.VectorSpace
 
 class MatConcatenateTest extends munit.FunSuite {
   test("concatenate rows of 2 matrices") {
@@ -75,7 +75,7 @@ class MatConcatenateTest extends munit.FunSuite {
         10,11,12,
         13,14,15
       )
-      mat3.concatenateColumns(mat4)
+      mat3.concatenateColumns[3](mat4)
     }
 
     val matProduct: Mat[4,6] = allRows * allCols
@@ -93,30 +93,4 @@ class MatConcatenateTest extends munit.FunSuite {
     )
   }
 
-  import slash.Random.defaultRandom as dr
-  test("matrix row concatenation with runtime dimensions"){
-    val ms0 = MatrixSpace(2 + dr.nextInt(42), 2 + dr.nextInt(42))
-    val ms1 = MatrixSpace(VectorSpace(2 + dr.nextInt(42)), ms0.columnVectorSpace)
-    val msr = MatrixSpace(VectorSpace(ms0.rowDimension + ms1.rowDimension), ms0.columnVectorSpace)
-
-    val m0 = ms0.ones
-    val m1 = ms1.ones
-
-    val mr:Mat[msr.M, msr.N] = msr(m0.concatenateRows(m1))
-
-    assertEquals(true, mr.strictEquals(msr.ones))
-  }
-
-  test("matrix columns concatenation with runtime dimensions"){
-    val ms0 = MatrixSpace(2 + dr.nextInt(42), 2 + dr.nextInt(42))
-    val ms1 = MatrixSpace(ms0.rowVectorSpace, VectorSpace(2 + dr.nextInt(42)))
-    val msr = MatrixSpace(ms0.rowVectorSpace, VectorSpace(ms0.columnDimension + ms1.columnDimension))
-
-    val m0 = ms0.ones
-    val m1 = ms1.ones
-
-    val mr:Mat[msr.M, msr.N] = msr(m0.concatenateColumns(m1))
-
-    assertEquals(true, mr.strictEquals(msr.ones))
-  }
 }

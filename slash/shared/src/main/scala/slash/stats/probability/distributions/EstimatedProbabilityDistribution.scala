@@ -16,9 +16,7 @@
 
 package slash.stats.probability.distributions
 
-import scala.reflect.ClassTag
-
-trait EstimatedProbabilityDistribution[DOMAIN:ClassTag, PPD <: ParametricProbabilityDistribution[DOMAIN]] extends ProbabilityDistribution[DOMAIN] with SampledPointStatistics[DOMAIN] {
+trait EstimatedProbabilityDistribution[DOMAIN, PPD <: ParametricProbabilityDistribution[DOMAIN]] extends ProbabilityDistribution[DOMAIN] with SampledPointStatistics[DOMAIN] {
 
   val idealized: PPD
 

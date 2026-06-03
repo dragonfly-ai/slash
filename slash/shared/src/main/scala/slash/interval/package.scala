@@ -45,13 +45,13 @@ package object interval {
 
   def `()`(min: Float, MAX: Float): FloatInterval = FloatInterval(OPEN, min, MAX)
 
-  def `[]`(min: Double, MAX: Double): ContinuousInterval = ContinuousInterval(CLOSED, min, MAX)
+  def `[]`(min: Double, MAX: Double): DoubleInterval = DoubleInterval(CLOSED, min, MAX)
 
-  def `(]`(min: Double, MAX: Double): ContinuousInterval = ContinuousInterval(RIGHT_CLOSED, min, MAX)
+  def `(]`(min: Double, MAX: Double): DoubleInterval = DoubleInterval(RIGHT_CLOSED, min, MAX)
 
-  def `[)`(min: Double, MAX: Double): ContinuousInterval = ContinuousInterval(LEFT_CLOSED, min, MAX)
+  def `[)`(min: Double, MAX: Double): DoubleInterval = DoubleInterval(LEFT_CLOSED, min, MAX)
 
-  def `()`(min: Double, MAX: Double): ContinuousInterval = ContinuousInterval(OPEN, min, MAX)
+  def `()`(min: Double, MAX: Double): DoubleInterval = DoubleInterval(OPEN, min, MAX)
 
   transparent inline def `[]`[DOMAIN](min: DOMAIN, MAX: DOMAIN): Interval[DOMAIN] = of[DOMAIN](CLOSED, min, MAX)
 
@@ -61,14 +61,37 @@ package object interval {
 
   transparent inline def `()`[DOMAIN](min: DOMAIN, MAX: DOMAIN): Interval[DOMAIN] = of[DOMAIN](OPEN, min, MAX)
 
-  transparent inline def of[DOMAIN](code: Int, min: DOMAIN, MAX: DOMAIN): Interval[DOMAIN] = inline min match {
-    //    case _: Byte => `[]`(min.asInstanceOf[Byte], MAX.asInstanceOf[Byte]).asInstanceOf[Interval[DOMAIN]]
-    //    case _: Short => `[]`(min.asInstanceOf[Short], MAX.asInstanceOf[Short]).asInstanceOf[Interval[DOMAIN]]
-    case _: Int => `[]`(min.asInstanceOf[Int], MAX.asInstanceOf[Int]).asInstanceOf[Interval[DOMAIN]]
-    case _: Long => `[]`(min.asInstanceOf[Long], MAX.asInstanceOf[Long]).asInstanceOf[Interval[DOMAIN]]
-    case _: Float => `[]`(min.asInstanceOf[Float], MAX.asInstanceOf[Float]).asInstanceOf[Interval[DOMAIN]]
-    case _: Double => `[]`(min.asInstanceOf[Double], MAX.asInstanceOf[Double]).asInstanceOf[Interval[DOMAIN]]
-    case a => throw Exception(s"minOf[$a] expects numeric types")
+  transparent inline def of[DOMAIN](code: Int, min: DOMAIN, MAX: DOMAIN): Interval[DOMAIN] = {
+    (code match {
+      case CLOSED => inline min match {
+        case _: Int => `[]`(min.asInstanceOf[Int], MAX.asInstanceOf[Int])
+        case _: Long => `[]`(min.asInstanceOf[Long], MAX.asInstanceOf[Long])
+        case _: Float => `[]`(min.asInstanceOf[Float], MAX.asInstanceOf[Float])
+        case _: Double => `[]`(min.asInstanceOf[Double], MAX.asInstanceOf[Double])
+        case a => throw Exception(s"minOf[$a] expects numeric types {Int, Long, Float, Double}")
+      }
+      case RIGHT_CLOSED => inline min match {
+        case _: Int => `(]`(min.asInstanceOf[Int], MAX.asInstanceOf[Int])
+        case _: Long => `(]`(min.asInstanceOf[Long], MAX.asInstanceOf[Long])
+        case _: Float => `(]`(min.asInstanceOf[Float], MAX.asInstanceOf[Float])
+        case _: Double => `(]`(min.asInstanceOf[Double], MAX.asInstanceOf[Double])
+        case a => throw Exception(s"minOf[$a] expects numeric types {Int, Long, Float, Double}")
+      }
+      case LEFT_CLOSED => inline min match {
+        case _: Int => `[)`(min.asInstanceOf[Int], MAX.asInstanceOf[Int])
+        case _: Long => `[)`(min.asInstanceOf[Long], MAX.asInstanceOf[Long])
+        case _: Float => `[)`(min.asInstanceOf[Float], MAX.asInstanceOf[Float])
+        case _: Double => `[)`(min.asInstanceOf[Double], MAX.asInstanceOf[Double])
+        case a => throw Exception(s"minOf[$a] expects numeric types {Int, Long, Float, Double}")
+      }
+      case OPEN => inline min match {
+        case _: Int => `()`(min.asInstanceOf[Int], MAX.asInstanceOf[Int])
+        case _: Long => `()`(min.asInstanceOf[Long], MAX.asInstanceOf[Long])
+        case _: Float => `()`(min.asInstanceOf[Float], MAX.asInstanceOf[Float])
+        case _: Double => `()`(min.asInstanceOf[Double], MAX.asInstanceOf[Double])
+        case a => throw Exception(s"minOf[$a] expects numeric types {Int, Long, Float, Double}")
+      }
+    }).asInstanceOf[Interval[DOMAIN]]
   }
 
   /**

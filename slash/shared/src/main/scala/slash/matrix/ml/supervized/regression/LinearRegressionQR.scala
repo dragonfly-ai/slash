@@ -16,9 +16,13 @@
 
 package slash.matrix.ml.supervized.regression
 
-import slash.matrix.decomposition.QR
+import slash.matrix.decomposition.{QR, RTQR}
 import slash.matrix.*
+
 class LinearRegressionQR[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]) extends LinearRegression[M, N] {
   override def estimateBeta(X: Mat[M, N], Y: Mat[M, 1]): Mat[N, 1] = QR[M, N](X).solve(Y)
+}
 
+class RTLinearRegressionQR extends RTLinearRegression {
+  override def estimateBeta(X: RTMat, Y: RTMat): RTMat = RTQR(X).solve(Y)
 }

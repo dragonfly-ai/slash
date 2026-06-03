@@ -15,6 +15,7 @@
  */
 
 import slash.accumulation.{ContinuousAccumulator, DiscreteAccumulator}
+import slash.squareInPlace
 
 class AccumulatorTest extends munit.FunSuite {
 
@@ -33,33 +34,88 @@ class AccumulatorTest extends munit.FunSuite {
     assertEquals(bi, da.total)
   }
 
+//  Previous results:  Accumulator runs 7 times slower than Double, but hundreds of times faster than BigDecimal.
+//  63640000000: BigDecimal time
+//  221999872: Accumulator time
+//  24000000: Double time
+//
+//  test("ContinuousAccumulator speed tests") {
+//    var bd: BigDecimal = BigDecimal(0.0)
+//    var i: Int = 0
+//    var start:Long = System.nanoTime()
+//    while (i < 1000000) {
+//      bd += BigDecimal(Double.MinPositiveValue)
+//      bd += BigDecimal(Math.random())
+//      i += 1
+//    }
+//    var end = System.nanoTime() - start
+//    println(s"$end: BigDecimal time")
+//    start = System.nanoTime()
+//    val ca: ContinuousAccumulator = ContinuousAccumulator()
+//    i = 0
+//    while (i < 1000000) {
+//      ca += Double.MinPositiveValue
+//      ca += Math.random() //Double.MaxValue
+//      i += 1
+//    }
+//    end = System.nanoTime() - start
+//    println(s"$end: Accumulator time")
+//    start = System.nanoTime()
+//    var d: Double = 0.0
+//    i = 0
+//    while (i < 1000000) {
+//      d += Double.MinPositiveValue
+//      d += Math.random() //Double.MaxValue
+//      i += 1
+//    }
+//    end = System.nanoTime() - start
+//    println(s"$end: Double time")
+//    println(s"Comparisons: \n\t$bd: BigDecimal\n\t${ca.total}: Accumulator\n\t$d: Double")
+//  }
+
   test("ContinuousAccumulator") {
     var bd: BigDecimal = BigDecimal(0.0)
     val ca: ContinuousAccumulator = ContinuousAccumulator()
-    var i: Int = 0; while (i < 1) {
-      bd += BigDecimal(Double.MinPositiveValue)
-      bd += BigDecimal(Double.MaxValue)
-      ca += Double.MinPositiveValue
-      ca += Double.MaxValue //Double.MaxValue
+    var d:Double = 0.0
+    var i: Int = 0; while (i < 1000) {
+      val rd:Double = Math.random() - 0.5
+      val ri:Int = slash.Random.defaultRandom.nextInt()
+      //bd += BigDecimal(Double.MinPositiveValue)
+      bd += BigDecimal(ri)
+      bd += BigDecimal(rd)
+      ca += ri
+      ca += rd
+      d += ri
+      d += rd
       i += 1
     }
 //    println(bd remainder BigDecimal(1.0))
 //    println(ca.total remainder BigDecimal(1.0))
-//    println(bd)
-//    println(ca.total)
-    assertEquals(bd, ca.total)
+
+//    println(s"$bd : BigDecimal")
+//    println(s"${ca.total} : Accumulator")
+//    println(s"$d : Double")
+
+//    println(s"${bd.toDouble} : BigDecimal")
+//    println(s"${ca.total.toDouble} : Accumulator")
+//    println(s"$d : Double")
+
+    assertEquals(ca.total.toDouble, bd.toDouble)
+
+    // accumulator result should be closer to the BigDecimal than the plain Double
+    assert(squareInPlace(bd - ca.total) <= squareInPlace(bd - d))
 
 //    println(s"sum ${bd + bd}, ${(ca + bd).total}")
-    assertEquals(bd + bd, (ca + bd).total)
+    assertEquals((bd + bd).toDouble, (ca + ca).total.toDouble)
 
 //    println(s"product ${bd * bd}, ${(ca * ca).total}")
-    assertEquals(bd * bd, (ca * ca).total)
+    assertEquals((bd * bd).toDouble, (ca * ca).total.toDouble)
 
 //    println(s"quotient ${bd / bd}, ${(ca / ca).total}")
-    assertEquals(bd / bd, (ca / ca).total)
+    assertEquals((bd / bd).toDouble, (ca / ca).total.toDouble)
 
 //    println(s"quotient ${bd / BigDecimal(2.0)}, ${(ca / (ContinuousAccumulator() + BigDecimal(2.0))).total}")
-    assertEquals(bd / BigDecimal(2.0), (ca / (ContinuousAccumulator() + BigDecimal(2.0))).total)
+    assertEquals((bd / BigDecimal(2.0)).toDouble, (ca / (ContinuousAccumulator() + BigDecimal(2.0))).total.toDouble)
 
   }
 

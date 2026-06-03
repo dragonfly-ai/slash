@@ -19,7 +19,7 @@ object Eigen extends Verification {
     println(s"\tComparing Imaginary Eigen Values: ${Verification.arrayCompare(jed.getImagEigenvalues(), med.imaginaryEigenvalues.asInstanceOf[Array[Double]])}")
 
     println(s"\tComparing V : ${Verification.matrixCompare(jed.getV, med.Q)}")
-    println(s"\tComparing D : ${Verification.matrixCompare(jed.getD, med.Λ)}")
+    println(s"\tComparing D : ${Verification.matrixCompare(jed.getD, med.blockDiagonalEigenvalueMatrix)}")
 
   }
 }

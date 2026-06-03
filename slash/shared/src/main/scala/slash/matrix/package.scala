@@ -16,10 +16,9 @@
 
 package slash
 
-import narr.*
-
 import slash.vector.*
 import slash.matrix.decomposition.*
+import slash.exceptions.CannotLinearizeMatrixData
 
 import scala.compiletime.ops.int.*
 import scala.compiletime.ops.any.==
@@ -28,8 +27,8 @@ import scala.compiletime.ops.boolean.||
 package object matrix {
 
   extension[N <: Int] (thisVector: Vec[N])(using ValueOf[N]) {
-    inline def asRowMatrix: Mat[1, N] = Mat[1, N](thisVector.asInstanceOf[NArray[Double]])
-    inline def asColumnMatrix: Mat[N, 1] = Mat[N, 1](thisVector.asInstanceOf[NArray[Double]])
+    inline def asRowMatrix: Mat[1, N] = Mat[1, N](thisVector.asNativeArray)
+    inline def asColumnMatrix: Mat[N, 1] = Mat[N, 1](thisVector.asNativeArray)
 
     def times [M <: Int](thatMatrix: Mat[N, M])(using ValueOf[M]): Mat[1, M] = asRowMatrix * thatMatrix
     inline def * [M <: Int](thatMatrix: Mat[N, M])(using ValueOf[M]): Mat[1, M] = times(thatMatrix)
@@ -39,26 +38,28 @@ package object matrix {
    * Support left add / multiply by Scalars
    */
   extension(s: Double) {
-    inline def +[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.addScalar(s)
+    inline def +[M <: Int, N <: Int](inline m: Mat[M,N]): Mat[M,N] = m + s
 //  inline def *[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.times(s)
   }
 
   /**
    * Extension methods for all matrices.
    */
-  extension[M <: Int, N <: Int](a: Mat[M, N])(using ValueOf[M], ValueOf[N]) {
+  extension[M <: Int, N <: Int](a: Mat[M, N]) {
 
-    /** cast matrix as Mat[R,C]
-    *
-    * @param R new vertical dimension
-    * @param C new horizontal dimension
-    * @return same values, but recast to RxC
-    */
-    def reshape[R <: Int, C <: Int](using ValueOf[R], ValueOf[C]): Mat[R,C] = new Mat[R,C](a.values)
+//    /** cast matrix as Mat[R,C]
+//    *
+//    * @param R new vertical dimension
+//    * @param C new horizontal dimension
+//    * @return same values, but recast to RxC
+//    */
+//    def reshape[R <: Int, C <: Int](using ValueOf[R], ValueOf[C]): Mat[R,C] = Mat[R,C](a.values)
 
     /** values as a Vector.
+     * @throws CannotLinearizeMatrixData
      */
-    def flatten: Vec[M*N] = a.values.asInstanceOf[Vec[M*N]]
+    def flatten: Vec[M*N] = a.values.flatten.asInstanceOf[Vec[M * N]]
+
   }
 
   /**
@@ -94,7 +95,7 @@ package object matrix {
   /**
    * Extension methods for rectangular matrices.
    */
-  extension[M <: Int, N <: Int](a: Mat[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M, N]], (N =:= M) =:= false) {
+  extension[M <: Int, N <: Int](a: Mat[M, N])(using ValueOf[M], ValueOf[N], (N =:= M) =:= false) {
     /** Solve a * x = b
      *
      * @param b right hand side
@@ -106,7 +107,7 @@ package object matrix {
    * Extension methods for rectangular matrices where M > N.
    */
 
-  extension[M <: Int, N <: Int](m: Mat[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M, N]], M >= N =:= true) {
+  extension[M <: Int, N <: Int](m: Mat[M, N])(using ValueOf[M], ValueOf[N], M >= N =:= true) {
     /** Solve b * m = I[N, N]
      * m = Mat[M, N] with M > N and Rank = N, has a left inverse b = Mat[N, M] such that b * m = I[N, N]
      * @return b = Mat[N, M] the Left Inverse of Mat m.
@@ -141,18 +142,24 @@ package object matrix {
    * Extension methods for rectangular matrices where M < N.
    */
 
-  extension[M <: Int, N <: Int](m: Mat[M, N])(using ValueOf[M], ValueOf[N], ValueOf[Min[M, N]], N > M =:= true) {
+  extension[M <: Int, N <: Int](m: Mat[M, N])(using ValueOf[M], ValueOf[N], N > M =:= true) {
     /**
      * m = Mat[M, N] with M < N and Rank = M, has a right inverse b = Mat[N, M] such that m * b = Identity[M, M]
      * @return the Right Inverse of Mat a.
      */
-    def rightInverse(using ValueOf[Min[M, M]]): Mat[N, M] = QR[M, N](m).solve(Mat.identity[M, M])
+    def rightInverse: Mat[N, M] = QR[M, N](m).solve(Mat.identity[M, M])
 
   }
 
   extension[M <: Int, N <: Int](m: Mat[M, N])(using (M == 1 || N == 1) =:= true) {
-    def asVector: Vec[M*N] = m.values.asInstanceOf[Vec[M*N]]
-    inline def copyAsVector[MN <: Int](using MN == (M * N) =:= true): Vec[MN] = narr.copy[Double](m.values).asInstanceOf[Vec[MN]]
+    def asVector: Vec[M*N] = {
+      if (m.values.linearizeable) m.values.rowPackedNArray.asInstanceOf[Vec[M*N]]
+      else throw CannotLinearizeMatrixData(m.rows, m.columns)
+    }
+    inline def copyAsVector[MN <: Int](using MN == (M * N) =:= true): Vec[MN] = {
+      if (m.values.linearizeable) m.values.rowPackedNArray.asInstanceOf[Vec[MN]]
+      else throw CannotLinearizeMatrixData(m.rows, m.columns)
+    }
   }
 
   /*
@@ -161,8 +168,30 @@ package object matrix {
   extension(m: Mat[? <: Int,? <: Int]) {
     def cast[M <: Int, N <: Int](using ValueOf[M], ValueOf[N]): Mat[M,N] = {
       assert(valueOf[M] == m.rows && valueOf[N] == m.columns)
-      Mat[M,N](m.values)
+      //Mat[M,N](m.values)
+      m.asInstanceOf[Mat[M,N]]
     }
+  }
+
+  // RTMat and RTVec
+
+  extension (thisVector: runtime.RTVec) {
+    inline def asRowMatrix: RTMat = RTMat(1, thisVector.dimension, thisVector.asNativeArray)
+    inline def asColumnMatrix: RTMat = RTMat(thisVector.dimension, 1, thisVector.asNativeArray)
+
+    def times [M <: Int](thatMatrix: RTMat): RTMat = {
+      dimensionCheck(thisVector.dimension, thatMatrix.rowDimension)
+      asRowMatrix * thatMatrix
+    }
+    inline def * [M <: Int](thatMatrix: RTMat): RTMat = times(thatMatrix)
+  }
+
+  /**
+   * Support left add / multiply by Scalars
+   */
+  extension(s: Double) {
+    inline def + (inline m: RTMat): RTMat = m + s
+    //  inline def *[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.times(s)
   }
 
 }

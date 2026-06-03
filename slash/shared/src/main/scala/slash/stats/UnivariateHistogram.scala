@@ -64,7 +64,7 @@ trait UnivariateHistogram[DOMAIN](using `#`: Numeric[DOMAIN]) {
   )
 
   override def toString: String = {
-    val capBlocks: Array[String] = Array[String](" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█" )  //
+    val capBlocks: Array[String] = Array[String](" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█")
 
     var maxBinMass:Double = Double.MinValue
 

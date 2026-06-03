@@ -10,7 +10,7 @@ object MatrixMethods extends Verification {
     println("Comparing ...")
     println(s"\t- matrices : ${Verification.matrixCompare(j, m)}")
     println(s"\t- rowPackedCopy : ${Verification.arrayCompare(j.getRowPackedCopy, m.values)}")
-    println(s"\t- columnPackedCopy : ${Verification.arrayCompare(j.getColumnPackedCopy, m.columnPackedArray)}")
+    println(s"\t- columnPackedCopy : ${Verification.arrayCompare(j.getColumnPackedCopy, m.columnPackedNArray)}")
     println(s"\t- columnPackedCopy : ${Verification.arrayCompare2D(j.getArray, m.rowVectors.asInstanceOf[Array[Array[Double]]])}")
     println(s"\t- transpose : ${Verification.matrixCompare(j.transpose(), m.transpose)}")
     println(s"\t- norm1 : ${j.norm1() == m.norm1}")

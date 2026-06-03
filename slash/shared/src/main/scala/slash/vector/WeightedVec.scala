@@ -28,3 +28,14 @@ case class WeightedVec[N <: Int](unweighted: Vec[N], private var w: Double = 0.0
 
   override def toString: String = s"WeightedVector($weight, ${unweighted.render()})"
 }
+
+case class WeightedRTVec(unweighted: runtime.RTVec, private var w: Double = 0.0) {
+  def weight:Double = w
+  def addWeight(w1: Double): WeightedRTVec = {
+    w = w + w1
+    this
+  }
+  def weighted: runtime.RTVec = unweighted * weight
+
+  override def toString: String = s"WeightedRTVec($weight, ${unweighted.render()})"
+}

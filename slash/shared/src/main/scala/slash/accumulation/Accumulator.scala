@@ -288,12 +288,14 @@ class ContinuousAccumulator private (
   }
 
   inline def +=(f: Float): Unit = this += f.toDouble
+
   def += (d: Double): Unit = {
 
     // split discrete and fractional parts
-    if (d < LongCutOff && d > -LongCutOff) {
-      discrete += d.toLong // discrete
-      addToSmall(d % 1.0) // fractional
+    if (-LongCutOff < d && d < LongCutOff) {
+      val whole = d.toLong
+      discrete += whole // discrete
+      addToSmall(d - whole) // fractional
     } else {
       // This d value already probably suffers from precision loss.
       this += BigDecimal(d)

@@ -16,28 +16,16 @@
 
 package slash.matrix.decomposition
 
+import slash.dimensionCheck
 import slash.matrix.*
 import slash.exceptions.*
 
-object Cholesky {
+object CholeskySolver {
 
-  /** Cholesky Decomposition.
-   * <P>
-   * For a symmetric, positive definite matrix A, the Cholesky decomposition
-   * is an lower triangular matrix L so that A = L*L'.
-   */
-  /** Cholesky algorithm for symmetric and positive definite matrix.
-   * Structure to access L and isspd flag.
-   *
-   * @param m a square, symmetric, positive definite matrix.
-   * @throws MatrixNotSymmetricPositiveDefinite exception if m is not a square, symmetric, positive definite matrix.
-   */
-
-  def apply[N <: Int](m:Mat[N, N])(using ValueOf[N]):Cholesky[N] = {
+  def computeL(n:Int, m:MatrixData):MatrixData = {
     // Initialize.
     val A = m.copy
-    val n = A.rows
-    val L = Mat.zeros[N, N]
+    val L = MatrixData(n, n)
     var isspd:Boolean = true
     // Main loop.
     var j:Int = 0; while (j < n) {
@@ -67,53 +55,110 @@ object Cholesky {
       }
       j += 1
     }
-    if (isspd) new Cholesky[N](L)
-    else throw MatrixNotSymmetricPositiveDefinite[N, N](m)
+    if (isspd) L
+    else throw MatrixNotSymmetricPositiveDefinite(n, n)
   }
-}
 
-class Cholesky[N <: Int] private(val L: Mat[N, N])(using ValueOf[N]) {
-
-  val mn:Int = valueOf[N]
 
   /** Solve A*X = B
-    *
-    * @param  B A Mat with as many rows as A and any number of columns.
-    * @return X so that L*L'*X = B
-    * @throws IllegalArgumentException  Mat row dimensions must agree.
-    * @throws RuntimeException  Mat is not symmetric positive definite.
-    */
-  def solve[V <: Int](B: Mat[N, V])(using ValueOf[V]): Mat[N, V] = {
+   *
+   * @param B A Mat with as many rows as A and any number of columns.
+   * @return X so that L*L'*X = B
+   * @throws IllegalArgumentException Mat row dimensions must agree.
+   * @throws RuntimeException         Mat is not symmetric positive definite.
+   */
+  def solve(mn:Int, lValues:MatrixData, bColumns:Int, bValues: MatrixData): MatrixData = {
 
     // Copy right hand side.
-    val X: Mat[N, V] = B.copy
-    val nx: Int = B.columns
+    val X: MatrixData = bValues.copy
+    val nx: Int = bColumns
     // Solve L*Y = B;
-    var k:Int = 0; while (k < mn) {
-      var j:Int = 0; while (j < nx) {
-        var i:Int = 0; while (i < k) {
-          X(k, j) = X(k, j) - X(i, j) * L(k, i)
+    var k: Int = 0;
+    while (k < mn) {
+      var j: Int = 0;
+      while (j < nx) {
+        var i: Int = 0;
+        while (i < k) {
+          X(k, j) = X(k, j) - X(i, j) * lValues(k, i)
           i += 1
         }
-        X(k, j) = X(k, j) / L(k, k)
+        X(k, j) = X(k, j) / lValues(k, k)
         j += 1
       }
       k += 1
     }
     // Solve L'*thatMatrix = Y;
-    k = mn - 1; while  (k > -1) { // recycling k
-      var j:Int = 0; while (j < nx) {
-        var i:Int = k + 1; while (i < mn) {
-          X(k, j) = X(k, j) - X(i, j) * L(i, k)
+    k = mn - 1;
+    while (k > -1) { // recycling k
+      var j: Int = 0;
+      while (j < nx) {
+        var i: Int = k + 1;
+        while (i < mn) {
+          X(k, j) = X(k, j) - X(i, j) * lValues(i, k)
           i += 1
         }
-        X(k, j) = X(k, j) / L(k, k)
+        X(k, j) = X(k, j) / lValues(k, k)
         j += 1
       }
       k -= 1
     }
     X
   }
-
 }
 
+object Cholesky {
+
+  /** Cholesky Decomposition.
+   * <P>
+   * For a symmetric, positive definite matrix A, the Cholesky decomposition
+   * is a lower triangular matrix L so that A = L*L'.
+   */
+  /** Cholesky algorithm for symmetric and positive definite matrix.
+   * Structure to access L and isspd flag.
+   *
+   * @param m a square, symmetric, positive definite matrix.
+   * @throws MatrixNotSymmetricPositiveDefinite exception if m is not a square, symmetric, positive definite matrix.
+   */
+
+  def apply[N <: Int](m:Mat[N, N])(using ValueOf[N]):Cholesky[N] = new Cholesky[N](
+    Mat[N,N](
+      CholeskySolver.computeL(valueOf[N], m.values)
+    )
+  )
+}
+
+object RTCholesky {
+
+  def apply(m: RTMat): RTCholesky = new RTCholesky(
+    RTMat(
+      CholeskySolver.computeL(m.rowDimension, m.values)
+    )
+  )
+}
+
+class RTCholesky private (val L: RTMat) {
+  dimensionCheck(L.rowDimension, L.columnDimension)
+
+  val mn:Int = L.rowDimension
+
+  def solve(B: RTMat): RTMat = {
+    dimensionCheck(mn, B.rowDimension)
+    RTMat(CholeskySolver.solve(mn, L.values, B.columnDimension, B.values))
+  }
+}
+
+class Cholesky[N <: Int] private (val L: Mat[N, N])(using ValueOf[N]) {
+
+  val mn:Int = valueOf[N]
+
+  /** Solve A*X = B
+   *
+   * @param  B A Mat with as many rows as A and any number of columns.
+   * @return X so that L*L'*X = B
+   * @throws IllegalArgumentException  Mat row dimensions must agree.
+   * @throws RuntimeException  Mat is not symmetric positive definite.
+   */
+  def solve[V <: Int](B: Mat[N, V])(using ValueOf[V]): Mat[N, V] = Mat[N, V](
+    CholeskySolver.solve(mn, L.values, B.columnDimension, B.values )
+  )
+}

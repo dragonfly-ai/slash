@@ -19,6 +19,20 @@ import slash.matrix.*
 
 class MatExtensionsTest extends munit.FunSuite {
 
+  val m3x3: Mat[3,3] = Mat[3,3](
+    1.0, 2.0, 3.0,
+    4.0, 5.0, 6.0,
+    7.0, 8.0, 9.0
+  )
+
+  test("Mat[3, 3].diagonal") {
+    assertVecEquals(Vec[3](1.0, 5.0, 9.0), m3x3.diagonalVector)
+  }
+
+  test("Mat[3, 3].trace") {
+    assertEquals(15.0, m3x3.trace)
+  }
+
   test("Mat[1, N] -> Vec[N] -> Mat[1, N]") {
     val m1x1:Mat[1,1] = Mat.random[1,1]
     val m1x1Vec:Vec[1] = m1x1.asVector
