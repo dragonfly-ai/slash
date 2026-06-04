@@ -50,7 +50,7 @@ case class LinearRegressionModel[N <: Int](A: Mat[N, 1], mean: Vec[N], bias: Dou
 
 case class RTLinearRegressionModel(A: RTMat, mean: RTVec, bias: Double, standardError: Double, R2: Double) {
 
-  val a: RTVec = A.copy.values.asInstanceOf[RTVec]
+  val a: RTVec = A.values.rowPackedNArray.asInstanceOf[RTVec]
 
   def apply(x: RTVec): Double = (a dot (x - mean)) + bias
 

@@ -525,8 +525,7 @@ class RTMat private (val values: MatrixData) {
   inline def times (v: RTVec): RTVec = util.times(values, v.asNativeArray).asInstanceOf[RTVec]
 
   inline def * (thatMatrix: RTMat): RTMat = {
-    dimensionCheck(rows, thatMatrix.rowDimension)
-    dimensionCheck(columns, thatMatrix.columnDimension)
+    dimensionCheck(columns, thatMatrix.rowDimension)
     times(thatMatrix)
   }
 
