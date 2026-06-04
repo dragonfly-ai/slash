@@ -24,7 +24,7 @@ object Cholesky extends Verification {
 
 //    println(spd.render())
 
-    val sqJCh: CholeskyDecomposition = new CholeskyDecomposition(new Matrix(spd.values, spd.rows))
+    val sqJCh: CholeskyDecomposition = new CholeskyDecomposition(new Matrix(spd.rowVectors.asInstanceOf[Array[Array[Double]]]))
     val sqMCh: matrix.decomposition.Cholesky[11] = matrix.decomposition.Cholesky[11](spd)
 
     println(s"\tComparing L : ${Verification.matrixCompare(sqJCh.getL, sqMCh.L)}")

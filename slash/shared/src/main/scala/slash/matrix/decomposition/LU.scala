@@ -119,7 +119,7 @@ object LUSolver {
   }
 
   def computeU(lu:MatrixData):MatrixData = {
-    val n:Int = lu.rowDimension
+    val n:Int = lu.columnDimension
     val out: MatrixData = MatrixData(n, n)
     var r: Int = 0
     while (r < n) {

@@ -28,6 +28,7 @@ object SV extends Verification {
       println(s"\tComparing V : ${Verification.matrixCompare(msvd.V, jsvd.getV)}")
       println(s"\tComparing S : ${Verification.matrixCompare(msvd.S, jsvd.getS)}")
       println(s"\tComparing U : ${Verification.matrixCompare(msvd.U, jsvd.getU)}")
+      println(s"\tComparing S_inverse : ${Verification.matrixCompare(msvd.S_inverse, jsvd.getS.inverse())}")
 
       println("\n")
 
@@ -43,8 +44,8 @@ object SV extends Verification {
       println(
         s"\tslash Comparing M to USVᵀ: ${
           Verification.arrayCompare(
-            m.values,
-            msvd.U.times(msvd.S).times(msvd.V.transpose).values
+            m.values.rowPackedNArray,
+            msvd.U.times(msvd.S).times(msvd.V.transpose).values.rowPackedNArray
           )
         }"
       )

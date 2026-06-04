@@ -714,7 +714,7 @@ class RTSV private(
    *
    * @return S
    */
-  lazy val S_inverse: RTMat = RTMat.diagonal(SVSolver.sInverse(singularValues.asNativeArray).asInstanceOf[RTVec])
+  lazy val S_inverse: RTMat = RTMat(SVSolver.sInverse(singularValues.asNativeArray))
 
   /** Two norm
    *

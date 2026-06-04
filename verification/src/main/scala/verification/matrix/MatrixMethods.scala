@@ -9,7 +9,7 @@ object MatrixMethods extends Verification {
   def kitchenSink[M <: Int, N <: Int](j:Jama.Matrix, m: Mat[M, N])(using ValueOf[M], ValueOf[N]):Unit = {
     println("Comparing ...")
     println(s"\t- matrices : ${Verification.matrixCompare(j, m)}")
-    println(s"\t- rowPackedCopy : ${Verification.arrayCompare(j.getRowPackedCopy, m.values)}")
+    println(s"\t- rowPackedCopy : ${Verification.arrayCompare(j.getRowPackedCopy, m.values.rowPackedNArray)}")
     println(s"\t- columnPackedCopy : ${Verification.arrayCompare(j.getColumnPackedCopy, m.columnPackedNArray)}")
     println(s"\t- columnPackedCopy : ${Verification.arrayCompare2D(j.getArray, m.rowVectors.asInstanceOf[Array[Array[Double]]])}")
     println(s"\t- transpose : ${Verification.matrixCompare(j.transpose(), m.transpose)}")
