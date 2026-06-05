@@ -25,12 +25,12 @@ class LinearRegressionTest extends munit.FunSuite {
 
   val data = new StaticSupervisedData[6,3](
     NArray[LabeledVec[3]](
-      SimpleLabeledVector[3](3.0 + Math.random() / 1000.0, Vec[3](1.0, 2.0, 3.0) + Vec.random[3](0.001)),
-      SimpleLabeledVector[3](3.0 - Math.random() / 1000.0, Vec[3](1.0, 2.0, 3.0) + Vec.random[3](0.001)),
-      SimpleLabeledVector[3](6.0 + Math.random() / 1000.0, Vec[3](2.0, 4.0, 6.0) + Vec.random[3](0.001)),
-      SimpleLabeledVector[3](6.0 - Math.random() / 1000.0, Vec[3](2.0, 4.0, 6.0) + Vec.random[3](0.001)),
-      SimpleLabeledVector[3](9.0 + Math.random() / 1000.0, Vec[3](3.0, 6.0, 9.0) + Vec.random[3](0.001)),
-      SimpleLabeledVector[3](9.0 - Math.random() / 1000.0, Vec[3](3.0, 6.0, 9.0) + Vec.random[3](0.001)),
+      SimpleLabeledVector[3](3.0 + Math.random() / 10000.0, Vec[3](1.0, 2.0, 3.0) + Vec.random[3](0.0001)),
+      SimpleLabeledVector[3](3.0 - Math.random() / 10000.0, Vec[3](1.0, 2.0, 3.0) + Vec.random[3](0.0001)),
+      SimpleLabeledVector[3](6.0 + Math.random() / 10000.0, Vec[3](2.0, 4.0, 6.0) + Vec.random[3](0.0001)),
+      SimpleLabeledVector[3](6.0 - Math.random() / 10000.0, Vec[3](2.0, 4.0, 6.0) + Vec.random[3](0.0001)),
+      SimpleLabeledVector[3](9.0 + Math.random() / 10000.0, Vec[3](3.0, 6.0, 9.0) + Vec.random[3](0.0001)),
+      SimpleLabeledVector[3](9.0 - Math.random() / 10000.0, Vec[3](3.0, 6.0, 9.0) + Vec.random[3](0.0001)),
     )
   )
 
