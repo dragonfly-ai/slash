@@ -30,7 +30,7 @@ package object matrix {
     inline def asRowMatrix: Mat[1, N] = Mat[1, N](thisVector.asNativeArray)
     inline def asColumnMatrix: Mat[N, 1] = Mat[N, 1](thisVector.asNativeArray)
 
-    def times [M <: Int](thatMatrix: Mat[N, M])(using ValueOf[M]): Mat[1, M] = asRowMatrix * thatMatrix
+    inline def times [M <: Int](thatMatrix: Mat[N, M])(using ValueOf[M]): Mat[1, M] = asRowMatrix * thatMatrix
     inline def * [M <: Int](thatMatrix: Mat[N, M])(using ValueOf[M]): Mat[1, M] = times(thatMatrix)
   }
 
@@ -39,27 +39,7 @@ package object matrix {
    */
   extension(s: Double) {
     inline def +[M <: Int, N <: Int](inline m: Mat[M,N]): Mat[M,N] = m + s
-//  inline def *[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.times(s)
-  }
-
-  /**
-   * Extension methods for all matrices.
-   */
-  extension[M <: Int, N <: Int](a: Mat[M, N]) {
-
-//    /** cast matrix as Mat[R,C]
-//    *
-//    * @param R new vertical dimension
-//    * @param C new horizontal dimension
-//    * @return same values, but recast to RxC
-//    */
-//    def reshape[R <: Int, C <: Int](using ValueOf[R], ValueOf[C]): Mat[R,C] = Mat[R,C](a.values)
-
-    /** values as a Vector.
-     * @throws CannotLinearizeMatrixData
-     */
-    def flatten: Vec[M*N] = a.values.flatten.asInstanceOf[Vec[M * N]]
-
+    inline def *[M <: Int, N <: Int](inline m: Mat[M,N]): Mat[M,N] = m.copy * s
   }
 
   /**
@@ -95,7 +75,7 @@ package object matrix {
   /**
    * Extension methods for rectangular matrices.
    */
-  extension[M <: Int, N <: Int](a: Mat[M, N])(using ValueOf[M], ValueOf[N], (N =:= M) =:= false) {
+  extension[M <: Int, N <: Int](a: Mat[M, N])(using ValueOf[M], ValueOf[N], N =:= M =:= false) {
     /** Solve a * x = b
      *
      * @param b right hand side
@@ -191,7 +171,7 @@ package object matrix {
    */
   extension(s: Double) {
     inline def + (inline m: RTMat): RTMat = m + s
-    //  inline def *[M <: Int, N <: Int](inline m: Mat[M,N])(using ValueOf[M], ValueOf[N]): Mat[M,N] = m.copy.times(s)
+    inline def * (inline m: RTMat): RTMat = m * s
   }
 
 }

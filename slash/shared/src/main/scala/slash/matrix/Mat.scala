@@ -175,25 +175,21 @@ object Mat {
     util.fill(valueOf[M], valueOf[N], 1.0)
   )
 
-  /** Construct a matrix from a one-dimensional packed array
+  /** Construct an MxN matrix from a MatrixData instance.
    *
-   * @param values matrix data.
+   * @param md an instance of MatrixData.
+   * @param x$2 valueOf[M]
+   * @param x$3 valueOf[N]
    * @tparam M the number of rows
    * @tparam N the number of columns
-   * @throws IllegalArgumentException NArray length must equal M * N
-   */
-  /** Construct a matrix from a one-dimensional packed array
-   *
-   * @param values One-dimensional array of doubles, packed by rows.
-   * @tparam M the number of rows
-   * @tparam N the number of columns
+   * @return an MxN matrix.
    * @throws IllegalArgumentException NArray length must equal M * N
    */
   def apply[M <: Int, N <: Int](md: MatrixData)(using ValueOf[M], ValueOf[N]):Mat[M,N] = new Mat[M, N](md)
 
   /** Construct a matrix from a one-dimensional packed array
    *
-   * @param values One-dimensional array of doubles, packed by rows.
+   * @param arr One-dimensional array of doubles, packed by rows.
    * @tparam M the number of rows
    * @tparam N the number of columns
    * @throws IllegalArgumentException NArray length must equal M * N
@@ -285,12 +281,18 @@ class Mat[M <: Int, N <: Int] private (val values: MatrixData)(using ValueOf[M],
     */
   inline def columnDimension: Int = columns
 
+  /** values as a Vector.
+   *
+   * @throws CannotLinearizeMatrixData if the product of the matrix dimensions exceeds maximum array size.
+   */
+  def flatten: Vec[M * N] = values.flatten.asInstanceOf[Vec[M * N]]
+
   /** Get a single element.
     *
     * @param r Row index.
     * @param c Column index.
     * @return A(i,j)
-    * @throws ArrayIndexOutOfBoundsException
+    * @throws ArrayIndexOutOfBoundsException if r, c lie outside the matrix dimensions.
     */
   inline def apply(r: Int, c: Int): Double = values(r, c)
 
@@ -299,7 +301,7 @@ class Mat[M <: Int, N <: Int] private (val values: MatrixData)(using ValueOf[M],
    * @param r     Row index.
    * @param c     Column index.
    * @param value values(i,j).
-   * @throws ArrayIndexOutOfBoundsException
+   * @throws ArrayIndexOutOfBoundsException if r, c lie outside the matrix dimensions.
    */
   inline def update(r: Int, c: Int, value: Double): Unit = values(r, c) = value
 
@@ -346,9 +348,8 @@ class Mat[M <: Int, N <: Int] private (val values: MatrixData)(using ValueOf[M],
 
   /** Get a submatrix.
     *
-    * @param r  Array of row indices.
+    * @param rowIndices  Array of row indices.
     * @param c0 Initial column index
-    * @param c1 Final column index
     * @return A(r(:),j0:j1)
     * @throws ArrayIndexOutOfBoundsException Submatrix indices
     */
@@ -356,12 +357,13 @@ class Mat[M <: Int, N <: Int] private (val values: MatrixData)(using ValueOf[M],
     new Mat[M1, N1](util.subMatrix(values, rowIndices, valueOf[N1], c0))
   }
 
-  /** Set a submatrix.
+  /** Set a submatrix
+   *
    * @param r0 Initial row index
    * @param c0 Initial column index
    * @param thatMatrix a metrix of lesser or equal dimension to this matrix
-   * @param ValueOf[M1] Row dimension of thatMatrix
-   * @param ValueOf[N1] Column dimension of thatMatrix
+   * @param x$4 Row dimension of thatMatrix
+   * @param x$5 Column dimension of thatMatrix
    * @tparam M1 Row dimension of thatMatrix
    * @tparam N1 Column dimension of thatMatrix
    */
@@ -622,14 +624,14 @@ class Mat[M <: Int, N <: Int] private (val values: MatrixData)(using ValueOf[M],
 
   override def toString: String = csv
 
-  def csv: String = csv(MatFormat.UNALIGNED, new StringBuilder()).toString
+  def csv: String = csv(MatFormat.UNALIGNED, new StringBuilder())
 
   def csv(
     alignment: Function2[MatrixData, MatFormat, NArray[NArray[String]]],
     sb: StringBuilder = new StringBuilder()
   ): String = render(MatFormat.CSV, alignment, sb).toString
 
-  def tsv: String = tsv(MatFormat.UNALIGNED, new StringBuilder()).toString
+  def tsv: String = tsv(MatFormat.UNALIGNED, new StringBuilder())
 
   def tsv(
     alignment: Function2[MatrixData, MatFormat, NArray[NArray[String]]],
