@@ -55,8 +55,8 @@ package object util {
   /** Construct an MxN constant matrix.
    *
    * @param value Fill the matrix with this scalar value.
-   * @tparam M the number of rows
-   * @tparam N the number of columns
+   * @param m the number of rows
+   * @param n the number of columns
    * @return a NArray representing the values of an MxN constant matrix.
    */
   inline def fill(m:Int, n:Int, value: Double): MatrixData = {
@@ -113,11 +113,10 @@ package object util {
   /**
    * Create an array of values representing a rectangular matrix with the given vector along the diagonal.
    *
+   * @param rows the number of rows.
+   * @param columns the number of rows.
    * @param v a vector to place along the diagonal.  If v.dimension < Min(M, N) then zeros will make up the remaining elements on the diagonal.
    *          If v.dimension > Min(M, N) then the resulting matrix will exclude its extra elements.
-   * @tparam M the number of rows.
-   * @tparam N the number of rows.
-   * @tparam D the dimension of the vector.
    * @return an NArray[Double] representing an MxN rectangular matrix with the given vector along the diagonal.
    */
   def diagonal(rows:Int, columns:Int, v: NArray[Double]): MatrixData = {
@@ -164,7 +163,6 @@ package object util {
 
   /**
    * extract a column from a row packed array of matrix values.
-   * @param columns the number of columns.
    * @param column the desired column.
    * @param values the row packed matrix array.
    * @return a copy of the specified matrix column in NArray[Double] format.
@@ -175,9 +173,7 @@ package object util {
 
   /**
    * convert a row packed matrix into a 2D Array.
-   * @param rows number of rows.
-   * @param columns number of columns.
-   * @param values a row packed copy of the matrix values.
+   * @param values an instance of MatrixData.
    * @return a 2D array representing the matrix values.
    */
   def as2DNArray(values:MatrixData):NArray[NArray[Double]] = {
@@ -186,16 +182,15 @@ package object util {
     )
   }
 
-  /**
+  /** Get a sub matrix from this matrix.
    *
-   * @param columns from the original matrix
-   * @param values original matrix values
-   * @param subRows number of rows in the submatrix
-   * @param subColumns number of columns in the submatrix
-   * @param r0 Initial row index
-   * @param c0 Initial column index
-   * @return rowpacked array of submatrix values A(r0:r0 + subRows,c0:c0 + subColumns)
-   * @throws ArrayIndexOutOfBoundsException Submatrix indices
+   * @param values original matrix values.
+   * @param r0 Initial row index.
+   * @param c0 Initial column index.
+   * @param subRows number of rows in the submatrix.
+   * @param subColumns number of columns in the submatrix.
+   * @return an instance of MatrixData representing the submatrix.
+   * @throws ArrayIndexOutOfBoundsException if indices or columns lie outsie of matrix dimensions.
    */
   def subMatrix(values:MatrixData, r0: Int, c0: Int, subRows: Int, subColumns: Int): MatrixData = {
 
@@ -255,7 +250,6 @@ package object util {
     val rEnd: Int = r0 + subRows
 
     val out: MatrixData = MatrixData(subRows, columnIndices.length)
-    var i: Int = 0
     var ri: Int = r0
     var sRi: Int = 0
     while (ri < rEnd) {
@@ -276,12 +270,12 @@ package object util {
   /** Get a submatrix.
    *
    * @param rowIndices  Array of row indices.
-   * @param subColumns number of columns to extract
    * @param c0 Initial column index.
+   * @param subColumns number of columns to extract
    * @return A(r(:),j0:j1).
    * @throws ArrayIndexOutOfBoundsException Submatrix indices
    */
-  def subMatrix(values:MatrixData, rowIndices: NArray[Int], subColumns:Int, c0: Int): MatrixData = {
+  def subMatrix(values:MatrixData, rowIndices: NArray[Int], c0: Int, subColumns:Int): MatrixData = {
     val cEnd = c0 + subColumns
     val vs: MatrixData = MatrixData(rowIndices.length, subColumns)
     var ri: Int = 0
@@ -303,7 +297,6 @@ package object util {
   /**
    * Set a submatrix.
    *
-   * @param columns number of columns in original matrix.
    * @param values values of the original matrix.
    * @param r0 starting row in the original matrix.
    * @param c0 starting column in the original matrix.
@@ -329,8 +322,7 @@ package object util {
   /**
    * Set a submatrix.
    *
-   * @param columns number of columns in the original matrix.
-   * @param original original matrix values.
+   * @param values original matrix data values.
    * @param rowIndices Array of row indices.
    * @param columnIndices Array of column indices.
    * @param donorValues new values
@@ -351,12 +343,10 @@ package object util {
   /**
    * Set a submatrix.
    *
-   * @param columns number of columns in the original matrix.
    * @param values original matrix values.
    * @param rowIndices Array of row indices.
    * @param c0 Initial column index.
    * @param donorValues new values.
-   * @param newColumns number of columns in the donor matrix.
    * @throws ArrayIndexOutOfBoundsException Submatrix indices
    */
   def setMatrix(values:MatrixData, rowIndices: NArray[Int], c0: Int, donorValues: MatrixData): Unit = {
@@ -375,7 +365,6 @@ package object util {
   /**
    * Set a submatrix.
    *
-   * @param columns number of columns in receiving matrix.
    * @param values values of the receiving matrix.
    * @param r0 initial row index.
    * @param columnIndices Array of column indices.
@@ -398,10 +387,8 @@ package object util {
   /**
    * One norm
    *
-   * @param rows number of rows.
-   * @param columns number of columns.
    * @param values matrix values.
-   * @return maximum column sum
+   * @return maximum column sum.
    */
   def norm1(values:MatrixData): Double = {
     var maxColumnSum: Double = Double.MinValue
@@ -580,20 +567,9 @@ package object util {
     out
   }
 
-
   /** Linear algebraic matrix multiplication, A * B
    *
-   * @param b another matrix
-   * @return Mat product, A * B
-   * @throws IllegalArgumentException Mat inner dimensions must agree.
-   */
-
-  /**
-   *
-   * @param aRows number of rows in matrix A.
-   * @param aColumns number of columns in matrix A.
    * @param a matrix A.
-   * @param bColumns number of columns in matrix B.
    * @param b matrix B.
    * @return matrix product A X B
    * @throws IllegalArgumentException Mat inner dimensions must agree.
@@ -650,11 +626,7 @@ package object util {
   /**
    * Kronecker product.
    *
-   * @param aRows number of rows in matrix A.
-   * @param aColumns number of columns in matrix A.
    * @param a Matrix A
-   * @param bRows number of rows in matrix B.
-   * @param bColumns number of columns in matrix B.
    * @param b Matrix B
    * @return the Kronecker product of two matrices.
    * @throws ArrayIndexOutOfBoundsException Submatrix indices
@@ -749,8 +721,6 @@ package object util {
   /**
    * Create an upper triangular matrix from this matrix.
    *
-   * @param rows number of matrix rows.
-   * @param columns number of matrix columns.
    * @param values the values of the matrix.
    * @return an upper triangular matrix
    * @throws ArrayIndexOutOfBoundsException Submatrix indices
@@ -772,8 +742,6 @@ package object util {
   /**
    * Create a lower triangular matrix from this matrix.
    *
-   * @param rows number of matrix rows.
-   * @param columns number of matrix columns.
    * @param values the values of the matrix.
    * @return a lower triangular matrix
    * @throws ArrayIndexOutOfBoundsException Submatrix indices
@@ -795,8 +763,6 @@ package object util {
   /**
    * A vector constructed from the diagonal of a matrix.
    *
-   * @param rows number of matrix rows.
-   * @param columns number of matrix columns.
    * @param values the values of the matrix.
    * @return a vector constructed from the diagonal of a matrix.
    * @throws ArrayIndexOutOfBoundsException Submatrix indices

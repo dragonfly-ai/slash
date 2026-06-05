@@ -198,7 +198,6 @@ object Mat {
     arr match {
       case values: NArray[Double] => new Mat[M, N](new LinearizedMatrixData(valueOf[M], valueOf[N], values))
       case values: NArray[NArray[Double]] => new Mat[M, N](new MatrixDataGrid(values))
-      case _ => throw IllegalArgumentException("Expected either NArray[Double] or NArray[NArray[Double]].")
     }
   }
 
@@ -354,7 +353,7 @@ class Mat[M <: Int, N <: Int] private (val values: MatrixData)(using ValueOf[M],
     * @throws ArrayIndexOutOfBoundsException Submatrix indices
     */
   def subMatrix[M1 <: Int, N1 <: Int](rowIndices: NArray[Int], c0: Int)(using ValueOf[M1], ValueOf[N1]): Mat[M1, N1] = {
-    new Mat[M1, N1](util.subMatrix(values, rowIndices, valueOf[N1], c0))
+    new Mat[M1, N1](util.subMatrix(values, rowIndices, c0, valueOf[N1]))
   }
 
   /** Set a submatrix

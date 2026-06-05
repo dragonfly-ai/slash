@@ -21,44 +21,42 @@ import stats.*
 import slash.interval.*
 import probability.distributions.*
 
-import scala.reflect.ClassTag
-
 trait OnlineEstimator {
   def sampleMass:BigDecimal
 }
 
-trait OnlineUnivariateEstimator[DOMAIN:ClassTag] extends OnlineEstimator {
+trait OnlineUnivariateEstimator[DOMAIN] extends OnlineEstimator {
   def observe(observation:DOMAIN):this.type
   def observe(frequency:DOMAIN, observation:DOMAIN):this.type
 }
 
-trait OnlineBivariateEstimator[DOMAIN:ClassTag] extends OnlineEstimator {
+trait OnlineBivariateEstimator[DOMAIN] extends OnlineEstimator {
   def observe(observation1:DOMAIN, observation2:DOMAIN):this.type
   def observe(frequency:DOMAIN, observation1:DOMAIN, observation2:DOMAIN):this.type
 }
 
-trait OnlineProbabilityDistributionEstimator[DOMAIN:ClassTag, PPD <: ParametricProbabilityDistribution[DOMAIN]] {
+trait OnlineProbabilityDistributionEstimator[DOMAIN, PPD <: ParametricProbabilityDistribution[DOMAIN]] {
   def estimate:EstimatedProbabilityDistribution[DOMAIN, PPD]
 }
 
-trait EstimatesRange[DOMAIN:ClassTag] extends OnlineUnivariateEstimator[DOMAIN] {
+trait EstimatesRange[DOMAIN] extends OnlineUnivariateEstimator[DOMAIN] {
   def sampleRange:Interval[DOMAIN]
 }
 
-trait EstimatesMean[DOMAIN:ClassTag] extends OnlineUnivariateEstimator[DOMAIN] {
+trait EstimatesMean[DOMAIN] extends OnlineUnivariateEstimator[DOMAIN] {
   def sampleMean:Double
 }
 
-trait EstimatesBoundedMean[DOMAIN:ClassTag] extends EstimatesMean[DOMAIN] with EstimatesRange[DOMAIN] {
+trait EstimatesBoundedMean[DOMAIN] extends EstimatesMean[DOMAIN] with EstimatesRange[DOMAIN] {
   def sampleBoundedMean:SampleBoundedMean[DOMAIN] = SampleBoundedMean[DOMAIN]( sampleMean, sampleRange, sampleMass )
 }
 
-trait EstimatesMeanAndVariance[DOMAIN:ClassTag] extends EstimatesMean[DOMAIN] {
+trait EstimatesMeanAndVariance[DOMAIN] extends EstimatesMean[DOMAIN] {
   def sampleVariance:Double
   def sampleMeanAndVariance:SampleMeanAndVariance = SampleMeanAndVariance(sampleMean, sampleVariance, sampleMass)
 }
 
-trait EstimatesPointStatistics[DOMAIN:ClassTag] extends EstimatesMeanAndVariance[DOMAIN] with EstimatesRange[DOMAIN] {
+trait EstimatesPointStatistics[DOMAIN] extends EstimatesMeanAndVariance[DOMAIN] with EstimatesRange[DOMAIN] {
   def samplePointStatistics:SamplePointStatistics[DOMAIN] = SamplePointStatistics[DOMAIN](
     sampleMean,
     sampleVariance,

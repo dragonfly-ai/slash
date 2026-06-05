@@ -80,7 +80,7 @@ class SimpleVecOpsTest extends munit.FunSuite {
   test("vector cross") {
     val v1 = Vec[3](1.0, 0.0, 0.0)
     val v2 = Vec[3](0.0, 1.0, 0.0)
-    println(v1.cross(v2).show)
+    //println(v1.cross(v2).show)
     val vResult = Vec[3](0.0, 0.0, 1.0)
     assertVecEquals(v1.cross(v2), vResult)
   }

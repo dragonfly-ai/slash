@@ -24,29 +24,29 @@ trait Accumulator[T <: BigInt | BigDecimal] {
   def copy:AT
 
   def + (b: Byte): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out += b
-    out.asInstanceOf[AT]
+    out
   }
   def + (s: Short): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out += s
-    out.asInstanceOf[AT]
+    out
   }
   def + (i: Int): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out += i
-    out.asInstanceOf[AT]
+    out
   }
   def + (l: Long): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out += l
-    out.asInstanceOf[AT]
+    out
   }
   def + (bi: BigInt): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out += bi
-    out.asInstanceOf[AT]
+    out
   }
 
   def +=(b: Byte): Unit
@@ -56,33 +56,33 @@ trait Accumulator[T <: BigInt | BigDecimal] {
   def +=(bi: BigInt): Unit
 
   def -(b: Byte): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out -= b
-    out.asInstanceOf[AT]
+    out
   }
 
   def -(s: Short): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out -= s
-    out.asInstanceOf[AT]
+    out
   }
 
   def -(i: Int): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out -= i
-    out.asInstanceOf[AT]
+    out
   }
 
   def -(l: Long): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out -= l
-    out.asInstanceOf[AT]
+    out
   }
 
   def -(bi: BigInt): AT = {
-    val out = this.copy
+    val out:AT = this.copy
     out -= bi
-    out.asInstanceOf[AT]
+    out
   }
 
   def -=(b: Byte): Unit
@@ -232,9 +232,9 @@ object ContinuousAccumulator {
 }
 
 class ContinuousAccumulator private (
-  var discrete: DiscreteAccumulator = DiscreteAccumulator(),
-  var small: Double = 0.0,
-  var error: Double = 0.0
+  var discrete:DiscreteAccumulator,
+  var small:Double,
+  var error:Double
 ) extends Accumulator[BigDecimal] {
 
   override type AT = ContinuousAccumulator
@@ -270,19 +270,19 @@ class ContinuousAccumulator private (
   override def +=(l: Long): Unit = discrete += l
 
   def + (f: Float): ContinuousAccumulator = {
-    val out = this.copy
+    val out: ContinuousAccumulator = this.copy
     out += f.toDouble
     out
   }
 
   def +(d: Double): ContinuousAccumulator = {
-    val out = this.copy
+    val out: ContinuousAccumulator = this.copy
     out += d
     out
   }
 
   def +(bd: BigDecimal): ContinuousAccumulator = {
-    val out = this.copy
+    val out: ContinuousAccumulator = this.copy
     out += bd
     out
   }
@@ -303,7 +303,7 @@ class ContinuousAccumulator private (
   }
 
   def -(d: Double): ContinuousAccumulator = {
-    val out = this.copy
+    val out: ContinuousAccumulator = this.copy
     out -= d
     out
   }
@@ -322,7 +322,7 @@ class ContinuousAccumulator private (
 
   inline def -=(bd: BigDecimal): Unit = {
     if (bd >= One || bd <= NegativeOne) discrete -= bd.toBigInt
-    this -= (bd.remainder(One)).toDouble // bite me!
+    this -= bd.remainder(One).toDouble // bite me!
   }
 
   override def -=(l: Long): Unit = discrete -= l

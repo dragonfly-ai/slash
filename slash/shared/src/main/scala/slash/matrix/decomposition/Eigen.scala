@@ -687,7 +687,7 @@ object EigenSolver {
                 H(k, k - 1) = -s * x
               } else {
                 if (l != m) {
-                  H(k, k - 1) = -(H(k, k - 1))
+                  H(k, k - 1) = -H(k, k - 1)
                 }
               }
               p = p + s
@@ -940,8 +940,6 @@ object Eigen {
 
   def apply[N <: Int](A:Mat[N, N])(using ValueOf[N]): Eigen[N] = {
 
-    val n = valueOf[N]
-
     val q = A.values.copy
 
     val temp = {
@@ -1005,8 +1003,6 @@ object RTEigen {
 
   def apply(A:RTMat): RTEigen = {
     slash.dimensionCheck(A.rowDimension, A.columnDimension)
-
-    val n = A.columnDimension
 
     val q = A.values.copy
 
