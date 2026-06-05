@@ -153,7 +153,7 @@ object LUSolver {
     // Copy right hand side with pivoting
     val nx: Int = B.columnDimension
     //val X: Mat[N, V] = B.subMatrix[N, V](piv, 0)
-    val X: MatrixData = util.subMatrix(B, piv, B.columnDimension, 0)
+    val X: MatrixData = util.subMatrix(B, piv, 0, B.columnDimension)
 
     // Solve L*Y = B(piv,:)
     var k: Int = 0
@@ -170,9 +170,9 @@ object LUSolver {
       k += 1
     }
     // Solve U*X = Y;
-    k = lu.columnDimension - 1;
+    k = lu.columnDimension - 1
     while (k > -1) { // recycling k
-      var j: Int = 0;
+      var j: Int = 0
       while (j < nx) {
         X(k, j) = X(k, j) / lu(k, k)
         j += 1
@@ -218,13 +218,13 @@ object LU {
  * LU Decomposition
  * Structure to access L, U and piv.
  *
- * @param LU
- * @param piv
- * @param pivsign
- * @param x$4
- * @param x$5
- * @tparam M
- * @tparam N
+ * @param LU an MxN matrix to decompose.
+ * @param piv the pivot
+ * @param pivsign pivot sign.
+ * @tparam M Row dimension
+ * @tparam N Column dimension
+ * @param x$4 implicit row dimension parameter.
+ * @param x$5 implicit column dimension parameter.
  */
 
 class LU[M <: Int, N <: Int] private (
