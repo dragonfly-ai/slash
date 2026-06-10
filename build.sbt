@@ -138,5 +138,5 @@ lazy val tests = crossProject(
   .dependsOn(slash)
   .settings(
     name := "slash-tests",
-    libraryDependencies += "org.scalameta" %%% "munit" % "1.3.2" % Test
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.3.3" % Test
   )
