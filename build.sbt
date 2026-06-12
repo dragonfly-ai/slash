@@ -5,7 +5,7 @@ import laika.helium.Helium
 import laika.format.Markdown
 import laika.config.SyntaxHighlighting
 
-val globalScalaVersion = "3.3.7"
+val globalScalaVersion = "3.3.8"
 
 ThisBuild / organization := "ai.dragonfly"
 ThisBuild / organizationName := "dragonfly.ai"
